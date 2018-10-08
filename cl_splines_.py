@@ -8,34 +8,12 @@ import matplotlib.pyplot as plt
 from sklearn.cluster import KMeans
 import  parameters as param_mars_dist
 
+SEED = 1000
 
-def importData(path):
-    series = Series.from_csv(path, sep=',', header=0)
-    Y = series.values
-    X = series._index.values
-    Xnew=[]
-    prev=[[X[i],np.mean(X[i-30:i])] for i in range(30,len(X))]
-    Xnew.append(prev)
-    Xnew = np.array(Xnew).reshape(-1,2)
-    return Xnew,Y
 
-def clusteringV(dataX,nClusters):
-    # Number of clusters
-    #dataX=dataX[:,0:2]
-    kmeans = KMeans(n_clusters=nClusters)
-    # Fitting the input data
-    kmeans = kmeans.fit(dataX)
-    # Getting the cluster labels
-    labels = kmeans.predict(dataX)
-    # Centroid values
-    centroids = kmeans.cluster_centers_
-    #plt.scatter(centroids[:,0],c="red")
-    plt.scatter(dataX[:,0],dataX[:,1], c=labels)
-    plt.title("K-means with "+str(nClusters)+" clusters")
-    plt.show()
-    return labels , centroids , kmeans
 
-def ClustersForTraining(dataX,Y,nClusters,labels):
+# Given a set of instances, returns labels per cluster
+def getClustersForTraining(dataX, Y, nClusters, labels):
     clustersX=[]
     clustersY=[]
     for n in range(0,nClusters):
@@ -48,17 +26,9 @@ def ClustersForTraining(dataX,Y,nClusters,labels):
 
     return clustersX,clustersY
 
-Xnew,Y=importData('/home/dimitris/Desktop/autoregre/kaklis_autoregr_rpm_speed.csv')
-labels,centroids , kmeans =clusteringV(Xnew,30)
-clTrX,clTrY=ClustersForTraining(Xnew,Y,30,labels)
-
-error_mse=[]
-trains_x=[]
-
 def trainingModel(clX,clY,trSplit,nParamsSearch,nsplits):
-
     splits = nsplits
-    tscv.n_splits=splits
+    trSplit.n_splits=splits
     def report(results, n_top=1):
         for i in range(1, n_top + 1):
             candidate = np.flatnonzero(results[ 'rank_test_score' ] == i)
@@ -72,6 +42,9 @@ def trainingModel(clX,clY,trSplit,nParamsSearch,nsplits):
     models_coef=[]
     n_iter_search=nParamsSearch
     model = Earth()
+
+    trains_x = []
+    error_mse = []
 
     for i in range(0,len(clX)):
         X=np.array(clX[i])
@@ -123,9 +96,6 @@ def trainingModel(clX,clY,trSplit,nParamsSearch,nsplits):
         models.append(model)
     return models,models_basis,models_coef,error_mse
 
-tscv = TimeSeriesSplit()
-models,models_basis,models_coef,error=trainingModel(clTrX,clTrY,tscv,4,1)
-
 def importUnseen(path):
     data = pd.read_csv(
         path, nrows=20000)
@@ -134,13 +104,12 @@ def importUnseen(path):
     rpm_unseen = X[ 4200:4900, 4 ]
     return  unseen,rpm_unseen
 
-unseen , rpm_unseen = importUnseen('/home/dimitris/Desktop/kaklis.csv')
 
 def predictLabelUnseen(unseenX,model):
     y=model.predict(unseenX)
     return y
 
-def predictRPM(X,Y):
+def predictRPM(X,Y, model):
     lenx=0
     offset=10
     mseU=[]
@@ -153,7 +122,7 @@ def predictRPM(X,Y):
 
         chunkX = Xnew[lenx:offset+lenx]
         chunkY = Y[lenx:offset+lenx]
-        label = predictLabelUnseen(chunkX,kmeans)
+        label = predictLabelUnseen(chunkX,model)
 
         c=max(set(label), key=list(label).count)
         newModel = models[c]
@@ -168,6 +137,21 @@ def predictRPM(X,Y):
 
     return np.mean(mseU)
 
-mse=predictRPM(unseen,rpm_unseen)
+def main():
+    Xnew,Y=importSeriesDataFromFile('./kaklis_autoregr_rpm_speed.csv')
+    labels,centroids , kmeans =clusteringV(Xnew,30)
+    clTrX,clTrY=getClustersForTraining(Xnew, Y, 30, labels)
 
-x=1
+    # error_mse=[]
+    # trains_x=[]
+
+    tscv = TimeSeriesSplit()
+    models,models_basis,models_coef,error=trainingModel(clTrX,clTrY,tscv,4,1)
+
+    unseen , rpm_unseen = importUnseen('./kaklis.csv')
+    mse=predictRPM(unseen,rpm_unseen)
+
+    print ("Mean squared error: %4.2f"%(mse))
+
+if __name__ == "__main__":
+    main()
