@@ -1,9 +1,11 @@
 import sklearn.linear_model as sk
 import numpy as np
 import numpy.linalg
+from scipy.spatial import Delaunay
+import random
 
 class BasePartitionModeler:
-    def createModelsFor(self, partitions):
+    def createModelsFor(self,partitionsX, partitionsY, partition_labels):
         pass
 
     def getBestModelForPoint(self, point):
@@ -24,7 +26,7 @@ class BasePartitionModeler:
         return 0.0
 
 
-class LinearRegressionModeler:
+class LinearRegressionModeler(BasePartitionModeler):
     def createModelsFor(self, partitionsX, partitionsY, partition_labels):
         # Init result model list
         models = []
@@ -46,5 +48,23 @@ class LinearRegressionModeler:
         # Return list of models
         return models
 
+
+
     def getFitnessOfModelForPoint(self, model, point):
-        return numpy.linalg.norm(mean(self._partitionsPerModel[model])-point)
+        return numpy.linalg.norm(np.mean(self._partitionsPerModel[model])-point)
+
+    def getTriangle(self,X,Y,usedV,usedRpm,errorBound):
+        xy=np.vstack([X,Y])
+        if usedV==[]:
+            pointV1 = random.sample(X)
+            pointV2RPM =random.sample(list(xy).index(n>pointV1 for n in xy[0,:]))
+
+        else:
+            pointV1= random.sample(X[filter(n not in usedV for n in range(0,len(X)))])
+            p = [xy[filter(n not in usedV for n in range(0,len(xy)))]]
+            pointV2RPM = random.sample(list((p).index(n > pointV1 for n in (p[0,:]))))
+
+        pointRpm = [np.mean(n) for n in Y[list(X.index(pointV1))]]
+
+        tri = Delaunay([pointV1,pointRpm],[pointV2RPM[0],pointV2RPM[1]+errorBound],[pointV2RPM[0],pointV2RPM[1]-errorBound])
+        return tri

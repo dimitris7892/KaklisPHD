@@ -14,7 +14,7 @@ class KMeansClusterer:
         # Init clustering model
         self._nClusters = nClusters
         self.random_state = random_state
-        clusteringModel = self.getClusterer()
+        clusteringModel = self.getClusterer(dataX)
 
         # Fit the input data
         dataModel = clusteringModel.fit(dataX)
@@ -45,7 +45,7 @@ class KMeansClusterer:
 
         return partitionsX, partitionsY, partitionLabels , centroids , clusteringModel
 
-    def getClusterer(self):
+    def getClusterer(self,dataX):
         # Assign a default number of clusters if not provided
         if self._nClusters == None:
             self._nClusters = int(math.log2(len(dataX) + 1))
