@@ -2,7 +2,7 @@ import dataReading as dRead
 import featureCalculation as fCalc
 import dataPartitioning as dPart
 import dataModeling as dModel
-# import evaluation as eval
+import evaluation as eval
 import sys
 
 # Get file name
@@ -32,5 +32,9 @@ modelMap = dict(zip(partitionLabels, modeler.createModelsFor(partitionsX, partit
 
 # Get unseen data
 unseenDataSource = dRead
+
+# Evaluate performance
+evaluator = eval.MeanAbsoluteErrorEvaluation()
+evaluator.evaluate(X)
 
 print ("Pipeline done.")
