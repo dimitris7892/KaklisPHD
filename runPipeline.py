@@ -45,4 +45,8 @@ unseenX,unseenY = dRead.UnseenSeriesReader.readSeriesDataFromFile(dRead.UnseenSe
 error = eval.MeanAbsoluteErrorEvaluation.evaluate(eval.MeanAbsoluteErrorEvaluation(),unseenX,unseenY,modeler)
 print error
 
+# Evaluate performance
+evaluator = eval.MeanAbsoluteErrorEvaluation()
+evaluator.evaluate(X)
+
 print ("Pipeline done.")
