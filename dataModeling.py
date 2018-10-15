@@ -51,7 +51,7 @@ class LinearRegressionModeler(BasePartitionModeler):
 
 
     def getFitnessOfModelForPoint(self, model, point):
-        return numpy.linalg.norm(np.mean(self._partitionsPerModel[model])-point)
+        return 1.0 / (1.0 + numpy.linalg.norm(np.mean(self._partitionsPerModel[model])-point))
 
     def getTriangle(self,X,Y,usedV,usedRpm,errorBound):
         xy=np.vstack([X,Y])

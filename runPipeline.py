@@ -29,7 +29,7 @@ X, Y = featureExtractor.extractFeatures(seriesX, targetY,history)
 # Partition data
 partitioner = dPart.KMeansClusterer()
 NUM_OF_CLUSTERS = 30
-partitionsX, partitionsY, partitionLabels, partitionRepresentatives, partitioningModel = partitioner.clusteringV(X, Y, NUM_OF_CLUSTERS, False)
+partitionsX, partitionsY, partitionLabels, partitionRepresentatives, partitioningModel = partitioner.clustering(X, Y, NUM_OF_CLUSTERS, False)
 # Keep label to partition mapping in a dict
 partitionXPerLabel = dict(zip(partitionLabels, partitionsX))
 partitionYPerLabel = dict(zip(partitionLabels, partitionsY))
@@ -41,14 +41,15 @@ modelMap = dict(zip(partitionLabels, modeler.createModelsFor(partitionsX, partit
 
 # Get unseen data
 unseenX,unseenY = dRead.UnseenSeriesReader.readSeriesDataFromFile(dRead.UnseenSeriesReader(),sFile,startU,endU,40000)
+unseenFeaturesX, unseenFeaturesY = featureExtractor.extractFeatures(unseenX, unseenY,history)
 
 #Predict
-error = eval.MeanAbsoluteErrorEvaluation.evaluate(eval.MeanAbsoluteErrorEvaluation(),unseenX,unseenY,modeler)
+error = eval.MeanAbsoluteErrorEvaluation.evaluate(eval.MeanAbsoluteErrorEvaluation(),unseenFeaturesX,unseenFeaturesY,modeler)
 print (error)
 
-# Evaluate performance
-evaluator = eval.MeanAbsoluteErrorEvaluation()
-evaluator.evaluate(X)
+# # Evaluate performance
+# evaluator = eval.MeanAbsoluteErrorEvaluation()
+# evaluator.evaluate(X)
 
 print ("Pipeline done.")
 

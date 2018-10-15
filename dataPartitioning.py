@@ -160,7 +160,6 @@ class BoundedProximityClusterer (DefaultClusterer):
                 # Go to next v1
                 canContinue = notInU.size > 2
                 continue
-            # Create a triangle T connecting v1,r with v2, min(r,v2) and v2, max(r_v2)
             # Add all points in T to new Cluster
             clusterX = np.append(v1, dataX[selectionIndices], axis=0)
             clusterY = np.append(np.asarray([r]), dataY[selectionIndices], axis=0)
