@@ -6,6 +6,12 @@ class Evaluation:
         return 0.0
 
 class MeanAbsoluteErrorEvaluation (Evaluation):
+    '''
+    Performs evaluation of the datam returning:
+    errors: the list of errors over all instances
+    meanError: the mean of the prediction error
+    sdError: standard deviation of the error
+    '''
     def evaluate(self, unseenX, unseenY, modeler):
         lErrors = []
         for iCnt in range(np.shape(unseenX)[0]):
@@ -15,4 +21,4 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
             lErrors.append(abs(prediction - trueVal))
         errors = np.asarray(lErrors)
 
-        return np.mean(errors)
+        return errors, np.mean(errors), np.std(lErrors)

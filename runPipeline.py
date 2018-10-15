@@ -4,58 +4,89 @@ import dataPartitioning as dPart
 import dataModeling as dModel
 import evaluation as eval
 import numpy as np
+from math import sqrt
 import sys
 
-# Get file name
-sFile = "./kaklis.csv"
-history=20
-start=2000
-end=12000
-startU=30000
-endU=30900
-if len(sys.argv) > 1:
-    sFile = sys.argv[1]
-    history = sys.argv[2]
-    start = sys.argv[3]
-    end =sys.argv[4]
-# Load data
-reader = dRead.BaseSeriesReader()
-seriesX, targetY = reader.readSeriesDataFromFile(sFile,start,end,20000)
+def main():
+    # Init parameters based on command line
+    end, endU, history, sFile, start, startU = initParameters()
+    # Load data
+    print("Reading data...")
+    reader = dRead.BaseSeriesReader()
 
-# Extract features
-featureExtractor = fCalc.BaseFeatureExtractor()
-X, Y = featureExtractor.extractFeatures(seriesX, targetY,history)
+    seriesX, targetY = reader.readSeriesDataFromFile(sFile,start,end,20000)
+    print("Reading data... Done.")
 
-# Partition data
-partitioner = dPart.KMeansClusterer()
-NUM_OF_CLUSTERS = 30
-partitionsX, partitionsY, partitionLabels, partitionRepresentatives, partitioningModel = partitioner.clustering(X, Y, NUM_OF_CLUSTERS, False)
-# Keep label to partition mapping in a dict
-partitionXPerLabel = dict(zip(partitionLabels, partitionsX))
-partitionYPerLabel = dict(zip(partitionLabels, partitionsY))
+    # Extract features
+    print("Extracting features from training set...")
+    featureExtractor = fCalc.BaseFeatureExtractor()
+    X, Y = featureExtractor.extractFeatures(seriesX, targetY,history)
+    print("Extracting features from training set... Done.")
 
-# For each partition create model
-modeler = dModel.LinearRegressionModeler()
-# ...and keep them in a dict, connecting label to model
-modelMap = dict(zip(partitionLabels, modeler.createModelsFor(partitionsX, partitionsY, partitionLabels)))
+    # Partition data
+    print("Partitioning training set...")
+    NUM_OF_CLUSTERS = 8 # TODO: Read from command line
+    # partitioner = dPart.DefaultPartitioner()
+    # partitioner = dPart.KMeansPartitioner()
+    partitioner = dPart.BoundedProximityPartitioner()
+    partitionsX, partitionsY, partitionLabels, partitionRepresentatives, partitioningModel = partitioner.clustering(X, Y, NUM_OF_CLUSTERS, False)
+    # Keep label to partition mapping in a dict
+    partitionXPerLabel = dict(zip(partitionLabels, partitionsX))
+    partitionYPerLabel = dict(zip(partitionLabels, partitionsY))
+    print("Partitioning training set... Done.")
 
-# Get unseen data
-unseenX,unseenY = dRead.UnseenSeriesReader.readSeriesDataFromFile(dRead.UnseenSeriesReader(),sFile,startU,endU,40000)
-unseenFeaturesX, unseenFeaturesY = featureExtractor.extractFeatures(unseenX, unseenY,history)
+    # For each partition create model
+    print("Creating models per partition...")
+    modeler = dModel.LinearRegressionModeler()
+    # ...and keep them in a dict, connecting label to model
+    modelMap = dict(zip(partitionLabels, modeler.createModelsFor(partitionsX, partitionsY, partitionLabels)))
+    print("Creating models per partition... Done")
 
-#Predict
-error = eval.MeanAbsoluteErrorEvaluation.evaluate(eval.MeanAbsoluteErrorEvaluation(),unseenFeaturesX,unseenFeaturesY,modeler)
-print (error)
+    # Get unseen data
+    print("Reading unseen data...")
+    unseenX,unseenY = dRead.UnseenSeriesReader.readSeriesDataFromFile(dRead.UnseenSeriesReader(),sFile,startU,endU,40000)
+    # and their features
+    unseenFeaturesX, unseenFeaturesY = featureExtractor.extractFeatures(unseenX, unseenY,history)
+    print("Reading unseen data... Done")
 
-# # Evaluate performance
-# evaluator = eval.MeanAbsoluteErrorEvaluation()
-# evaluator.evaluate(X)
+    # Predict and evaluate on seen data
+    print("Evaluating on seen data...")
+    _, meanError, sdError = eval.MeanAbsoluteErrorEvaluation.evaluate(eval.MeanAbsoluteErrorEvaluation(),X,Y,modeler)
+    print ("Mean absolute error on training data: %4.2f (+/- %4.2f standard error)"%(meanError, sdError/sqrt(unseenFeaturesY.shape[0])))
+    print("Evaluating on seen data... Done.")
 
-print ("Pipeline done.")
+    # Predict and evaluate on unseen data
+    print("Evaluating on unseen data...")
+    _, meanError, sdError = eval.MeanAbsoluteErrorEvaluation.evaluate(eval.MeanAbsoluteErrorEvaluation(),unseenFeaturesX,unseenFeaturesY,modeler)
+    print ("Mean absolute error on unseen data: %4.2f (+/- %4.2f standard error)"%(meanError, sdError/sqrt(unseenFeaturesY.shape[0])))
+    print("Evaluating on unseen data... Done.")
+
+    # # Evaluate performance
+    # evaluator = eval.MeanAbsoluteErrorEvaluation()
+    # evaluator.evaluate(X)
+
+    print ("Pipeline done.")
+
+
+def initParameters():
+    sFile = "./kaklis.csv"
+    # Get file name
+    history = 20
+    start = 2000
+    end = 12000
+    startU = 30000
+    endU = 30900
+    if len(sys.argv) > 1:
+        sFile = sys.argv[1]
+        history = sys.argv[2]
+        start = sys.argv[3]
+        end = sys.argv[4]
+    return end, endU, history, sFile, start, startU
+
 
 # # ENTRY POINT
-# if __name__ == "__main__":
-#     # main()
+if __name__ == "__main__":
+    main()
 #     v=np.round(np.random.rand(10, 3), 1)
 #     v=np.append(v,v[1:3], axis=0)
 #     r= np.dot(np.sum(v, axis=1), np.diag(np.random.rand(v.shape[0])))

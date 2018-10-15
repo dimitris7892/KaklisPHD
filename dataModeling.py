@@ -25,7 +25,6 @@ class BasePartitionModeler:
     def  getFitnessOfModelForPoint(self, model, point):
         return 0.0
 
-
 class LinearRegressionModeler(BasePartitionModeler):
     def createModelsFor(self, partitionsX, partitionsY, partition_labels):
         # Init result model list

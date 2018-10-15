@@ -9,17 +9,22 @@ from scipy import spatial
 
 from utils import *
 
-class DefaultClusterer:
+class DefaultPartitioner:
     '''
-    Performs a clustering, returning:
+    Performs a partitioning of the data, returning:
     partitionsX: An array of instance sets from X, where each instance set belongs to the same cluster.
     partitionsY: An array of instance sets from Y, where each instance set belongs to the same cluster.
     partitionLabels: The array of labels mapped to each partition.
     centroids: A representative instance from each partition.
     clusteringModel: The sklearn clustering model (or None if not applicable)
+
+    The Default action is one partition containing everything.
     '''
-    def clustering(self, dataX, nClusters, showPlot=False):
-        return ([], [], [], [], None)
+
+    def clustering(self, dataX, dataY=None, nClusters=None, showPlot=False, random_state=1000):
+        if nClusters is not None:
+            print("WARNING: DefaultPartitioner ignores number of clusters.")
+        return ([dataX], [dataY], [0], [dataX[0]], None)
 
     def showClusterPlot(self, dataX, labels, nClusters):
         xData = np.asarray(dataX[:, 0]).T[0]
@@ -31,7 +36,7 @@ class DefaultClusterer:
         plt.show()
 
 
-class KMeansClusterer(DefaultClusterer):
+class KMeansPartitioner(DefaultPartitioner):
     # Clusters data, for a given number of clusters
     def clustering(self, dataX, dataY = None, nClusters = None, showPlot=False, random_state=1000):
 
@@ -81,6 +86,7 @@ class KMeansClusterer(DefaultClusterer):
             else:
                 self._nClusters = 2
 
+        print("Number of clusters: %d"%(self._nClusters))
                 # Return clusterer
         return KMeans(n_clusters=self._nClusters , random_state=self.random_state)
 
@@ -88,7 +94,7 @@ class KMeansClusterer(DefaultClusterer):
         return self._dataModel.cluster_centers_
 
 
-class BoundedProximityClusterer (DefaultClusterer):
+class BoundedProximityPartitioner (DefaultPartitioner):
     def clustering(self, dataX, dataY = None, nClusters = None, showPlot=False, random_state=1000):
         return self._clustering(dataX, dataY, nClusters, showPlot, random_state)
 
@@ -101,10 +107,10 @@ class BoundedProximityClusterer (DefaultClusterer):
         representatives = []
 
         # V is the set of all V values in the training set.
-        V = np.unique(dataX, axis=0)
+        V, inverseIndex = np.unique(dataX, axis=0, return_inverse=True)
 
-        # R is the set of RPM values in the training set.
-        R = np.unique(dataY, axis=0)
+        # R is the set of corresponding RPM values in the training set.
+        R = dataY[inverseIndex]
 
         # yBound is the bound of error in y axis
         if yBound is None:
@@ -132,7 +138,7 @@ class BoundedProximityClusterer (DefaultClusterer):
             Vmapped = pcaMapping.transform(dataX)
             # xBound is the bound of error in x PCA axis
             if xBound is None:
-                xBound = np.mean(np.max(Vmapped) - np.min(Vmapped)) / math.log(2.0 + dataY.shape[0], 2.0)
+                xBound = (np.max(Vmapped) - np.min(Vmapped)) / math.log(2.0 + dataY.shape[0], 2.0)
 
             # Select another point (v2, r) with r_v2 - r_v1 < bound in the V space not in U.
             notInU = self.setDiff(U, V)
@@ -175,6 +181,11 @@ class BoundedProximityClusterer (DefaultClusterer):
             # Add all points in T to U
             U = np.append(U, dataX[selectionIndices], axis=0)
             notInU = self.setDiff(U, V)
+
+            # DEBUG LINES
+            print("Created a total of %d clusters. Remaining %d instances unclustered."%(len(representatives),
+                                                                                         notInU.shape[0]))
+            #############
 
             # Repeat until no more points can be added.
             canContinue = notInU.size > 2
