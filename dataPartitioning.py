@@ -5,7 +5,7 @@ import matplotlib.cm as cm
 import itertools
 import math
 import numpy as np
-from scipy import spatial
+from scipy.spatial.distance import cdist
 
 from utils import *
 
@@ -21,7 +21,7 @@ class DefaultPartitioner:
     The Default action is one partition containing everything.
     '''
 
-    def clustering(self, dataX, dataY=None, nClusters=None, showPlot=False, random_state=1000):
+    def clustering(self, dataX, dataY=None, nClusters=None, showPlot=False, random_state=1000, useYInClustering=False):
         if nClusters is not None:
             print("WARNING: DefaultPartitioner ignores number of clusters.")
         return ([dataX], [dataY], [0], [dataX[0]], None)
@@ -38,11 +38,11 @@ class DefaultPartitioner:
 
 class KMeansPartitioner(DefaultPartitioner):
     # Clusters data, for a given number of clusters
-    def clustering(self, dataX, dataY = None, nClusters = None, showPlot=False, random_state=1000):
+    def clustering(self, dataX, dataY, nClusters = None, showPlot=False, random_state=1000, useYInClustering=False):
 
         # Check if we need to use dataY
         dataUpdatedX = dataX
-        if dataY is not None:
+        if useYInClustering:
             dataUpdatedX = np.append(dataX, np.asmatrix([dataY]).T, axis=1)
 
             # Init clustering model
@@ -95,7 +95,7 @@ class KMeansPartitioner(DefaultPartitioner):
 
 
 class BoundedProximityPartitioner (DefaultPartitioner):
-    def clustering(self, dataX, dataY = None, nClusters = None, showPlot=False, random_state=1000):
+    def clustering(self, dataX, dataY = None, nClusters = None, showPlot=False, random_state=1000, useYInClustering=False):
         return self._clustering(dataX, dataY, nClusters, showPlot, random_state)
 
     # Clusters data, for a given number of clusters
@@ -136,6 +136,7 @@ class BoundedProximityPartitioner (DefaultPartitioner):
             pcaMapping = PCA(1)
             pcaMapping.fit(dataX)
             Vmapped = pcaMapping.transform(dataX)
+            mappedV1 = pcaMapping.transform(v1)
             # xBound is the bound of error in x PCA axis
             if xBound is None:
                 xBound = (np.max(Vmapped) - np.min(Vmapped)) / math.log(2.0 + dataY.shape[0], 2.0)
@@ -143,23 +144,34 @@ class BoundedProximityPartitioner (DefaultPartitioner):
             # Select another point (v2, r) with r_v2 - r_v1 < bound in the V space not in U.
             notInU = self.setDiff(U, V)
 
-            # Init selected v2 indices
-            selectionIndices = []
-            ## For each point in notInU
-            for iIdx in range(notInU.shape[0]):
-                # Examine whether the R of its corresponding group
-                # is within xBound distance from the v1 R
-                # and its distance in the PCA space is also equally bounded by yBound
-                v2 = np.asarray([notInU[iIdx]])
-                pcaDist = spatial.distance.euclidean(pcaMapping.transform(v2), pcaMapping.transform(v1))
-                # Find all points with v2 as X value
-                allCandidateV2Indices = self.getAllRowsYsWhereRowsXEqV(dataX, np.arange(dataY.shape[0]), v2[0])
-                rDist = np.abs(np.mean(R[allCandidateV2Indices]) - r)
-                if (pcaDist <= xBound) and (rDist <= yBound):
-                    # then add to selection indices
-                    selectionIndices.extend(allCandidateV2Indices)
-                    # Update U with used v2
-                    U  = np.append(U, v2, axis=0)
+            # ## For each point in notInU
+            ## Init selected v2 indices
+            # selectionIndices = []
+            # for iIdx in range(notInU.shape[0]):
+            #     # Examine whether the R of its corresponding group
+            #     # is within xBound distance from the v1 R
+            #     # and its distance in the PCA space is also equally bounded by yBound
+            #     v2 = np.asarray([notInU[iIdx]])
+            #     pcaDist = spatial.distance.euclidean(pcaMapping.transform(v2), pcaMapping.transform(v1))
+            #     # Find all points with v2 as X value
+            #     allCandidateV2Indices = self.getAllRowsYsWhereRowsXEqV(dataX, np.arange(dataY.shape[0]), v2[0])
+            #     rDist = np.abs(np.mean(R[allCandidateV2Indices]) - r)
+            #     if (pcaDist <= xBound) and (rDist <= yBound):
+            #         # then add to selection indices
+            #         selectionIndices.extend(allCandidateV2Indices)
+            #         # Update U with used v2
+            #         U  = np.append(U, v2, axis=0)
+
+            # Get indices where v condition holds
+            vConditionHolds = cdist(pcaMapping.transform(notInU), mappedV1, 'euclidean') <= xBound
+            # For each such v where vConditionHolds
+            # Get all R values and average them
+            curCandidates = notInU[vConditionHolds.flatten()]
+            curCandidatesR = np.apply_along_axis(lambda vCandidate: np.mean(self.getAllRowsYsWhereRowsXEqV(dataX, dataY, vCandidate)) , axis=1, arr=curCandidates)
+
+            rDist = np.abs(curCandidatesR - r)
+            rConditionHolds = rDist <= yBound
+            selectionIndices = np.logical_and(vConditionHolds, rConditionHolds)
 
             # If nothing found
             if len(selectionIndices) == 0:
