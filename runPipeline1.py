@@ -14,14 +14,15 @@ def main():
     end, endU, history, future,sFile, start, startU = initParameters()
     # Load data
     #KtrSetlen=[[np.square(i) for i  in range(1,8)],[i for i in range(10000,80000,10000)]]
-    K=[np.square(i) for i  in range(1,8)]
-    trSetlen=[i for i in range(10000,80000,10000)]
+    K=[np.square(i) for i  in range(1,9)]
+    trSetlen=[i for i in range(10000,90000,10000)]
     errors=[]
     clusters=[]
     trSize=[]
     #KtrSetlen=zip(K,trSetlen)
     KtrSetlen=list(itertools.product(K, trSetlen))
 
+    modeler = dModel.SplineRegressionModeler()
 
     for k,trLen in zip(K,trSetlen):
         print("Reading data...")
@@ -50,7 +51,7 @@ def main():
 
         # For each partition create model
         print("Creating models per partition...")
-        modeler = dModel.LinearRegressionModeler()
+
         # ...and keep them in a dict, connecting label to model
         modelMap = dict(zip(partitionLabels, modeler.createModelsFor(partitionsX, partitionsY, partitionLabels)))
         print("Creating models per partition... Done")
@@ -79,10 +80,10 @@ def main():
         # evaluator.evaluate(X)
         errors.append(meanError)
         #clusters.append(k)
-        #trSize.append(trSetlen)
+        #trSize.append(trLen)
         print ("Pipeline for K="+str(k)+ " Clusters and Training Size "+str(trLen)+" done.")
     plotErr =plres.ErrorGraphs()
-    plotErr.ErrorGraphswithKandTrlen(errors,K,trSetlen,True)
+    plotErr.ErrorGraphswithKandTrlen(errors,K,trSetlen,True,modeler.__class__.__name__)
 
 def initParameters():
     sFile = "./kaklis.csv"
