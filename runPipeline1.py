@@ -82,7 +82,7 @@ def main():
         #trSize.append(trSetlen)
         print ("Pipeline for K="+str(k)+ " Clusters and Training Size "+str(trLen)+" done.")
     plotErr =plres.ErrorGraphs()
-    plotErr.ErrorGraphswithKandTrlen(errors,k,trLen,True)
+    plotErr.ErrorGraphswithKandTrlen(errors,K,trSetlen,True)
 
 def initParameters():
     sFile = "./kaklis.csv"
