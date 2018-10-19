@@ -5,6 +5,7 @@ import matplotlib.cm as cm
 import itertools
 import math
 import numpy as np
+from scipy.spatial import Delaunay,ConvexHull
 from scipy import spatial,random
 
 from utils import *
@@ -206,6 +207,8 @@ class BoundedProximityPartitioner (DefaultPartitioner):
         notInU = np.asarray(list(map(list, notInU)))
         return notInU
 
+class BoundedProximityPartionerwithTriangles:
+
     def showTriangle(self,x, y, z, error):
         # vertices = plotly_trisurf(x, y, z, tri.simplices)
         # polytops = list()
@@ -222,11 +225,17 @@ class BoundedProximityPartitioner (DefaultPartitioner):
     def sign(self,p1, p2, p3):
         return (p1[ 0 ] - p3[ 0 ]) * (p2[ 1 ] - p3[ 1 ]) - (p2[ 0 ] - p3[ 0 ]) * (p1[ 1 ] - p3[ 1 ])
 
+    def distance(self,a, b):
+        return math.sqrt((a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2)
+
+    def is_between(self,a, c, b):
+        return self.distance(a, c) + self.distance(c, b) == self.distance(a, b)
+
     def PointInTriangle(self,pt, v1, v2, v3):
 
-        b1 = self.sign(pt, v1, v2) < 0.0
-        b2 = self.sign(pt, v2, v3) < 0.0
-        b3 = self.sign(pt, v3, v1) < 0.0
+        b1 = self.sign(pt, v1, v2) < 0.0 or self.is_between(v1,pt,v2)
+        b2 = self.sign(pt, v2, v3) < 0.0 or self.is_between(v2,pt,v3)
+        b3 = self.sign(pt, v3, v1) < 0.0 or self.is_between(v3,pt,v1)
 
         return ((b1 == b2) and (b2 == b3))
 
@@ -261,3 +270,101 @@ class BoundedProximityPartitioner (DefaultPartitioner):
 
         indexInTr = [ i for i in range(0, len(indinXnotinU)) if d[ i ] == True ]
         return indexInTr
+
+    def tri_indices(self,simplices):
+        # simplices is a numpy array defining the simplices of the triangularization
+        # returns the lists of indices i, j, k
+
+        return ([ triplet[ c ] for triplet in simplices ] for c in range(3))
+
+    def plotly_trisurf(self,x, y, z, simplices):
+        # x, y, z are lists of coordinates of the triangle vertices
+        # simplices are the simplices that define the triangularization;
+        # simplices  is a numpy array of shape (no_triangles, 3)
+        # insert here the  type check for input data
+
+        points3D = np.vstack((x, y, z)).T
+        tri_vertices = map(lambda index: points3D[ index ], simplices)  # vertices of the surface triangles
+        zmean = [ np.mean(tri[ :, 2 ]) for tri in tri_vertices ]  # mean values of z-coordinates of
+
+        # triangle vertices
+        min_zmean = np.min(zmean)
+        max_zmean = np.max(zmean)
+
+        I, J, K = self.tri_indices(simplices)
+        return tri_vertices
+
+    def clustering(self, dataX, dataY = None, nClusters = None, showPlot=False):
+          i = 0
+          cutoffPoint = 0.5
+          errorBound= 5
+          UsedV=[]
+          ##Convex HUll
+          #XY=np.vstack([dataX[:,0],dataY]).T
+          hull = ConvexHull(dataX)
+          history=20
+          pointsy=[]
+          pointsx0x1=[]
+          plt.plot(dataX[ :, 0 ], dataX[0:,1], 'o')
+          for simplex in hull.simplices:
+              plt.plot(dataX[ simplex, 0 ], dataX[simplex,1], 'k-')
+
+              pointsx0x1.append(dataX[ simplex, 0 ])
+              pointsx0x1.append(dataX[ simplex, 1 ])
+              pointsy.append(dataY[ simplex[0]])
+              pointsy.append(np.mean(dataY[simplex[1]-history: simplex[1] ]))
+          ######Delauny triangulation of the training instances
+
+          points2D=list(dataX)[0:len(dataX):1500]
+          pointsY2D = list(dataY)[ 0:len(dataY):1500 ]
+
+          for p in pointsy: pointsY2D.append(p)
+          for p in pointsx0x1: points2D.append(p)
+
+          points2D = np.array(points2D)
+          pointsY2D = np.array(pointsY2D)
+          zx = range(0, len(points2D[:,0]))
+          tri = Delaunay(points2D)
+          vertices = self.plotly_trisurf(points2D[:,0], zx, points2D[:,1], tri.simplices)
+          polytops = list()
+          for v in vertices:
+              k = np.array([ [ v[ 0 ][ 0 ], v[ 0 ][ 2 ] ], [ v[ 1 ][ 0 ], v[ 1 ][ 2 ] ], [ v[ 2 ][ 0 ], v[ 2 ][ 2 ] ] ])
+              polytops.append(k)
+              t = plt.Polygon(k, fill=False,color='red')
+              plt.gca().add_patch(t)
+          #plt.show()
+
+          train_xy=dataX
+          #train_y=dataX[:,1]
+          trains_x_list=[]
+          trains_y_list=[]
+          labels=np.empty(len(dataX))
+          cluster=0
+          for p in polytops:
+              train_x_list = []
+              train_y_list = []
+              for i in range(0, len(dataX)):
+                  if (self.PointInTriangle([ train_xy[ i,0 ], train_xy[ i,1 ] ], [ p[ 0 ][ 0 ], p[ 0 ][ 1 ] ],
+                                      [ p[ 1 ][ 0 ], p[ 1 ][ 1 ] ], [ p[ 2 ][ 0 ], p[ 2 ][ 1 ] ])):
+                      #k = [ [ p[ 0 ][ 0 ], p[ 0 ][ 1 ] ], [ p[ 1 ][ 0 ], p[ 1 ][ 1 ] ], [ p[ 2 ][ 0 ], p[ 2 ][ 1 ] ] ]
+                      train_x_list.append(train_xy[ i ])
+                      train_y_list.append(dataY[ i ])
+                      if (len(train_x_list) > 0): labels[i]=cluster
+                      else: np.delete(labels,i)
+              if(len(train_x_list)>0):
+                trains_x_list.append(train_x_list)
+                trains_y_list.append(train_y_list)
+                cluster+=1
+
+
+          return trains_x_list,trains_y_list,np.delete(np.unique(labels),1) , None, None
+          #while i < len(dataX[ 0, 0: ]):
+
+          #while i < len(dataX[0,0:]):
+          #  for k in range(0,len(dataX)):
+          #        if np.log( spatial.distance.euclidean(dataX[k,1] , dataX[i,1]))<=cutoffPoint:
+          #          pass
+
+
+
+

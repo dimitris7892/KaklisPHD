@@ -65,12 +65,12 @@ class SplineRegressionModeler(BasePartitionModeler):
             # Create a linear model
             curModel = sp.Earth()
             ##HP tuning
-            #random_search3 = RandomizedSearchCV(curModel, param_distributions=parameters.param_mars_dist, n_iter=4)
-            #try:
-            #    random_search3.fit(partitionsX[ idx ], partitionsY[ idx ])
-            #    curModel.set_params(**self.report(random_search3.cv_results_))
-           # except:
-            #    print "Error on HP tuning"
+            random_search3 = RandomizedSearchCV(curModel, param_distributions=parameters.param_mars_dist, n_iter=4)
+            try:
+                random_search3.fit(partitionsX[ idx ], partitionsY[ idx ])
+                curModel.set_params(**self.report(random_search3.cv_results_))
+            except:
+                print "Error on HP tuning"
             # Fit to data
             curModel.fit(partitionsX[ idx ], partitionsY[ idx ])
             # Add to returned list

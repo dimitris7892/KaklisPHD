@@ -25,10 +25,10 @@ def main():
 
     # Partition data
     print("Partitioning training set...")
-    NUM_OF_CLUSTERS = 8 # TODO: Read from command line
+    NUM_OF_CLUSTERS = 10 # TODO: Read from command line
     # partitioner = dPart.DefaultPartitioner()
-    # partitioner = dPart.KMeansPartitioner()
-    partitioner = dPart.BoundedProximityPartitioner()
+    partitioner = dPart.BoundedProximityPartionerwithTriangles()
+    #partitioner = dPart.BoundedProximityPartitioner()
     partitionsX, partitionsY, partitionLabels, partitionRepresentatives, partitioningModel = partitioner.clustering(X, Y, NUM_OF_CLUSTERS, False)
     # Keep label to partition mapping in a dict
     partitionXPerLabel = dict(zip(partitionLabels, partitionsX))
