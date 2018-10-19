@@ -32,6 +32,6 @@ class ErrorGraphs:
          ax.set_ylabel('Training Set size(instances)')
          ax.set_zlabel('MAE %')
          ax.set_zlim(0, np.max(errors))
-         ax.plot3D(xline, yline, zline, 'gray')
+         ax.plot3D(xline, yline, zline, 'red')
          if show :plt.show()
          x=1

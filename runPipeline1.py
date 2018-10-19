@@ -14,8 +14,8 @@ def main():
     end, endU, history, future,sFile, start, startU = initParameters()
     # Load data
     #KtrSetlen=[[np.square(i) for i  in range(1,8)],[i for i in range(10000,80000,10000)]]
-    K=[np.square(i) for i  in range(1,9)]
-    trSetlen=[i for i in range(10000,90000,10000)]
+    K=[np.square(i) for i  in range(1,7)]
+    trSetlen=[i for i in range(10000,70000,10000)]
     errors=[]
     clusters=[]
     trSize=[]
@@ -60,7 +60,7 @@ def main():
         print("Reading unseen data...")
         unseenX,unseenY = dRead.UnseenSeriesReader.readSeriesDataFromFile(dRead.UnseenSeriesReader(),sFile,startU,endU,40000)
         # and their features
-        unseenFeaturesX, unseenFeaturesY = featureExtractor.extractFeatures(unseenX, unseenY,future)
+        unseenFeaturesX, unseenFeaturesY = featureExtractor.extractFeatures(unseenX, unseenY,history)
         print("Reading unseen data... Done")
 
         # Predict and evaluate on seen data
@@ -84,7 +84,7 @@ def main():
         print ("Pipeline for K="+str(k)+ " Clusters and Training Size "+str(trLen)+" done.")
     plotErr =plres.ErrorGraphs()
     plotErr.ErrorGraphswithKandTrlen(errors,K,trSetlen,True,modeler.__class__.__name__)
-
+    print ("Min Error with "+str(modeler.__class__.__name__)+" "+ np.min(errors))
 def initParameters():
     sFile = "./kaklis.csv"
     # Get file name
