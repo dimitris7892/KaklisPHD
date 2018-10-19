@@ -12,3 +12,14 @@ class BaseFeatureExtractor:
 
         # Return data (ignoring lines that have no target value)
         return Xnew, Y[HISTORY_SIZE:]
+
+
+    def extractFeatureswithVariance(self,X,Y,futureN):
+        FUTUREv = futureN
+        Xnew = [ ]
+        next = [ [ X[ i ], np.var(X[ i:i+FUTUREv ]) ] for i in range(0, len(X)) ]
+        Xnew.append(next)
+        Xnew = np.array(Xnew).reshape(-1, 2)
+
+        # Return data (ignoring lines that have no target value)
+        return Xnew,Y
