@@ -233,9 +233,9 @@ class BoundedProximityPartionerwithTriangles:
 
     def PointInTriangle(self,pt, v1, v2, v3):
 
-        b1 = self.sign(pt, v1, v2) < 0.0 or self.is_between(v1,pt,v2)
-        b2 = self.sign(pt, v2, v3) < 0.0 or self.is_between(v2,pt,v3)
-        b3 = self.sign(pt, v3, v1) < 0.0 or self.is_between(v3,pt,v1)
+        b1 = self.sign(pt, v1, v2) <= 0.0 or self.is_between(v1,pt,v2)
+        b2 = self.sign(pt, v2, v3) <= 0.0 or self.is_between(v2,pt,v3)
+        b3 = self.sign(pt, v3, v1) <= 0.0 or self.is_between(v3,pt,v1)
 
         return ((b1 == b2) and (b2 == b3))
 
@@ -296,7 +296,7 @@ class BoundedProximityPartionerwithTriangles:
 
     def clustering(self, dataX, dataY = None, nClusters = None, showPlot=False):
           i = 0
-          cutoffPoint = 0.5
+          cutoffPoint = 0.6
           errorBound= 5
           UsedV=[]
           ##Convex HUll
@@ -313,34 +313,87 @@ class BoundedProximityPartionerwithTriangles:
               pointsx0x1.append(dataX[ simplex, 1 ])
               pointsy.append(dataY[ simplex[0]])
               pointsy.append(np.mean(dataY[simplex[1]-history: simplex[1] ]))
-          ######Delauny triangulation of the training instances
-
-          points2D=list(dataX)[0:len(dataX):1500]
-          pointsY2D = list(dataY)[ 0:len(dataY):1500 ]
+          ######Delaunay triangulation of the training instances
+          #plt.show()
+          #points2D=list(dataX)[0:len(dataX):2000]
+          #pointsY2D = list(dataY)[ 0:len(dataY):2000]
+          points2D=[]
+          pointsY2D = []
 
           for p in pointsy: pointsY2D.append(p)
           for p in pointsx0x1: points2D.append(p)
 
-          points2D = np.array(points2D)
-          pointsY2D = np.array(pointsY2D)
-          zx = range(0, len(points2D[:,0]))
+          points2D = np.array(dataX)
+
+          zx = range(0, len(dataX[:,0]))
           tri = Delaunay(points2D)
           vertices = self.plotly_trisurf(points2D[:,0], zx, points2D[:,1], tri.simplices)
-          polytops = list()
+
           for v in vertices:
               k = np.array([ [ v[ 0 ][ 0 ], v[ 0 ][ 2 ] ], [ v[ 1 ][ 0 ], v[ 1 ][ 2 ] ], [ v[ 2 ][ 0 ], v[ 2 ][ 2 ] ] ])
-              polytops.append(k)
-              t = plt.Polygon(k, fill=False,color='red')
-              plt.gca().add_patch(t)
+              #t = plt.Polygon(k, fill=False,color='red')
+              #plt.gca().add_patch(t)
+
           #plt.show()
+          cl=0
+          labels=[]
+          neighboringV = []
+          clusters={"points":[]}
+          for i in range(0,len(dataX)):
+              pointX=dataX[i,0]
+              pointY=dataX[i,1]
+              neighbors = [ ]
+              #for v in vertices:
+              cluster={}
+              flag1 = True
+              flag2 = True
+              flag3 = True
+              c=tri.find_simplex(dataX[i])
+              neighboringSimplices= [vertices[np.array(tri.neighbors[c][0])],vertices[np.array(tri.neighbors[c][1])],vertices[np.array(tri.neighbors[c][2])]]
+              for n in neighboringSimplices:
+                      v1 = [ n[ 0 ][ 0 ], n[ 0 ][ 2 ] ]
+                      v2 = [ n[ 1 ][ 0 ], n[ 1 ][ 2 ] ]
+                      v3 = [ n[ 2 ][ 0 ], n[ 2 ][ 2 ] ]
+                      if spatial.distance.euclidean(dataX[ i ],v1 ) <= cutoffPoint:
+                         neighbors.append(v1)
+                      else:flag1=False
+                      if spatial.distance.euclidean(dataX[ i ], v2) <= cutoffPoint:
+                          neighbors.append(v2)
+                      else:flag2 = False
+                      if spatial.distance.euclidean(dataX[ i ], v3) <= cutoffPoint:
+                          neighbors.append(v3)
+                      else:flag3 = False
+              if flag1 or flag2 or flag3:
+                  cluster[cl]=neighbors
+                  labels.append(cl)
+                  clusters["points"].append(cluster)
+              else:
+                  cl+=1
+              neighboringV.append(neighbors)
+
+          for i in range(0, len(dataX)):
+              t = plt.Polygon(neighboringV[i], fill=False, color='green')
+              plt.gca().add_patch(t)
+
+          plt.show()
+          #labels=np.unique(labels)
+          i=0
+
+          #for v in clusters[ "points" ]:
+          #points=np.array(v.items()[ 0 ][ 1 ])
+          plt.scatter(dataX[:len(labels),0],dataX[:len(labels),1], c=labels)
+          i=+1
+
+
+
 
           train_xy=dataX
           #train_y=dataX[:,1]
           trains_x_list=[]
           trains_y_list=[]
-          labels=np.empty(len(dataX))
+          labels= np.empty((len(dataX)))
           cluster=0
-          for p in polytops:
+          for p in vertices:
               train_x_list = []
               train_y_list = []
               for i in range(0, len(dataX)):
@@ -354,7 +407,7 @@ class BoundedProximityPartionerwithTriangles:
               if(len(train_x_list)>0):
                 trains_x_list.append(train_x_list)
                 trains_y_list.append(train_y_list)
-                cluster+=1
+                cluster=cluster+1
 
 
           return trains_x_list,trains_y_list,np.delete(np.unique(labels),1) , None, None
