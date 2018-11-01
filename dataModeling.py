@@ -72,7 +72,10 @@ class SplineRegressionModeler(BasePartitionModeler):
             #except:
             #    print "Error on HP tuning"
             # Fit to data
-            curModel.fit(partitionsX[ idx ], partitionsY[ idx ])
+            try:
+             curModel.fit(partitionsX[ idx ], partitionsY[ idx ])
+            except:
+                print idx
             # Add to returned list
             models.append(curModel)
             self._partitionsPerModel[ curModel ] = partitionsX[ idx ]
