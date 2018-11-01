@@ -72,8 +72,8 @@ def initParameters():
     sFile = "./kaklis.csv"
     # Get file name
     history = 20
-    start = 0
-    end = 2000
+    start = 3000
+    end = 6000
     startU = 30000
     endU = 30900
     if len(sys.argv) > 1:

@@ -7,7 +7,7 @@ class BaseSeriesReader:
     def readSeriesDataFromFile(self, path,start,end,nrows):
         # Load file
         data = pd.read_csv(
-            path, nrows=nrows)
+            path)
         dt = data.values[ 0:, 3:23 ]
         X = dt[ start:end, 1 ]
         Y = dt[ start:end, 4 ]
