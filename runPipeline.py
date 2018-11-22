@@ -25,7 +25,7 @@ def main():
 
     # Partition data
     print("Partitioning training set...")
-    NUM_OF_CLUSTERS = 10 # TODO: Read from command line
+    NUM_OF_CLUSTERS = 4 # TODO: Read from command line
     # partitioner = dPart.DefaultPartitioner()
     partitioner = dPart.BoundedProximityPartionerwithTriangles()
     #partitioner = dPart.BoundedProximityPartitioner()
@@ -72,8 +72,8 @@ def initParameters():
     sFile = "./kaklis.csv"
     # Get file name
     history = 20
-    start = 3000
-    end = 6000
+    start = 8000
+    end = 9000
     startU = 30000
     endU = 30900
     if len(sys.argv) > 1:

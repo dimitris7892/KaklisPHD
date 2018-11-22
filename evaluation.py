@@ -16,7 +16,7 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
         lErrors = []
         for iCnt in range(np.shape(unseenX)[0]):
             pPoint = unseenX[iCnt].reshape(1, -1)#[0] # Convert to matrix
-            trueVal = unseenY[iCnt]
+            trueVal = unseenY[iCnt].reshape(1,-1)
             prediction = modeler.getBestModelForPoint(pPoint).predict(pPoint)
             lErrors.append(abs(prediction - trueVal))
         errors = np.asarray(lErrors)

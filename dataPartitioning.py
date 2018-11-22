@@ -8,6 +8,9 @@ import numpy as np
 from scipy.spatial import Delaunay,ConvexHull
 from scipy import spatial,random
 import colorsys
+from sklearn.model_selection import KFold
+import sys
+sys.setrecursionlimit(1000000)
 
 from utils import *
 
@@ -37,10 +40,27 @@ class DefaultPartitioner:
         plt.title("K-means with " + str(nClusters) + " clusters")
         plt.show()
 
+class CrossValidationPartioner(DefaultPartitioner):
+
+    def NfoldValidation(self,dataX,dataY,dataW=None,folds=None,showPLot=False):
+        kf = KFold(n_splits=folds)
+        trainXList=[]
+        trainYList=[]
+        testXList = []
+        testYList = []
+        for train, test in kf.split(dataX):
+            train_X, test_X = dataX[ train ], dataX[ test ]
+            train_y, test_y = dataY[ train ], dataY[ train ]
+            trainXList.append(train_X)
+            trainYList.append(train_y)
+            testXList.append(test_X)
+            testYList.append(test_y)
+
+        return trainXList , trainYList  ,list(range(0,folds)), None,None,testXList , testYList
 
 class KMeansPartitioner(DefaultPartitioner):
     # Clusters data, for a given number of clusters
-    def clustering(self, dataX, dataY = None, nClusters = None, showPlot=False, random_state=1000):
+    def clustering(self, dataX, dataY = None, dataW=None,nClusters = None, showPlot=False, random_state=1000):
 
         # Check if we need to use dataY
         dataUpdatedX = dataX
@@ -53,7 +73,11 @@ class KMeansPartitioner(DefaultPartitioner):
         clusteringModel = self.getClusterer()
 
         # Fit the input data
-        dataModel = clusteringModel.fit(dataUpdatedX)
+        #dataUpdatedX=np.
+        try:
+            dataModel = clusteringModel.fit(np.nan_to_num(dataUpdatedX))
+        except:
+            print ""
         self._dataModel = dataModel
         # Get the cluster labels
         labels = dataModel.predict(dataUpdatedX)
@@ -101,7 +125,7 @@ class BoundedProximityPartitioner (DefaultPartitioner):
         return self._clustering(dataX, dataY, nClusters, showPlot, random_state)
 
     # Clusters data, for a given number of clusters
-    def _clustering(self, dataX, dataY = None, nClusters = None, showPlot=False, random_state=1000, xBound = None, yBound = None):
+    def _clustering(self, dataX, dataY = None,dataW=None ,nClusters = None, showPlot=False, random_state=1000, xBound = None, yBound = None):
         # Init return arrays
         partitionsX = []
         partitionsY = []
@@ -208,7 +232,7 @@ class BoundedProximityPartitioner (DefaultPartitioner):
         notInU = np.asarray(list(map(list, notInU)))
         return notInU
 
-class BoundedProximityPartionerwithTriangles:
+class DelaunayTriPartitioner:
 
     def showTriangle(self,x, y, z, error):
         # vertices = plotly_trisurf(x, y, z, tri.simplices)
@@ -296,7 +320,6 @@ class BoundedProximityPartionerwithTriangles:
         return tri_vertices
 
 
-
     def HSVToRGB(self,h, s, v):
 
         (r, g, b) = colorsys.hsv_to_rgb(h, s, v)
@@ -306,26 +329,24 @@ class BoundedProximityPartionerwithTriangles:
         huePartition = 1.0 / (n + 1)
         return np.array(self.HSVToRGB(huePartition * value, 1.0, 1.0) for value in range(0, n))
 
-    def clustering(self, dataX, dataY = None, nClusters = None, showPlot=False):
-          i = 0
-          cutoffPoint = 0.12
-          errorBound= 5
-          UsedV=[]
+    def clustering(self, dataX, dataY = None,dataW=None ,cutOffvalues = None, showPlot=False):
+          cutoffPoint = cutOffvalues
           ##Convex HUll
           #XY=np.vstack([dataX[:,0],dataY]).T
           hull = ConvexHull(dataX)
           history=20
           pointsy=[]
           pointsx0x1=[]
-          #plt.plot(dataX[ :, 0 ], dataX[0:,1], 'o')
-          for simplex in hull.simplices:
-              plt.plot(dataX[ simplex, 0 ], dataX[simplex,1], 'k-')
+          #plt.plot(dataX[ :, 0 ], dataX[0:,1], 'o',markersize=4 )
+          #for simplex in hull.simplices:
+          #    plt.plot(dataX[ simplex, 0 ], dataX[simplex,1], 'k-')
 
-              pointsx0x1.append(dataX[ simplex, 0 ])
-              pointsx0x1.append(dataX[ simplex, 1 ])
-              pointsy.append(dataY[ simplex[0]])
-              pointsy.append(np.mean(dataY[simplex[1]-history: simplex[1] ]))
+          #    pointsx0x1.append(dataX[ simplex, 0 ])
+          #    pointsx0x1.append(dataX[ simplex, 1 ])
+          #    pointsy.append(dataY[ simplex[0]])
+          #    pointsy.append(np.mean(dataY[simplex[1]-history: simplex[1] ]))
           ######Delaunay triangulation of the training instances
+
           #plt.show()
           #points2D=list(dataX)[0:len(dataX):2000]
           #pointsY2D = list(dataY)[ 0:len(dataY):2000]
@@ -341,11 +362,13 @@ class BoundedProximityPartionerwithTriangles:
           tri = Delaunay(points2D)
           vertices = self.plotly_trisurf(points2D[:,0], zx, points2D[:,1], tri.simplices)
 
-          for v in vertices:
-              k = np.array([ [ v[ 0 ][ 0 ], v[ 0 ][ 2 ] ], [ v[ 1 ][ 0 ], v[ 1 ][ 2 ] ], [ v[ 2 ][ 0 ], v[ 2 ][ 2 ] ] ])
-              #t = plt.Polygon(k, fill=False,color='red')
-              #plt.gca().add_patch(t)
+          #for v in vertices:
+          #    k = np.array([ [ v[ 0 ][ 0 ], v[ 0 ][ 2 ] ], [ v[ 1 ][ 0 ], v[ 1 ][ 2 ] ], [ v[ 2 ][ 0 ], v[ 2 ][ 2 ] ] ])
+          #    t = plt.Polygon(k, fill=False,color='red')
+          #    plt.gca().add_patch(t)
 
+          #plt.xlabel('V')
+          #plt.ylabel('V(t-n)')
           #plt.show()
           cl=0
           graph={}
@@ -361,17 +384,15 @@ class BoundedProximityPartionerwithTriangles:
               # for v in vertices:
               cluster = {}
               flag1 = True
-              c = tri.find_simplex(dataX[ i ])
-
+              #c = tri.find_simplex(dataX[ i ])
               neighboringVertices=tri.vertex_neighbor_vertices[1][tri.vertex_neighbor_vertices[0][i]:tri.vertex_neighbor_vertices[0][i+1]]
-
               for n in list(neighboringVertices):
-                  if spatial.distance.euclidean(dataX[ i ], dataX[n]) <= cutoffPoint:
+                  if spatial.distance.euclidean(dataX[ i ], dataX[n]) *(spatial.distance.euclidean(dataW[ i ], dataW[n])*0.0013)<= cutoffPoint   :
                       #v=[dataX[n][0],dataX[n][1]]
                       v=n
                       vy=[dataY[n]]
                       #if neighbors.__contains__(v) == False:
-                      neighbors.append(v)
+                      neighbors.append([dataX[n][0],dataX[n][1]])
                       sets.add(v)
                       setsy.add(tuple(vy))
                   else:
@@ -385,30 +406,14 @@ class BoundedProximityPartionerwithTriangles:
               #if list(sets) !=[]:
               graph[i]=[sets,False,dataY[i]]
               #graph[""].append(n)
-              neighboringV.append(neighbors)
+              if neighbors!=[]:
+                neighboringV.append(neighbors)
 
           #####################################
-          ##########################################3
-          def dfs(graph, start):
-              visited, stack = set(), [ start ]
-              while stack:
-                 vertex = stack.pop()
-                 if vertex not in visited:
-                    try:
-                     visited.add(vertex)
-                    except:
-                        print visited
-                        return visited
-                        #vertex = stack[0].pop()
-                        #visited.add(vertex)
-                    stack.extend(graph[ str(np.array(vertex)) ] - visited)
-              return visited
-          ###############################################NEW
 
           ###################################
               # A function used by DFS
           def DFSUtil( v,i ,graph,cl,cly):
-
                   # Mark the current node as visited and print it
                   graph[ i ][ 1 ] = True
                   print v,
@@ -425,10 +430,8 @@ class BoundedProximityPartionerwithTriangles:
                   #return cl
           def DFS():
                   V = len(graph)  # total vertices
-
                   # Mark all the vertices as not visited
                   #visited = [ False ] * (V)
-
                   # Call the recursive helper function to print
                   # DFS traversal starting from all vertices one
                   # by one
@@ -481,23 +484,11 @@ class BoundedProximityPartionerwithTriangles:
               #trains_y_list.append(np.array(train_y_list).reshape(-1,1))
               #train_x_list = [ ]
               #train_y_list = [ ]
-          from sklearn import  svm
-          trData=np.array(trData)
-          clf=svm.SVC()
-          clf.fit(trData,trlabels)
-          uncl=np.array(uncl).reshape(-1,2)
-          uncly = np.array(uncly).reshape(-1, 1)
-          labels=clf.predict(np.array(uncl))
-
-          for curLbl in np.unique(labels):
-              # Create a partition for X using records with corresponding label equal to the current
-              listx=list(trains_x_list[int(curLbl)])
-              listx.extend(np.asarray(uncl[ labels == curLbl ]))
-              trains_x_list[int(curLbl)]=listx
-              # Create a partition for Y using records with corresponding label equal to the current
-              listy = list(trains_y_list[ int(curLbl) ])
-              listy.extend(np.asarray(uncly[ labels == curLbl ]))
-              trains_y_list[ int(curLbl) ] = listy
+          colors = tuple([ numberToRGBAColor(l) for l in np.unique(trlabels) ])
+          #for i in range(0, len(trains_x_list)):
+          #  t = plt.Polygon(trains_x_list[i], fill=False, color='red', linewidth=1)
+          #  plt.gca().add_patch(t)
+          #plt.show()
 
           return trains_x_list, trains_y_list, list(range(0, len(clusters))),None,None
           #import sys
@@ -511,159 +502,7 @@ class BoundedProximityPartionerwithTriangles:
           #          labels[i]=k
           #          minDist= dist
 
-          trains_x_list=[]
-          trains_y_list=[]
-          partitionLabels = [ ]
-          for curLbl in np.unique(labels):
-              # Create a partition for X using records with corresponding label equal to the current
-              trains_x_list.append(np.asarray(dataX[ labels == curLbl ]))
-              # Create a partition for Y using records with corresponding label equal to the current
-              trains_y_list.append(np.asarray(dataY[ labels == curLbl ]))
-              # Keep partition label to ascertain same order of results
-              partitionLabels.append(curLbl)
 
-          return trains_x_list, trains_y_list, partitionLabels, None, None
-          clusters=[]
-          tuples = zip(dataX[:,0],dataX[:,1])
-          tuples=sorted(tuples, key=lambda k: k[0])
-          st1=np.array(tuples)
-          dataX=sorted(dataX, key=lambda row: row[0])
-          # X=stack[0:,0]
-          # Y=stack[0:,1]
-          stack=[]
-          c=0
-          sdataX=set()
-          for n in dataX:
-              sdataX.add(tuple(n))
-          counter=0
-          while True!=[]:
-               counter+=1
-               if counter==13: break
-               cluster = [ ]
-               print len(sdataX)
-               if c==0:
-                stack=list(sdataX)[0]
-                sdataX.remove(list(sdataX)[0])
-               else:
-                   try:
-                       ind=random.choice(range(0,len(sdataX)))
-                       stack=list(sdataX)[ind]
-                   except: break
-               flag=False
-               stacks=[]
-               flagG = False
-               while stack!=[]:
-                    flagG1 = True
-                    if len(stack)==2:
-                        stack = dfs(graph, stack)
-                        if cluster.__contains__(stack):
-                            break
-                        cluster.append(stack)
-                        stacks.append(stack)
-
-                    else:
-                        #c=0
-                        while True:
-                            flagG=False
-                            stacksx=stacks
-                            stacks=[]
-                            #stacks.append(stackx)
-                            for stack in stacksx:
-                                 for v in np.array(list(stack)):
-                                        stacki=dfs(graph, tuple(v))
-
-                                        if cluster.__contains__(stacki)==False:
-                                         cluster.append(stacki)
-                                         stacks.append(stacki)
-                                         c += 1
-                                         flagG = True
-                                        #else:
-
-                        #if stacks!=[]:
-                        #    stack=stacks.pop()
-                        #else:
-                        #    flagG=True
-                        #    break
-                            if flagG==False :
-                                flagG1=False
-                                break
-
-                    if flagG1 == False: break
-               x=set()
-               for n in cluster:
-                   sdataX = sdataX - n
-                   #for k in n:
-                    #del graph[str(np.array(k))]
-               if clusters.__contains__(cluster)==False:
-                clusters.append(cluster)
-                c+=1
-
-          train_x_list=[]
-          train_y_list=[]
-          trains_x_list = [ ]
-          trains_y_list = [ ]
-          for cluster in np.array(list(clusters)):
-             for x in np.array(list(cluster)):
-                 for n in x:
-                     train_x_list.append(n[0])
-                     train_y_list.append(n[1])
-             if len(train_x_list)>1:
-              trains_x_list.append(np.array(train_x_list).reshape(-1,1))
-              trains_y_list.append(np.array(train_y_list).reshape(-1,1))
-             train_x_list = [ ]
-             train_y_list = [ ]
-
-          return  trains_x_list,trains_y_list,partitionLabels,None,None
-          #dfs(graph,tuple(dataX[0]))
-
-          labels=itertools.cycle(['b', 'g', 'r', 'c', 'm', 'y', 'k', 'w','g'])
-          for i in range(0,len(neighboringV)):
-            plt.scatter(np.array(neighboringV[i])[:,0],np.array(neighboringV[i])[:,1],c=next(labels))
-          #for i in range(1, len(neighboringV)):
-           #     t = plt.Polygon(neighboringV[i], fill=False,color=numberToRGBAColor(i))
-            #    plt.gca().add_patch(t)
-
-          plt.show()
-
-
-          train_xy=dataX
-          #train_y=dataX[:,1]
-          trains_x_list=[]
-          trains_y_list=[]
-          labels= np.empty((len(dataX)))
-          cluster=0
-          neighboringV.remove(neighboringV[0])
-          for v in neighboringV:
-              xy = np.array(v)
-              trains_x_list.append(np.array(xy[ :, 0 ]).reshape(-1,1))
-              trains_y_list.append(np.array(xy[ :, 1 ]).reshape(-1,1))
-
-          return trains_x_list, trains_y_list, range(0,len(neighboringV)), None, None
-
-          for p in vertices:
-              train_x_list = []
-              train_y_list = []
-              for i in range(0, len(dataX)):
-                  if (self.PointInTriangle([ train_xy[ i,0 ], train_xy[ i,1 ] ], [ p[ 0 ][ 0 ], p[ 0 ][ 1 ] ],
-                                      [ p[ 1 ][ 0 ], p[ 1 ][ 1 ] ], [ p[ 2 ][ 0 ], p[ 2 ][ 1 ] ])):
-                      #k = [ [ p[ 0 ][ 0 ], p[ 0 ][ 1 ] ], [ p[ 1 ][ 0 ], p[ 1 ][ 1 ] ], [ p[ 2 ][ 0 ], p[ 2 ][ 1 ] ] ]
-                      train_x_list.append(train_xy[ i ])
-                      train_y_list.append(dataY[ i ])
-                      if (len(train_x_list) > 0): labels[i]=cluster
-                      else: np.delete(labels,i)
-              if(len(train_x_list)>0):
-                trains_x_list.append(train_x_list)
-                trains_y_list.append(train_y_list)
-                cluster=cluster+1
-
-
-          return trains_x_list,trains_y_list,np.delete(np.unique(labels),1) , None, None
-          #while i < len(dataX[ 0, 0: ]):
-
-          #while i < len(dataX[0,0:]):
-          #  for k in range(0,len(dataX)):
-          #        if np.log( spatial.distance.euclidean(dataX[k,1] , dataX[i,1]))<=cutoffPoint:
-          #          pass
 
 
 
