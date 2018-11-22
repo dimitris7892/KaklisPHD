@@ -20,6 +20,19 @@ class ErrorGraphs:
         if show : plt.show()
         x=1
 
+    def ErrorGraphsForPartioners(self, errors, K, trSize, show, modeler,clustering):
+
+        plt.plot(K, errors, 'k-',label=str(trSize)+ ' Instances')
+        plt.legend(loc='upper right', shadow=True)
+        plt.title('Error convergence with ' + str(modeler)+" and " + str(clustering))
+        if clustering=='KMeansPartitioner':
+            plt.xlabel('# of clusters')
+        else:
+            plt.xlabel('cut-off value')
+        plt.ylabel('Mean Absolute Error')
+
+        if show: plt.show()
+        x = 1
 
     def ThreeDErrorGraphwithKandTrlen(self,errors,K,trSize,show) :
          ax = plt.axes(projection='3d')

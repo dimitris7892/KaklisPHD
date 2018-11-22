@@ -14,39 +14,46 @@ def main():
     end, endU, history, future,sFile, start, startU = initParameters()
     # Load data
     #KtrSetlen=[[np.square(i) for i  in range(1,8)],[i for i in range(10000,80000,10000)]]
-    K=[np.square(i) for i  in range(1,7)]
-    trSetlen=[i for i in range(10000,70000,10000)]
+    K=[np.square(i) for i  in range(1,10)]
+    #trSetlen=[i for i in range(1000,30000,1000)]
+    trSetlen=[500,1000,2000,3000,5000,10000,20000,30000,40000]
     errors=[]
     clusters=[]
     trSize=[]
     #KtrSetlen=zip(K,trSetlen)
-    KtrSetlen=list(itertools.product(K, trSetlen))
+    #KtrSetlen=list(itertools.product(K, trSetlen))
 
     modeler = dModel.SplineRegressionModeler()
-
-    for k,trLen in zip(K,trSetlen):
+    cutoff=np.linspace(0.1,1,111)
+    #for k,trLen in zip(K,trSetlen):
+    minErr=[]
+    minK=[]
+    #for trLen in trSetlen:
+      #errors=[]
+    for k in [1]:
         print("Reading data...")
         reader = dRead.BaseSeriesReader()
-
-        seriesX, targetY = reader.readSeriesDataFromFile(sFile,start,end,trLen)
+        trSize=80000
+        seriesX, targetY, targetW = reader.readSeriesDataFromFile(sFile,start,end,trSize,'t')
         print("Reading data... Done.")
 
         # Extract features
         print("Extracting features from training set...")
         featureExtractor = fCalc.BaseFeatureExtractor()
-        X, Y = featureExtractor.extractFeatures(seriesX, targetY,history)
+        X, Y , W = featureExtractor.extractFeatures(seriesX, targetY,targetW,history)
         print("Extracting features from training set... Done.")
 
         # Partition data
         print("Partitioning training set...")
         NUM_OF_CLUSTERS =k# TODO: Read from command line
+        NUM_OF_FOLDS=6
         #partitioner = dPart.DefaultPartitioner()
-        partitioner = dPart.KMeansPartitioner()
+        partitioner = dPart.CrossValidationPartioner()
         #partitioner = dPart.BoundedProximityPartitioner()
-        partitionsX, partitionsY, partitionLabels, partitionRepresentatives, partitioningModel = partitioner.clustering(X, Y, NUM_OF_CLUSTERS, False)
+        partitionsX, partitionsY, partitionLabels, partitionRepresentatives, partitioningModel , partitionsXt,partitionsYt = partitioner.NfoldValidation(X, Y,W,NUM_OF_FOLDS, False)
         # Keep label to partition mapping in a dict
-        partitionXPerLabel = dict(zip(partitionLabels, partitionsX))
-        partitionYPerLabel = dict(zip(partitionLabels, partitionsY))
+        #partitionXPerLabel = dict(zip(partitionLabels, partitionsX))
+        #partitionYPerLabel = dict(zip(partitionLabels, partitionsY))
         print("Partitioning training set... Done.")
 
         # For each partition create model
@@ -58,14 +65,15 @@ def main():
 
         # Get unseen data
         print("Reading unseen data...")
-        unseenX,unseenY = dRead.UnseenSeriesReader.readSeriesDataFromFile(dRead.UnseenSeriesReader(),sFile,startU,endU,40000)
+        unseenX,unseenY , unseenW = dRead.UnseenSeriesReader.readSeriesDataFromFile(dRead.UnseenSeriesReader(),sFile,startU,endU,40000,'u')
         # and their features
-        unseenFeaturesX, unseenFeaturesY = featureExtractor.extractFeatures(unseenX, unseenY,history)
+        featureExtractor=fCalc.UnseenFeaturesExtractor()
+        unseenFeaturesX, unseenFeaturesY , unseenFeaturesW = featureExtractor.extractFeatures(unseenX, unseenY,unseenW,history)
         print("Reading unseen data... Done")
 
         # Predict and evaluate on seen data
         print("Evaluating on seen data...")
-        _, meanError, sdError = eval.MeanAbsoluteErrorEvaluation.evaluate(eval.MeanAbsoluteErrorEvaluation(),X,Y,modeler)
+        _, meanError, sdError = eval.MeanAbsoluteErrorEvaluation.evaluate(eval.MeanAbsoluteErrorEvaluation(),np.concatenate(partitionsXt),np.concatenate(partitionsYt),modeler)
         print ("Mean absolute error on training data: %4.2f (+/- %4.2f standard error)"%(meanError, sdError/sqrt(unseenFeaturesY.shape[0])))
         print("Evaluating on seen data... Done.")
 
@@ -79,21 +87,30 @@ def main():
         # evaluator = eval.MeanAbsoluteErrorEvaluation()
         # evaluator.evaluate(X)
         errors.append(meanError)
+        clusters.append(len(partitionLabels))
         #clusters.append(k)
         #trSize.append(trLen)
-        print ("Pipeline for K="+str(k)+ " Clusters and Training Size "+str(trLen)+" done.")
+        #print ("Pipeline for K="+str(k)+ " Clusters and Training Size "+str(trLen)+" done.")
+      #minerr=min(errors)
+      #mink=K[errors.index(min(errors))]
+      ###################################
+      #minErr.append(minerr)
+      #minK.append(mink)
+      ###################################
+    optcl = clusters[ errors.index(min(errors)) ]
     plotErr =plres.ErrorGraphs()
-    plotErr.ErrorGraphswithKandTrlen(errors,K,trSetlen,True,modeler.__class__.__name__)
-    print ("Min Error with "+str(modeler.__class__.__name__)+" "+ np.min(errors))
+    plotErr.ErrorGraphsForPartioners(errors,cutoff,3000,True,modeler.__class__.__name__,partitioner.__class__.__name__)
+    #plotErr.ErrorGraphswithKandTrlen(errors, 6000, trSetlen, True, modeler.__class__.__name__)
+    #print ("Min Error with "+str(modeler.__class__.__name__)+" "+ np.min(errors))
 def initParameters():
     sFile = "./kaklis.csv"
     # Get file name
     history = 20
     future=30
-    start = 2000
-    end = 12000
+    start = 10000
+    end = 17000
     startU = 30000
-    endU = 30900
+    endU = 31000
     if len(sys.argv) > 1:
         sFile = sys.argv[1]
         history = sys.argv[2]
