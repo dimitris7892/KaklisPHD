@@ -14,7 +14,7 @@ def main():
     print("Reading data...")
     reader = dRead.BaseSeriesReader()
 
-    seriesX, targetY = reader.readSeriesDataFromFile(sFile,start,end,20000)
+    seriesX, targetY = reader.readSeriesDataFromFile(sFile,start,end,2000)
     print("Reading data... Done.")
 
     # Extract features
@@ -25,10 +25,10 @@ def main():
 
     # Partition data
     print("Partitioning training set...")
-    NUM_OF_CLUSTERS = 8 # TODO: Read from command line
+    NUM_OF_CLUSTERS = 4 # TODO: Read from command line
     # partitioner = dPart.DefaultPartitioner()
-    # partitioner = dPart.KMeansPartitioner()
-    partitioner = dPart.BoundedProximityPartitioner()
+    partitioner = dPart.BoundedProximityPartionerwithTriangles()
+    #partitioner = dPart.BoundedProximityPartitioner()
     partitionsX, partitionsY, partitionLabels, partitionRepresentatives, partitioningModel = partitioner.clustering(X, Y, NUM_OF_CLUSTERS, False)
     # Keep label to partition mapping in a dict
     partitionXPerLabel = dict(zip(partitionLabels, partitionsX))
@@ -37,7 +37,7 @@ def main():
 
     # For each partition create model
     print("Creating models per partition...")
-    modeler = dModel.LinearRegressionModeler()
+    modeler = dModel.SplineRegressionModeler()
     # ...and keep them in a dict, connecting label to model
     modelMap = dict(zip(partitionLabels, modeler.createModelsFor(partitionsX, partitionsY, partitionLabels)))
     print("Creating models per partition... Done")
@@ -72,8 +72,8 @@ def initParameters():
     sFile = "./kaklis.csv"
     # Get file name
     history = 20
-    start = 2000
-    end = 12000
+    start = 8000
+    end = 9000
     startU = 30000
     endU = 30900
     if len(sys.argv) > 1:
