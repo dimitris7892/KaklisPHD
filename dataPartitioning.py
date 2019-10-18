@@ -8,11 +8,15 @@ import numpy as np
 from scipy.spatial import Delaunay,ConvexHull
 from scipy import spatial,random
 import colorsys
-from sklearn.model_selection import KFold
+#from sklearn.model_selection import KFold
 import sys
 sys.setrecursionlimit(1000000)
-
-from utils import *
+#import SSplines as simplexSplines
+#from utils import *
+#from dtw import dtw
+#from matplotlib import rc
+#plt.rcParams.update({'font.size':45})
+#rc('text', usetex=True)
 
 class DefaultPartitioner:
     '''
@@ -34,29 +38,29 @@ class DefaultPartitioner:
     def showClusterPlot(self, dataX, labels, nClusters):
         xData = np.asarray(dataX[:, 0]).T[0]
         yData = np.asarray(dataX[:, 1]).T[0]
-        colors=tuple([numberToRGBAColor(l) for l in labels])
+        #colors=tuple([numberToRGBAColor(l) for l in labels])
 
-        plt.scatter(xData, yData, c=colors, cmap=plt.cm.gnuplot)
+        plt.scatter(xData, yData, c=labels)
         plt.title("K-means with " + str(nClusters) + " clusters")
         plt.show()
 
-class CrossValidationPartioner(DefaultPartitioner):
+#class CrossValidationPartioner(DefaultPartitioner):
 
-    def NfoldValidation(self,dataX,dataY,dataW=None,folds=None,showPLot=False):
-        kf = KFold(n_splits=folds)
-        trainXList=[]
-        trainYList=[]
-        testXList = []
-        testYList = []
-        for train, test in kf.split(dataX):
-            train_X, test_X = dataX[ train ], dataX[ test ]
-            train_y, test_y = dataY[ train ], dataY[ train ]
-            trainXList.append(train_X)
-            trainYList.append(train_y)
-            testXList.append(test_X)
-            testYList.append(test_y)
+    #def NfoldValidation(self,dataX,dataY,dataW=None,folds=None,showPLot=False):
+        #kf = KFold(n_splits=folds)
+        #trainXList=[]
+        #trainYList=[]
+        #testXList = []
+        #testYList = []
+        #for train, test in kf.split(dataX):
+            #train_X, test_X = dataX[ train ], dataX[ test ]
+            #train_y, test_y = dataY[ train ], dataY[ train ]
+            #trainXList.append(train_X)
+            #trainYList.append(train_y)
+            #testXList.append(test_X)
+            #testYList.append(test_y)
 
-        return trainXList , trainYList  ,list(range(0,folds)), None,None,testXList , testYList
+        #return trainXList , trainYList  ,list(range(0,folds)), None,None,testXList , testYList
 
 class KMeansPartitioner(DefaultPartitioner):
     # Clusters data, for a given number of clusters
@@ -64,6 +68,7 @@ class KMeansPartitioner(DefaultPartitioner):
 
         # Check if we need to use dataY
         dataUpdatedX = dataX
+        #dataY=None
         if dataY is not None:
             dataUpdatedX = np.append(dataX, np.asmatrix([dataY]).T, axis=1)
 
@@ -74,16 +79,21 @@ class KMeansPartitioner(DefaultPartitioner):
 
         # Fit the input data
         #dataUpdatedX=np.
+        #dataUpdatedX = [dataX, dataY]
         try:
             dataModel = clusteringModel.fit(np.nan_to_num(dataUpdatedX))
         except:
-            print ""
+            print ("Error in clustering")
         self._dataModel = dataModel
         # Get the cluster labels
         labels = dataModel.predict(dataUpdatedX)
         # Extract centroid values
         centroids = self.getCentroids()
-
+        from scipy.interpolate import interp1d
+        import scipy as sp
+        import scipy.interpolate
+        #spline = sp.interpolate.Rbf(centroids[0:,0], centroids[0:,1], centroids[0:,2], function='thin_plate', smooth=5, episilon=5)
+        #f2 = interp1d(centroids[0:,0], centroids[0:,2], kind='cubic')
         # Create partitions, based on common label
         partitionsX = []
         partitionsY = []
@@ -98,10 +108,12 @@ class KMeansPartitioner(DefaultPartitioner):
             partitionLabels.append(curLbl)
 
         # Show plot, if requested
-        if (showPlot):
-            self.showClusterPlot(dataUpdatedX, labels, nClusters)
-
-        return partitionsX, partitionsY, partitionLabels , centroids , clusteringModel
+        #if (showPlot):
+            #self.showClusterPlot(dataUpdatedX, labels, nClusters)
+        #for k in partitionLabels:
+            #print("RPM variance of cluster "+str(k) +": " + str(np.var(partitionsY[k]))+
+            #"\n"+ "Velocity variance of cluster "+str(k)+": "+str(np.var(partitionsX[k])))
+        return partitionsX, partitionsY, partitionLabels , dataX , dataY,None
 
 
     def getClusterer(self, dataX=None, dataY = None):
@@ -218,8 +230,8 @@ class BoundedProximityPartitioner (DefaultPartitioner):
             canContinue = notInU.size > 2
 
         # Show plot, if requested
-        if (showPlot):
-            self.showClusterPlot(dataX, partitionLabels, nClusters)
+        #if (showPlot):
+            #self.showClusterPlot(dataX, partitionLabels, nClusters)
 
         # Return
         return partitionsX, partitionsY, partitionLabels, representatives, None
@@ -325,56 +337,80 @@ class DelaunayTriPartitioner:
         (r, g, b) = colorsys.hsv_to_rgb(h, s, v)
         return (int(255 * r), int(255 * g), int(255 * b))
 
-    def getDistinctColors(self,n):
+    def getDistinctPixelss(self,n):
         huePartition = 1.0 / (n + 1)
         return np.array(self.HSVToRGB(huePartition * value, 1.0, 1.0) for value in range(0, n))
 
-    def clustering(self, dataX, dataY = None,dataW=None ,cutOffvalues = None, showPlot=False):
-          cutoffPoint = cutOffvalues
+    def clustering(self, dataX, dataY = None,dataW=None ,cutOffvalues = None, showPlot=False,numofCl=None):
+          vData = dataX
+          points2D = np.array(vData)
+          zx = range(0, len(vData[ :, 0 ]))
+          tri = Delaunay(points2D,)
+          vertices = self.plotly_trisurf(points2D[ :, 0 ], zx, points2D[ :, 1 ], tri.simplices)
+          hull = ConvexHull(vData)
+
+          #self.plotly_trisurf(dataX[ tri.vertices[ 0 ] ][ :, 0 ], zx[ 0:3 ], dataX[ tri.vertices[ 0 ] ][ :, 1 ],
+                              #tri.simplices)
+
+          #plt.plot(vData[ 0:, 0 ], vData[ 0:, 1 ], 'o', markersize=8)
+          #for simplex in hull.simplices:
+              #plt.plot(vData[ simplex, 0 ], vData[ simplex, 1 ], 'k-',linewidth=3)
+          ###hull plot and data plot
+          def in_hull(p, hull):
+              """
+              Test if points in `p` are in `hull`
+
+              `p` should be a `NxK` coordinates of `N` points in `K` dimensions
+              `hull` is either a scipy.spatial.Delaunay object or the `MxK` array of the
+              coordinates of `M` points in `K`dimensions for which Delaunay triangulation
+              will be computed
+              """
+
+              if not isinstance(hull, Delaunay):
+                  hull = Delaunay(hull)
+
+              return hull.find_simplex(p) >= 0
+
+          #for v in vertices:
+              #k = np.array([ [ v[ 0 ][ 0 ], v[ 0 ][ 2 ] ], [ v[ 1 ][ 0 ], v[ 1 ][ 2 ] ], [ v[ 2 ][ 0 ], v[ 2 ][ 2 ] ] ])
+              #t = plt.Polygon(k, fill=False,color='red',linewidth=3)
+              #plt.gca().add_patch(t)
+
+          #plt.xlabel('$V(t)$')
+          #plt.ylabel(r'$\bar{\bf V}_N(t_i)$')
+          #plt.show()
+          x=1
+          ### DT plot
+          ##################################
+          #dataX = np.append(dataX, np.asmatrix([ dataY ]).T, axis=1)
+          #points2D = np.array(dataX)
+          #zx = range(0, len(dataX[ :, 0 ]))
+          #tri = Delaunay(points2D)
+          #vertices = self.plotly_trisurf(points2D[ :, 0 ], zx, points2D[ :, 1 ], tri.simplices)
+          cutoffPoint =cutOffvalues
           ##Convex HUll
           #XY=np.vstack([dataX[:,0],dataY]).T
-          hull = ConvexHull(dataX)
+
+          #################################
+          #pcaMapping = PCA(1)
+          #pcaMapping.fit(dataX)
+          #Vmapped = pcaMapping.transform(dataX)
+          #dataX = Vmapped
+          ##################################
+
+          #hull = ConvexHull(vData)
           history=20
           pointsy=[]
           pointsx0x1=[]
-          #plt.plot(dataX[ :, 0 ], dataX[0:,1], 'o',markersize=4 )
+
+          #plt.plot(dataX[0:,0], dataX[0:,1], 'o',markersize=4 )
           #for simplex in hull.simplices:
-          #    plt.plot(dataX[ simplex, 0 ], dataX[simplex,1], 'k-')
-
-          #    pointsx0x1.append(dataX[ simplex, 0 ])
-          #    pointsx0x1.append(dataX[ simplex, 1 ])
-          #    pointsy.append(dataY[ simplex[0]])
-          #    pointsy.append(np.mean(dataY[simplex[1]-history: simplex[1] ]))
-          ######Delaunay triangulation of the training instances
-
-          #plt.show()
-          #points2D=list(dataX)[0:len(dataX):2000]
-          #pointsY2D = list(dataY)[ 0:len(dataY):2000]
-          points2D=[]
-          pointsY2D = []
-
-          for p in pointsy: pointsY2D.append(p)
-          for p in pointsx0x1: points2D.append(p)
-
-          points2D = np.array(dataX)
-
-          zx = range(0, len(dataX[:,0]))
-          tri = Delaunay(points2D)
-          vertices = self.plotly_trisurf(points2D[:,0], zx, points2D[:,1], tri.simplices)
-
-          #for v in vertices:
-          #    k = np.array([ [ v[ 0 ][ 0 ], v[ 0 ][ 2 ] ], [ v[ 1 ][ 0 ], v[ 1 ][ 2 ] ], [ v[ 2 ][ 0 ], v[ 2 ][ 2 ] ] ])
-          #    t = plt.Polygon(k, fill=False,color='red')
-          #    plt.gca().add_patch(t)
-
-          #plt.xlabel('V')
-          #plt.ylabel('V(t-n)')
+              #plt.plot(vData[ simplex, 0 ], vData[simplex,1], 'k-')
           #plt.show()
           cl=0
           graph={}
-
           neighboringV=[]
-          ##################################
+          dataX=np.asarray(dataX)
           for i in range(0, len(dataX)):
               pointX = dataX[ i, 0 ]
               pointY = dataX[ i, 1 ]
@@ -387,10 +423,18 @@ class DelaunayTriPartitioner:
               #c = tri.find_simplex(dataX[ i ])
               neighboringVertices=tri.vertex_neighbor_vertices[1][tri.vertex_neighbor_vertices[0][i]:tri.vertex_neighbor_vertices[0][i+1]]
               for n in list(neighboringVertices):
-                  if spatial.distance.euclidean(dataX[ i ], dataX[n]) *(spatial.distance.euclidean(dataW[ i ], dataW[n])*0.0013)<= cutoffPoint   :
+                  #if np.linalg.norm(np.array((dataX[i][0],dataX[i][1],dataY[i])) -np.array((dataX[n][0],dataX[n][1],dataY[n]))) <=cutoffPoint:
+                  if spatial.distance.euclidean(dataX[ i ], dataX[ n ]) <= cutoffPoint :
+                      #spatial.distance.euclidean([dataX[ i ][0],dataX[i][1],dataY[i]], [dataX[n][0],dataX[n][1],dataY[n]])<0.5:
+
+                       # and  spatial.distance.euclidean( dataY[ i ],dataY[ n ] )<=cutoffPoint:
+                            #and spatial.distance.euclidean( [dataX[i][1],dataY[ i ]], [dataX[n][1],dataY[ n ]] )<=cutoffPoint:
+                                                     #[ dataX[ n ][ 0 ], dataY[ n ] ]) <= cutoffPoint:
+
                       #v=[dataX[n][0],dataX[n][1]]
                       v=n
                       vy=[dataY[n]]
+                      #data=dataX[n].T
                       #if neighbors.__contains__(v) == False:
                       neighbors.append([dataX[n][0],dataX[n][1]])
                       sets.add(v)
@@ -416,7 +460,7 @@ class DelaunayTriPartitioner:
           def DFSUtil( v,i ,graph,cl,cly):
                   # Mark the current node as visited and print it
                   graph[ i ][ 1 ] = True
-                  print v,
+                  #print v,
                   cl.append(dataX[i])
                   cly.append(graph[ i ][2])
                   # Recur for all the vertices adjacent to
@@ -469,14 +513,21 @@ class DelaunayTriPartitioner:
           trlabels=np.empty(sum(map(len,clusters)))
           trData=[]
           counter=0
+          outliers=[]
           for i in range(0,len(clusters)):
 
-              trains_x_list.append(np.array(clusters[i]))
-              trains_y_list.append(np.array(clustersy[i]))
-              for v in clusters[i]:
-                  trData.append(v)
-                  trlabels[counter]=i
-                  counter+=1
+              #clusters[i]=[clusters[i][ k ][ 0:2 ] for k in range(0,len(clusters[i]))]
+              if len(np.array(clusters[ i ]))>4:
+                trains_x_list.append(np.array(clusters[i]))
+              #else:
+                  #for k in range(0,len(np.array(clusters[ i ]))):
+                    #outliers.append(clusters[i][k])
+              if len(np.array(clusters[ i ]))>4:
+                trains_y_list.append(np.array(clustersy[i]))
+              #for v in clusters[i]:
+                  #trData.append(v)
+                  #trlabels[counter]=i
+                  #counter+=1
          # return trains_x_list, trains_y_list,list(range(0,len(clusters))), None, None
               #train_y_list.append(np.array(cluster)[:,1])
               #if len(train_x_list) > 1:
@@ -484,23 +535,48 @@ class DelaunayTriPartitioner:
               #trains_y_list.append(np.array(train_y_list).reshape(-1,1))
               #train_x_list = [ ]
               #train_y_list = [ ]
-          colors = tuple([ numberToRGBAColor(l) for l in np.unique(trlabels) ])
+          #colors = tuple([ numberToRGBAColor(l) for l in np.unique(trlabels) ])
           #for i in range(0, len(trains_x_list)):
-          #  t = plt.Polygon(trains_x_list[i], fill=False, color='red', linewidth=1)
-          #  plt.gca().add_patch(t)
-          #plt.show()
+             #t = plt.Polygon(trains_x_list[i], fill=False, color='red', linewidth=3)
+             #plt.gca().add_patch(t)
 
-          return trains_x_list, trains_y_list, list(range(0, len(clusters))),None,None
-          #import sys
-          #labels=np.empty(len(dataX))
-          #for i in range(0,len(dataX)):
-          #    point=dataX[i]
-          #    minDist=sys.maxsize
-          #    for k in range(0,len(trains_x_list)):
-          #      dist=spatial.distance.correlation(point,(np.mean(trains_x_list[k],axis=0)))
-          #      if dist< minDist:
-          #          labels[i]=k
-          #          minDist= dist
+          outliers=[]
+          for l in range(0,len(vData)):
+            point = vData[l]
+            flagForPoint = False
+            for i in range(0, len(trains_x_list)):
+                #for k in range(0,len(trains_x_list[i])):
+                    if(point in trains_x_list[i]) :
+                        flagForPoint=True
+                        break
+            if(flagForPoint==False):
+                outliers.append(point)
+
+          outliers=np.array(outliers)
+          vDataNew=[]
+
+          for k in range(0,len(outliers)):
+             for i in range(0, len(trains_x_list)):
+                if outliers[k] not in trains_x_list[i]:
+                        vDataNew.append(outliers[k])
+          #plt.plot(vData[ 0:, 0 ], vData[ 0:, 1 ], 'o', markersize=3)
+          vDataNew=np.array(vDataNew)
+          #plt.plot(vDataNew[ 0:, 0 ], vDataNew[ 0:, 1 ], 'o', markersize=12,c='y')
+
+          vDataSimple=[]
+          for i in range(0,len(trains_x_list)):
+              for k in range(0,len(trains_x_list[i])):
+                vDataSimple.append(trains_x_list[i][k])
+
+          vDataSimple=np.array(vDataSimple)
+          #plt.plot(vDataSimple[ 0:, 0 ], vDataSimple[ 0:, 1 ], 'o', markersize=8)
+
+          #plt.show()
+          print ("\n"+ str(cutoffPoint))
+          print (len(trains_x_list))
+
+          return trains_x_list,trains_y_list, list(range(0, len(trains_x_list))),dataX,dataY , tri
+
 
 
 
