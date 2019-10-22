@@ -4,6 +4,9 @@ import pandas as pd
 from scipy.stats import ks_2samp,chisquare,chi2_contingency
 import math
 import random
+import csv
+import datetime
+from dateutil.rrule import rrule, DAILY, MINUTELY
 
 class BaseSeriesReader:
     # Imports data from time series file. Expected format: CSV with 2 fields (velocity, RPM)
@@ -27,9 +30,7 @@ class BaseSeriesReader:
 
     def readLarosDAta(self,dtFrom,dtTo):
 
-        import csv
-        import datetime
-        from dateutil.rrule import rrule, DAILY, MINUTELY
+
 
         draft={"data": [ ]}
         draftAFT = {"data": [ ]}
@@ -155,6 +156,77 @@ class BaseSeriesReader:
                except:
                    x=0
 
+    def readLarosDataFromCsv(self, data):
+        # Load file
+        #if self.__class__.__name__ == 'UnseenSeriesReader':
+            #dt = data.sample(n=2880).values[ :90000:, 3:23 ]
+            #dt = data.values[ 0:, 2:23 ]
+        #else:
+            #dt = data.values[0:,2:23]
+        dt = data.values[ 0:, 2:8 ].astype(float)
+        dt = dt[~np.isnan(dt).any(axis=1)]
+        WS= np.asarray([x for x in dt[ :, 0 ] ])
+        WA = np.asarray([ x for x in dt[ :, 1 ] ])
+        SO = np.asarray([ y for y in dt[ :, 2 ] ])
+        RPM = np.asarray([ y for y in dt[ :, 3 ] ])
+        FOC = np.asarray([ y for y in dt[ :, 4 ] ])
+        POW = np.asarray([ y for y in dt[ :, 5 ] ])
+        #DA = np.asarray([ np.nan_to_num(np.float(y)) for y in dt[ :, 13 ] ])
+        #DF = np.asarray([ np.nan_to_num(np.float(y)) for y in dt[ :, 14 ] ])
+        WaFoc=[]
+        for i in range(0,len(WA)):
+            prev = np.append(WA[i], FOC[i])
+            WaFoc.append(prev)
+
+        WaFoc = np.array(WaFoc).reshape(-1, 2)
+        #WaFoc = np.array(np.stack([WA,FOC],axis=0))
+        firstFOC =[]
+        secondFOC = []
+        thirdFOC = []
+        fourthFOC = []
+        fifthFOC = []
+        for val in WaFoc:
+            if  val[0]<=22.5 or (val[0]<=360 and val[0]>337.5):
+                firstFOC.append(val[1])
+            elif (val[0] >22.5 and val[0] < 67.5) or (val[0] >292.5 and val[0] < 247.5):
+                secondFOC.append(val[1])
+            elif (val[0] > 67.5 and val[0] < 112.5) or (val[0] > 247.5 and val[0] < 292.5):
+                thirdFOC.append(val[1])
+            elif (val[0] > 112.5 and val[0] < 157.5) or (val[0] > 202.5 and val[0] < 247.5):
+                fourthFOC.append(val[1])
+            elif val[0] >157.5 and val[0] < 202.5:
+                fifthFOC.append(val[1])
+
+        ##extract FOC depending on wind angle
+        import matplotlib.pyplot as plt
+        #arraysToplot = np.array(np.stack([firstFOC,secondFOC],axis=0))
+        df = pd.DataFrame(np.array(firstFOC),
+                columns = [''])
+        boxplot = df.boxplot(column=[''])
+        plt.ylabel('M/E FOC (kg/min)')
+        plt.title("STD and outliers of FOC with 0< WA <= 22.5")
+        plt.show()
+        df = pd.DataFrame(np.array(secondFOC),
+                          columns=[''])
+        boxplot1 = df.boxplot(
+            column=[''])
+        plt.ylabel('M/E FOC (kg/min)')
+        plt.title("STD and outliers of FOC with WA > 22.5")
+        plt.show()
+        x=1
+
+
+        #x = [ math.sin(Lon[ i ] - Lon[ i - 1 ]) * math.cos(Lat[ i ]) for i in range(1, len(Lat)) ]
+        #y = [ math.cos(Lat[ i ]) * math.sin(Lat[ i - 1 ])
+              #- math.sin(Lat[ i - 1 ]) * math.sin(Lat[ i ]) * math.cos(Lon[ i ] - Lon[ i - 1 ]) for i in
+              #range(1, len(Lat)) ]
+        #bearing = [ ]
+
+        #bearing.append([ math.atan2(x[ i ], y[ i ]) for i in range(0, len(x)) ])
+        #bearing[ 0 ].insert(0, 0)
+        #bearing = np.asarray(bearing)[ 0 ]
+        #WA = np.asarray([ np.nan_to_num(np.float(y)) for y in dt[ :, 5 ] ])
+        return WS, WA
 
     def readRandomSeriesDataFromFileAF(self, data):
         # Load file

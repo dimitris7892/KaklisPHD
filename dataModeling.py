@@ -6,7 +6,7 @@ import numpy.linalg
 import sklearn.ensemble as skl
 from scipy.spatial import Delaunay
 import random
-from sklearn.cross_validation import train_test_split
+#from sklearn.cross_validation import train_test_split
 import parameters
 import itertools
 #from sklearn.model_selection import KFold as kf
@@ -24,7 +24,7 @@ from tensorflow import keras
 #import pydot
 #import graphviz
 import scipy.stats as st
-from tensorflow.python.tools import inspect_checkpoint as chkp
+#from tensorflow.python.tools import inspect_checkpoint as chkp
 from time import time
 import metrics
 from sklearn.cluster import KMeans
@@ -1470,8 +1470,8 @@ class TensorFlowW(BasePartitionModeler):
                                                      2 * W1 * W3 * leastSqApprx.coef_[ 0 ][ 2 ]])
                                             +np.mean([math.pow(W2, 2),math.pow(W1, 2),math.pow(W3, 2)]))/2)
 
-                    except Exception ,e:
-                        print(str(e))
+                    except:
+                        #print(str(e))
                         x=1
             return np.array(weights)
         seed = 7
@@ -2999,8 +2999,8 @@ class TensorFlow(BasePartitionModeler):
                             weights.append(leastSqApprx.coef_[ 0 ][ 2 ])
                             #weights.append(np.mean(leastSqApprx.coef_))
 
-                    except Exception ,e:
-                        print(str(e))
+                    except :
+                        #print(str(e))
                         x=1
             return weights
         seed = 7
