@@ -1186,29 +1186,35 @@ class TensorFlowW(BasePartitionModeler):
 
         class MyLayer(tf.keras.layers.Layer):
 
-            def __init__(self, output_dim):
-                self.output_dim = output_dim
-                super(MyLayer, self).__init__()
 
-            def build(self, input_shape):
+            def __init__(self, sharp=100, **kwargs):
+                super(MyLayer, self).__init__(**kwargs)
+                self.supports_masking = True
+                self.sharp =tf.keras.backend.cast_to_floatx(sharp)
 
-                # Create a trainable weight variable for this layer.
-                self.kernel = self.add_weight(name='kernel',
-                                              shape=(input_shape[ 1 ], self.output_dim),
-                                              trainable=True)
-                super(MyLayer, self).build(input_shape)  # Be sure to call this at the end
+            def call(self, inputs):
 
-            def call(self, x,mask=None):
-                #r1 = keras.Input(shape=(1, 1))
-                #r2 = keras.Input(shape=(1, 2))
-                minus_r2 = keras.layers.Lambda(lambda x: -x**2)
-                subtracted = keras.layers.add([ 0.88**2, minus_r2 ])
-                #keras.layers.Lambda(lambda x: x ** 2)(subtracted)
+                orig = inputs
+                inputs = tf.where(orig <= 0.0, tf.zeros_like(inputs), inputs)
+                inputs = tf.where(orig>8.76,
+                                      sr.coef_[0][0] * (inputs - 8.76), inputs)
+                inputs = tf.where(tf.math.logical_and(tf.greater(orig, 1.32), tf.less(orig, 8.76)),
+                                  (sr.coef_[0][1] * ( 8.76 - inputs)), inputs)
+                inputs = tf.where(tf.math.logical_and(tf.greater(orig, 1.32), tf.less(orig, 8.76)),
+                                  (sr.coef_[0][2] * (inputs-1.32)), inputs)
 
-                return subtracted
+                inputs = tf.where(tf.math.logical_and(tf.less(orig, 1.32), tf.greater(orig, 0)),
+                                  (sr.coef_[0][3] * (1.32 - inputs )), inputs)
+
+                return inputs
+
+            def get_config(self):
+                config = {'sharp': float(self.sharp)}
+                base_config = super(MyLayer, self).get_config()
+                return dict(list(base_config.items()) + list(config.items()))
 
             def compute_output_shape(self, input_shape):
-                return (input_shape[ 0 ], self.output_dim)
+                return input_shape
 
         def stackedModels(members):
             for i,pCurLbl in  enumerate(partition_labels):
@@ -1247,80 +1253,29 @@ class TensorFlowW(BasePartitionModeler):
             #model.add(keras.layers.Dense(100, input_shape=(2,), activation='relu', name='layer_0'))
             #model.add(keras.layers.Dense(50, input_shape=(2,), activation='relu' ))
             dims = [ partitionsX.shape[ -1 ], 50, len(partition_labels)]
+
+            #model.add(MyLayer(len(partition_labels)*2,activation='relu'))
+            #model.add(MyLayer(len(partition_labels),activation='relu'))
             #model.add(keras.layers.Embedding(20, 1, input_length=2, name='layer_'))
             model.add(keras.layers.Dense(len(partition_labels), input_shape=(2,), activation='relu', name='layer_0'))
             model.add(keras.layers.Dense(len(partition_labels) * 2, activation='relu'))
             model.add(keras.layers.Dense(len(partition_labels) * 3, activation='relu'))
+
+            model.add(MyLayer(len(partition_labels)))
             #model.add(keras.layers.Dense(len(partition_labels) * 4, activation='relu'))
-            model.add(keras.layers.Dense(len(partition_labels) * 3, activation='relu'))
+            #model.add(keras.layers.Dense(len(partition_labels) * 3, activation='relu'))
+
             model.add(keras.layers.Dense(len(partition_labels) * 2, activation='relu'))
             model.add(keras.layers.Dense(len(partition_labels), activation='relu'))
             #model.add(keras.layers.Dense(2, input_shape=(2,), activation='relu'))
 
-            #model.add(ClusteringLayer(len(partition_labels), name='clustering'))
-
-            #n_stacks = len(dims) - 1
-            #dims[ 0 ] = 2
-            # input
-
-            # internal layers in encoder
-            #for i in range(n_stacks - 1):
-                #model.add(keras.layers.Dense(dims[ i + 1 ], activation='relu', name='encoder_%d' % i))
-            # hidden layer
-            #model.add(keras.layers.Dense(dims[ -1 ], activation='relu', name='encoder_%d' % (n_stacks - 1)))
-            # hidden layer, features are extracted from here
-            #model.add(ClusteringLayer(len(partition_labels), name='clustering'))
-
-            #model.add(keras.layers.Dense(inputs=encoder.input, outputs=clustering_layer))
-            #model.add(keras.layers.Dense(len(partition_labels), input_shape=(2,), activation='relu', name='layer_1'))
-            #model.add(keras.layers.Dense(len(partition_labels) * 2, activation='relu'))
-            #model.add(keras.layers.Dense(len(partition_labels) * 3, activation='relu'))
-            #model.add(keras.layers.Dense(len(partition_labels) * 4, activation='relu'))
-            #model.add(keras.layers.Dense(len(partition_labels) * 3, activation='relu'))
-            #model.add(keras.layers.Dense(len(partition_labels) * 2, activation='relu'))
-
-            #for i in range(n_stacks - 1, 0, -1):
-                #model.add(keras.layers.Dense(dims[ i ], activation='relu', kernel_initializer=init, name='decoder_%d' % i))
-
-            # output
-            #model.add(keras.layers.Dense(dims[ 0 ], kernel_initializer=init, name='decoder_0'))
-
-
-            #for i in range(n_stacks - 1):
-                #model.add(keras.layers.Dense(dims[ i + 1 ], activation='relu', name='encoder_%dEST' % i))
-            # hidden layer
-            #model.add(keras.layers.Dense(dims[ -1 ], activation='relu', name='encoder_%dEST' % (n_stacks - 1)))
-            #model.add(keras.layers.Dense(3, activation='relu'))
-            #model.add(keras.layers.Dense(2, activation='relu'))
-            #model.add(keras.layers.Dropout(0.005))
             model.add(keras.layers.Flatten())
             model.add(keras.layers.Dense(1))
 
             # Compile model
             model.compile(loss='mse', optimizer=keras.optimizers.Adam())
 
-            #w = np.array(weights)[ 0:partitionsX.shape[0]].reshape(-1,1)
-            #w=pre_trained_weights
 
-            #model.get_layer(name='layer_').set_weights([ Xweights.reshape(-1, 1) ])
-
-            #model.get_layer(name='layer_').set_weights(
-                #np.array([ np.array(np.zeros((2,partitionsX.shape[0]))),Xweights.reshape(-1) ]))
-
-                #model.get_layer(name='layer_0').set_weights(
-                #np.array([ kmeans.cluster_centers_[:,0].reshape(1,-1),np.array(np.zeros((len(partition_labels)))) ]))
-                #.reshape(-1,1)
-                #.reshape(-1,1)
-
-
-
-            #model.get_layer(name='layer_0').set_weights(
-            #np.array([ DelCenters.reshape(1,-1),np.array(np.zeros((len(partition_labels)))) ]))
-
-            #keras.utils.plot_model(model, show_shapes=True, to_file='/home/dimitris/model_graph.png')
-            #model.get_layer(name='layer_0').weights[ 0 ] = w
-            #model.layers[0].set_weights([kmeans.cluster_centers_[0:,0].reshape(-1,1)])
-                                                         #np.zeros(partitionsX.shape[1])])
             return model
 
         def preTrainedWeights():
@@ -1499,9 +1454,6 @@ class TensorFlowW(BasePartitionModeler):
         autoencoder.fit(partitionsX, partitionsX, batch_size=batch_size, epochs=pretrain_epochs)  # , callbacks=cb)
         # autoencoder.save_weights(save_dir + '/ae_weights.h5')
 
-
-
-
         clustering_layer = ClusteringLayer(len(partition_labels), name='clustering')(encoder.output)
         model1 = keras.models.Model(inputs=encoder.input, outputs=clustering_layer)
 
@@ -1515,6 +1467,9 @@ class TensorFlowW(BasePartitionModeler):
 
         q = model1.predict(partitionsX, verbose=0)
         y_predDeepCl = q.argmax(1)
+
+        sr = sp.Earth()
+        sr.fit(partitionsX,partitionsY)
 
 
         DeepCLpartitionsX = [ ]
@@ -1545,9 +1500,9 @@ class TensorFlowW(BasePartitionModeler):
 
         #for train, test in kfold.split(partitionsX[idx],partitionsY[idx]):
         #if len(partition_labels)>0:
-        for idx, pCurLbl in enumerate(DeepClpartitionLabels):
+        #for idx, pCurLbl in enumerate(DeepClpartitionLabels):
                 #partitionsX[ idx ]=partitionsX[idx].reshape(-1,2)
-                estimator.fit(np.array(DeepCLpartitionsX[idx]),np.array(DeepCLpartitionsY[idx]),epochs=100)
+                #estimator.fit(np.array(DeepCLpartitionsX[idx]),np.array(DeepCLpartitionsY[idx]),epochs=100)
                     #scores = estimator.score(partitionsX[idx][ test ], partitionsY[idx][ test ])
                     #print("%s: %.2f%%" % ("acc: ", scores))
 
