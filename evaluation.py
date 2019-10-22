@@ -395,8 +395,8 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
                         rpm12 = rpms[0]
                         rpm23=rpms[1]
                         rpm31 = rpms[2]
-                    except Exception ,e:
-                        print(str(e))
+                    except :
+                        #print(str(e))
                         x=0
 
                     if len(vs) < 3:
@@ -450,8 +450,8 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
                         cond_numer3 = np.linalg.cond(eq1)
                     ####################################
                     ##############################
-                    except Exception, e:
-                        print(str(e))
+                    except :
+                        #print(str(e))
                         x=0
 
                     #############################
@@ -678,9 +678,9 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
                                 Xpred=XpredN
                                         #Xpred = [ W2 * rpm2 + W1 * rpm1 + W3 * rpm3 ]
 
-                    except  Exception, e:
+                    except :
                         flgExc = True
-                        print str(e)
+                        #print str(e)
                     #errorsTue.append(abs(Xpred - trueVal))
                     #if abs(Xpred[0] - trueVal) > 10 or flgExc:
                         #y=0

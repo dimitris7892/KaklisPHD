@@ -60,6 +60,12 @@ def main():
         if cl=='DC' :partitioners.append(dPart.DelaunayTriPartitioner())
 
     print(modelers)
+
+    ####################################LAROS DATA STATISTICAL TESTS
+    data = pd.read_csv('./MT_DELTA_MARIA_data.csv')
+    seriesX, targetY, targetW, targetB = reader.readLarosDataFromCsv(data)
+    #################
+
     data = pd.read_csv(sFile)
     meanBTr=[]
     meanVTr=[]
