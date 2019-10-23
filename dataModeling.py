@@ -1177,7 +1177,9 @@ class TensorFlowW(BasePartitionModeler):
 
             def compute_output_shape(self, input_shape):
                 assert input_shape and len(input_shape) == 2
+
                 return input_shape[ 0 ], self.n_clusters
+
 
             def get_config(self):
                 config = {'n_clusters': self.n_clusters}
@@ -1187,26 +1189,36 @@ class TensorFlowW(BasePartitionModeler):
         class MyLayer(tf.keras.layers.Layer):
 
 
-            def __init__(self, sharp=100, **kwargs):
+            def __init__(self, output_dim, **kwargs):
+                self.output_dim = output_dim
                 super(MyLayer, self).__init__(**kwargs)
-                self.supports_masking = True
-                self.sharp =tf.keras.backend.cast_to_floatx(sharp)
+
+            def build(self, input_shape):
+                # Create a trainable weight variable for this layer.
+                self.kernel = self.add_weight(name='kernel',
+                                              shape=(input_shape[1], self.output_dim),
+                                              initializer='uniform',
+                                              trainable=True)
+                super(MyLayer, self).build(input_shape)  # Be sure to call this at the end
 
             def call(self, inputs):
 
                 orig = inputs
                 inputs = tf.where(orig <= 0.0, tf.zeros_like(inputs), inputs)
-                inputs = tf.where(orig>8.76,
-                                      sr.coef_[0][0] * (inputs - 8.76), inputs)
-                inputs = tf.where(tf.math.logical_and(tf.greater(orig, 1.32), tf.less(orig, 8.76)),
-                                  (sr.coef_[0][1] * ( 8.76 - inputs)), inputs)
-                inputs = tf.where(tf.math.logical_and(tf.greater(orig, 1.32), tf.less(orig, 8.76)),
-                                  (sr.coef_[0][2] * (inputs-1.32)), inputs)
+                inputs = tf.where(orig > 8.76,
+                                  sr.coef_[0][0] * (inputs - 8.76), inputs)
+                inputs = tf.where(orig < 8.76,
+                                  sr.coef_[0][1] * (8.76 - inputs), inputs)
+
+                inputs = tf.where(orig > 1.32,
+                                  sr.coef_[0][2] * (inputs - 1.32), inputs)
 
                 inputs = tf.where(tf.math.logical_and(tf.less(orig, 1.32), tf.greater(orig, 0)),
-                                  (sr.coef_[0][3] * (1.32 - inputs )), inputs)
+                                  (sr.coef_[0][3] * (1.32 - inputs)), inputs)
 
-                return inputs
+                return  inputs
+
+
 
             def get_config(self):
                 config = {'sharp': float(self.sharp)}
@@ -1214,7 +1226,7 @@ class TensorFlowW(BasePartitionModeler):
                 return dict(list(base_config.items()) + list(config.items()))
 
             def compute_output_shape(self, input_shape):
-                return input_shape
+                return (input_shape[0], self.output_dim)
 
         def stackedModels(members):
             for i,pCurLbl in  enumerate(partition_labels):
@@ -1237,6 +1249,22 @@ class TensorFlowW(BasePartitionModeler):
             model.compile(loss='mean_squared_error', optimizer=keras.optimizers.Adagrad())
             return model
 
+        def custom_activation(inputs):
+
+            orig = inputs
+            inputs = tf.where(orig > 8.76,
+                              sr.coef_[0][0] * (inputs - 8.76), inputs)
+            inputs = tf.where(orig < 8.76,
+                              sr.coef_[0][1] * (8.76 - inputs), inputs)
+
+            inputs = tf.where(orig > 1.32,
+                              sr.coef_[0][2] * (inputs - 1.32), inputs)
+
+            inputs = tf.where(tf.math.logical_and(tf.less(orig, 1.32), tf.greater(orig, 0)),
+                              (sr.coef_[0][3] * (1.32 - inputs)), inputs)
+
+            return keras.backend.sum(inputs , keepdims=True)
+
         def baseline_model():
             #create model
             #model = keras.models.Model(input, decoded)
@@ -1257,20 +1285,36 @@ class TensorFlowW(BasePartitionModeler):
             #model.add(MyLayer(len(partition_labels)*2,activation='relu'))
             #model.add(MyLayer(len(partition_labels),activation='relu'))
             #model.add(keras.layers.Embedding(20, 1, input_length=2, name='layer_'))
-            model.add(keras.layers.Dense(len(partition_labels), input_shape=(2,), activation='relu', name='layer_0'))
-            model.add(keras.layers.Dense(len(partition_labels) * 2, activation='relu'))
-            model.add(keras.layers.Dense(len(partition_labels) * 3, activation='relu'))
 
-            model.add(MyLayer(len(partition_labels)))
-            #model.add(keras.layers.Dense(len(partition_labels) * 4, activation='relu'))
-            #model.add(keras.layers.Dense(len(partition_labels) * 3, activation='relu'))
+            model.add(keras.layers.Dense(len(partition_labels), input_shape=(2,), activation='relu', name='layer_0'))
+            model.add(keras.layers.Dense(len(partition_labels)*2, activation='relu'))
+            model.add(keras.layers.Dense(len(partition_labels), activation='relu'))
+            #model.add(keras.layers.Dense(4, activation='relu'))
+            #model.add(MyLayer(len(partition_labels)))
+            model.add(MyLayer(4))
 
             model.add(keras.layers.Dense(len(partition_labels) * 2, activation='relu'))
             model.add(keras.layers.Dense(len(partition_labels), activation='relu'))
+
+            #model.add(keras.layers.Dense(len(partition_labels)*2 , activation='relu'))
+            #model.add(keras.layers.Dense(len(partition_labels), activation='relu'))
+
+
+            #model.add(keras.layers.Dense(len(partition_labels) , activation='relu'))
+
+
+            #model.add(keras.layers.Dense(len(partition_labels) * 4, activation='relu'))
+            #model.add(keras.layers.Dense(len(partition_labels) * 3, activation='relu'))
+            #model.add(MyLayer(len(partition_labels)))
+            #model.add(keras.layers.Dense(len(partition_labels) * 2, activation='relu'))
+
+            #model.add(keras.layers.Dense(len(partition_labels), activation='relu'))
             #model.add(keras.layers.Dense(2, input_shape=(2,), activation='relu'))
 
             model.add(keras.layers.Flatten())
+
             model.add(keras.layers.Dense(1))
+
 
             # Compile model
             model.compile(loss='mse', optimizer=keras.optimizers.Adam())
