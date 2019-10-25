@@ -55,70 +55,78 @@ class BaseSeriesReader:
                 dt=datetime.datetime.strptime(newDate, '%Y-%m-%d %H:%M')
                 value = row[3]
                 siteId=row[2]
-                #if id=='21' and dt >= dtFrom and dt<=dtTo:
+                #if id=='7' :
                     #drftA={}
                     #drftA["value"]=value
                     #drftA["dt"]=dt
                     #draftAFT[ "data" ].append(drftA)
 
-                #if id=='22' and dt >= dtFrom and dt<=dtTo:
+                #if id=='8':
                     #drftF={}
-                    ###drftF["value"]=value
+                    #drftF["value"]=value
                     #drftF["dt"]=dt
                     #draftFORE[ "data" ].append(drftF)
 
 
-                if id=='61' and  dt >= dtFrom and dt<=dtTo:
+                if id=='61' :
                     drft={}
                     drft["value"]=value
                     drft["dt"]=dt
                     draft[ "data" ].append(drft)
 
-                if id == '81' and dt >= dtFrom and dt <= dtTo:
+                if id == '81':
                     wa={}
                     wa[ "value" ] = value
                     wa[ "dt" ] = dt
                     windAngle[ "data" ].append(wa)
 
-                if id == '82' and dt >= dtFrom and dt <= dtTo:
+                if id == '82' :
                     ws={}
                     ws[ "value" ] = value
                     ws[ "dt" ] = dt
                     windSpeed[ "data" ].append(ws)
 
-                if id == '84' and dt >= dtFrom and dt <= dtTo:
+                if id == '84' :
                     so={}
                     so[ "value" ] = value
                     so[ "dt" ] = dt
                     SpeedOvg[ "data" ].append(so)
 
-                if id == '89' and dt >= dtFrom and dt <= dtTo:
+                if id == '89' :
                     rpms={}
                     rpms[ "value" ] = value
                     rpms[ "dt" ] = dt
                     rpm[ "data" ].append(rpms)
 
-                if id == '137' and dt >= dtFrom and dt <= dtTo:
+                if id == '137' :
                     fo={}
                     fo[ "value" ] = value
                     fo[ "dt" ] = dt
                     foc[ "data" ].append(fo)
 
-                if id == '353' and dt >= dtFrom and dt <= dtTo:
+                if id == '353' :
                     pow={}
                     pow[ "value" ] = value
                     pow[ "dt" ] = dt
                     power[ "data" ].append(pow)
 
                 line_count+=1
-                if int(id) > 353 : break
+                if int(id) >61 : break
             print('Processed '+str(line_count)+ ' lines.')
 
 
 
         with open('./MT_DELTA_MARIA_data.csv', mode='w') as data:
             data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-            data_writer.writerow(['Draft', 'WindSpeed', 'WindAngle', 'SpeedOvg','Rpm' ,'M/E FOC (kg/min)', 'Power','DateTime' ])
+            #data_writer.writerow(['Draft', 'WindSpeed', 'WindAngle', 'SpeedOvg','Rpm' ,'M/E FOC (kg/min)', 'Power','DateTime' ])
+            data_writer.writerow(
+                ['Draft','DateTime' ])
+
+            for i in range(0,len(draft['data'])):
+                value = draft['data'][i]['value']
+                dt = draft['data'][i]['dt']
+                data_writer.writerow([value,str(dt)])
+
             for dt in rrule(MINUTELY, dtstart=dtFrom, until=dtTo):
                dtTocompare = dt
 

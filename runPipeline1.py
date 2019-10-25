@@ -119,7 +119,7 @@ def main():
            else:
              partK=[15]
        error = {"errors": [ ]}
-       #random.seed(1)
+       random.seed(1)
 
        flagEvalTri = False
        for k in partK:
