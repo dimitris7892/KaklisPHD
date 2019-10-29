@@ -1305,12 +1305,13 @@ class TensorFlowW(BasePartitionModeler):
             cond3 = tf.cast(tf.math.greater(x,1.32), tf.float32)
             cond4 = tf.cast(tf.math.logical_and(tf.math.less_equal(x, 1.32), tf.math.greater_equal(x, 0.0)), tf.float32)
 
-            a = tf.math.multiply(cond1,   sr.coef_[0][0] * (x - 8.76))
-            b = tf.math.multiply(cond2, sr.coef_[0][1] * (8.76 - x))
-            c = tf.math.multiply(cond3,  sr.coef_[0][2] * (x - 1.32))
-            d = tf.math.multiply(cond4, (sr.coef_[0][3] * (1.32 - x)))
+            intercept = sr.coef_[0][0]
+            a = tf.math.multiply(cond1,   sr.coef_[0][1] * (x - 8.76))
+            b = tf.math.multiply(cond2, sr.coef_[0][2] * (8.76 - x))
+            c = tf.math.multiply(cond3,  sr.coef_[0][3] * (x - 1.32))
+            d = tf.math.multiply(cond4, (sr.coef_[0][4] * (1.32 - x)))
 
-            f = a + b + c + d
+            f =intercept+ a + b + c + d
 
             return f
                 #keras.backend.sum(inputs , keepdims=True)
@@ -1343,14 +1344,14 @@ class TensorFlowW(BasePartitionModeler):
             #model.add(keras.layers.Embedding(20, 1, input_length=2, name='layer_'))
             #model.add(ClassifyLayer(1, input_shape=(2,),name='classify'))
 
-            model.add(keras.layers.Dense(len(partition_labels)*3, input_shape=(2,), activation='relu', name='layer_0'))
-            model.add(keras.layers.Dense(len(partition_labels)*2, activation='relu'))
-            model.add(keras.layers.Dense(len(partition_labels), activation='relu'))
+            #model.add(keras.layers.Dense(len(partition_labels)*3, input_shape=(2,), activation='relu', name='layer_0'))
+            #model.add(keras.layers.Dense(len(partition_labels)*2, activation='relu'))
+            #model.add(keras.layers.Dense(len(partition_labels), activation='relu'))
             #model.add(keras.layers.Dense(4, activation='relu'))
             #model.add(MyLayer(len(partition_labels)))
             #model.add(MyLayer(4))
 
-            model.add(keras.layers.Dense(4, activation=custom_activation))
+            model.add(keras.layers.Dense(len(partition_labels), activation=custom_activation))
 
 
             #model.add(keras.layers.Dense(len(partition_labels), activation='relu'))
