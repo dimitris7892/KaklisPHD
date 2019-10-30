@@ -2,7 +2,6 @@ import numpy as np
 import dataModeling as dt
 import tensorflow as tf
 import sklearn.ensemble as skl
-from tensorflow.python.tools import inspect_checkpoint as chkp
 import statsmodels.api
 from statsmodels.formula.api import ols
 import pandas as pd
