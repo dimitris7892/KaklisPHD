@@ -1372,7 +1372,7 @@ class TensorFlowW(BasePartitionModeler):
 
             model.add(keras.layers.Flatten())
 
-            model.add(keras.layers.Dense(1))
+            model.add(keras.layers.Dense(1, activation=custom_activation))
 
 
             # Compile model
