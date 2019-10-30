@@ -115,7 +115,7 @@ def main():
                  #[0.6]
        if partitioner.__class__.__name__=='KMeansPartitioner':
            if modeler.__class__.__name__=='TriInterpolantModeler' or modeler.__class__.__name__ == 'TensorFlow':
-             partK = [1]
+             partK = [15]
            else:
              partK=[15]
        error = {"errors": [ ]}
@@ -196,14 +196,15 @@ def main():
 
 
                 elif modeler.__class__.__name__ == 'TensorFlow' or modeler.__class__.__name__ == 'TensorFlowW':
-                    #_, meanError, sdError = eval.MeanAbsoluteErrorEvaluation.evaluateKerasNN(
+                    #, meanError, sdError = eval.MeanAbsoluteErrorEvaluation.evaluateKerasNN(
                         #eval.MeanAbsoluteErrorEvaluation(), X,
                         #Y,
                         #modeler, output, xs)
                         x=1
+
                 #print ("Mean absolute error on training data: %4.2f (+/- %4.2f standard error)" % (
                     #meanError, sdError / sqrt(unseenFeaturesY.shape[ 0 ])))
-                print("Evaluating on seen data... Done.")
+                #print("Evaluating on seen data... Done.")
 
             # Predict and evaluate on unseen data
             print("Evaluating on unseen data...")

@@ -1250,19 +1250,19 @@ class TensorFlowW(BasePartitionModeler):
                 orig = inputs
 
 
-                inputs = tf.where(orig <= 0.0, tf.zeros_like(inputs), inputs)
-                inputs = tf.where(orig > 8.76,
+                a = tf.where(orig <= 0.0, tf.zeros_like(inputs), inputs)
+                b = tf.where(orig > 8.76,
                                   sr.coef_[0][0] * (inputs - 8.76), inputs)
-                inputs = tf.where(orig < 8.76,
+                c = tf.where(orig < 8.76,
                                   sr.coef_[0][1] * (8.76 - inputs), inputs)
 
-                inputs = tf.where(orig > 1.32,
+                d = tf.where(orig > 1.32,
                                   sr.coef_[0][2] * (inputs - 1.32), inputs)
 
-                inputs = tf.where(tf.math.logical_and(tf.less(orig, 1.32), tf.greater(orig, 0)),
+                e = tf.where(tf.math.logical_and(tf.less(orig, 1.32), tf.greater(orig, 0)),
                                   (sr.coef_[0][3] * (1.32 - inputs)), inputs)
 
-                return  inputs
+                return  keras.backend.sum(a,b,c,d,e)
 
 
 
@@ -1300,18 +1300,36 @@ class TensorFlowW(BasePartitionModeler):
 
             x = inputs
 
+            #n = 1.0 / (1.0 + tf.norm(np.mean(DeepCLpartitionsX[0]) - x))
+
+            mBest = None
+            dBestFit = 0
+            # For each model
+            for m in range(0, len(DeepClpartitionLabels)):
+                # If it is a better for the point
+                dCurFit = 1.0 / (1.0 + tf.norm(np.mean(DeepCLpartitionsX[m]) - x))
+
+                cond1 = tf.cast(tf.math.greater(dCurFit, dBestFit), tf.float32)
+                dBestFit = tf.math.multiply(cond1, dCurFit)
+                # Update the selected best model and corresponding fit
+
+                mBest = tf.math.multiply(cond1, m)
+
+
+            #d = tf.keras.backend.eval(mBest)
+            #id , fit = getBestPartitionForPoint(x,DeepCLpartitionsX)
             cond1 = tf.cast(tf.math.greater(x, 8.76), tf.float32)
-            cond2 = tf.cast(tf.math.logical_and(tf.math.less_equal(x, 8.76), tf.math.greater_equal(x, 0.0)), tf.float32)
+            cond2 = tf.cast(tf.math.less_equal(x, 8.76), tf.float32)
             cond3 = tf.cast(tf.math.greater(x,1.32), tf.float32)
-            cond4 = tf.cast(tf.math.logical_and(tf.math.less_equal(x, 1.32), tf.math.greater_equal(x, 0.0)), tf.float32)
+            cond4 = tf.cast(tf.math.less_equal(x, 1.32), tf.float32)
 
-            intercept = sr.coef_[0][0]
-            a = tf.math.multiply(cond1,   sr.coef_[0][1] * (x - 8.76))
-            b = tf.math.multiply(cond2, sr.coef_[0][2] * (8.76 - x))
-            c = tf.math.multiply(cond3,  sr.coef_[0][3] * (x - 1.32))
-            d = tf.math.multiply(cond4, (sr.coef_[0][4] * (1.32 - x)))
+            #intercept = sr.coef_[0][0]
+            a = tf.math.multiply(cond1,   sr.coef_[0][0] * (x - 8.76))
+            b = tf.math.multiply(cond2, sr.coef_[0][1] * (8.76 - x))
+            c = tf.math.multiply(cond3,  sr.coef_[0][2] * (x - 1.32))
+            d = tf.math.multiply(cond4, (sr.coef_[0][3] * (1.32 - x)))
 
-            f =intercept+ a + b + c + d
+            f = a + b + c + d
 
             return f
                 #keras.backend.sum(inputs , keepdims=True)
@@ -1341,7 +1359,7 @@ class TensorFlowW(BasePartitionModeler):
 
             #model.add(MyLayer(len(partition_labels)*2,activation='relu'))
             #model.add(MyLayer(len(partition_labels),activation='relu'))
-            #model.add(keras.layers.Embedding(20, 1, input_length=2, name='layer_'))
+            #model.add(keras.layers.Embedding(partitionsX.shape[0], 1, input_length=2, name='layer_'))
             #model.add(ClassifyLayer(1, input_shape=(2,),name='classify'))
 
             #model.add(keras.layers.Dense(len(partition_labels)*3, input_shape=(2,), activation='relu', name='layer_0'))
@@ -1351,7 +1369,8 @@ class TensorFlowW(BasePartitionModeler):
             #model.add(MyLayer(len(partition_labels)))
             #model.add(MyLayer(4))
 
-            model.add(keras.layers.Dense(len(partition_labels), activation=custom_activation))
+            model.add(keras.layers.Dense(len(partition_labels), input_shape=(2,),activation=custom_activation))
+            #model.add(keras.layers.Dense(4, input_shape=(2,), activation=custom_activation))
 
 
             #model.add(keras.layers.Dense(len(partition_labels), activation='relu'))
@@ -1373,7 +1392,7 @@ class TensorFlowW(BasePartitionModeler):
 
             model.add(keras.layers.Flatten())
 
-            model.add(keras.layers.Dense(1, activation=custom_activation))
+            model.add(keras.layers.Dense(1,activation=custom_activation)) #activation=custom_activation
 
 
             # Compile model
@@ -1541,7 +1560,7 @@ class TensorFlowW(BasePartitionModeler):
         partitionsY=Y
         #weights = preTrainedWeights()
 
-        dims = [ 2 ,1000,500,200,100,50, len(partition_labels) ]
+        dims = [ 2 ,500,200,100, len(partition_labels) ]
         init = keras.initializers.VarianceScaling(scale=1. / 3., mode='fan_in',
                                                   distribution='uniform')
         # pretrain_optimizer =keras.optimizers.SGD(lr=1, momentum=0.9)
@@ -1596,7 +1615,11 @@ class TensorFlowW(BasePartitionModeler):
             DeepClpartitionLabels.append(curLbl)
             #models.append(autoencoder)
 
-
+        srModels=[]
+        for idx, pCurLbl in enumerate(DeepClpartitionLabels):
+            srM = sp.Earth()
+            srM.fit(np.array(DeepCLpartitionsX[idx]),np.array(DeepCLpartitionsY[idx]))
+            srModels.append(srM)
         ########SET K MEANS INITIAL WEIGHTS TO CLUSTERING LAYER
 
         #X_train, X_test, y_train, y_test = train_test_split(partitionsX, partitionsY, test_size=0.33, random_state=seed)
@@ -1605,11 +1628,18 @@ class TensorFlowW(BasePartitionModeler):
 
         estimator.fit(partitionsX,partitionsY,validation_split=0.33,epochs=100)        #validation_data=(X_test,y_test)
 
+        model2 = keras.models.Model(inputs=estimator.input, outputs=estimator.layers[-2].output)
+
+        model2.compile(optimizer=keras.optimizers.Adam(), loss='mse')
+
+        q = model2.predict(partitionsX, verbose=0)
+        y_predDeepCl = q.argmax(1)
+
         #for train, test in kfold.split(partitionsX[idx],partitionsY[idx]):
         #if len(partition_labels)>0:
-        #for idx, pCurLbl in enumerate(DeepClpartitionLabels):
+        for idx, pCurLbl in enumerate(DeepClpartitionLabels):
                 #partitionsX[ idx ]=partitionsX[idx].reshape(-1,2)
-                #estimator.fit(np.array(DeepCLpartitionsX[idx]),np.array(DeepCLpartitionsY[idx]),epochs=100)
+                estimator.fit(np.array(DeepCLpartitionsX[idx]),np.array(DeepCLpartitionsY[idx]),epochs=100)
                     #scores = estimator.score(partitionsX[idx][ test ], partitionsY[idx][ test ])
                     #print("%s: %.2f%%" % ("acc: ", scores))
 
