@@ -115,7 +115,7 @@ def main():
                  #[0.6]
        if partitioner.__class__.__name__=='KMeansPartitioner':
            if modeler.__class__.__name__=='TriInterpolantModeler' or modeler.__class__.__name__ == 'TensorFlow':
-             partK = [15]
+             partK = [1]
            else:
              partK=[15]
        error = {"errors": [ ]}
@@ -164,7 +164,7 @@ def main():
             #modelMap, xs, output, genericModel =None,None,None,None
             if modeler.__class__.__name__!= 'TriInterpolantModeler' :
                     #and modeler.__class__.__name__ != 'TensorFlow':
-                modelMap, xs, output, genericModel=modeler.createModelsFor(partitionsX, partitionsY, partitionLabels,tri,partitionRepresentatives,partitioningModel)
+                modelMap, model2,xs, output, genericModel=modeler.createModelsFor(partitionsX, partitionsY, partitionLabels,tri,partitionRepresentatives,partitioningModel)
             #if modeler.__class__.__name__ != 'TensorFlow':
                 #modelMap = dict(zip(partitionLabels, modelMap))
             print("Creating models per partition... Done")
@@ -217,7 +217,7 @@ def main():
                 _, meanError, sdError = eval.MeanAbsoluteErrorEvaluation.evaluateKerasNN(
                     eval.MeanAbsoluteErrorEvaluation(),unseenFeaturesX,
                     unseenFeaturesY,
-                    modeler, output, xs)
+                    modeler,output, xs,model2)
             else:
                 if flagEvalTri == False:
                     Errors, meanError, sdError = eval.MeanAbsoluteErrorEvaluation.evaluateTriInterpolant(
