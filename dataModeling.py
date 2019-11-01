@@ -1175,10 +1175,10 @@ class TensorFlowW(BasePartitionModeler):
 
             def build(self, input_shape):
                 # Create a trainable weight variable for this layer.
-                self.kernel = self.add_weight(name='kernel',
-                                              shape=(input_shape[1], self.output_dim),
-                                              initializer='uniform',
-                                              trainable=True)
+                #self.kernel = self.add_weight(name='kernel',
+                                              #shape=(input_shape[1].value, self.output_dim),
+                                              #initializer='uniform',
+                                              #trainable=True)
                 super(MyLayer, self).build(input_shape)  # Be sure to call this at the end
 
             def call(self, inputs):
@@ -1300,36 +1300,39 @@ class TensorFlowW(BasePartitionModeler):
 
             x = inputs
 
-            #n = 1.0 / (1.0 + tf.norm(np.mean(DeepCLpartitionsX[0]) - x))
-
-            mBest = None
-            dBestFit = 0
-            # For each model
-            for m in range(0, len(DeepClpartitionLabels)):
-                # If it is a better for the point
-                dCurFit = 1.0 / (1.0 + tf.norm(np.mean(DeepCLpartitionsX[m]) - x))
-
-                cond1 = tf.cast(tf.math.greater(dCurFit, dBestFit), tf.float32)
-                dBestFit = tf.math.multiply(cond1, dCurFit)
-                # Update the selected best model and corresponding fit
-
-                mBest = tf.math.multiply(cond1, m)
+            cond1 = tf.cast(tf.math.greater(x, 8.76), tf.float32)
+            cond2 = tf.cast(tf.math.less_equal(x, 8.76), tf.float32)
+            cond3 = tf.cast(tf.math.logical_and(tf.less(x, 8.76), tf.greater(x, 2.56)), tf.float32)
+            cond4 = tf.cast(tf.math.logical_or(tf.greater(x, 8.76), tf.less(x, 2.56)), tf.float32)
 
 
-            #d = tf.keras.backend.eval(mBest)
-            #id , fit = getBestPartitionForPoint(x,DeepCLpartitionsX)
+            intercept = sr.coef_[ 0 ][ 0 ]
+            a = tf.math.multiply(cond1, sr.coef_[ 0 ][ 1 ] * (x - 8.76))
+            b = tf.math.multiply(cond2, sr.coef_[ 0 ][ 2 ] * (8.76 - x))
+            c = tf.math.multiply(cond3, sr.coef_[ 0 ][ 3 ] * (x - 2.56) * (8.76 - x))
+            d = tf.math.multiply(cond4, (sr.coef_[ 0 ][ 4 ] * (2.56 - x)* (x - 8.76)))
+
+            f = intercept + a + b + c + d
+
+            return f
+
+        def custom_activation1(inputs):
+
+            x = inputs
+
+
             cond1 = tf.cast(tf.math.greater(x, 8.76), tf.float32)
             cond2 = tf.cast(tf.math.less_equal(x, 8.76), tf.float32)
             cond3 = tf.cast(tf.math.greater(x,1.32), tf.float32)
             cond4 = tf.cast(tf.math.less_equal(x, 1.32), tf.float32)
 
-            #intercept = sr.coef_[0][0]
-            a = tf.math.multiply(cond1,   sr.coef_[0][0] * (x - 8.76))
-            b = tf.math.multiply(cond2, sr.coef_[0][1] * (8.76 - x))
-            c = tf.math.multiply(cond3,  sr.coef_[0][2] * (x - 1.32))
-            d = tf.math.multiply(cond4, (sr.coef_[0][3] * (1.32 - x)))
+            intercept = sr.coef_[0][0]
+            a = tf.math.multiply(cond1,   sr.coef_[0][1] * (x - 8.76))
+            b = tf.math.multiply(cond2, sr.coef_[0][2] * (8.76 - x))
+            c = tf.math.multiply(cond3,  sr.coef_[0][3] * (x - 1.32))
+            d = tf.math.multiply(cond4, (sr.coef_[0][4] * (1.32 - x)))
 
-            f = a + b + c + d
+            f =intercept+ a + b + c + d
 
             return f
                 #keras.backend.sum(inputs , keepdims=True)
@@ -1342,63 +1345,18 @@ class TensorFlowW(BasePartitionModeler):
 
         def baseline_model():
             #create model
-            #model = keras.models.Model(input, decoded)
-            #model.add(MyLayer(10))
             model = keras.models.Sequential()
-            #inputs = keras.layers.Input(shape=(pre_trained_weights.shape[0],), name='layer_0')
-            #x = input_img
-            #model.add(keras.layers.Dense(500, activation='relu',name='layer_1'))(inputs)
-            #model.add(keras.layers.Input(pre_trained_weights.shape[0],shape=(2,), name='layer_0'))
-            #model.add(keras.layers.Embedding(2, 1, input_length=2, name='layer_'))
 
-            #model.add(keras.layers.Conv1D(len(partition_labels),100 ,padding='same',input_shape=(partitionsX.shape[ 0 ],), name='layer_'))
-
-            #model.add(keras.layers.Dense(100, input_shape=(2,), activation='relu', name='layer_0'))
-            #model.add(keras.layers.Dense(50, input_shape=(2,), activation='relu' ))
-            dims = [ partitionsX.shape[ -1 ], 50, len(partition_labels)]
-
-            #model.add(MyLayer(len(partition_labels)*2,activation='relu'))
-            #model.add(MyLayer(len(partition_labels),activation='relu'))
-            #model.add(keras.layers.Embedding(partitionsX.shape[0], 1, input_length=2, name='layer_'))
-            #model.add(ClassifyLayer(1, input_shape=(2,),name='classify'))
-
-            #model.add(keras.layers.Dense(len(partition_labels)*3, input_shape=(2,), activation='relu', name='layer_0'))
-            #model.add(keras.layers.Dense(len(partition_labels)*2, activation='relu'))
-            #model.add(keras.layers.Dense(len(partition_labels), activation='relu'))
-            #model.add(keras.layers.Dense(4, activation='relu'))
-            #model.add(MyLayer(len(partition_labels)))
-            #model.add(MyLayer(4))
-
-            model.add(keras.layers.Dense(len(partition_labels), input_shape=(2,),activation=custom_activation))
-            #model.add(keras.layers.Dense(4, input_shape=(2,), activation=custom_activation))
-
-
-            #model.add(keras.layers.Dense(len(partition_labels), activation='relu'))
-
-            #model.add(keras.layers.Dense(len(partition_labels)*2 , activation='relu'))
-            #model.add(keras.layers.Dense(len(partition_labels), activation='relu'))
-
-
-            #model.add(keras.layers.Dense(len(partition_labels) , activation='relu'))
-
-
-            #model.add(keras.layers.Dense(len(partition_labels) * 4, activation='relu'))
-            #model.add(keras.layers.Dense(len(partition_labels) * 3, activation='relu'))
-            #model.add(MyLayer(len(partition_labels)))
-            #model.add(keras.layers.Dense(len(partition_labels) * 2, activation='relu'))
-
-            #model.add(keras.layers.Dense(len(partition_labels), activation='relu'))
-            #model.add(keras.layers.Dense(2, input_shape=(2,), activation='relu'))
-
-            model.add(keras.layers.Flatten())
-
-            model.add(keras.layers.Dense(1,activation=custom_activation)) #activation=custom_activation
-
-
+            model.add(keras.layers.Dense(len(partition_labels)*2, input_shape=(2,)))
+            model.add(keras.layers.Dense(len(partition_labels), input_shape=(2,)))
+            model.add(keras.layers.Dense(10, input_shape=(2,)))
+            model.add(keras.layers.Dense(5, input_shape=(2,)))
+            model.add(keras.layers.Activation(custom_activation))
+            model.add(keras.layers.Dense(1,)) #activation=custom_activation
+            #model.add(keras.layers.Activation(custom_activation))
+            #model.add(keras.layers.Activation('linear'))  # activation=custom_activation
             # Compile model
             model.compile(loss='mse', optimizer=keras.optimizers.Adam())
-
-
             return model
 
         def preTrainedWeights():
@@ -1585,18 +1543,37 @@ class TensorFlowW(BasePartitionModeler):
 
         model1.compile(optimizer=keras.optimizers.Adam(), loss='kld')
         #SGD(0.01, 0.9)
-        #kmeans = KMeans(n_clusters=len(partition_labels), n_init=20)
+        kmeans = KMeans(n_clusters=len(partition_labels), n_init=20)
         #dataUpdatedX = partitionsX.reshape(-1, 2)
-        #y_pred = kmeans.fit_predict(partitionsX)
-        #cl_centers=np.array([np.mean(k) for k in kmeans.cluster_centers_]).reshape(-1,1)
-        #model1.get_layer(name='clustering').set_weights([ cl_centers ])
+        y_pred = kmeans.fit_predict(partitionsX)
+        cl_centers=np.array([np.mean(k) for k in kmeans.cluster_centers_]).reshape(-1,1)
+        model1.get_layer(name='clustering').set_weights([ cl_centers ])
 
         q = model1.predict(partitionsX, verbose=0)
         y_predDeepCl = q.argmax(1)
 
-        sr = sp.Earth()
+        sr = sp.Earth(max_degree=2)
         sr.fit(partitionsX,partitionsY)
 
+            #models.append(autoencoder)
+
+
+        ########SET K MEANS INITIAL WEIGHTS TO CLUSTERING LAYER
+
+        #X_train, X_test, y_train, y_test = train_test_split(partitionsX, partitionsY, test_size=0.33, random_state=seed)
+
+        estimator = baseline_model()
+
+        estimator.fit(partitionsX,partitionsY,validation_split=0.33,epochs=150)        #validation_data=(X_test,y_test)
+
+        #model2 = keras.models.Model(inputs=estimator.input, outputs=estimator.layers[-3].output)
+
+        #model2.compile(optimizer=keras.optimizers.Adam(), loss='mse')
+
+        #q = model2.predict(partitionsX, verbose=0)
+        #y_predDeepCl = q.argmax(1)
+
+        #pred =np.sum(model2.predict(partitionsX[0].reshape(1,2), verbose=0))/15
 
         DeepCLpartitionsX = [ ]
         DeepCLpartitionsY = [ ]
@@ -1606,53 +1583,42 @@ class TensorFlowW(BasePartitionModeler):
         y2 = partitionsY.reshape(-1, 1)
         for curLbl in np.unique(y_predDeepCl):
             # Create a partition for X using records with corresponding label equal to the current
-            if np.asarray(x2[ y_predDeepCl == curLbl ]).__len__() <10 :
+            if np.asarray(x2[ y_predDeepCl == curLbl ]).__len__() < 10:
                 continue
             DeepCLpartitionsX.append(np.asarray(x2[ y_predDeepCl == curLbl ]))
             # Create a partition for Y using records with corresponding label equal to the current
             DeepCLpartitionsY.append(np.asarray(y2[ y_predDeepCl == curLbl ]))
             # Keep partition label to ascertain same order of results
             DeepClpartitionLabels.append(curLbl)
-            #models.append(autoencoder)
 
-        srModels=[]
+        srModels = [ ]
         for idx, pCurLbl in enumerate(DeepClpartitionLabels):
             srM = sp.Earth()
-            srM.fit(np.array(DeepCLpartitionsX[idx]),np.array(DeepCLpartitionsY[idx]))
+            srM.fit(np.array(DeepCLpartitionsX[ idx ]), np.array(DeepCLpartitionsY[ idx ]))
             srModels.append(srM)
-        ########SET K MEANS INITIAL WEIGHTS TO CLUSTERING LAYER
-
-        #X_train, X_test, y_train, y_test = train_test_split(partitionsX, partitionsY, test_size=0.33, random_state=seed)
-
-        estimator = baseline_model()
-
-        estimator.fit(partitionsX,partitionsY,validation_split=0.33,epochs=100)        #validation_data=(X_test,y_test)
-
-        model2 = keras.models.Model(inputs=estimator.input, outputs=estimator.layers[-2].output)
-
-        model2.compile(optimizer=keras.optimizers.Adam(), loss='mse')
-
-        q = model2.predict(partitionsX, verbose=0)
-        y_predDeepCl = q.argmax(1)
-
         #for train, test in kfold.split(partitionsX[idx],partitionsY[idx]):
         #if len(partition_labels)>0:
+        #models.append(estimator)
+        models={}
+        models[ 300 ] = estimator
         for idx, pCurLbl in enumerate(DeepClpartitionLabels):
                 #partitionsX[ idx ]=partitionsX[idx].reshape(-1,2)
+
+                estimator = baseline_model()
                 estimator.fit(np.array(DeepCLpartitionsX[idx]),np.array(DeepCLpartitionsY[idx]),epochs=100)
                     #scores = estimator.score(partitionsX[idx][ test ], partitionsY[idx][ test ])
                     #print("%s: %.2f%%" % ("acc: ", scores))
 
-
-            #self._partitionsPerModel[ estimator ] = partitionsX[idx]
+                models[pCurLbl]=estimator
+                #self._partitionsPerModel[ estimator ] = partitionsX[idx]
         # Update private models
         #models=[]
-        #models.append(model)
-        models.append(estimator)
+
+
         self._models = models
 
         # Return list of models
-        return estimator, numpy.empty, numpy.empty , None
+        return estimator,model1 ,numpy.empty, numpy.empty , None
 
     def createModelsForConv(self,partitionsX, partitionsY, partition_labels):
         ##Conv1D NN
