@@ -844,7 +844,7 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
         print(np.mean(np.nan_to_num(errors)))
         return errors, np.mean(errors), np.std(lErrors)
 
-    def evaluateKerasNN(self, unseenX, unseenY, modeler,output,xs,model1):
+    def evaluateKerasNN(self, unseenX, unseenY, modeler,output,xs,genericModel,partitionsX):
         lErrors = []
         #unseenX = unseenX.reshape((unseenX.shape[ 0 ], 1, unseenX.shape[ 1 ]))
 
@@ -858,11 +858,14 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
             #pPoint=[ pPoint for _ in range(len(modeler._models[0].input)) ]
             #trueVal = unseenY[ iCnt ]
             #prediction = modeler._models[0].model.predict([unseenX[:,0].reshape(1,unseenX.shape[0],1) , unseenX[ :, 1 ].reshape(1, unseenX.shape[ 0 ], 1)])
-            q = model1.predict(pPoint, verbose=0)
-            cl = q.argmax(1)
+            #q = model1.predict(pPoint, verbose=0)
+            #cl = q.argmax(1)
             #weight= model2.layers[1].get_weights()[0][0,:][cl]
             #prediction = np.sum(model2.predict(pPoint, verbose=0)) / 5
-            prediction = (modeler._models[cl[0]].predict(pPoint) + modeler._models[300].predict(pPoint))/2
+            ind , fit = modeler.getBestPartitionForPoint(pPoint,partitionsX)
+            #prediction = modeler._models[0].predict(pPoint)
+            prediction = modeler._models[ind].predict(pPoint)
+                          #+ modeler._models[300].predict(pPoint))/2
             #states_value = modeler._models[0].model.predict([unseenX[:,0].reshape(1,unseenX.shape[200],1) , unseenX[ :, 1 ].reshape(1, unseenX.shape[ 200 ], 1)])
 
             ##########

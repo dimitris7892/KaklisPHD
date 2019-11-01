@@ -118,51 +118,26 @@ class BaseSeriesReader:
 
         with open('./MT_DELTA_MARIA_data.csv', mode='w') as data:
             data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-            #data_writer.writerow(['Draft', 'WindSpeed', 'WindAngle', 'SpeedOvg','Rpm' ,'M/E FOC (kg/min)', 'Power','DateTime' ])
-            data_writer.writerow(
-                ['Draft','DateTime' ])
+            data_writer.writerow(['Draft', 'WindSpeed', 'WindAngle', 'SpeedOvg','Rpm' ,'M/E FOC (kg/min)', 'Power','DateTime' ])
+            #data_writer.writerow(
+                #['Draft','DateTime' ])
 
             for i in range(0,len(draft['data'])):
                 value = draft['data'][i]['value']
                 dt = draft['data'][i]['dt']
-                data_writer.writerow([value,str(dt)])
 
-            for dt in rrule(MINUTELY, dtstart=dtFrom, until=dtTo):
-               dtTocompare = dt
+                value1 = windAngle['data'][i]['value']
 
-               #ListfilteredDRFTaft=[i for i in range(0,len(draftAFT['data'])) if draftAFT['data'][i]['dt']==dtTocompare ]
-               #filteredDRFTaft = "" if len(ListfilteredDRFTaft) == 0 else draftAFT['data'][ListfilteredDRFTaft[0]][ 'value' ]
+                value2 = windSpeed['data'][i]['value']
 
-               #ListfilteredDRFTfore = [ i for i in range(0, len(draftFORE[ 'data' ])) if draftFORE[ 'data' ][ i ][ 'dt' ] == dtTocompare ]
-               #filteredDRFTfore = "" if len(ListfilteredDRFTfore) == 0 else draftFORE[ 'data' ][ ListfilteredDRFTfore[ 0 ] ]['value' ]
+                value3 = power['data'][i]['value']
+                value4 = foc['data'][i]['value']
+                value5 = rpm['data'][i]['value']
+                value6 = SpeedOvg['data'][i]['value']
 
-               ListfilteredDRFT=[i for i in range(0,len(draft['data'])) if draft['data'][i]['dt']==dtTocompare ]
-               filteredDRFT="" if len(ListfilteredDRFT) == 0 else draftAFT['data'][ListfilteredDRFT[0]][ 'value' ]
-
-               ListfilteredWA=[i for i in range(0,len(windAngle['data'])) if windAngle['data'][i]['dt']==dtTocompare ]
-               filteredWA ="" if len(ListfilteredWA)==0 else windAngle["data"][ListfilteredWA[0]]['value']
-
-               ListfilteredWS = [i for i in range(0,len(windSpeed['data'])) if windSpeed['data'][i]['dt']==dtTocompare ]
-               filteredWS ="" if len(ListfilteredWS)==0 else windSpeed["data"][ListfilteredWS[0]]['value']
-
-               ListfilteredSO = [i for i in range(0,len(SpeedOvg['data'])) if SpeedOvg['data'][i]['dt']==dtTocompare ]
-               filteredSO ="" if len(ListfilteredSO)==0 else SpeedOvg["data"][ListfilteredSO[0]]['value']
-
-               ListfilteredFO =[i for i in range(0,len(foc['data'])) if foc['data'][i]['dt']==dtTocompare ]
-               filteredFO ="" if len(ListfilteredFO)==0 else foc["data"][ListfilteredFO[0]]['value']
-
-               ListfilteredRPM =[i for i in range(0,len(rpm['data'])) if rpm['data'][i]['dt']==dtTocompare ]
-               filteredRPM ="" if len(ListfilteredRPM)==0 else rpm["data"][ListfilteredRPM[0]]['value']
+                data_writer.writerow([value,value2,value1,value6,value5,value4,value3,str(dt)])
 
 
-               ListfilteredPOW = [i for i in range(0,len(power['data'])) if power['data'][i]['dt']==dtTocompare ]
-               filteredPOW ="" if len(ListfilteredPOW)==0 else power["data"][ListfilteredPOW[0]]['value']
-               try:
-                data_writer.writerow([ filteredDRFT, filteredWS, filteredWA , filteredSO ,filteredRPM,filteredFO ,
-                                      filteredPOW,str(dtTocompare)])
-
-               except:
-                   x=0
 
     def readLarosDataFromCsv(self, data):
         # Load file

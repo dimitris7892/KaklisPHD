@@ -1087,7 +1087,23 @@ class TensorFlowW(BasePartitionModeler):
         # Return list of models
         return models, numpy.empty, numpy.empty , None
 
+    def getBestPartitionForPoint(self, point, partitions):
+        # mBest = None
+        mBest = None
+        dBestFit = 0
+        # For each model
+        for m in range(0, len(partitions)):
+            # If it is a better for the point
+            dCurFit = self.getFitnessOfPoint(partitions, m, point)
+            if dCurFit > dBestFit:
+                # Update the selected best model and corresponding fit
+                dBestFit = dCurFit
+                mBest = m
 
+        if mBest == None:
+            return 0, 0
+        else:
+            return mBest, dBestFit
 
     def createModelsFor(self, partitionsX, partitionsY, partition_labels,tri,X,Y):
 
@@ -1208,24 +1224,6 @@ class TensorFlowW(BasePartitionModeler):
             def compute_output_shape(self, input_shape):
                 return (input_shape[0], self.output_dim)
 
-        def getBestPartitionForPoint( point, partitions):
-            # mBest = None
-            mBest = None
-            dBestFit = 0
-            # For each model
-            for m in range(0, len(partitions)):
-                # If it is a better for the point
-                dCurFit = self.getFitnessOfPoint(partitions, m, point)
-                if dCurFit > dBestFit:
-                    # Update the selected best model and corresponding fit
-                    dBestFit = dCurFit
-                    mBest = m
-
-            if mBest == None:
-                return 0, 0
-            else:
-                return mBest, dBestFit
-
         def getFitnessOfPoint( partitions, cluster, point):
             return 1.0 / (1.0 + numpy.linalg.norm(np.mean(partitions[cluster]) - point))
 
@@ -1296,6 +1294,34 @@ class TensorFlowW(BasePartitionModeler):
             model.compile(loss='mean_squared_error', optimizer=keras.optimizers.Adagrad())
             return model
 
+        def custom_activation2(inputs):
+
+            x = inputs
+
+            cond1 = tf.cast(tf.math.greater(x, 8.76), tf.float32)
+            cond2 = tf.cast(tf.math.less_equal(x, 8.76), tf.float32)
+            cond3 = tf.cast(tf.math.greater(x, 18.597), tf.float32)
+            cond4 = tf.cast(tf.math.less(x, 18.597), tf.float32)
+            cond5 = tf.cast(tf.math.greater(x, 12.3237), tf.float32)
+            cond6 = tf.cast(tf.math.less(x, 12.3237), tf.float32)
+            cond7 = tf.cast(tf.math.greater(x, 17.6784), tf.float32)
+            cond8 = tf.cast(tf.math.less(x, 17.6784), tf.float32)
+            #cond4 = tf.cast(tf.math.logical_or(tf.greater(x, 8.76), tf.less(x, 2.56)), tf.float32)
+
+            intercept = sr.coef_[0][0]
+            a = tf.math.multiply(cond1, sr.coef_[0][1] * (x - 8.76))
+            b = tf.math.multiply(cond2, sr.coef_[0][2] * (8.76 - x))
+            c = tf.math.multiply(cond3, sr.coef_[0][3] * (x - 18.597))
+            d = tf.math.multiply(cond3, sr.coef_[0][4] * ( 18.597 - x))
+            e = tf.math.multiply(cond3, sr.coef_[0][5] * (x -  12.3237))
+            f = tf.math.multiply(cond3, sr.coef_[0][6] * ( 12.3237 - x))
+            g = tf.math.multiply(cond4, (sr.coef_[0][7] * ( 17.6784 - x)))
+            h = tf.math.multiply(cond4, (sr.coef_[0][8] *  (x - 17.6784 )))
+
+            f = intercept + a + b + c + d + e + f + g + h
+
+            return f
+
         def custom_activation(inputs):
 
             x = inputs
@@ -1343,12 +1369,28 @@ class TensorFlowW(BasePartitionModeler):
             assert shape1 == shape2  # else hadamard product isn't possible
             return [tuple(shape1), tuple(shape2[:-1])]
 
+        def baseline_modelDeepCl():
+            #create model
+            model = keras.models.Sequential()
+
+            #model.add(keras.layers.Dense(len(partition_labels)*2, input_shape=(2,)))
+            model.add(keras.layers.Dense(len(partition_labels), input_shape=(3,)))
+            #model.add(keras.layers.Dense(10, input_shape=(2,)))
+            #model.add(keras.layers.Dense(5, input_shape=(2,)))
+            model.add(keras.layers.Activation(custom_activation))
+            model.add(keras.layers.Dense(1,)) #activation=custom_activation
+            #model.add(keras.layers.Activation(custom_activation))
+            #model.add(keras.layers.Activation('linear'))  # activation=custom_activation
+            # Compile model
+            model.compile(loss='kld', optimizer=keras.optimizers.Adam())
+            return model
+
         def baseline_model():
             #create model
             model = keras.models.Sequential()
 
-            model.add(keras.layers.Dense(len(partition_labels)*2, input_shape=(2,)))
-            model.add(keras.layers.Dense(len(partition_labels), input_shape=(2,)))
+            #model.add(keras.layers.Dense(len(partition_labels)*2, input_shape=(2,)))
+            model.add(keras.layers.Dense(len(partition_labels), input_shape=(2,) ))
             model.add(keras.layers.Dense(10, input_shape=(2,)))
             model.add(keras.layers.Dense(5, input_shape=(2,)))
             model.add(keras.layers.Activation(custom_activation))
@@ -1518,7 +1560,7 @@ class TensorFlowW(BasePartitionModeler):
         partitionsY=Y
         #weights = preTrainedWeights()
 
-        dims = [ 2 ,500,200,100, len(partition_labels) ]
+        dims = [ 2 ,1000,500,200 , 100, len(partition_labels) ]
         init = keras.initializers.VarianceScaling(scale=1. / 3., mode='fan_in',
                                                   distribution='uniform')
         # pretrain_optimizer =keras.optimizers.SGD(lr=1, momentum=0.9)
@@ -1529,49 +1571,47 @@ class TensorFlowW(BasePartitionModeler):
         pretrain_epochs = 3
         batch_size = 100
 
-        autoencoder, encoder = self.autoencoder(dims, init=init)
+        #autoencoder, encoder = self.autoencoder(dims, init=init)
         partitionsX.reshape(-1,2)
         #dataUpdatedX = np.append(partitionsX, np.asmatrix([partitionsY]).T, axis=1)
-        autoencoder.compile(optimizer=keras.optimizers.Adam(), loss='mse')
+        #autoencoder.compile(optimizer=keras.optimizers.Adam(), loss='mse')
         #autoencoder.fit(partitionsX, partitionsX, batch_size=batch_size, epochs=pretrain_epochs)  # , callbacks=cb)
-        autoencoder.fit(partitionsX, partitionsX, batch_size=batch_size,
-                        epochs=3)
+        #autoencoder.fit(partitionsX, partitionsX, batch_size=batch_size,
+                        #epochs=3)
         # autoencoder.save_weights(save_dir + '/ae_weights.h5')
 
-        clustering_layer = ClusteringLayer(len(partition_labels), name='clustering')(encoder.output)
-        model1 = keras.models.Model(inputs=encoder.input, outputs=clustering_layer)
+        #clustering_layer = ClusteringLayer(len(partition_labels), name='clustering')(encoder.output)
+        #model1 = keras.models.Model(inputs=encoder.input, outputs=clustering_layer)
 
-        model1.compile(optimizer=keras.optimizers.Adam(), loss='kld')
+        #model1.compile(optimizer=keras.optimizers.Adam(), loss='kld')
         #SGD(0.01, 0.9)
-        kmeans = KMeans(n_clusters=len(partition_labels), n_init=20)
+        #kmeans = KMeans(n_clusters=len(partition_labels), n_init=20)
         #dataUpdatedX = partitionsX.reshape(-1, 2)
-        y_pred = kmeans.fit_predict(partitionsX)
-        cl_centers=np.array([np.mean(k) for k in kmeans.cluster_centers_]).reshape(-1,1)
-        model1.get_layer(name='clustering').set_weights([ cl_centers ])
+        #y_pred = kmeans.fit_predict(partitionsX)
+        #cl_centers=np.array([np.mean(k) for k in kmeans.cluster_centers_]).reshape(-1,1)
+        #model1.get_layer(name='clustering').set_weights([ cl_centers ])
 
-        q = model1.predict(partitionsX, verbose=0)
-        y_predDeepCl = q.argmax(1)
+        #q = model1.predict(partitionsX, verbose=0)
+        #y_predDeepCl = q.argmax(1)
 
         sr = sp.Earth(max_degree=2)
         sr.fit(partitionsX,partitionsY)
 
             #models.append(autoencoder)
 
-
         ########SET K MEANS INITIAL WEIGHTS TO CLUSTERING LAYER
 
         #X_train, X_test, y_train, y_test = train_test_split(partitionsX, partitionsY, test_size=0.33, random_state=seed)
+        estimator = baseline_modelDeepCl()
+        dataUpdatedX = np.append(partitionsX, np.asmatrix([partitionsY]).T, axis=1)
+        estimator.fit(dataUpdatedX, dataUpdatedX, epochs=100)
 
-        estimator = baseline_model()
+        model2 = keras.models.Model(inputs=estimator.input, outputs=estimator.layers[-2].output)
 
-        estimator.fit(partitionsX,partitionsY,validation_split=0.33,epochs=150)        #validation_data=(X_test,y_test)
+        model2.compile(optimizer=keras.optimizers.Adam(), loss='kld')
 
-        #model2 = keras.models.Model(inputs=estimator.input, outputs=estimator.layers[-3].output)
-
-        #model2.compile(optimizer=keras.optimizers.Adam(), loss='mse')
-
-        #q = model2.predict(partitionsX, verbose=0)
-        #y_predDeepCl = q.argmax(1)
+        q = model2.predict(dataUpdatedX, verbose=0)
+        y_predDeepCl = q.argmax(1)
 
         #pred =np.sum(model2.predict(partitionsX[0].reshape(1,2), verbose=0))/15
 
@@ -1591,6 +1631,11 @@ class TensorFlowW(BasePartitionModeler):
             # Keep partition label to ascertain same order of results
             DeepClpartitionLabels.append(curLbl)
 
+        estimator = baseline_model()
+        estimator.fit(partitionsX, partitionsY, epochs=110,validation_split=0.33)
+
+         # validation_data=(X_test,y_test)
+
         srModels = [ ]
         for idx, pCurLbl in enumerate(DeepClpartitionLabels):
             srM = sp.Earth()
@@ -1599,26 +1644,28 @@ class TensorFlowW(BasePartitionModeler):
         #for train, test in kfold.split(partitionsX[idx],partitionsY[idx]):
         #if len(partition_labels)>0:
         #models.append(estimator)
-        models={}
-        models[ 300 ] = estimator
+        #models={}
+        #models[ 300 ] = estimator
         for idx, pCurLbl in enumerate(DeepClpartitionLabels):
                 #partitionsX[ idx ]=partitionsX[idx].reshape(-1,2)
 
                 estimator = baseline_model()
+                estimator.layers[3] = custom_activation2 if idx ==3 else estimator.layers[3]
                 estimator.fit(np.array(DeepCLpartitionsX[idx]),np.array(DeepCLpartitionsY[idx]),epochs=100)
                     #scores = estimator.score(partitionsX[idx][ test ], partitionsY[idx][ test ])
                     #print("%s: %.2f%%" % ("acc: ", scores))
-
-                models[pCurLbl]=estimator
+                models.append(estimator)
+                #models[pCurLbl]=estimator
                 #self._partitionsPerModel[ estimator ] = partitionsX[idx]
         # Update private models
         #models=[]
+        #models.append(estimator)
 
 
         self._models = models
 
         # Return list of models
-        return estimator,model1 ,numpy.empty, numpy.empty , None
+        return estimator,model2 ,numpy.empty, numpy.empty , estimator , DeepCLpartitionsX
 
     def createModelsForConv(self,partitionsX, partitionsY, partition_labels):
         ##Conv1D NN
