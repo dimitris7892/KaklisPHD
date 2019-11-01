@@ -39,7 +39,7 @@ def main():
     subsetsB=[]
     reader = dRead.BaseSeriesReader()
 
-    #reader.readLarosDAta(datetime.datetime(2017,1,1),datetime.datetime(2018,1,1))
+    reader.readLarosDAta(datetime.datetime(2017,1,1),datetime.datetime(2018,1,1))
     num_lines = sum(1 for l in open(sFile))
     num_linesx = num_lines
 
@@ -164,7 +164,7 @@ def main():
             #modelMap, xs, output, genericModel =None,None,None,None
             if modeler.__class__.__name__!= 'TriInterpolantModeler' :
                     #and modeler.__class__.__name__ != 'TensorFlow':
-                modelMap, model2,xs, output, genericModel=modeler.createModelsFor(partitionsX, partitionsY, partitionLabels,tri,partitionRepresentatives,partitioningModel)
+                modelMap, model2,xs, output, genericModel , partitionsXDC=modeler.createModelsFor(partitionsX, partitionsY, partitionLabels,tri,partitionRepresentatives,partitioningModel)
             #if modeler.__class__.__name__ != 'TensorFlow':
                 #modelMap = dict(zip(partitionLabels, modelMap))
             print("Creating models per partition... Done")
@@ -217,7 +217,7 @@ def main():
                 _, meanError, sdError = eval.MeanAbsoluteErrorEvaluation.evaluateKerasNN(
                     eval.MeanAbsoluteErrorEvaluation(),unseenFeaturesX,
                     unseenFeaturesY,
-                    modeler,output, xs,model2)
+                    modeler,output, xs,genericModel,partitionsXDC)
             else:
                 if flagEvalTri == False:
                     Errors, meanError, sdError = eval.MeanAbsoluteErrorEvaluation.evaluateTriInterpolant(
