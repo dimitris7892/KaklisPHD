@@ -1294,6 +1294,54 @@ class TensorFlowW(BasePartitionModeler):
             model.compile(loss='mean_squared_error', optimizer=keras.optimizers.Adagrad())
             return model
 
+        def custom_activation3(inputs):
+
+            x = inputs
+
+            cond1 = tf.cast(tf.math.greater(x, 8.06), tf.float32)
+            cond2 = tf.cast(tf.math.less_equal(x, 8.06), tf.float32)
+            cond3 = tf.cast(tf.math.greater(x, 4.16014), tf.float32)
+            cond4 = tf.cast(tf.math.less(x, 4.16014), tf.float32)
+            cond5 = tf.cast(tf.math.greater(x, 18.597), tf.float32)
+            cond6 = tf.cast(tf.math.less(x, 18.597), tf.float32)
+            cond7 = tf.cast(tf.math.greater(x, 12.19), tf.float32)
+            cond8 = tf.cast(tf.math.less(x, 12.19), tf.float32)
+            cond9 = tf.cast(tf.math.greater(x, 5.1834), tf.float32)
+            cond10 = tf.cast(tf.math.less(x, 5.1834), tf.float32)
+            cond11 = tf.cast(tf.math.greater(x, 2.56829), tf.float32)
+            cond12 = tf.cast(tf.math.less(x, 2.56829), tf.float32)
+            cond11 = tf.cast(tf.math.greater(x, 6.13714), tf.float32)
+            cond12 = tf.cast(tf.math.less(x, 6.13714), tf.float32)
+            cond13 = tf.cast(tf.math.greater(x, 3.2), tf.float32)
+            cond14 = tf.cast(tf.math.less(x, 3.2), tf.float32)
+            cond15 = tf.cast(tf.math.greater(x,17.6784), tf.float32)
+            cond16 = tf.cast(tf.math.less(x, 17.6784), tf.float32)
+            #cond4 = tf.cast(tf.math.logical_or(tf.greater(x, 8.76), tf.less(x, 2.56)), tf.float32)
+
+            intercept = sr.coef_[0][0]
+            a = tf.math.multiply(cond1, sr.coef_[0][1] * (x - 8.06))
+            b = tf.math.multiply(cond2, sr.coef_[0][2] * (8.06 - x))
+            c = tf.math.multiply(cond3, sr.coef_[0][3] * (x -  4.16014))
+            d = tf.math.multiply(cond4, sr.coef_[0][4] * (  4.16014 - x))
+            e = tf.math.multiply(cond5, sr.coef_[0][5] * (x -  18.597))
+            f = tf.math.multiply(cond6, sr.coef_[0][6] * ( 18.597 - x))
+            g = tf.math.multiply(cond7, (sr.coef_[0][7] * ( 12.19 - x)))
+            h = tf.math.multiply(cond8, (sr.coef_[0][8] *  (x -12.19 )))
+            i = tf.math.multiply(cond7, (sr.coef_[ 0 ][ 9 ] * (5.1834 - x)))
+            j = tf.math.multiply(cond8, (sr.coef_[ 0 ][ 10 ] * (x - 5.1834)))
+            k = tf.math.multiply(cond7, (sr.coef_[ 0 ][ 7 ] * (2.56829- x)))
+            l = tf.math.multiply(cond8, (sr.coef_[ 0 ][ 8 ] * (x - 2.56829)))
+            m = tf.math.multiply(cond7, (sr.coef_[ 0 ][ 7 ] * (6.13714 - x)))
+            n = tf.math.multiply(cond8, (sr.coef_[ 0 ][ 8 ] * (x -6.13714)))
+            o = tf.math.multiply(cond7, (sr.coef_[ 0 ][ 7 ] * (3.2 - x)))
+            p = tf.math.multiply(cond8, (sr.coef_[ 0 ][ 8 ] * (x - 3.2)))
+            q = tf.math.multiply(cond7, (sr.coef_[ 0 ][ 7 ] * (17.6784 - x)))
+            r = tf.math.multiply(cond8, (sr.coef_[ 0 ][ 8 ] * (x - 17.6784)))
+
+            f = intercept + a + b + c + d + e + f + g + h + i + j + k + l + m + n + o + p + q + r
+
+            return f
+
         def custom_activation2(inputs):
 
             x = inputs
@@ -1312,11 +1360,11 @@ class TensorFlowW(BasePartitionModeler):
             a = tf.math.multiply(cond1, sr.coef_[0][1] * (x - 8.76))
             b = tf.math.multiply(cond2, sr.coef_[0][2] * (8.76 - x))
             c = tf.math.multiply(cond3, sr.coef_[0][3] * (x - 18.597))
-            d = tf.math.multiply(cond3, sr.coef_[0][4] * ( 18.597 - x))
-            e = tf.math.multiply(cond3, sr.coef_[0][5] * (x -  12.3237))
-            f = tf.math.multiply(cond3, sr.coef_[0][6] * ( 12.3237 - x))
-            g = tf.math.multiply(cond4, (sr.coef_[0][7] * ( 17.6784 - x)))
-            h = tf.math.multiply(cond4, (sr.coef_[0][8] *  (x - 17.6784 )))
+            d = tf.math.multiply(cond4, sr.coef_[0][4] * ( 18.597 - x))
+            e = tf.math.multiply(cond5, sr.coef_[0][5] * (x -  12.3237))
+            f = tf.math.multiply(cond6, sr.coef_[0][6] * ( 12.3237 - x))
+            g = tf.math.multiply(cond7, (sr.coef_[0][7] * ( 17.6784 - x)))
+            h = tf.math.multiply(cond8, (sr.coef_[0][8] *  (x - 17.6784 )))
 
             f = intercept + a + b + c + d + e + f + g + h
 
@@ -1650,7 +1698,7 @@ class TensorFlowW(BasePartitionModeler):
                 #partitionsX[ idx ]=partitionsX[idx].reshape(-1,2)
 
                 estimator = baseline_model()
-                estimator.layers[3] = custom_activation2 if idx ==3 else estimator.layers[3]
+                estimator.layers[3] = custom_activation3 if idx ==5 else estimator.layers[3]
                 estimator.fit(np.array(DeepCLpartitionsX[idx]),np.array(DeepCLpartitionsY[idx]),epochs=100)
                     #scores = estimator.score(partitionsX[idx][ test ], partitionsY[idx][ test ])
                     #print("%s: %.2f%%" % ("acc: ", scores))
