@@ -41,7 +41,7 @@ class BaseSeriesReader:
         rpm={"data": [ ]}
         power={"data": [ ]}
         foc={"data": [ ]}
-
+        dateD={"data":[ ]}
         with open('./MT_DELTA_MARIA.txt') as csv_file:
             csv_reader = csv.reader(csv_file, delimiter=';')
             line_count = 0
@@ -67,6 +67,10 @@ class BaseSeriesReader:
                     #drftF["dt"]=dt
                     #draftFORE[ "data" ].append(drftF)
 
+                datt={}
+                datt["value"] = 0
+                datt["dt"]=dt
+                dateD[ "data" ].append(datt)
 
                 if id=='61' :
                     drft={}
@@ -111,7 +115,7 @@ class BaseSeriesReader:
                     power[ "data" ].append(pow)
 
                 line_count+=1
-                if int(id) >61 : break
+                if int(id) >353 : break
             print('Processed '+str(line_count)+ ' lines.')
 
 
@@ -123,19 +127,44 @@ class BaseSeriesReader:
                 #['Draft','DateTime' ])
 
             for i in range(0,len(draft['data'])):
-                value = draft['data'][i]['value']
-                dt = draft['data'][i]['dt']
-
-                value1 = windAngle['data'][i]['value']
-
-                value2 = windSpeed['data'][i]['value']
-
-                value3 = power['data'][i]['value']
-                value4 = foc['data'][i]['value']
-                value5 = rpm['data'][i]['value']
-                value6 = SpeedOvg['data'][i]['value']
-
-                data_writer.writerow([value,value2,value1,value6,value5,value4,value3,str(dt)])
+                    dt = dateD['data'][i]['dt']
+                    value=""
+                    value2=""
+                    value1=""
+                    value6=""
+                    value5=""
+                    value4=""
+                    value3=""
+                    try:
+                        value = draft['data'][i]['value']
+                    except:
+                        x=0
+                    try:
+                        value1 = windAngle['data'][i]['value']
+                    except:
+                        x=0
+                    try:
+                        value2 = windSpeed['data'][i]['value']
+                    except:
+                        x=0
+                    try:
+                        value3 = power['data'][i]['value']
+                    except:
+                        x=0
+                    try:
+                        value4 = foc['data'][i]['value']
+                    except:
+                        x=0
+                    try:
+                        value5 = rpm['data'][i]['value']
+                    except:
+                        x=0
+                    try:
+                        value6 = SpeedOvg['data'][i]['value']
+                    except:
+                        x=0
+                    #####
+                    data_writer.writerow([value,value2,value1,value6,value5,value4,value3,str(dt)])
 
 
 
