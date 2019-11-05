@@ -1294,7 +1294,76 @@ class TensorFlowW(BasePartitionModeler):
             model.compile(loss='mean_squared_error', optimizer=keras.optimizers.Adagrad())
             return model
 
-        def custom_activation2(inputs):
+        def custom_activation2(inputs,modelId):
+
+            x = inputs
+
+            models = {"data":[]}
+            for csvM in csvModels:
+                id = csvM.split("_")[1]
+                piecewiseFunc = []
+                with open(csvM) as csv_file:
+                    data = csv.reader(csv_file, delimiter=',')
+                    for row in data:
+                        #for d in row:
+                            if [w for w in row if w=="Basis"].__len__() > 0:
+                                continue
+                            if [w for w in row if w=="(Intercept)"].__len__() > 0:
+                                intercept = float(row[1])
+                                continue
+                            if row.__len__()==0:
+                                continue
+                            d=row[0]
+                            if   d.split("*").__len__() == 1:
+                                if d.split('-')[0][2] != "x":
+                                    num = float(d.split('-')[0].split('h(')[1])
+                                    piecewiseFunc.append(tf.math.multiply(tf.cast(tf.math.greater(x, num), tf.float32),float(row[1]) * (x - num)))
+                                else:
+                                    num = float(d.split('-')[1].split(')')[0])
+                                    piecewiseFunc.append( tf.math.multiply(tf.cast(tf.math.less(x, num), tf.float32), float(row[1]) * (num - x)))
+                            else:
+                                funcs = d.split("*")
+                                nums=[]
+                                for r in funcs:
+                                    if r.split('-')[0][2] != "x":
+                                        nums.append(float(r.split('-')[0].split('h(')[1]))
+
+                                    else:
+                                        nums.append( float(r.split('-')[1].split(')')[0]))
+                                piecewiseFunc.append( tf.math.multiply(tf.cast(tf.math.logical_and( tf.math.less(x, nums[0]),tf.math.greater(nums[1], x)), tf.float32),float(row[1]) * (nums[0] - x) * (x - nums[1])))
+                    model = {}
+                    model["id"] = id
+                    model["funcs"] = piecewiseFunc
+                    models["data"].append(model)
+
+
+
+
+            cond1 = tf.cast(tf.math.greater(x, 8.76), tf.float32)
+            cond2 = tf.cast(tf.math.less_equal(x, 8.76), tf.float32)
+            cond3 = tf.cast(tf.math.greater(x, 18.597), tf.float32)
+            cond4 = tf.cast(tf.math.less(x, 18.597), tf.float32)
+            cond5 = tf.cast(tf.math.greater(x, 12.3237), tf.float32)
+            cond6 = tf.cast(tf.math.less(x, 12.3237), tf.float32)
+            cond7 = tf.cast(tf.math.greater(x, 17.6784), tf.float32)
+            cond8 = tf.cast(tf.math.less(x, 17.6784), tf.float32)
+            # cond4 = tf.cast(tf.math.logical_or(tf.greater(x, 8.76), tf.less(x, 2.56)), tf.float32)
+
+            intercept = sr.coef_[0][0]
+            a = tf.math.multiply(cond1, sr.coef_[0][1] * (x - 8.76))
+            b = tf.math.multiply(cond2, sr.coef_[0][2] * (8.76 - x))
+            c = tf.math.multiply(cond3, sr.coef_[0][3] * (x - 18.597))
+            d = tf.math.multiply(cond3, sr.coef_[0][4] * (18.597 - x))
+            e = tf.math.multiply(cond3, sr.coef_[0][5] * (x - 12.3237))
+            f = tf.math.multiply(cond3, sr.coef_[0][6] * (12.3237 - x))
+            g = tf.math.multiply(cond4, (sr.coef_[0][7] * (17.6784 - x)))
+            h = tf.math.multiply(cond4, (sr.coef_[0][8] * (x - 17.6784)))
+
+            f = intercept + a + b + c + d + e + f + g + h
+
+            return f
+
+        def custom_activation3(inputs):
 
             x = inputs
 
@@ -1373,7 +1442,8 @@ class TensorFlowW(BasePartitionModeler):
             #create model
             model = keras.models.Sequential()
 
-            #model.add(keras.layers.Dense(len(partition_labels)*2, input_shape=(2,)))
+            model.add(keras.layers.Dense(len(partition_labels)*3, input_shape=(3,)))
+            model.add(keras.layers.Dense(len(partition_labels) * 2, input_shape=(3,)))
             model.add(keras.layers.Dense(len(partition_labels), input_shape=(3,)))
             #model.add(keras.layers.Dense(10, input_shape=(2,)))
             #model.add(keras.layers.Dense(5, input_shape=(2,)))
@@ -1393,7 +1463,8 @@ class TensorFlowW(BasePartitionModeler):
             model.add(keras.layers.Dense(len(partition_labels), input_shape=(2,) ))
             model.add(keras.layers.Dense(10, input_shape=(2,)))
             model.add(keras.layers.Dense(5, input_shape=(2,)))
-            model.add(keras.layers.Activation(custom_activation))
+            model.add(keras.layers.Activation(custom_activation2(inputs=model.layers[2].output, modelId=1)))
+            #model.add(keras.layers.Activation(custom_activation2(inputs=model.get_layer(-2).input,modelId=1)))
             model.add(keras.layers.Dense(1,)) #activation=custom_activation
             #model.add(keras.layers.Activation(custom_activation))
             #model.add(keras.layers.Activation('linear'))  # activation=custom_activation
@@ -1604,7 +1675,7 @@ class TensorFlowW(BasePartitionModeler):
         #X_train, X_test, y_train, y_test = train_test_split(partitionsX, partitionsY, test_size=0.33, random_state=seed)
         estimator = baseline_modelDeepCl()
         dataUpdatedX = np.append(partitionsX, np.asmatrix([partitionsY]).T, axis=1)
-        estimator.fit(dataUpdatedX, dataUpdatedX, epochs=100)
+        estimator.fit(dataUpdatedX, dataUpdatedX, epochs=3)
 
         model2 = keras.models.Model(inputs=estimator.input, outputs=estimator.layers[-2].output)
 
@@ -1631,16 +1702,40 @@ class TensorFlowW(BasePartitionModeler):
             # Keep partition label to ascertain same order of results
             DeepClpartitionLabels.append(curLbl)
 
+        srModels = []
+        for idx, pCurLbl in enumerate(DeepClpartitionLabels):
+            srM = sp.Earth(max_degree=2)
+            srM.fit(np.array(DeepCLpartitionsX[idx]), np.array(DeepCLpartitionsY[idx]))
+            srModels.append(srM)
+        modelCount = 0
+        import csv
+        csvModels = []
+        for models in srModels:
+            modelSummary = str(models.summary()).split("\n")[4:]
+
+            with open('./model_'+str(modelCount)+'_.csv', mode='w') as data:
+                csvModels.append('./model_'+str(modelCount)+'_.csv')
+                data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+                data_writer.writerow(
+                ['Basis', 'Coeff'])
+                for row in modelSummary:
+                    row=np.delete(np.array(row.split(" ")), [i for i, x in enumerate(row.split(" ")) if x == ""])
+                    try:
+                        basis = row[0]
+                        pruned = row[1]
+                        coeff = row[2]
+                        if pruned == "No":
+                            data_writer.writerow([basis, coeff])
+                    except:
+                        x=0
+            modelCount+=1
         estimator = baseline_model()
         estimator.fit(partitionsX, partitionsY, epochs=110,validation_split=0.33)
 
          # validation_data=(X_test,y_test)
 
-        srModels = [ ]
-        for idx, pCurLbl in enumerate(DeepClpartitionLabels):
-            srM = sp.Earth()
-            srM.fit(np.array(DeepCLpartitionsX[ idx ]), np.array(DeepCLpartitionsY[ idx ]))
-            srModels.append(srM)
+
+
         #for train, test in kfold.split(partitionsX[idx],partitionsY[idx]):
         #if len(partition_labels)>0:
         #models.append(estimator)
@@ -1650,7 +1745,7 @@ class TensorFlowW(BasePartitionModeler):
                 #partitionsX[ idx ]=partitionsX[idx].reshape(-1,2)
 
                 estimator = baseline_model()
-                estimator.layers[3] = custom_activation2 if idx ==3 else estimator.layers[3]
+                #estimator.layers[3] = custom_activation2 if idx ==3 else estimator.layers[3]
                 estimator.fit(np.array(DeepCLpartitionsX[idx]),np.array(DeepCLpartitionsY[idx]),epochs=100)
                     #scores = estimator.score(partitionsX[idx][ test ], partitionsY[idx][ test ])
                     #print("%s: %.2f%%" % ("acc: ", scores))
