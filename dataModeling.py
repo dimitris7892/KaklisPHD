@@ -29,6 +29,8 @@ from time import time
 import metrics
 from sklearn.cluster import KMeans
 
+tf.executing_eagerly()
+
 class BasePartitionModeler:
     def createModelsFor(self,partitionsX, partitionsY, partition_labels):
         pass
@@ -1109,6 +1111,7 @@ class TensorFlowW(BasePartitionModeler):
 
         models = [ ]
         self.ClustersNum=len(partitionsX)
+        self.modelId = -1
         partition_labels = partitionsX
         # Init model to partition map
         self._partitionsPerModel = {}
@@ -1344,7 +1347,7 @@ class TensorFlowW(BasePartitionModeler):
             return f
 
 
-        def custom_activation2(inputs,modelId):
+        def custom_activation2(inputs):
 
             x = inputs
 
@@ -1388,11 +1391,12 @@ class TensorFlowW(BasePartitionModeler):
                     model["funcs"] = piecewiseFunc
                     models["data"].append(model)
 
+            interc = tf.cast(x, tf.float32) + intercepts[self.modelId]
+            SelectedFuncs = interc+ np.sum([x for x in models['data'] if x['id']==str(self.modelId)][0]['funcs'])
+                #intercepts[self.modelId]+np.sum([x for x in models['data'] if x['id']==str(self.modelId)][0]['funcs'])
 
-            SelectedFuncs =intercepts[modelId]+np.sum([x for x in models['data'] if x['id']==str(modelId)][0]['funcs'])
 
-
-
+            #tf.math.multiply(tf.cast(x, tf.float32)  ,0)  if SelectedFuncs==0.0 else
             return SelectedFuncs
 
         def custom_activation3(inputs):
@@ -1492,9 +1496,10 @@ class TensorFlowW(BasePartitionModeler):
             model = keras.models.Sequential()
 
             #model.add(keras.layers.Dense(len(partition_labels)*2, input_shape=(2,)))
-            model.add(keras.layers.Dense(len(partition_labels), input_shape=(2,) ))
-            model.add(keras.layers.Dense(10, input_shape=(2,)))
-            model.add(keras.layers.Dense(5, input_shape=(2,)))
+            #model.add(keras.layers.Dense(len(partition_labels), input_shape=(2,) ))
+            model.add(keras.layers.Dense(len(csvModels), input_shape=(2,)))
+            #model.add(keras.layers.Dense(5, input_shape=(2,)))
+            #model.add(keras.layers.Dense(2, input_shape=(2,)))
             #model.add(keras.layers.Activation(custom_activation2(inputs=model.layers[2].output, modelId=1)))
             #model.add(keras.layers.Activation(custom_activation2(inputs=model.get_layer(-2).input,modelId=1)))
             model.add(keras.layers.Dense(1,)) #activation=custom_activation
@@ -1705,11 +1710,11 @@ class TensorFlowW(BasePartitionModeler):
         ########SET K MEANS INITIAL WEIGHTS TO CLUSTERING LAYER
 
         #X_train, X_test, y_train, y_test = train_test_split(partitionsX, partitionsY, test_size=0.33, random_state=seed)
-        estimator = baseline_modelDeepCl()
+        estimatorD = baseline_modelDeepCl()
         dataUpdatedX = np.append(partitionsX, np.asmatrix([partitionsY]).T, axis=1)
-        estimator.fit(dataUpdatedX, dataUpdatedX, epochs=3)
+        estimatorD.fit(dataUpdatedX, dataUpdatedX, epochs=3)
 
-        model2 = keras.models.Model(inputs=estimator.input, outputs=estimator.layers[-2].output)
+        model2 = keras.models.Model(inputs=estimatorD.input, outputs=estimatorD.layers[-2].output)
 
         model2.compile(optimizer=keras.optimizers.Adam(), loss='kld')
 
@@ -1762,7 +1767,7 @@ class TensorFlowW(BasePartitionModeler):
                         x=0
             modelCount+=1
         estimator = baseline_model()
-        estimator.fit(partitionsX, partitionsY, epochs=110,validation_split=0.33)
+        estimator.fit(partitionsX, partitionsY, epochs=50,validation_split=0.33)
 
          # validation_data=(X_test,y_test)
 
@@ -1777,7 +1782,9 @@ class TensorFlowW(BasePartitionModeler):
                     x = new_layer(x)
                 x = layers[ i ](x)
 
-            new_model = keras.Model(input=layers[ 0 ].input, output=x)
+            new_model = keras.Model(inputs=layers[ 0 ].input, outputs=x)
+            new_model.compile(loss='mse', optimizer=keras.optimizers.Adam())
+            #.add(x)
             return new_model
 
         #for train, test in kfold.split(partitionsX[idx],partitionsY[idx]):
@@ -1785,26 +1792,31 @@ class TensorFlowW(BasePartitionModeler):
         #models.append(estimator)
         #models={}
         #models[ 300 ] = estimator
+
+        NNmodels=[]
         for idx, pCurLbl in enumerate(DeepClpartitionLabels):
                 #partitionsX[ idx ]=partitionsX[idx].reshape(-1,2)
 
                 #estimator = baseline_model()
-                estimator = insert_intermediate_layer_in_keras(estimator, 3,keras.layers.Activation(custom_activation2(inputs=estimator.layers[2].output, modelId=idx)))
-
-                #estimator.layers[3] = custom_activation3 if idx ==5 else estimator.layers[3]
+                self.modelId = idx
+                #estimator = baseline_model()
+                estimator.add(keras.layers.Activation(custom_activation2))
+                #estimator = insert_intermediate_layer_in_keras(estimator, 2 ,keras.layers.Activation(custom_activation2))
+                #estimator.compile()
+                #estimator.layers[3] = custom_activation2(inputs=estimator.layers[2].output, modelId=idx) if idx ==0 else estimator.layers[3]
                 #estimator.layers[3] = custom_activation2 if idx ==3 else estimator.layers[3]
-                estimator.fit(np.array(DeepCLpartitionsX[idx]),np.array(DeepCLpartitionsY[idx]),epochs=100)
+                estimator.fit(np.array(DeepCLpartitionsX[idx]),np.array(DeepCLpartitionsY[idx]),epochs=50)
                     #scores = estimator.score(partitionsX[idx][ test ], partitionsY[idx][ test ])
                     #print("%s: %.2f%%" % ("acc: ", scores))
-                #models.append(estimator)
+                NNmodels.append(estimator)
                 #models[pCurLbl]=estimator
                 #self._partitionsPerModel[ estimator ] = partitionsX[idx]
         # Update private models
         #models=[]
-        models.append(estimator)
+        #models.append(estimator)
 
 
-        self._models = models
+        self._models = NNmodels
 
         # Return list of models
         return estimator,model2 ,numpy.empty, numpy.empty , estimator , DeepCLpartitionsX
