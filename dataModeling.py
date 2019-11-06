@@ -1767,7 +1767,7 @@ class TensorFlowW(BasePartitionModeler):
                         x=0
             modelCount+=1
         estimator = baseline_model()
-        estimator.fit(partitionsX, partitionsY, epochs=50,validation_split=0.33)
+        estimator.fit(partitionsX, partitionsY, epochs=5,validation_split=0.33)
 
          # validation_data=(X_test,y_test)
 
@@ -1782,8 +1782,8 @@ class TensorFlowW(BasePartitionModeler):
                     x = new_layer(x)
                 x = layers[ i ](x)
 
-            new_model = keras.Model(inputs=layers[ 0 ].input, outputs=x)
-            new_model.compile(loss='mse', optimizer=keras.optimizers.Adam())
+            new_model = keras.Model(inputs=model.input, outputs=x)
+            #new_model.compile(loss='mse', optimizer=keras.optimizers.Adam())
             #.add(x)
             return new_model
 
