@@ -1389,7 +1389,7 @@ class TensorFlowW(BasePartitionModeler):
                     models["data"].append(model)
 
 
-            SelectedFuncs =intercepts[modelId]+np.sum([x for x in models['data'] if x['id']==str(modelId)][0]['funcs'])
+            SelectedFuncs =intercepts[1]+np.sum([x for x in models['data'] if x['id']==str(1)][0]['funcs'])
 
 
 
