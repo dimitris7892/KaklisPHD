@@ -862,9 +862,9 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
             #cl = q.argmax(1)
             #weight= model2.layers[1].get_weights()[0][0,:][cl]
             #prediction = np.sum(model2.predict(pPoint, verbose=0)) / 5
-            #ind , fit = modeler.getBestPartitionForPoint(pPoint,partitionsX)
-            prediction = modeler._models[0].predict(pPoint)
-            #prediction = modeler._models[ind].predict(pPoint)
+            ind , fit = modeler.getBestPartitionForPoint(pPoint,partitionsX)
+            #prediction = modeler._models[0].predict(pPoint)
+            prediction = modeler._models[ind].predict(pPoint)
                           #+ modeler._models[300].predict(pPoint))/2
             #states_value = modeler._models[0].model.predict([unseenX[:,0].reshape(1,unseenX.shape[200],1) , unseenX[ :, 1 ].reshape(1, unseenX.shape[ 200 ], 1)])
 
