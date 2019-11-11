@@ -864,7 +864,8 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
             #prediction = np.sum(model2.predict(pPoint, verbose=0)) / 5
             ind , fit = modeler.getBestPartitionForPoint(pPoint,partitionsX)
             #prediction = modeler._models[0].predict(pPoint)
-            prediction = (modeler._models[ind].predict(pPoint)+ modeler._models[len(modeler._models)-1].predict(pPoint))/2
+            #prediction = (modeler._models[ind].predict(pPoint)+ modeler._models[len(modeler._models)-1].predict(pPoint))/2
+            prediction = abs(modeler._models[ind].predict(pPoint))
             #states_value = modeler._models[0].model.predict([unseenX[:,0].reshape(1,unseenX.shape[200],1) , unseenX[ :, 1 ].reshape(1, unseenX.shape[ 200 ], 1)])
 
             ##########
