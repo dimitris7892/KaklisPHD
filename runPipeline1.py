@@ -196,14 +196,14 @@ def main():
 
 
                 elif modeler.__class__.__name__ == 'TensorFlow' or modeler.__class__.__name__ == 'TensorFlowW':
-                    #, meanError, sdError = eval.MeanAbsoluteErrorEvaluation.evaluateKerasNN(
-                        #eval.MeanAbsoluteErrorEvaluation(), X,
-                        #Y,
-                        #modeler, output, xs)
-                        x=1
+                    _,meanError, sdError = eval.MeanAbsoluteErrorEvaluation.evaluateKerasNN(
+                        eval.MeanAbsoluteErrorEvaluation(), X,
+                        Y,
+                        modeler, output, xs,genericModel,partitionsXDC)
 
-                #print ("Mean absolute error on training data: %4.2f (+/- %4.2f standard error)" % (
-                    #meanError, sdError / sqrt(unseenFeaturesY.shape[ 0 ])))
+
+                print ("Mean absolute error on training data: %4.2f (+/- %4.2f standard error)" % (
+                    meanError, sdError / sqrt(unseenFeaturesY.shape[ 0 ])))
                 #print("Evaluating on seen data... Done.")
 
             # Predict and evaluate on unseen data

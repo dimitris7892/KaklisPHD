@@ -29,6 +29,8 @@ from time import time
 import metrics
 from sklearn.cluster import KMeans
 
+tf.executing_eagerly()
+
 class BasePartitionModeler:
     def createModelsFor(self,partitionsX, partitionsY, partition_labels):
         pass
@@ -1109,6 +1111,7 @@ class TensorFlowW(BasePartitionModeler):
 
         models = [ ]
         self.ClustersNum=len(partitionsX)
+        self.modelId = -1
         partition_labels = partitionsX
         # Init model to partition map
         self._partitionsPerModel = {}
@@ -1197,24 +1200,106 @@ class TensorFlowW(BasePartitionModeler):
                                               #trainable=True)
                 super(MyLayer, self).build(input_shape)  # Be sure to call this at the end
 
-            def call(self, inputs):
+            def call(self, inputs,modelId={'args':self.modelId}):
 
-                orig = inputs
-                inputs = tf.where(orig <= 0.0, tf.zeros_like(inputs), inputs)
-                inputs = tf.where(orig > 8.76,
-                                  sr.coef_[0][0] * (inputs - 8.76), inputs)
-                inputs = tf.where(orig < 8.76,
-                                  sr.coef_[0][1] * (8.76 - inputs), inputs)
+                x = inputs
 
-                inputs = tf.where(orig > 1.32,
-                                  sr.coef_[0][2] * (inputs - 1.32), inputs)
+                models = {"data": [ ]}
+                intercepts = [ ]
+                for csvM in csvModels:
+                    id = csvM.split("_")[ 1 ]
+                    piecewiseFunc = [ ]
 
-                inputs = tf.where(tf.math.logical_and(tf.less(orig, 1.32), tf.greater(orig, 0)),
-                                  (sr.coef_[0][3] * (1.32 - inputs)), inputs)
+                    with open(csvM) as csv_file:
+                        data = csv.reader(csv_file, delimiter=',')
+                        for row in data:
+                            # for d in row:
+                            if [ w for w in row if w == "Basis" ].__len__() > 0:
+                                continue
+                            if [ w for w in row if w == "(Intercept)" ].__len__() > 0:
+                                intercepts.append(float(row[ 1 ]))
+                                continue
+                            if row.__len__() == 0:
+                                continue
+                            d = row[ 0 ]
+                            if d.split("*").__len__() == 1:
+                                split = ""
+                                try:
+                                    split = d.split('-')[ 0 ][ 2 ]
+                                    if split != "x":
+                                        num = float(d.split('-')[ 0 ].split('h(')[ 1 ])
+                                        piecewiseFunc.append(
+                                            tf.math.multiply(tf.cast(tf.math.greater(inputs, num), tf.float32),
+                                                             float(row[ 1 ]) * (inputs - num)))
+                                        if id == modelId['args'] or id == -1:
+                                            inputs=tf.where(x >= num , float(row[ 1 ]) * (inputs - num), inputs)
+                                    else:
+                                        num = float(d.split('-')[ 1 ].split(')')[ 0 ])
+                                        piecewiseFunc.append(tf.math.multiply(tf.cast(tf.math.less(inputs, num), tf.float32),
+                                                                              float(row[ 1 ]) * (num - inputs)))
+                                        if id == modelId['args'] or id == -1:
+                                            inputs = tf.where(x >= num, float(row[ 1 ]) * (num - inputs), inputs)
+                                except:
+                                    piecewiseFunc.append(tf.math.multiply(tf.cast(x, tf.float32),
+                                                                          float(row[ 1 ]) * (inputs)))
+                                    if id == modelId['args'] or id == -1:
+                                        inputs = tf.where(x >= 0, float(row[ 1 ]) * inputs, inputs)
+                                    # continue
 
-                return  inputs
+                            else:
+                                funcs = d.split("*")
+                                nums = [ ]
+                                for r in funcs:
+                                    try:
+                                        if r.split('-')[ 0 ][ 2 ] != "x":
+                                            nums.append(float(r.split('-')[ 0 ].split('h(')[ 1 ]))
 
+                                        else:
+                                            nums.append(float(r.split('-')[ 1 ].split(')')[ 0 ]))
+                                        piecewiseFunc.append(tf.math.multiply(tf.cast(
+                                            tf.math.logical_and(tf.math.less(x, nums[ 0 ]),
+                                                                tf.math.greater(nums[ 1 ], x)), tf.float32),
+                                                                              float(row[ 1 ]) * (nums[ 0 ] - inputs) * (
+                                                                                      inputs - nums[ 1 ])))
+                                        if id==modelId['args'] or id == -1:
+                                            inputs = tf.where(x < nums[0] and x >= nums[0], float(row[ 1 ]) * (nums[ 0 ] - inputs) * (
+                                                    inputs - nums[ 1 ]), inputs)
+                                    except:
+                                        try:
+                                            if d.split('-')[ 0 ][ 2 ]=="x":
+                                                piecewiseFunc.append(tf.math.multiply(tf.cast(x, tf.float32),
+                                                                              float(row[ 1 ]) * (inputs) *(inputs - nums[0])))
+                                                if id == modelId[ 'args' ] or id == -1:
+                                                    inputs = tf.where(inputs >= nums[ 0 ] ,float(row[ 1 ]) * (inputs) * (inputs - nums[ 0 ]), x)
 
+                                            else:
+                                                piecewiseFunc.append(tf.math.multiply(tf.cast(x, tf.float32),
+                                                                                  float(row[ 1 ]) * (inputs) * (
+                                                                                          nums[ 0 ] - inputs)))
+                                                if id == modelId['args'] or id == -1:
+                                                    inputs = tf.where(x < nums[ 0 ],
+                                                                  float(row[ 1 ]) * (inputs) * ( nums[ 0 ]- inputs), inputs)
+                                        except:
+                                            piecewiseFunc.append(tf.math.multiply(tf.cast(x, tf.float32),
+                                                                                  float(row[ 1 ]) * (inputs) ))
+                                            if id == modelId['args'] or id == -1:
+                                                inputs = tf.where(x >= 0, float(row[ 1 ]) * (inputs),inputs)
+                        model = {}
+                        model[ "id" ] = id
+                        model[ "funcs" ] = piecewiseFunc
+                        models[ "data" ].append(model)
+
+                modelId = 0 if modelId['args'] == -1 else modelId['args']
+
+                # interc = tf.cast(x, tf.float32) + intercepts[self.modelId]
+                #funcs = [ x for x in models[ 'data' ] if x[ 'id' ] == str(modelId) ][ 0 ][ 'funcs' ]
+                #for f in funcs:
+                    #inputs = f
+
+                SelectedFuncs = intercepts[ modelId ] + np.sum(
+                    [ x for x in models[ 'data' ] if x[ 'id' ] == str(modelId) ][ 0 ][ 'funcs' ])
+
+                return inputs
 
             def get_config(self):
                 config = {'sharp': float(self.sharp)}
@@ -1272,7 +1357,6 @@ class TensorFlowW(BasePartitionModeler):
             def compute_output_shape(self, input_shape):
                 return (input_shape[0], self.output_dim)
 
-
         def stackedModels(members):
             for i,pCurLbl in  enumerate(partition_labels):
                 model = members[ i ]
@@ -1293,7 +1377,6 @@ class TensorFlowW(BasePartitionModeler):
             #keras.utils.plot_model(model, show_shapes=True, to_file='/home/dimitris/model_graph.png')
             model.compile(loss='mean_squared_error', optimizer=keras.optimizers.Adagrad())
             return model
-
 
         def custom_activation3(inputs):
 
@@ -1343,57 +1426,113 @@ class TensorFlowW(BasePartitionModeler):
 
             return f
 
-
-        def custom_activation2(inputs,modelId):
+        def custom_activation2(inputs):
 
             x = inputs
 
-            models = {"data":[]}
+
+
+            models = {"data": [ ]}
             intercepts = [ ]
             for csvM in csvModels:
-                id = csvM.split("_")[1]
-                piecewiseFunc = []
+                id = csvM.split("_")[ 1 ]
+                piecewiseFunc = [ ]
 
                 with open(csvM) as csv_file:
                     data = csv.reader(csv_file, delimiter=',')
                     for row in data:
-                        #for d in row:
-                            if [w for w in row if w=="Basis"].__len__() > 0:
-                                continue
-                            if [w for w in row if w=="(Intercept)"].__len__() > 0:
-                                intercepts.append(float(row[1]))
-                                continue
-                            if row.__len__()==0:
-                                continue
-                            d=row[0]
-                            if   d.split("*").__len__() == 1:
-                                if d.split('-')[0][2] != "x":
-                                    num = float(d.split('-')[0].split('h(')[1])
-                                    piecewiseFunc.append(tf.math.multiply(tf.cast(tf.math.greater(x, num), tf.float32),float(row[1]) * (x - num)))
+                        # for d in row:
+                        if [ w for w in row if w == "Basis" ].__len__() > 0:
+                            continue
+                        if [ w for w in row if w == "(Intercept)" ].__len__() > 0:
+                            intercepts.append(float(row[ 1 ]))
+                            continue
+                        if row.__len__() == 0:
+                            continue
+                        d = row[ 0 ]
+                        if d.split("*").__len__() == 1:
+                            split = ""
+                            try:
+                                split = d.split('-')[ 0 ][ 2 ]
+                                if split != "x":
+                                    num = float(d.split('-')[ 0 ].split('h(')[ 1 ])
+                                    piecewiseFunc.append(
+                                        tf.math.multiply(tf.cast(tf.math.greater(x, num), tf.float32),
+                                                         float(row[ 1 ]) * (inputs - num)))
+                                    if id ==  self.modelId:
+                                        inputs = tf.where(x >= num, float(row[ 1 ]) * (inputs - num), inputs)
                                 else:
-                                    num = float(d.split('-')[1].split(')')[0])
-                                    piecewiseFunc.append( tf.math.multiply(tf.cast(tf.math.less(x, num), tf.float32), float(row[1]) * (num - x)))
-                            else:
-                                funcs = d.split("*")
-                                nums=[]
-                                for r in funcs:
-                                    if r.split('-')[0][2] != "x":
-                                        nums.append(float(r.split('-')[0].split('h(')[1]))
+                                    num = float(d.split('-')[ 1 ].split(')')[ 0 ])
+                                    piecewiseFunc.append(
+                                        tf.math.multiply(tf.cast(tf.math.less(x, num), tf.float32),
+                                                         float(row[ 1 ]) * (num - inputs)))
+                                    if id == self.modelId:
+                                        inputs = tf.where(x >= num, float(row[ 1 ]) * (num - inputs), inputs)
+                            except:
+                                piecewiseFunc.append(tf.math.multiply(tf.cast(x, tf.float32),
+                                                                      float(row[ 1 ]) * (inputs)))
+                                if id ==  self.modelId:
+                                    inputs = tf.where(x >= 0, float(row[ 1 ]) * inputs, inputs)
+                                # continue
+
+                        else:
+                            funcs = d.split("*")
+                            nums = [ ]
+                            for r in funcs:
+                                try:
+                                    if r.split('-')[ 0 ][ 2 ] != "x":
+                                        nums.append(float(r.split('-')[ 0 ].split('h(')[ 1 ]))
 
                                     else:
-                                        nums.append( float(r.split('-')[1].split(')')[0]))
-                                piecewiseFunc.append( tf.math.multiply(tf.cast(tf.math.logical_and( tf.math.less(x, nums[0]),tf.math.greater(nums[1], x)), tf.float32),float(row[1]) * (nums[0] - x) * (x - nums[1])))
+                                        nums.append(float(r.split('-')[ 1 ].split(')')[ 0 ]))
+                                    piecewiseFunc.append(tf.math.multiply(tf.cast(
+                                        tf.math.logical_and(tf.math.less(x, nums[ 0 ]),
+                                                            tf.math.greater(nums[ 1 ], x)), tf.float32),
+                                        float(row[ 1 ]) * (nums[ 0 ] - inputs) * (
+                                                inputs - nums[ 1 ])))
+                                    if id ==  self.modelId:
+                                        inputs = tf.where(x < nums[ 0 ] and x >= nums[ 0 ],
+                                                          float(row[ 1 ]) * (nums[ 0 ] - inputs) * (
+                                                                  inputs - nums[ 1 ]), inputs)
+                                except:
+                                    try:
+                                        if d.split('-')[ 0 ][ 2 ] == "x":
+                                            piecewiseFunc.append(tf.math.multiply(tf.cast(x, tf.float32),
+                                                                                  float(row[ 1 ]) * (inputs) * (
+                                                                                          inputs - nums[ 0 ])))
+                                            if id ==  self.modelId :
+                                                inputs = tf.where(inputs >= nums[ 0 ],
+                                                                  float(row[ 1 ]) * (inputs) * (inputs - nums[ 0 ]), x)
+
+                                        else:
+                                            piecewiseFunc.append(tf.math.multiply(tf.cast(x, tf.float32),
+                                                                                  float(row[ 1 ]) * (inputs) * (
+                                                                                          nums[ 0 ] - inputs)))
+                                            if id == self.modelId:
+                                                inputs = tf.where(x < nums[ 0 ],
+                                                                  float(row[ 1 ]) * (inputs) * (nums[ 0 ] - inputs),
+                                                                  inputs)
+                                    except:
+                                        piecewiseFunc.append(tf.math.multiply(tf.cast(x, tf.float32),
+                                                                              float(row[ 1 ]) * (inputs)))
+                                        if id == self.modelId :
+                                            inputs = tf.where(x >= 0, float(row[ 1 ]) * (inputs), inputs)
                     model = {}
-                    model["id"] = id
-                    model["funcs"] = piecewiseFunc
-                    models["data"].append(model)
+                    model[ "id" ] = id
+                    model[ "funcs" ] = piecewiseFunc
+                    models[ "data" ].append(model)
 
+            #modelId = 0 if modelId[ 'args' ] == -1 else modelId[ 'args' ]
 
-            SelectedFuncs =intercepts[1]+np.sum([x for x in models['data'] if x['id']==str(1)][0]['funcs'])
+            # interc = tf.cast(x, tf.float32) + intercepts[self.modelId]
+            # funcs = [ x for x in models[ 'data' ] if x[ 'id' ] == str(modelId) ][ 0 ][ 'funcs' ]
+            # for f in funcs:
+            # inputs = f
 
+            #SelectedFuncs = intercepts[ self.modelId ] + np.sum(
+                #[ x for x in models[ 'data' ] if x[ 'id' ] == str( self.modelId) ][ 0 ][ 'funcs' ])
 
-
-            return SelectedFuncs
+            return inputs
 
         def custom_activation3(inputs):
 
@@ -1427,21 +1566,125 @@ class TensorFlowW(BasePartitionModeler):
 
             x = inputs
 
-            cond1 = tf.cast(tf.math.greater(x, 8.76), tf.float32)
-            cond2 = tf.cast(tf.math.less_equal(x, 8.76), tf.float32)
-            cond3 = tf.cast(tf.math.logical_and(tf.less(x, 8.76), tf.greater(x, 2.56)), tf.float32)
-            cond4 = tf.cast(tf.math.logical_or(tf.greater(x, 8.76), tf.less(x, 2.56)), tf.float32)
+            x = inputs
+
+            models = {"data": [ ]}
+            intercepts = [ ]
+            for csvM in csvModels:
+                id = csvM.split("_")[ 1 ]
+                piecewiseFunc = [ ]
+
+                with open(csvM) as csv_file:
+                    data = csv.reader(csv_file, delimiter=',')
+                    for row in data:
+                        # for d in row:
+                        if [ w for w in row if w == "Basis" ].__len__() > 0:
+                            continue
+                        if [ w for w in row if w == "(Intercept)" ].__len__() > 0:
+                            intercepts.append(float(row[ 1 ]))
+                            continue
+                        if row.__len__() == 0:
+                            continue
+                        d = row[ 0 ]
+                        if d.split("*").__len__() == 1:
+                            split = ""
+                            try:
+                                split = d.split('-')[ 0 ][ 2 ]
+                                if split != "x":
+                                    num = float(d.split('-')[ 0 ].split('h(')[ 1 ])
+                                    piecewiseFunc.append(
+                                        tf.math.multiply(tf.cast(tf.math.greater(x, num), tf.float32),
+                                                         float(row[ 1 ]) * (inputs - num)))
+                                    if id == self.modelId:
+                                        inputs = tf.where(x >= num, float(row[ 1 ]) * (inputs - num), inputs)
+                                else:
+                                    num = float(d.split('-')[ 1 ].split(')')[ 0 ])
+                                    piecewiseFunc.append(
+                                        tf.math.multiply(tf.cast(tf.math.less(x, num), tf.float32),
+                                                         float(row[ 1 ]) * (num - inputs)))
+                                    if id == self.modelId:
+                                        inputs = tf.where(x >= num, float(row[ 1 ]) * (num - inputs), inputs)
+                            except:
+                                piecewiseFunc.append(tf.math.multiply(tf.cast(x, tf.float32),
+                                                                      float(row[ 1 ]) * (inputs)))
+                                if id == self.modelId:
+                                    inputs = tf.where(x >= 0, float(row[ 1 ]) * inputs, inputs)
+                                # continue
+
+                        else:
+                            funcs = d.split("*")
+                            nums = [ ]
+                            for r in funcs:
+                                try:
+                                    if r.split('-')[ 0 ][ 2 ] != "x":
+                                        nums.append(float(r.split('-')[ 0 ].split('h(')[ 1 ]))
+
+                                    else:
+                                        nums.append(float(r.split('-')[ 1 ].split(')')[ 0 ]))
+                                    piecewiseFunc.append(tf.math.multiply(tf.cast(
+                                        tf.math.logical_and(tf.math.less(x, nums[ 0 ]),
+                                                            tf.math.greater(nums[ 1 ], x)), tf.float32),
+                                        float(row[ 1 ]) * (nums[ 0 ] - inputs) * (
+                                                inputs - nums[ 1 ])))
+                                    if id == self.modelId:
+                                        inputs = tf.where(x < nums[ 0 ] and x >= nums[ 0 ],
+                                                          float(row[ 1 ]) * (nums[ 0 ] - inputs) * (
+                                                                  inputs - nums[ 1 ]), inputs)
+                                except:
+                                    try:
+                                        if d.split('-')[ 0 ][ 2 ] == "x":
+                                            piecewiseFunc.append(tf.math.multiply(tf.cast(x, tf.float32),
+                                                                                  float(row[ 1 ]) * (inputs) * (
+                                                                                          inputs - nums[ 0 ])))
+                                            if id == self.modelId:
+                                                inputs = tf.where(inputs >= nums[ 0 ],
+                                                                  float(row[ 1 ]) * (inputs) * (inputs - nums[ 0 ]), x)
+
+                                        else:
+                                            piecewiseFunc.append(tf.math.multiply(tf.cast(x, tf.float32),
+                                                                                  float(row[ 1 ]) * (inputs) * (
+                                                                                          nums[ 0 ] - inputs)))
+                                            if id == self.modelId:
+                                                inputs = tf.where(x < nums[ 0 ],
+                                                                  float(row[ 1 ]) * (inputs) * (nums[ 0 ] - inputs),
+                                                                  inputs)
+                                    except:
+                                        piecewiseFunc.append(tf.math.multiply(tf.cast(x, tf.float32),
+                                                                              float(row[ 1 ]) * (inputs)))
+                                        if id == self.modelId:
+                                            inputs = tf.where(x >= 0, float(row[ 1 ]) * (inputs), inputs)
+                    model = {}
+                    model[ "id" ] = id
+                    model[ "funcs" ] = piecewiseFunc
+                    models[ "data" ].append(model)
+
+            # modelId = 0 if modelId[ 'args' ] == -1 else modelId[ 'args' ]
+
+            # interc = tf.cast(x, tf.float32) + intercepts[self.modelId]
+            # funcs = [ x for x in models[ 'data' ] if x[ 'id' ] == str(modelId) ][ 0 ][ 'funcs' ]
+            # for f in funcs:
+            # inputs = f
+
+            # SelectedFuncs = intercepts[ self.modelId ] + np.sum(
+            # [ x for x in models[ 'data' ] if x[ 'id' ] == str( self.modelId) ][ 0 ][ 'funcs' ])
+
+            return inputs
+
+            #cond1 = tf.cast(tf.math.greater(x, 8.76), tf.float32)
+            #cond2 = tf.cast(tf.math.less_equal(x, 8.76), tf.float32)
+            #cond3 = tf.cast(tf.math.logical_and(tf.less(x, 8.76), tf.greater(x, 2.56)), tf.float32)
+            #cond4 = tf.cast(tf.math.logical_or(tf.greater(x, 8.76), tf.less(x, 2.56)), tf.float32)
 
 
-            intercept = sr.coef_[ 0 ][ 0 ]
-            a = tf.math.multiply(cond1, sr.coef_[ 0 ][ 1 ] * (x - 8.76))
-            b = tf.math.multiply(cond2, sr.coef_[ 0 ][ 2 ] * (8.76 - x))
-            c = tf.math.multiply(cond3, sr.coef_[ 0 ][ 3 ] * (x - 2.56) * (8.76 - x))
-            d = tf.math.multiply(cond4, (sr.coef_[ 0 ][ 4 ] * (2.56 - x)* (x - 8.76)))
+            #intercept = sr.coef_[ 0 ][ 0 ]
+            #a = tf.math.multiply(cond1, sr.coef_[ 0 ][ 1 ] * (x - 8.76))
+            #b = tf.math.multiply(cond2, sr.coef_[ 0 ][ 2 ] * (8.76 - x))
+            #c = tf.math.multiply(cond3, sr.coef_[ 0 ][ 3 ] * (x - 2.56) * (8.76 - x))
+            #d = tf.math.multiply(cond4, (sr.coef_[ 0 ][ 4 ] * (2.56 - x)* (x - 8.76)))
 
-            f = intercept + a + b + c + d
+            #f = intercept + a + b + c + d
 
-            return f
+            #return f
 
         def custom_activation1(inputs):
 
@@ -1492,11 +1735,16 @@ class TensorFlowW(BasePartitionModeler):
             model = keras.models.Sequential()
 
             #model.add(keras.layers.Dense(len(partition_labels)*2, input_shape=(2,)))
-            model.add(keras.layers.Dense(len(partition_labels), input_shape=(2,) ))
-            model.add(keras.layers.Dense(10, input_shape=(2,)))
-            model.add(keras.layers.Dense(5, input_shape=(2,)))
+            #model.add(keras.layers.Dense(len(partition_labels), input_shape=(2,) ))
+            #model.add(keras.layers.Activation(custom_activation2))
+            model.add(keras.layers.Dense(len(DeepClpartitionLabels), input_shape=(2,)))
+            #model.add(MyLayer(5))
+            #model.add(keras.layers.Dense(15, input_shape=(2,)))
+
+            #model.add(keras.layers.Dense(genModelKnots, input_shape=(2,)))
+            #model.add(keras.layers.Dense(2, input_shape=(2,)))
             #model.add(keras.layers.Activation(custom_activation2(inputs=model.layers[2].output, modelId=1)))
-            #model.add(keras.layers.Activation(custom_activation2(inputs=model.get_layer(-2).input,modelId=1)))
+            model.add(keras.layers.Activation(custom_activation2))
             model.add(keras.layers.Dense(1,)) #activation=custom_activation
             #model.add(keras.layers.Activation(custom_activation))
             #model.add(keras.layers.Activation('linear'))  # activation=custom_activation
@@ -1688,33 +1936,62 @@ class TensorFlowW(BasePartitionModeler):
 
         #model1.compile(optimizer=keras.optimizers.Adam(), loss='kld')
         #SGD(0.01, 0.9)
-        #kmeans = KMeans(n_clusters=len(partition_labels), n_init=20)
+        dataUpdatedX = np.append(partitionsX, np.asmatrix([ partitionsY ]).T, axis=1)
+        kmeans = KMeans(n_clusters=len(partition_labels), n_init=20)
         #dataUpdatedX = partitionsX.reshape(-1, 2)
-        #y_pred = kmeans.fit_predict(partitionsX)
+        y_predDeepCl = kmeans.fit_predict(partitionsX)
         #cl_centers=np.array([np.mean(k) for k in kmeans.cluster_centers_]).reshape(-1,1)
         #model1.get_layer(name='clustering').set_weights([ cl_centers ])
 
         #q = model1.predict(partitionsX, verbose=0)
         #y_predDeepCl = q.argmax(1)
 
+        sModel=[]
         sr = sp.Earth(max_degree=2)
         sr.fit(partitionsX,partitionsY)
+        sModel.append(sr)
+        import csv
+        csvModels = [ ]
+        genModelKnots=[]
+        self.modelId = 0
+        for models in sModel:
+            modelSummary = str(models.summary()).split("\n")[ 4: ]
 
+            with open('./model_Gen_.csv', mode='w') as data:
+                csvModels.append('./model_Gen_.csv')
+                data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+                data_writer.writerow(
+                    [ 'Basis', 'Coeff' ])
+                for row in modelSummary:
+                    row = np.delete(np.array(row.split(" ")), [ i for i, x in enumerate(row.split(" ")) if x == "" ])
+                    try:
+                        basis = row[ 0 ]
+                        pruned = row[ 1 ]
+                        coeff = row[ 2 ]
+
+                        if pruned == "No":
+                            data_writer.writerow([ basis, coeff ])
+                            genModelKnots.append(basis)
+                    except:
+                        x = 0
+
+            genModelKnots = len(genModelKnots)
+            #modelCount += 1
             #models.append(autoencoder)
 
         ########SET K MEANS INITIAL WEIGHTS TO CLUSTERING LAYER
 
         #X_train, X_test, y_train, y_test = train_test_split(partitionsX, partitionsY, test_size=0.33, random_state=seed)
-        estimator = baseline_modelDeepCl()
-        dataUpdatedX = np.append(partitionsX, np.asmatrix([partitionsY]).T, axis=1)
-        estimator.fit(dataUpdatedX, dataUpdatedX, epochs=3)
+        #estimatorD = baseline_modelDeepCl()
+        #dataUpdatedX = np.append(partitionsX, np.asmatrix([partitionsY]).T, axis=1)
+        #estimatorD.fit(dataUpdatedX, dataUpdatedX, epochs=3)
 
-        model2 = keras.models.Model(inputs=estimator.input, outputs=estimator.layers[-2].output)
+        #model2 = keras.models.Model(inputs=estimatorD.input, outputs=estimatorD.layers[-2].output)
 
-        model2.compile(optimizer=keras.optimizers.Adam(), loss='kld')
+        #model2.compile(optimizer=keras.optimizers.Adam(), loss='kld')
 
-        q = model2.predict(dataUpdatedX, verbose=0)
-        y_predDeepCl = q.argmax(1)
+        #q = model2.predict(dataUpdatedX, verbose=0)
+        #y_predDeepCl = q.argmax(1)
 
         #pred =np.sum(model2.predict(partitionsX[0].reshape(1,2), verbose=0))/15
 
@@ -1736,15 +2013,17 @@ class TensorFlowW(BasePartitionModeler):
 
         srModels = []
         for idx, pCurLbl in enumerate(DeepClpartitionLabels):
-            srM = sp.Earth(max_degree=1)
+            srM = sp.Earth(max_degree=2)
             srM.fit(np.array(DeepCLpartitionsX[idx]), np.array(DeepCLpartitionsY[idx]))
             srModels.append(srM)
         modelCount = 0
         import csv
-        csvModels = []
+        #csvModels = []
+        ClModels={"data":[]}
+
         for models in srModels:
             modelSummary = str(models.summary()).split("\n")[4:]
-
+            basisM = [ ]
             with open('./model_'+str(modelCount)+'_.csv', mode='w') as data:
                 csvModels.append('./model_'+str(modelCount)+'_.csv')
                 data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
@@ -1758,15 +2037,20 @@ class TensorFlowW(BasePartitionModeler):
                         coeff = row[2]
                         if pruned == "No":
                             data_writer.writerow([basis, coeff])
+                            basisM.append(basis)
                     except:
                         x=0
+                model = {}
+                model[ "id" ] = modelCount
+                model[ "funcs" ] = len(basisM)
+                ClModels[ "data" ].append(model)
             modelCount+=1
         estimator = baseline_model()
-        estimator.fit(partitionsX, partitionsY, epochs=110,validation_split=0.33)
+        estimator.fit(partitionsX, partitionsY, epochs=100,validation_split=0.33)
 
          # validation_data=(X_test,y_test)
 
-        def insert_intermediate_layer_in_keras(model, layer_id, new_layer):
+        def insert_intermediate_layer_in_keras(model,layer_id, new_layer):
 
 
             layers = [ l for l in model.layers ]
@@ -1775,9 +2059,28 @@ class TensorFlowW(BasePartitionModeler):
             for i in range(1, len(layers)):
                 if i == layer_id:
                     x = new_layer(x)
-                x = layers[ i ](x)
 
-            new_model = keras.Model(input=layers[ 0 ].input, output=x)
+                x = layers[ i ](x)
+            #x = new_layer(x)
+            new_model = keras.Model(inputs=model.input, outputs=x)
+            #new_model.add(new_layer)
+            new_model.compile(loss='mse', optimizer=keras.optimizers.Adam())
+            #.add(x)
+            return new_model
+
+        def replace_intermediate_layer_in_keras(model, layer_id, new_layer):
+
+            layers = [ l for l in model.layers ]
+
+            x = layers[ 0 ].output
+            for i in range(1, len(layers)):
+                if i == layer_id:
+                    x = new_layer(x)
+                else:
+                    x = layers[ i ](x)
+
+            new_model = keras.Model(inputs=model.input, outputs=x)
+            new_model.compile(loss='mse', optimizer=keras.optimizers.Adam())
             return new_model
 
         #for train, test in kfold.split(partitionsX[idx],partitionsY[idx]):
@@ -1785,29 +2088,41 @@ class TensorFlowW(BasePartitionModeler):
         #models.append(estimator)
         #models={}
         #models[ 300 ] = estimator
+
+        NNmodels=[]
         for idx, pCurLbl in enumerate(DeepClpartitionLabels):
                 #partitionsX[ idx ]=partitionsX[idx].reshape(-1,2)
 
                 #estimator = baseline_model()
-                estimator = insert_intermediate_layer_in_keras(estimator, 3,keras.layers.Activation(custom_activation2(inputs=estimator.layers[2].output, modelId=idx)))
-
-                #estimator.layers[3] = custom_activation3 if idx ==5 else estimator.layers[3]
+                self.modelId = idx+1
+                modelId=idx
+                estimatorCl = baseline_model()
+                #if idx==0:
+                    #estimator.add(keras.layers.Activation(custom_activation2))
+                #else:
+                numOfNeurons = [x for x in ClModels['data'] if x['id']==idx][0]['funcs']
+                #estimatorCl=replace_intermediate_layer_in_keras(estimator, 1 ,MyLayer(5))
+                #estimatorCl = replace_intermediate_layer_in_keras(estimator, 1, keras.layers.Activation(custom_activation2))
+                #estimatorCl = insert_intermediate_layer_in_keras(estimator,-1,keras.layers.Activation(custom_activation2))
+                #estimatorCl.add(keras.layers.Activation(custom_activation2))
+                #estimator.compile()
+                #estimator.layers[3] = custom_activation2(inputs=estimator.layers[2].output, modelId=idx) if idx ==0 else estimator.layers[3]
                 #estimator.layers[3] = custom_activation2 if idx ==3 else estimator.layers[3]
-                estimator.fit(np.array(DeepCLpartitionsX[idx]),np.array(DeepCLpartitionsY[idx]),epochs=100)
+                estimatorCl.fit(np.array(DeepCLpartitionsX[idx]),np.array(DeepCLpartitionsY[idx]),epochs=200)
                     #scores = estimator.score(partitionsX[idx][ test ], partitionsY[idx][ test ])
                     #print("%s: %.2f%%" % ("acc: ", scores))
-                #models.append(estimator)
+                NNmodels.append(estimatorCl)
                 #models[pCurLbl]=estimator
                 #self._partitionsPerModel[ estimator ] = partitionsX[idx]
         # Update private models
         #models=[]
-        models.append(estimator)
+        #models.append(estimator)
 
-
-        self._models = models
+        NNmodels.append(estimator)
+        self._models = NNmodels
 
         # Return list of models
-        return estimator,model2 ,numpy.empty, numpy.empty , estimator , DeepCLpartitionsX
+        return estimator,kmeans ,numpy.empty, numpy.empty , estimator , DeepCLpartitionsX
 
     def createModelsForConv(self,partitionsX, partitionsY, partition_labels):
         ##Conv1D NN
