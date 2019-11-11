@@ -166,7 +166,35 @@ class BaseSeriesReader:
                     #####
                     data_writer.writerow([value,value2,value1,value6,value5,value4,value3,str(dt)])
 
+    def readLarosDataFromCsvNew(self, data):
+        # Load file
+        #if self.__class__.__name__ == 'UnseenSeriesReader':
+            #dt = data.sample(n=2880).values[ :90000:, 3:23 ]
+            #dt = data.values[ 0:, 2:23 ]
+        #else:
+            #dt = data.values[0:,2:23]
+        dataNew=data.drop(['M/E FOC (kg/min)' ,'DateTime'],axis=1)
+        dtNew = dataNew.values[ 0:, 0:6 ].astype(float)
+        dtNew = dtNew[~np.isnan(dtNew).any(axis=1)]
+        seriesX=dtNew[0:120000,:]
+        UnseenSeriesX = dtNew[130000:131000, :]
 
+        dt = data.values[0:, 5].astype(float)
+        dt = dt[~np.isnan(dt).any(axis=0)]
+        FOC = dt[0][0:120000]
+
+        unseenFOC = dt[0][130000:131000]
+        #WS= np.asarray([x for x in dt[ :, 1 ] ])
+        #WA = np.asarray([ x for x in dt[ :, 2 ] ])
+        #SO = np.asarray([ y for y in dt[ :, 3 ] ])
+        #RPM = np.asarray([ y for y in dt[ :, 4 ] ])
+        #FOC = np.asarray([ y for y in dt[ :, 5 ] ])
+        #POW = np.asarray([ y for y in dt[ :, 6 ] ])
+        #DA = np.asarray([ np.nan_to_num(np.float(y)) for y in dt[ :, 13 ] ])
+        #DF = np.asarray([ y for y in dt[ :, 0 ] ])
+        WaFoc=[]
+        #newArray = np.append([WS,WA,SO,RPM,POW,DF])
+        return seriesX ,FOC , UnseenSeriesX , unseenFOC
 
     def readLarosDataFromCsv(self, data):
         # Load file
@@ -179,12 +207,12 @@ class BaseSeriesReader:
         dt = dt[~np.isnan(dt).any(axis=1)]
         WS= np.asarray([x for x in dt[ :, 0 ] ])
         WA = np.asarray([ x for x in dt[ :, 1 ] ])
-        SO = np.asarray([ y for y in dt[ :, 2 ] ])
-        RPM = np.asarray([ y for y in dt[ :, 3 ] ])
-        FOC = np.asarray([ y for y in dt[ :, 4 ] ])
+        SO = np.asarray([ y for y in dt[ :, 3 ] ])
+        RPM = np.asarray([ y for y in dt[ :, 4 ] ])
+        FOC = np.asarray([ y for y in dt[ :, 5 ] ])
         POW = np.asarray([ y for y in dt[ :, 5 ] ])
         #DA = np.asarray([ np.nan_to_num(np.float(y)) for y in dt[ :, 13 ] ])
-        #DF = np.asarray([ np.nan_to_num(np.float(y)) for y in dt[ :, 14 ] ])
+        DF = np.asarray([ np.nan_to_num(np.float(y)) for y in dt[ :, 6 ] ])
         WaFoc=[]
         for i in range(0,len(WA)):
             prev = np.append(WA[i], FOC[i])
