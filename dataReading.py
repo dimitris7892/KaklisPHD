@@ -176,14 +176,14 @@ class BaseSeriesReader:
         dataNew=data.drop(['M/E FOC (kg/min)' ,'DateTime'],axis=1)
         dtNew = dataNew.values[ 0:, 0:6 ].astype(float)
         dtNew = dtNew[~np.isnan(dtNew).any(axis=1)]
-        seriesX=dtNew[0:120000,:]
-        UnseenSeriesX = dtNew[130000:131000, :]
+        seriesX=dtNew[0:140000,:]
+        UnseenSeriesX = dtNew[150000:151000, :]
 
         dt = data.values[0:, 5].astype(float)
         dt = dt[~np.isnan(dt).any(axis=0)]
-        FOC = dt[0][0:120000]
+        FOC = dt[0][0:140000]
 
-        unseenFOC = dt[0][130000:131000]
+        unseenFOC = dt[0][150000:151000]
         #WS= np.asarray([x for x in dt[ :, 1 ] ])
         #WA = np.asarray([ x for x in dt[ :, 2 ] ])
         #SO = np.asarray([ y for y in dt[ :, 3 ] ])
