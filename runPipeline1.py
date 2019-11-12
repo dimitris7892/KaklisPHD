@@ -133,8 +133,9 @@ def main():
             trSize=80000
 
             ####################################LAROS DATA STATISTICAL TESTS
-            data = pd.read_csv('./MT_DELTA_MARIA_data.csv')
-            seriesX, targetY,unseenFeaturesX, unseenFeaturesY = reader.readLarosDataFromCsvNew(data)
+            if modeler.__class__.__name__ == 'TensorFlowWD':
+                data = pd.read_csv('./MT_DELTA_MARIA_data.csv')
+                seriesX, targetY,unseenFeaturesX, unseenFeaturesY = reader.readLarosDataFromCsvNew(data)
             #################
 
             #seriesX, targetY ,targetW= reader.readStatDifferentSubsets(data,subsetsX,subsetsY,2880)
@@ -286,7 +287,7 @@ def initParameters():
     end = 17000
     startU = 30000
     endU = 31000
-    algs=['NNWD']
+    algs=['NNW']
     # ['SR','LR','RF','NN','NNW','TRI']
 
 

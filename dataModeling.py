@@ -52,6 +52,17 @@ class BasePartitionModeler:
             return self._models[0]
         else: return mBest
 
+    def getFitForEachPartitionForPoint(self, point, partitions):
+        # For each model
+        fits=[]
+        for m in range(0, len(partitions)):
+            # If it is a better for the point
+            dCurFit = self.getFitnessOfPoint(partitions, m, point)
+            fits.append(dCurFit)
+
+
+        return fits
+
     def getBestPartitionForPoint(self, point,partitions):
             # mBest = None
             mBest = None
@@ -192,7 +203,7 @@ class TensorFlowWD(BasePartitionModeler):
         #partitionsX.reshape(-1, 2)
 
         estimator = baseline_model()
-        estimator.fit(X, Y, epochs=20, validation_split=0.33)
+        estimator.fit(X, Y, epochs=1, validation_split=0.33)
 
         def insert_intermediate_layer_in_keras(model, layer_id, new_layer):
 
@@ -1896,7 +1907,7 @@ class TensorFlowW(BasePartitionModeler):
             #model.add(keras.layers.Dense(2, input_shape=(2,)))
             #model.add(keras.layers.Activation(custom_activation2(inputs=model.layers[2].output, modelId=1)))
             model.add(keras.layers.Activation(custom_activation2))
-            model.add(keras.layers.Dense(1,)) #activation=custom_activation
+            model.add(keras.layers.Dense(1,input_shape=(2,))) #activation=custom_activation
             #model.add(keras.layers.Activation(custom_activation))
             #model.add(keras.layers.Activation('linear'))  # activation=custom_activation
             # Compile model
@@ -2197,7 +2208,7 @@ class TensorFlowW(BasePartitionModeler):
                 ClModels[ "data" ].append(model)
             modelCount+=1
         estimator = baseline_model()
-        estimator.fit(partitionsX, partitionsY, epochs=100,validation_split=0.33)
+        estimator.fit(partitionsX, partitionsY, epochs=1,validation_split=0.33)
 
          # validation_data=(X_test,y_test)
 
@@ -2210,8 +2221,10 @@ class TensorFlowW(BasePartitionModeler):
             for i in range(1, len(layers)):
                 if i == layer_id:
                     x = new_layer(x)
-
-                x = layers[ i ](x)
+                if i == len(layers)-1:
+                    x = keras.layers.Dense(1)(x)
+                else:
+                    x = layers[ i ](x)
             #x = new_layer(x)
             new_model = keras.Model(inputs=model.input, outputs=x)
             #new_model.add(new_layer)
@@ -2252,14 +2265,15 @@ class TensorFlowW(BasePartitionModeler):
                     #estimator.add(keras.layers.Activation(custom_activation2))
                 #else:
                 numOfNeurons = [x for x in ClModels['data'] if x['id']==idx][0]['funcs']
-                estimatorCl=replace_intermediate_layer_in_keras(estimator, -1 ,MyLayer(5))
-                #estimatorCl = replace_intermediate_layer_in_keras(estimator, 1, keras.layers.Activation(custom_activation2))
+                #estimatorCl=replace_intermediate_layer_in_keras(estimator, -1 ,MyLayer(5))
+                #estimatorCl = replace_intermediate_layer_in_keras(estimator, 1, keras.layers.Dense(numOfNeurons))
+                estimatorCl = insert_intermediate_layer_in_keras(estimator, 1, keras.layers.Dense(numOfNeurons))
                 #estimatorCl = insert_intermediate_layer_in_keras(estimator,-1,keras.layers.Activation(custom_activation2))
                 #estimatorCl.add(keras.layers.Activation(custom_activation2))
                 #estimator.compile()
                 #estimator.layers[3] = custom_activation2(inputs=estimator.layers[2].output, modelId=idx) if idx ==0 else estimator.layers[3]
                 #estimator.layers[3] = custom_activation2 if idx ==3 else estimator.layers[3]
-                estimatorCl.fit(np.array(DeepCLpartitionsX[idx]),np.array(DeepCLpartitionsY[idx]),epochs=200)
+                estimatorCl.fit(np.array(DeepCLpartitionsX[idx]),np.array(DeepCLpartitionsY[idx]),epochs=1)
                     #scores = estimator.score(partitionsX[idx][ test ], partitionsY[idx][ test ])
                     #print("%s: %.2f%%" % ("acc: ", scores))
                 NNmodels.append(estimatorCl)
@@ -2267,7 +2281,7 @@ class TensorFlowW(BasePartitionModeler):
                 #self._partitionsPerModel[ estimator ] = partitionsX[idx]
         # Update private models
         #models=[]
-        #models.append(estimator)
+        NNmodels.append(estimator)
 
         #NNmodels.append(estimator)
         self._models = NNmodels
