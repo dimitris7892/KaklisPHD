@@ -866,12 +866,12 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
             fits = modeler.getFitForEachPartitionForPoint(pPoint, partitionsX)
             weightedPreds=[]
             for n,model in enumerate(modeler._models):
-                weightedPreds.append(modeler._models[n].predict(pPoint)*fits[n])
+                weightedPreds.append(modeler._models[n].predict(pPoint))
             weightedPreds.append(modeler._models[len(modeler._models)-1].predict(pPoint))
             predX = np.mean(weightedPreds)
             #prediction = modeler._models[0].predict(pPoint)
-            prediction = (modeler._models[ind].predict(pPoint)+ modeler._models[len(modeler._models)-1].predict(pPoint))/2
-            #prediction = abs(modeler._models[ind].predict(pPoint))
+            #prediction = (modeler._models[ind].predict(pPoint)+ modeler._models[len(modeler._models)-1].predict(pPoint))/2
+            prediction = abs(modeler._models[ind].predict(pPoint))
             #states_value = modeler._models[0].model.predict([unseenX[:,0].reshape(1,unseenX.shape[200],1) , unseenX[ :, 1 ].reshape(1, unseenX.shape[ 200 ], 1)])
 
             ##########
