@@ -95,9 +95,6 @@ def main():
     histTr=[]
     counter=0
 
-
-
-
     K = range(1,30)
     print("Number of Statistically ind. subsets for training: " + str(len(subsetsX)))
     subsetsX=[subsetsX[0:5]] if len(subsetsX) > 5 else subsetsX

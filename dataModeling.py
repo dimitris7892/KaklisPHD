@@ -139,11 +139,8 @@ class TensorFlowWD(BasePartitionModeler):
 
             return model.coef_
 
-
         def getFitnessOfPoint(partitions, cluster, point):
             return 1.0 / (1.0 + numpy.linalg.norm(np.mean(partitions[cluster]) - point))
-
-
 
         def baseline_modelDeepCl():
             # create model
@@ -170,6 +167,7 @@ class TensorFlowWD(BasePartitionModeler):
             # model.add(keras.layers.Dense(len(partition_labels), input_shape=(2,) ))
             # model.add(keras.layers.Activation(custom_activation2))
             model.add(keras.layers.Dense(len(partition_labels), input_shape=(6,)))
+            model.add(keras.layers.Dense(10, input_shape=(6,)))
             # model.add(MyLayer(5))
             # model.add(keras.layers.Dense(15, input_shape=(2,)))
 
@@ -183,8 +181,6 @@ class TensorFlowWD(BasePartitionModeler):
             # Compile model
             model.compile(loss='mse', optimizer=keras.optimizers.Adam())
             return model
-
-
 
         seed = 7
         numpy.random.seed(seed)
@@ -203,7 +199,7 @@ class TensorFlowWD(BasePartitionModeler):
         #partitionsX.reshape(-1, 2)
 
         estimator = baseline_model()
-        estimator.fit(X, Y, epochs=1, validation_split=0.33)
+        estimator.fit(X, Y, epochs=200, validation_split=0.33)
 
         def insert_intermediate_layer_in_keras(model, layer_id, new_layer):
 
@@ -237,37 +233,20 @@ class TensorFlowWD(BasePartitionModeler):
             new_model.compile(loss='mse', optimizer=keras.optimizers.Adam())
             return new_model
 
-
-
         NNmodels = []
         for idx, pCurLbl in enumerate(partition_labels):
-            # partitionsX[ idx ]=partitionsX[idx].reshape(-1,2)
-
-            # estimator = baseline_model()
+            #
             self.modelId = idx + 1
             modelId = idx
-            #estimatorCl = baseline_model()
-            # if idx==0:
-            # estimator.add(keras.layers.Activation(custom_activation2))
-            # else:
-            #numOfNeurons = [x for x in ClModels['data'] if x['id'] == idx][0]['funcs']
-            estimatorCl=replace_intermediate_layer_in_keras(estimator, 1 ,keras.layers.Dense(5))
-            # estimatorCl = replace_intermediate_layer_in_keras(estimator, 1, keras.layers.Activation(custom_activation2))
-            # estimatorCl = insert_intermediate_layer_in_keras(estimator,-1,keras.layers.Activation(custom_activation2))
-            # estimatorCl.add(keras.layers.Activation(custom_activation2))
-            # estimator.compile()
-            # estimator.layers[3] = custom_activation2(inputs=estimator.layers[2].output, modelId=idx) if idx ==0 else estimator.layers[3]
-            # estimator.layers[3] = custom_activation2 if idx ==3 else estimator.layers[3]
-            estimatorCl.fit(np.array(partitionsX[idx]), np.array(partitionsY[idx]), epochs=20)
-            # scores = estimator.score(partitionsX[idx][ test ], partitionsY[idx][ test ])
-            # print("%s: %.2f%%" % ("acc: ", scores))
+
+            estimatorCl=replace_intermediate_layer_in_keras(estimator, -1 ,keras.layers.Dense(5))
+            estimatorCl.fit(np.array(partitionsX[idx]), np.array(partitionsY[idx]), epochs=30)
+            estimatorCl.save("estimatorCl_"+idx+".h5")
             NNmodels.append(estimatorCl)
-            # models[pCurLbl]=estimator
-            # self._partitionsPerModel[ estimator ] = partitionsX[idx]
+
         # Update private models
         # models=[]
         # models.append(estimator)
-
         #NNmodels.append(estimator)
         self._models = NNmodels
 
@@ -962,7 +941,6 @@ class TensorFlowW(BasePartitionModeler):
 
         # Return list of models
         return models, numpy.empty, numpy.empty , None
-
 
 
     def createSegmentsofTrData(self,trainX,trainY,timeStep,step):
@@ -1879,9 +1857,9 @@ class TensorFlowW(BasePartitionModeler):
             #create model
             model = keras.models.Sequential()
 
-            model.add(keras.layers.Dense(len(partition_labels)*3, input_shape=(3,)))
-            model.add(keras.layers.Dense(len(partition_labels) * 2, input_shape=(3,)))
-            model.add(keras.layers.Dense(len(partition_labels), input_shape=(3,)))
+            model.add(keras.layers.Dense(len(partition_labels)*3, input_shape=(2,)))
+            model.add(keras.layers.Dense(len(partition_labels) * 2, input_shape=(2,)))
+            model.add(keras.layers.Dense(len(partition_labels), input_shape=(2,)))
             #model.add(keras.layers.Dense(10, input_shape=(2,)))
             #model.add(keras.layers.Dense(5, input_shape=(2,)))
             model.add(keras.layers.Activation(custom_activation))
@@ -1889,9 +1867,9 @@ class TensorFlowW(BasePartitionModeler):
             #model.add(keras.layers.Activation(custom_activation))
             #model.add(keras.layers.Activation('linear'))  # activation=custom_activation
             # Compile model
-            model.compile(loss='kld', optimizer=keras.optimizers.Adam())
+            model.compile(loss='mse' , optimizer=keras.optimizers.Adam())
             return model
-
+        from keras import losses
         def baseline_model():
             #create model
             model = keras.models.Sequential()
@@ -2146,16 +2124,16 @@ class TensorFlowW(BasePartitionModeler):
         ########SET K MEANS INITIAL WEIGHTS TO CLUSTERING LAYER
 
         #X_train, X_test, y_train, y_test = train_test_split(partitionsX, partitionsY, test_size=0.33, random_state=seed)
-        #estimatorD = baseline_modelDeepCl()
+        estimatorD = baseline_modelDeepCl()
         #dataUpdatedX = np.append(partitionsX, np.asmatrix([partitionsY]).T, axis=1)
-        #estimatorD.fit(dataUpdatedX, dataUpdatedX, epochs=3)
+        estimatorD.fit(partitionsX, partitionsY, epochs=200)
 
-        #model2 = keras.models.Model(inputs=estimatorD.input, outputs=estimatorD.layers[-2].output)
+        model2 = keras.models.Model(inputs=estimatorD.input, outputs=estimatorD.layers[-2].output)
 
-        #model2.compile(optimizer=keras.optimizers.Adam(), loss='kld')
+        model2.compile(optimizer=keras.optimizers.Adam(), loss=losses.MeanSquaredError() + losses.CategoricalCrossentropy())
 
-        #q = model2.predict(dataUpdatedX, verbose=0)
-        #y_predDeepCl = q.argmax(1)
+        q = model2.predict(dataUpdatedX, verbose=0)
+        y_predDeepCl = q.argmax(1)
 
         #pred =np.sum(model2.predict(partitionsX[0].reshape(1,2), verbose=0))/15
 
