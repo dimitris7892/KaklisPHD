@@ -167,7 +167,7 @@ class TensorFlowWD(BasePartitionModeler):
             # model.add(keras.layers.Dense(len(partition_labels), input_shape=(2,) ))
             # model.add(keras.layers.Activation(custom_activation2))
             model.add(keras.layers.Dense(len(partition_labels), input_shape=(6,)))
-            model.add(keras.layers.Dense(10, input_shape=(6,)))
+            #model.add(keras.layers.Dense(10, input_shape=(6,)))
             # model.add(MyLayer(5))
             # model.add(keras.layers.Dense(15, input_shape=(2,)))
 
@@ -234,6 +234,7 @@ class TensorFlowWD(BasePartitionModeler):
             return new_model
 
         NNmodels = []
+        import csv
         for idx, pCurLbl in enumerate(partition_labels):
             #
             self.modelId = idx + 1
@@ -241,9 +242,12 @@ class TensorFlowWD(BasePartitionModeler):
 
             estimatorCl=replace_intermediate_layer_in_keras(estimator, -1 ,keras.layers.Dense(5))
             estimatorCl.fit(np.array(partitionsX[idx]), np.array(partitionsY[idx]), epochs=30)
-            estimatorCl.save("estimatorCl_"+idx+".h5")
+            estimatorCl.save("estimatorCl_"+str(idx)+".h5")
             NNmodels.append(estimatorCl)
-
+            with open('./cluster_' + str(idx) + '_.csv', mode='w') as data:
+                for k in range(0,len(partitionsX[idx])):
+                    data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+                    data_writer.writerow([partitionsX[idx][k][0],partitionsX[idx][k][1],partitionsX[idx][k][2],partitionsX[idx][k][3],partitionsX[idx][k][4],partitionsX[idx][k][5] ])
         # Update private models
         # models=[]
         # models.append(estimator)
