@@ -1695,7 +1695,9 @@ class TensorFlowW(BasePartitionModeler):
 
             #SelectedFuncs = intercepts[ self.modelId ] + np.sum(
                 #[ x for x in models[ 'data' ] if x[ 'id' ] == str( self.modelId) ][ 0 ][ 'funcs' ])
-
+            #intercept = tf.constant()
+            constants = intercepts[ 0 if self.modelId=='Gen' else self.modelId ]
+            k_constants = keras.backend.variable(constants)
             return inputs
 
         def custom_activation3(inputs):
@@ -1899,19 +1901,21 @@ class TensorFlowW(BasePartitionModeler):
             #model.add(keras.layers.Dense(len(partition_labels)*2, input_shape=(2,)))
             #model.add(keras.layers.Dense(len(partition_labels), input_shape=(2,) ))
             #model.add(keras.layers.Activation(custom_activation2))
-            model.add(keras.layers.Dense(len(DeepClpartitionLabels), input_shape=(2,)))
-            #model.add(MyLayer(5))
-            #model.add(keras.layers.Dense(15, input_shape=(2,)))
 
-            model.add(MyLayer(genModelKnots))
+            #len(DeepClpartitionLabels)
+            model.add(keras.layers.Dense(len(DeepClpartitionLabels), input_shape=(2,)))
+            #model.add(MyLayer(genModelKnots))
+            #model.add(keras.layers.Dense(15, input_shape=(2,)))
+            #model.add(keras.layers.Dense(1, input_shape=(2,)))  # activation=custom_activation
+            #model.add(MyLayer(genModelKnots))
             #model.add(keras.layers.Dense(2, input_shape=(2,)))
             #model.add(keras.layers.Activation(custom_activation2(inputs=model.layers[2].output, modelId=1)))
-            #model.add(keras.layers.Activation(custom_activation2))
-            model.add(keras.layers.Dense(1,input_shape=(2,))) #activation=custom_activation
+            model.add(keras.layers.Activation(custom_activation2))
+            model.add(keras.layers.Dense(1, input_shape=(2,)))  # activation=custom_activation
             #model.add(keras.layers.Activation(custom_activation))
             #model.add(keras.layers.Activation('linear'))  # activation=custom_activation
             # Compile model
-            model.compile(loss='mse', optimizer=keras.optimizers.Adam())
+            model.compile(loss='mse', optimizer=keras.optimizers.Adam(lr=0.001))
             return model
 
         def preTrainedWeights():
@@ -2115,7 +2119,7 @@ class TensorFlowW(BasePartitionModeler):
         import csv
         csvModels = [ ]
         genModelKnots=[]
-        self.modelId = 0
+        self.modelId = 'Gen'
         for models in sModel:
             modelSummary = str(models.summary()).split("\n")[ 4: ]
 
@@ -2208,7 +2212,8 @@ class TensorFlowW(BasePartitionModeler):
                 ClModels[ "data" ].append(model)
             modelCount+=1
         estimator = baseline_model()
-        estimator.fit(partitionsX, partitionsY, epochs=100,validation_split=0.33)
+
+        estimator.fit(partitionsX, partitionsY, epochs=200,validation_split=0.33)
 
          # validation_data=(X_test,y_test)
 
@@ -2232,7 +2237,8 @@ class TensorFlowW(BasePartitionModeler):
             #.add(x)
             return new_model
 
-        def replace_intermediate_layer_in_keras(model, layer_id,layer_id1, new_layer,new_layer1):
+        def replace_intermediate_layer_in_keras(model, layer_id,layer_id1 ,new_layer,new_layer1):
+
 
             layers = [ l for l in model.layers ]
 
@@ -2240,13 +2246,15 @@ class TensorFlowW(BasePartitionModeler):
             for i in range(1, len(layers)):
                 if i == layer_id:
                     x = new_layer(x)
-                elif i==layer_id1:
-                    x=new_layer1(x)
+
+                elif  i == layer_id1:
+                    x = new_layer1(x)
+
                 else:
-                    if i == len(layers) - 1:
-                        x = keras.layers.Dense(1)(x)
-                    else:
-                        x = layers[ i ](x)
+                    #if i == len(layers) - 1:
+                        #x = keras.layers.Dense(1)(x)
+                    #else:
+                    x = layers[ i ](x)
 
             new_model = keras.Model(inputs=model.input, outputs=x)
             new_model.compile(loss='mse', optimizer=keras.optimizers.Adam())
@@ -2263,7 +2271,7 @@ class TensorFlowW(BasePartitionModeler):
                 #partitionsX[ idx ]=partitionsX[idx].reshape(-1,2)
 
                 #estimator = baseline_model()
-                self.modelId = idx+1
+                self.modelId = idx
                 modelId=idx
                 #estimatorCl = baseline_model()
                 #if idx==0:
@@ -2271,9 +2279,12 @@ class TensorFlowW(BasePartitionModeler):
                 #else:
                 numOfNeurons = [x for x in ClModels['data'] if x['id']==idx][0]['funcs']
                 #estimatorCl=replace_intermediate_layer_in_keras(estimator, -1 ,MyLayer(5))
-                estimatorCl = replace_intermediate_layer_in_keras(estimator, -1,1, keras.layers.Dense(numOfNeurons),MyLayer(numOfNeurons))
+
                 #estimatorCl = insert_intermediate_layer_in_keras(estimator, 1, keras.layers.Dense(numOfNeurons))
-                #estimatorCl = insert_intermediate_layer_in_keras(estimator,-1,keras.layers.Activation(custom_activation2))
+                estimatorCl = replace_intermediate_layer_in_keras(estimator, 0,1, keras.layers.Dense( len(DeepClpartitionLabels)+numOfNeurons),keras.layers.Activation(custom_activation2))
+                #estimatorCl = insert_intermediate_layer_in_keras(estimator, 1, MyLayer(numOfNeurons))
+                #estimatorCl = insert_intermediate_layer_in_keras(estimator,0,keras.layers.Activation(custom_activation2))
+
                 #estimatorCl.add(keras.layers.Activation(custom_activation2))
                 #estimator.compile()
                 #estimator.layers[3] = custom_activation2(inputs=estimator.layers[2].output, modelId=idx) if idx ==0 else estimator.layers[3]
