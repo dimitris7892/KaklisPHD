@@ -7,7 +7,9 @@ class BaseFeatureExtractor:
         HISTORY_SIZE = 35
 
         Xnew = []
+        Yt=[]
         XnewX=[]
+        prev = []
         Y_decInput=[]
         Y_decTrget=[]
         #(B[i-HISTORY_SIZE]-B[i])
@@ -34,14 +36,15 @@ class BaseFeatureExtractor:
           #if modeler.__class__.__name__ != 'TensorFlow':
           #prev =np.append([X[i],np.mean(X[ i - HISTORY_SIZE:i ])],np.mean(X[ i - 2*HISTORY_SIZE:i - HISTORY_SIZE ]))
           #else:
-          prev = np.append(X[i],np.mean(X[ i - HISTORY_SIZE:i ]))
-
+          if X[i] > 1:
+            prev = np.append(X[i],np.mean(X[ i - HISTORY_SIZE:i ]))
+            Yt.append(Y[i])
           #if modeler.__class__.__name__ == 'TensorFlow':
               #prevY = np.append(Y[ i ], Y[ i - HISTORY_SIZE:i ])
               #if i+1 <  len(X):
                   #prevYt = np.append(Y[ i+1 ], Y[ (i+1) - HISTORY_SIZE:(i+1) ])
             # for i in range(HISTORY_SIZE, len(X))
-          Xnew.append(prev)
+            Xnew.append(prev)
           #Y_decInput.append(prevY)
           #Y_decTrget.append(prevYt)
         #if modeler.__class__.__name__ != 'TensorFlow':
@@ -58,7 +61,7 @@ class BaseFeatureExtractor:
 
         #if modeler.__class__.__name__ != 'TensorFlow':
         #Y[ history: ]
-        return Xnew, Y[HISTORY_SIZE:] , []
+        return Xnew, np.array(Yt), []
         #else:
             #return Xnew, Y_decInput, Y_decTrget
 
