@@ -2308,7 +2308,7 @@ class TensorFlowW(BasePartitionModeler):
                 #self._partitionsPerModel[ estimator ] = partitionsX[idx]
         # Update private models
         #models=[]
-        NNmodels.append(estimator)
+        #NNmodels.append(estimator)
 
         #NNmodels.append(estimator)
         self._models = NNmodels
