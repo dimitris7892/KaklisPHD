@@ -265,18 +265,6 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
             candidatePoint = unseenX[ iu ]
 
             preds=[]
-            #candidateTriangle = triNew.find_simplex(candidatePoint)
-            #index, bestFit = modeler.getBestPartitionForPoint(candidatePoint,trainX)
-            #triNew=triangulationsClusters[index]
-            #dataXnew=trainX[index]
-            #dataYnew=trainY[index]
-            # simplicesIndexes = triNew.find_simplex(trainX[index])
-            # dataXnew=dataX[triNew.vertices[simplicesIndexes]]
-            # dataYnew=dataY[triNew.vertices[simplicesIndexes]]
-
-            # dataXnew = np.concatenate(dataX[ tri.vertices[ simplicesIndexes ] ])
-            # dataYnew = np.concatenate(dataY[ tri.vertices[ simplicesIndexes ] ])
-
 
 
             for k in range(0 ,len(triNew.vertices)):
@@ -295,27 +283,8 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
                 W3 = 1 - np.sum(b)
 
                 if W1>0 and W2>0 and W3>0:
-                        #and (W1+W2+W3)==1:
-                        #and k not in flagedVertices:
-                    #V1 = dataXnew[ triNew.vertices[ k ] ][ 0 ]
-                    #V2 = dataXnew[ triNew.vertices[ k ] ][ 1 ]
-                    #V3 = dataXnew[ triNew.vertices[ k ] ][ 2 ]
 
-                    #plt.plot(candidatePoint[ 0 ], candidatePoint[ 1 ], 'o', markersize=8)
-                    #ki = np.array([ V1, V2,
-                                        #V3 ])
-                    #t4 = plt.Polygon(ki, fill=False, color='blue', linewidth=3)
-                    #plt.gca().add_patch(t4)
-                    #plt.show()
-                    #self.PointInTriangle(candidatePoint, dataXnew[ triNew.vertices[ k ] ][ 0 ],
-                                        #dataXnew[ triNew.vertices[ k ] ][ 1 ],
-                                        #dataXnew[ triNew.vertices[ k ] ][ 2 ])
-                    # #and k not in flagedVertices:
-                      #len([ x for x in flagedVertices if list(x) == list(triNew.vertices[ k ]) ])==0:
                     flg  = True
-                    #neighboringVertices=triNew.vertex_neighbor_vertices[ 1 ][
-                    #triNew.vertex_neighbor_vertices[ 0 ][ triNew.vertices[ k ] ]:triNew.vertex_neighbor_vertices[ 0 ][ triNew.vertices[ k ] + 1 ] ]
-
 
                     rpm1 = dataYnew[ triNew.vertices[ k ] ][ 0 ]
                     rpm2 = dataYnew[ triNew.vertices[ k ] ][ 1 ]
@@ -648,21 +617,11 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
                                                  W31_3, 2) * rpm3 ])
                                 cond_numerGen = np.linalg.cond(eq1)
                                 if cond_numerGen > 2500:
-                                        #or W12_1==W31_1 or W23_1==W31_1\
-                                #or W12_1==W23_1 or W12_2==W31_2 or W23_2==W31_2\
-                                #or W12_2==W23_2 or W12_3==W31_3 or W23_1==W31_3\
-                                #or W12_3==W23_3:
-                                    ###suneuthiaka simeia unstable 3x3 system
-                                    #####   EKTIMISI MONO ME TETRAGWNIKOUS OROUS??
-                                    #Xpred=[(math.pow(W2, 2) * rpm1 + math.pow(W1, 2) * rpm2 + math.pow(W3, 2) * rpm3)]
-                                    #Xpred = [ (rpm1 + rpm2 + rpm3) / 3 ]
 
                                     Xpred = ((math.pow(W2, 2) * rpm2 + math.pow(W1, 2) * rpm1 + math.pow(W3, 2) * rpm3) + \
                                     2 * W1 * W2 * rpm12 + 2 * W2 * W3 * rpm23 + 2 * W1 * W3 * rpm31)
                                     Xpred = [ W2 * rpm2 + W1 * rpm1 + W3 * rpm3 ]
-                                        #(modeler.getBestModelForPoint(candidatePoint.reshape(-1, 2)).predict(
-                                        #candidatePoint.reshape(-1, 2)) \
-                                             #+ (rpm1 + rpm2 + rpm3) / 3) / 2
+
                                 else:
                                     solutions = np.linalg.solve(eq1, eq2)
                                     Xpred = (math.pow(W2, 2) * rpm2 + math.pow(W1, 2) * rpm1 + math.pow(W3, 2) * rpm3) + \
@@ -679,25 +638,7 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
 
                     except :
                         flgExc = True
-                        #print str(e)
-                    #errorsTue.append(abs(Xpred - trueVal))
-                    #if abs(Xpred[0] - trueVal) > 10 or flgExc:
-                        #y=0
 
-                #########################################
-                    ##############################################
-                    #if W3 <0 or W2 < 0 or W1 < 0 :
-                        #continue
-                    #predictionB = Bernstein([[W1],[W2],[W3]],candidatePoint)
-
-                    #if np.min([ distV1, distV2, distV3 ]) < 0.6:
-                        #prediction = (W1 * rpm1 + W2 * rpm2 + W3 * rpm3) / (W1 + W2 + W3)
-                        #prediction = rpm1 if distV1 < distV2 and distV1 < distV3 else rpm2 if \
-                            #distV2 < distV1 and distV2 < distV3 else rpm3 if \
-                            #distV3 < distV2 and distV3 < distV1 else 0
-                    #else:
-                        #prediction = modeler.getBestModelForPoint(candidatePoint.reshape(1, -1)).predict(
-                            #candidatePoint.reshape(1, -1))
                     break
             if flg == False:
                 distList = [ ]
