@@ -1,6 +1,35 @@
 import numpy as np
 import matplotlib as mpl
 import matplotlib.cm as cm
+##############################################
+
+
+for models in srModels:
+    modelSummary = str(models.summary()).split("\n")[ 4: ]
+    basisM = [ ]
+    with open('./model_' + str(modelCount) + '_.csv', mode='w') as data:
+        csvModels.append('./model_' + str(modelCount) + '_.csv')
+        data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+        data_writer.writerow(
+            [ 'Basis', 'Coeff' ])
+        for row in modelSummary:
+            row = np.delete(np.array(row.split(" ")), [ i for i, x in enumerate(row.split(" ")) if x == "" ])
+            try:
+                basis = row[ 0 ]
+                pruned = row[ 1 ]
+                coeff = row[ 2 ]
+                if pruned == "No":
+                    data_writer.writerow([ basis, coeff ])
+                    basisM.append(basis)
+            except:
+                x = 0
+        model = {}
+        model[ "id" ] = modelCount
+        model[ "funcs" ] = len(basisM)
+        ClModels[ "data" ].append(model)
+    modelCount += 1
+
+
 #######################
 for s in neighboringTri:
     V1n = dataXnew[ s ][ 0 ]
