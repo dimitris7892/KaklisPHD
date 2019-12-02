@@ -1583,7 +1583,6 @@ class TensorFlowW(BasePartitionModeler):
             interceptsGen = 0
             for csvM in csvModels:
                 id = csvM.split("_")[ 1 ]
-                id =  0 if id=='Gen'  else int(id)
                 piecewiseFunc = [ ]
 
                 with open(csvM) as csv_file:
@@ -1599,15 +1598,12 @@ class TensorFlowW(BasePartitionModeler):
                         if row.__len__() == 0:
                             continue
                         d = row[ 0 ]
-                        coeffS = 1
-                        #float(row[1])
                         if d.split("*").__len__() == 1:
                             split = ""
                             try:
                                 split = d.split('-')[ 0 ][ 2 ]
                                 if split != "x":
                                     num = float(d.split('-')[ 0 ].split('h(')[ 1 ])
-
                                     if id == self.modelId:
                                         # if float(row[ 1 ]) < 10000:
                                         #piecewiseFunc.append(
@@ -1631,7 +1627,7 @@ class TensorFlowW(BasePartitionModeler):
                                                                           #float(row[ 1 ]) * (inputs)))
 
                                     inputs = tf.where(x >= 0, float(row[ 1 ]) * inputs, inputs)
-
+                                # continue
 
                         else:
                             funcs = d.split("*")
@@ -2385,174 +2381,17 @@ class TensorFlowW(BasePartitionModeler):
             assert shape1 == shape2  # else hadamard product isn't possible
             return [tuple(shape1), tuple(shape2[:-1])]
 
-        def preTrainedWeights(candidatePoint):
-            from scipy.spatial import Delaunay, ConvexHull
-            import math
-            from trianglesolver import solve, degree
-            dataXnew = partitionsX
-            dataYnew = partitionsY
-            triNew = Delaunay(dataXnew)
-            XpredN =0
-            weights = []
-            indexes = []
-            for k in range(0, len(triNew.vertices)):
-                # simplicesIndexes
-                # k=triNew.find_simplex(dataXnew[i])
-                V1 = dataXnew[triNew.vertices[k]][0]
-                V2 = dataXnew[triNew.vertices[k]][1]
-                V3 = dataXnew[triNew.vertices[k]][2]
-
-                # plt.plot(candidatePoint[ 0 ], candidatePoint[ 1 ], 'o', markersize=8)
-                # plt.show()
-                x = 1
-                b2 = triNew.transform[ k, :2 ].dot(candidatePoint - triNew.transform[ k, 2 ])
-                W1 = b2[ 0 ]
-                W2 = b2[ 1 ]
-                W3 = 1 - np.sum(b2)
-                if (W1 == 0 and W2 == 0) or (W3 == 0 and W1==0) or (W2==0 and W3==0) :
-
-                    a = spatial.distance.euclidean(V1, V2)
-                    b = spatial.distance.euclidean(V1, V3)
-                    c = spatial.distance.euclidean(V3, V2)
-                    a, b, c, A, B, C = solve(b=a, c=b, a=c)
-                    A = A / degree
-                    B = B / degree
-                    C = C / degree
-                    W1 = math.sin(A)
-                    W2 = math.sin(B)
-                    W3 = math.sin(C)
-
-                    if 1 == 1:
-
-                        rpm1 = dataYnew[triNew.vertices[k]][0]
-                        rpm2 = dataYnew[triNew.vertices[k]][1]
-                        rpm3 = dataYnew[triNew.vertices[k]][2]
-
-                        x = 0
-
-                        ##barycenters (W12,W23,W13) of neighboring triangles and solutions of linear 3x3 sustem in order to find gammas.
-
-
-                        #############################
-                        ##end of barycenters
-                        flgExc = False
-                        try:
-
-                            neighboringVertices1 = []
-
-                            for u in range(0, 2):
-                                try:
-                                    neighboringVertices1.append(triNew.vertex_neighbor_vertices[1][
-                                                                triNew.vertex_neighbor_vertices[0][
-                                                                    triNew.vertices[k][u]]:
-                                                                triNew.vertex_neighbor_vertices[0][
-                                                                    triNew.vertices[k][u] + 1]])
-                                except:
-                                    break
-                            neighboringTri = triNew.vertices[
-                                triNew.find_simplex(dataXnew[np.concatenate(np.array(neighboringVertices1))])]
-                            if (1 == 1):
-
-                                nRpms = []
-                                nGammas = []
-
-                                rpms = []
-                                for s in neighboringTri:
-                                    V1n = dataXnew[s][0]
-                                    V2n = dataXnew[s][1]
-                                    V3n = dataXnew[s][2]
-
-                                    rpm1n = dataYnew[s][0]
-                                    rpm2n = dataYnew[s][1]
-                                    rpm3n = dataYnew[s][2]
-
-                                    rpms.append([rpm1n, rpm2n, rpm3n])
-                                    ###barycentric coords of neighboring points in relation to initial triangle
-                                    eq1 = np.array([[(V1[0] - V3[0]), (V2[0] - V3[0])],
-                                                    [(V1[1] - V3[1]), (V2[1] - V3[1])]])
-
-                                    eq2 = np.array([V1n[0] - V3[0], V1n[1] - V3[1]])
-                                    solutions = np.linalg.solve(eq1, eq2)
-
-                                    W1n = solutions[0]
-                                    W2n = solutions[1]
-                                    W3n = 1 - solutions[0] - solutions[1]
-
-                                    B1 = (math.pow(W1n, 2) * rpm1 + math.pow(W2n, 2) * rpm2 + math.pow(W3n, 2) * rpm3)
-                                    nRpms.append(rpm1n - B1)
-
-                                    nGammas.append(np.array([2 * W1n * W2n, 2 * W1n * W3n, 2 * W2n * W3n]))
-                                    ####################################
-
-                                    eq1 = np.array([[(V1[0] - V3[0]), (V2[0] - V3[0])],
-                                                    [(V1[1] - V3[1]), (V2[1] - V3[1])]])
-
-                                    eq2 = np.array([V2n[0] - V3[0], V2n[1] - V3[1]])
-                                    solutions = np.linalg.solve(eq1, eq2)
-
-                                    W1n = solutions[0]
-                                    W2n = solutions[1]
-                                    W3n = 1 - solutions[0] - solutions[1]
-
-                                    B1 = (math.pow(W1n, 2) * rpm1 + math.pow(W2n, 2) * rpm2 + math.pow(W3n, 2) * rpm3)
-                                    nRpms.append(rpm2n - B1)
-
-                                    nGammas.append(np.array([2 * W1n * W2n, 2 * W1n * W3n, 2 * W2n * W3n]))
-                                    ##################################################
-
-                                    eq1 = np.array([[(V1[0] - V3[0]), (V2[0] - V3[0])],
-                                                    [(V1[1] - V3[1]), (V2[1] - V3[1])]])
-
-                                    eq2 = np.array([V3n[0] - V3[0], V3n[1] - V3[1]])
-                                    solutions = np.linalg.solve(eq1, eq2)
-
-                                    W1n = solutions[0]
-                                    W2n = solutions[1]
-                                    W3n = 1 - solutions[0] - solutions[1]
-
-                                    B1 = (math.pow(W1n, 2) * rpm1 + math.pow(W2n, 2) * rpm2 + math.pow(W3n, 2) * rpm3)
-                                    nRpms.append(rpm3n - B1)
-                                    nGammas.append(np.array([2 * W1n * W2n, 2 * W1n * W3n, 2 * W2n * W3n]))
-
-                                nGammas = np.array(nGammas)
-                                nRpms = np.array(nRpms)
-                                from sklearn.linear_model import LinearRegression
-                                lr = LinearRegression()
-                                leastSqApprx = lr.fit(nGammas.reshape(-1, 3), nRpms.reshape(-1, 1))
-                                XpredN = ((math.pow(W2, 2) * rpm2 + math.pow(W1, 2) * rpm1 + math.pow(W3, 2) * rpm3) +
-                                          2 * W1 * W2 * leastSqApprx.coef_[0][0] +
-                                          2 * W2 * W3 * leastSqApprx.coef_[0][1] +
-                                          2 * W1 * W3 * leastSqApprx.coef_[0][2])
-                                weights.append(leastSqApprx.coef_[0][0])
-                                weights.append(leastSqApprx.coef_[0][1])
-                                weights.append(leastSqApprx.coef_[0][2])
-                                # weights.append(np.mean(leastSqApprx.coef_))
-
-                        except:
-                            # print(str(e))
-                            x = 1
-                    return XpredN
-
         def baseline_modelDeepCl():
             #create model
             model = keras.models.Sequential()
 
-
+            model.add(keras.layers.Dense(len(partition_labels)*3, input_shape=(2,)))
+            model.add(keras.layers.Dense(len(partition_labels) * 2, input_shape=(2,)))
             model.add(keras.layers.Dense(len(partition_labels), input_shape=(2,)))
-            #model.add(keras.layers.Dense(len(partition_labels) * 2, input_shape=(2,)))
-            #model.add(keras.layers.Dense(len(partition_labels) * 3, input_shape=(2,)))
-            #model.add(keras.layers.Dense(len(partition_labels) * 2, input_shape=(2,)))
-            #model.add(keras.layers.Dense(len(partition_labels), input_shape=(2,)))
             #model.add(keras.layers.Dense(10, input_shape=(2,)))
             #model.add(keras.layers.Dense(5, input_shape=(2,)))
-
             model.add(keras.layers.Activation(custom_activation23))
-
             model.add(keras.layers.Dense(1,)) #activation=custom_activation
-            #model.add(keras.layers.Activation(custom_activation2))
-
-            #model.add(keras.layers.Activation(custom_activation2))
-            #
             #model.add(keras.layers.Activation(custom_activation))
             #model.add(keras.layers.Activation('linear'))  # activation=custom_activation
             # Compile model
@@ -2588,7 +2427,157 @@ class TensorFlowW(BasePartitionModeler):
             model.compile(loss='mse', optimizer=keras.optimizers.Adam())
             return model
 
+        def preTrainedWeights():
+            from scipy.spatial import Delaunay, ConvexHull
+            import math
+            from trianglesolver import solve , degree
+            dataXnew=partitionsX
+            dataYnew=partitionsY
+            triNew = Delaunay(dataXnew)
 
+            weights=[]
+            indexes=[]
+            for i in range(0, len(partitionsX)):
+                # simplicesIndexes
+                k=triNew.find_simplex(dataXnew[i])
+                V1 = dataXnew[ triNew.vertices[ k ] ][ 0 ]
+                V2 = dataXnew[ triNew.vertices[ k ] ][ 1 ]
+                V3 = dataXnew[ triNew.vertices[ k ] ][ 2 ]
+
+                # plt.plot(candidatePoint[ 0 ], candidatePoint[ 1 ], 'o', markersize=8)
+                # plt.show()
+                x = 1
+                candidatePoint=V1
+                #b = triNew.transform[ k, :2 ].dot(candidatePoint - triNew.transform[ k, 2 ])
+                #W1 = b[ 0 ]
+                #W2 = b[ 1 ]
+                #W3 = 1 - np.sum(b)
+                a=spatial.distance.euclidean(V1,V2)
+                b = spatial.distance.euclidean(V1, V3)
+                c = spatial.distance.euclidean(V3, V2)
+                a, b, c, A, B, C = solve(b=a, c=b, a=c)
+                A=A/degree
+                B=B/degree
+                C=C/degree
+                W1=math.sin(A)
+                W2=math.sin(B)
+                W3=math.sin(C)
+                weights.append(np.mean([W1,W2,W3]))
+                if 1==2:
+
+                    rpm1 = dataYnew[ triNew.vertices[ k ] ][ 0 ]
+                    rpm2 = dataYnew[ triNew.vertices[ k ] ][ 1 ]
+                    rpm3 = dataYnew[ triNew.vertices[ k ] ][ 2 ]
+
+
+                    x = 0
+
+                    ##barycenters (W12,W23,W13) of neighboring triangles and solutions of linear 3x3 sustem in order to find gammas.
+
+
+                    #############################
+                    ##end of barycenters
+                    flgExc = False
+                    try:
+
+                        neighboringVertices1 = [ ]
+
+
+                        for u in range(0, 2):
+                            try:
+                                neighboringVertices1.append(triNew.vertex_neighbor_vertices[ 1 ][
+                                                            triNew.vertex_neighbor_vertices[ 0 ][
+                                                                triNew.vertices[ k ][ u ] ]:
+                                                            triNew.vertex_neighbor_vertices[ 0 ][
+                                                                triNew.vertices[ k ][ u ] + 1 ] ])
+                            except:
+                                break
+                        neighboringTri = triNew.vertices[
+                            triNew.find_simplex(dataXnew[ np.concatenate(np.array(neighboringVertices1)) ]) ]
+                        if (1==1):
+
+                            nRpms = [ ]
+                            nGammas = [ ]
+
+                            rpms = [ ]
+                            for s in neighboringTri:
+                                V1n = dataXnew[ s ][ 0 ]
+                                V2n = dataXnew[ s ][ 1 ]
+                                V3n = dataXnew[ s ][ 2 ]
+
+                                rpm1n = dataYnew[ s ][ 0 ]
+                                rpm2n = dataYnew[ s ][ 1 ]
+                                rpm3n = dataYnew[ s ][ 2 ]
+
+                                rpms.append([ rpm1n, rpm2n, rpm3n ])
+                                ###barycentric coords of neighboring points in relation to initial triangle
+                                eq1 = np.array([ [ (V1[ 0 ] - V3[ 0 ]), (V2[ 0 ] - V3[ 0 ]) ],
+                                                 [ (V1[ 1 ] - V3[ 1 ]), (V2[ 1 ] - V3[ 1 ]) ] ])
+
+                                eq2 = np.array([ V1n[ 0 ] - V3[ 0 ], V1n[ 1 ] - V3[ 1 ] ])
+                                solutions = np.linalg.solve(eq1, eq2)
+
+                                W1n = solutions[ 0 ]
+                                W2n = solutions[ 1 ]
+                                W3n = 1 - solutions[ 0 ] - solutions[ 1 ]
+
+                                B1 = (math.pow(W1n, 2) * rpm1 + math.pow(W2n, 2) * rpm2 + math.pow(W3n, 2) * rpm3)
+                                nRpms.append(rpm1n - B1)
+
+                                nGammas.append(np.array([ 2 * W1n * W2n, 2 * W1n * W3n, 2 * W2n * W3n ]))
+                                ####################################
+
+                                eq1 = np.array([ [ (V1[ 0 ] - V3[ 0 ]), (V2[ 0 ] - V3[ 0 ]) ],
+                                                 [ (V1[ 1 ] - V3[ 1 ]), (V2[ 1 ] - V3[ 1 ]) ] ])
+
+                                eq2 = np.array([ V2n[ 0 ] - V3[ 0 ], V2n[ 1 ] - V3[ 1 ] ])
+                                solutions = np.linalg.solve(eq1, eq2)
+
+                                W1n = solutions[ 0 ]
+                                W2n = solutions[ 1 ]
+                                W3n = 1 - solutions[ 0 ] - solutions[ 1 ]
+
+                                B1 = (math.pow(W1n, 2) * rpm1 + math.pow(W2n, 2) * rpm2 + math.pow(W3n, 2) * rpm3)
+                                nRpms.append(rpm2n - B1)
+
+                                nGammas.append(np.array([ 2 * W1n * W2n, 2 * W1n * W3n, 2 * W2n * W3n ]))
+                                ##################################################
+
+                                eq1 = np.array([ [ (V1[ 0 ] - V3[ 0 ]), (V2[ 0 ] - V3[ 0 ]) ],
+                                                 [ (V1[ 1 ] - V3[ 1 ]), (V2[ 1 ] - V3[ 1 ]) ] ])
+
+                                eq2 = np.array([ V3n[ 0 ] - V3[ 0 ], V3n[ 1 ] - V3[ 1 ] ])
+                                solutions = np.linalg.solve(eq1, eq2)
+
+                                W1n = solutions[ 0 ]
+                                W2n = solutions[ 1 ]
+                                W3n = 1 - solutions[ 0 ] - solutions[ 1 ]
+
+                                B1 = (math.pow(W1n, 2) * rpm1 + math.pow(W2n, 2) * rpm2 + math.pow(W3n, 2) * rpm3)
+                                nRpms.append(rpm3n - B1)
+                                nGammas.append(np.array([ 2 * W1n * W2n, 2 * W1n * W3n, 2 * W2n * W3n ]))
+
+
+                            nGammas = np.array(nGammas)
+                            nRpms = np.array(nRpms)
+                            from sklearn.linear_model import LinearRegression
+                            lr = LinearRegression()
+                            leastSqApprx = lr.fit(nGammas.reshape(-1, 3), nRpms.reshape(-1, 1))
+                            XpredN = ((math.pow(W2, 2) * rpm2 + math.pow(W1, 2) * rpm1 + math.pow(W3, 2) * rpm3) +
+                                      2 * W1 * W2 * leastSqApprx.coef_[ 0 ][ 0 ] +
+                                      2 * W2 * W3 * leastSqApprx.coef_[ 0 ][ 1 ] +
+                                      2 * W1 * W3 * leastSqApprx.coef_[ 0 ][ 2 ])
+                            #weights.append(leastSqApprx.coef_[0][0])
+                            #weights.append(leastSqApprx.coef_[ 0 ][ 1 ])
+                            #weights.append(leastSqApprx.coef_[ 0 ][ 2 ])
+                            weights.append((np.mean([2 * W1 * W2 * leastSqApprx.coef_[ 0 ][ 0 ],2 * W2 * W3 * leastSqApprx.coef_[ 0 ][ 1 ],
+                                                     2 * W1 * W3 * leastSqApprx.coef_[ 0 ][ 2 ]])
+                                            +np.mean([math.pow(W2, 2),math.pow(W1, 2),math.pow(W3, 2)]))/2)
+
+                    except:
+                        #print(str(e))
+                        x=1
+            return np.array(weights)
         seed = 7
         numpy.random.seed(seed)
 
@@ -2634,18 +2623,19 @@ class TensorFlowW(BasePartitionModeler):
         #y_predDeepCl = q.argmax(1)
 
         sModel=[]
-        sr = sp.Earth()
+        sr = sp.Earth(max_degree=2)
         sr.fit(partitionsX,partitionsY)
         sModel.append(sr)
         import csv
         csvModels = [ ]
         genModelKnots=[]
-
         self.modelId = 'Gen'
         self.countTimes=0
         self.models = {"data": [ ]}
         self.intercepts = [ ]
         self.interceptsGen = 0
+
+
 
         for models in sModel:
             modelSummary = str(models.summary()).split("\n")[ 4: ]
@@ -2678,20 +2668,10 @@ class TensorFlowW(BasePartitionModeler):
         ##train general neural
 
         ########SET K MEANS INITIAL WEIGHTS TO CLUSTERING LAYER
-        def customLoss1(yTrue, yPred):
-            self.triRpm = preTrainedWeights(partitionsX[self.count])
-            self.count += 1
-            return (tf.losses.mean_squared_error(yTrue,(yPred + self.triRpm)/2 ))
 
-        def customLoss(yTrue, yPred):
-            return tf.losses.categorical_crossentropy(yTrue,yPred) +  tf.losses.kullback_leibler_divergence(yTrue,yPred)
-                     #+ tf.losses.kullback_leibler_divergence(yTrue,yPred))
-        #
-        ###############
         #X_train, X_test, y_train, y_test = train_test_split(partitionsX, partitionsY, test_size=0.33, random_state=seed)
         #estimatorD = baseline_modelDeepCl()
         #dataUpdatedX = np.append(partitionsX, np.asmatrix([partitionsY]).T, axis=1)
-
         #estimatorD.fit(partitionsX, partitionsY, epochs=100)
 
         #model2 = keras.models.Model(inputs=estimatorD.input, outputs=estimatorD.layers[-2].output)
@@ -2699,7 +2679,6 @@ class TensorFlowW(BasePartitionModeler):
         #model2.compile(optimizer=keras.optimizers.Adam(), loss=customLoss)
         #model2.fit(partitionsX,partitionsY,epochs=100)
         #q = model2.predict(partitionsX, verbose=0)
-
         #y_predDeepCl = q.argmax(1)
 
         #pred =np.sum(model2.predict(partitionsX[0].reshape(1,2), verbose=0))/15
@@ -2722,12 +2701,11 @@ class TensorFlowW(BasePartitionModeler):
 
         srModels = []
         for idx, pCurLbl in enumerate(DeepClpartitionLabels):
-
             #maxTerms = if len(DeepCLpartitionsX) > 5000
             srM = sp.Earth(max_degree=2)
             srM.fit(np.array(DeepCLpartitionsX[idx]), np.array(DeepCLpartitionsY[idx]))
             srModels.append(srM)
-        modelCount =1
+        modelCount = 0
         import csv
         #csvModels = []
         ClModels={"data":[]}
@@ -2760,10 +2738,6 @@ class TensorFlowW(BasePartitionModeler):
         estimator = baseline_model()
 
         estimator.fit(partitionsX, partitionsY, epochs=100, validation_split=0.33)
-
-        #for i in range(0,len(partitionsX)):
-            #self.triRpm = preTrainedWeights(partitionsX[i])
-        #checkpoint =keras.callbacks.ModelCheckpoint("best_model.hdf5", monitor='loss', verbose=1,
 
          # validation_data=(X_test,y_test)
 
@@ -2821,20 +2795,17 @@ class TensorFlowW(BasePartitionModeler):
                 #partitionsX[ idx ]=partitionsX[idx].reshape(-1,2)
 
                 #estimator = baseline_model()
-
                 self.modelId =idx
                 self.countTimes+=1
                 #modelId=idx
-
                 #estimatorCl = baseline_model()
                 #if idx==0:
                     #estimator.add(keras.layers.Activation(custom_activation2))
                 #else:
-                numOfNeurons = [x for x in ClModels['data'] if x['id']==idx+1][0]['funcs']
+                numOfNeurons = [x for x in ClModels['data'] if x['id']==idx][0]['funcs']
                 #estimatorCl=replace_intermediate_layer_in_keras(estimator, -1 ,MyLayer(5))
                 #len(DeepClpartitionLabels)+
                 #estimatorCl = insert_intermediate_layer_in_keras(estimator, 1, keras.layers.Dense(numOfNeurons))
-
                 estimatorCl = replace_intermediate_layer_in_keras(estimator, 0,1, keras.layers.Dense(len(DeepClpartitionLabels)+numOfNeurons) ,keras.layers.Activation(custom_activation2))
                 #estimatorCl = insert_intermediate_layer_in_keras(estimator, 1, MyLayer(numOfNeurons))
                 #estimatorCl = insert_intermediate_layer_in_keras(estimator,0,keras.layers.Activation(custom_activation2))
@@ -2843,9 +2814,7 @@ class TensorFlowW(BasePartitionModeler):
                 #estimator.compile()
                 #estimator.layers[3] = custom_activation2(inputs=estimator.layers[2].output, modelId=idx) if idx ==0 else estimator.layers[3]
                 #estimator.layers[3] = custom_activation2 if idx ==3 else estimator.layers[3]
-
                 estimatorCl.fit(np.array(DeepCLpartitionsX[idx]),np.array(DeepCLpartitionsY[idx]),epochs=100,)#validation_split=0.33
-
                     #scores = estimator.score(partitionsX[idx][ test ], partitionsY[idx][ test ])
                     #print("%s: %.2f%%" % ("acc: ", scores))
                 NNmodels.append(estimatorCl)
@@ -2853,13 +2822,13 @@ class TensorFlowW(BasePartitionModeler):
                 #self._partitionsPerModel[ estimator ] = partitionsX[idx]
         # Update private models
         #models=[]
-        #NNmodels.append(estimator)
+        NNmodels.append(estimator)
 
         #NNmodels.append(estimator)
         self._models = NNmodels
 
         # Return list of models
-        return estimator, kmeans ,numpy.empty, numpy.empty , estimator , DeepCLpartitionsX
+        return estimator,kmeans ,numpy.empty, numpy.empty , estimator , DeepCLpartitionsX
 
     def createModelsForConv(self,partitionsX, partitionsY, partition_labels):
         ##Conv1D NN
