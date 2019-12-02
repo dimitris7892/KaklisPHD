@@ -115,7 +115,7 @@ def main():
            if modeler.__class__.__name__=='TriInterpolantModeler' or modeler.__class__.__name__ == 'TensorFlow':
              partK = [1]
            else:
-             partK=[12]
+             partK=[14]
        error = {"errors": [ ]}
        #random.seed(1)
 
