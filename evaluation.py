@@ -804,12 +804,14 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
             #weight= model2.layers[1].get_weights()[0][0,:][cl]
             #prediction = np.sum(model2.predict(pPoint, verbose=0)) / 5
             ind , fit = modeler.getBestPartitionForPoint(pPoint,partitionsX)
+
             #fits = modeler.getFitForEachPartitionForPoint(pPoint, partitionsX)
             #weightedPreds=[]
             #for n,model in enumerate(modeler._models):
                 #weightedPreds.append(modeler._models[n].predict(pPoint)*fits[n])
             #weightedPreds.append(modeler._models[len(modeler._models)-1].predict(pPoint))
             #predX = np.mean(weightedPreds)
+
             #prediction = modeler._models[0].predict(pPoint)
             #prediction = (modeler._models[ind].predict(pPoint)+ modeler._models[len(modeler._models)-1].predict(pPoint))/2
             prediction = abs(modeler._models[ind].predict(pPoint))
