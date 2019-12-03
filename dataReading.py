@@ -30,8 +30,6 @@ class BaseSeriesReader:
 
     def readLarosDAta(self,dtFrom,dtTo):
 
-
-
         draft={"data": [ ]}
         draftAFT = {"data": [ ]}
         draftFORE = {"data": [ ]}
@@ -174,16 +172,16 @@ class BaseSeriesReader:
         #else:
             #dt = data.values[0:,2:23]
         dataNew=data.drop(['M/E FOC (kg/min)' ,'DateTime'],axis=1)
-        dtNew = dataNew.values[ 0:, 0:6 ].astype(float)
+        dtNew = dataNew.values[ 0:, 0:4 ].astype(float)
         dtNew = dtNew[~np.isnan(dtNew).any(axis=1)]
-        seriesX=dtNew[0:140000,:]
-        UnseenSeriesX = dtNew[150000:151000, :]
+        seriesX=dtNew[0:180000,:]
+        UnseenSeriesX = dtNew[190000:191000, :]
 
         dt = data.values[0:, 5].astype(float)
         dt = dt[~np.isnan(dt).any(axis=0)]
-        FOC = dt[0][0:140000]
+        FOC = dt[0][0:180000]
 
-        unseenFOC = dt[0][150000:151000]
+        unseenFOC = dt[0][190000:191000]
         #WS= np.asarray([x for x in dt[ :, 1 ] ])
         #WA = np.asarray([ x for x in dt[ :, 2 ] ])
         #SO = np.asarray([ y for y in dt[ :, 3 ] ])
@@ -308,7 +306,7 @@ class BaseSeriesReader:
             #dt = data.values[ 0:, 2:23 ]
         else:
 
-            dt = data.values[ 0:, 2:23 ][k*10000:(k*10000 + 10000)]
+            dt = data.values[ 0:, 2:23 ][k*20000:(k*20000 + 20000)]
             #[0:5000]
             #dt=np.array(random.sample(dt,20000))
             #dt = data.values[0:,2:23]

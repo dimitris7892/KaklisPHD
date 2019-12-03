@@ -28,7 +28,7 @@ import scipy.stats as st
 from time import time
 import metrics
 from sklearn.cluster import KMeans
-
+tf.compat.v1.disable_eager_execution()
 #tf.executing_eagerly()
 
 class BasePartitionModeler:
@@ -159,6 +159,247 @@ class TensorFlowWD(BasePartitionModeler):
             model.compile(loss='kld', optimizer=keras.optimizers.Adam())
             return model
 
+        def custom_activation2(inputs):
+
+            x = inputs
+            self.modelId = str(self.modelId)
+
+            if self.countTimes == 0:
+
+                for csvM in csvModels:
+                    id = csvM.split("_")[1]
+                    piecewiseFunc = []
+
+                    with open(csvM) as csv_file:
+                        data = csv.reader(csv_file, delimiter=',')
+                        for row in data:
+                            # for d in row:
+                            if [w for w in row if w == "Basis"].__len__() > 0:
+                                continue
+                            if [w for w in row if w == "(Intercept)"].__len__() > 0:
+                                self.intercepts.append(float(row[1]))
+                                self.interceptsGen = float(row[1])
+                                continue
+                            if row.__len__() == 0:
+                                continue
+                            d = row[0]
+                            if d.split("*").__len__() == 1:
+                                split = ""
+                                try:
+                                    split = d.split('-')[0][2]
+                                    if split != "x":
+                                        num = float(d.split('-')[0].split('h(')[1])
+                                        # if id == id:
+                                        # if float(row[ 1 ]) < 10000:
+                                        try:
+                                            piecewiseFunc.append(
+                                                tf.math.multiply(tf.cast(tf.math.less(x, num), tf.float32),
+                                                                 float(row[1]) * (num - inputs)))
+                                            # if id ==  self.modelId:
+                                            # inputs = tf.where(x >= num, float(row[ 1 ]) * (inputs - num), inputs)
+                                        except:
+                                            dc = 0
+                                    else:
+                                        num = float(d.split('-')[1].split(')')[0])
+                                        # if id == id:
+                                        # if float(row[ 1 ]) < 10000:
+                                        try:
+
+                                            piecewiseFunc.append(
+                                                tf.math.multiply(tf.cast(tf.math.greater(x, num), tf.float32),
+                                                                 float(row[1]) * (inputs - num)))
+                                            # if id == self.modelId:
+                                            # inputs = tf.where(x <= num, float(row[ 1 ]) * (num - inputs), inputs)
+                                        except:
+                                            dc = 0
+                                except:
+                                    # if id == id:
+                                    # if float(row[ 1 ]) < 10000:
+                                    try:
+                                        piecewiseFunc.append(tf.math.multiply(tf.cast(x, tf.float32),
+                                                                              float(row[1]) * (inputs)))
+
+                                        # inputs = tf.where(x >= 0, float(row[ 1 ]) * inputs, inputs)
+                                    # continue
+                                    except:
+                                        dc = 0
+
+                            else:
+                                funcs = d.split("*")
+                                nums = []
+                                flgFirstx = False
+                                flgs = []
+                                for r in funcs:
+                                    try:
+                                        if r.split('-')[0][2] != "x":
+                                            flgFirstx = True
+                                            nums.append(float(r.split('-')[0].split('h(')[1]))
+
+                                        else:
+                                            nums.append(float(r.split('-')[1].split(')')[0]))
+
+                                        flgs.append(flgFirstx)
+                                    except:
+                                        flgFirstx = False
+                                        flgs = []
+                                        try:
+                                            if d.split('-')[0][2] == "x":
+                                                # if id == id:
+                                                # if float(row[ 1 ]) < 10000:
+                                                try:
+                                                    piecewiseFunc.append(tf.math.multiply(tf.cast(x, tf.float32),
+                                                                                          float(row[1]) * (inputs) * (
+                                                                                              inputs - nums[0])))
+
+                                                    # inputs = tf.where(x >= 0,
+                                                    # float(row[ 1 ]) * (inputs) * (inputs - nums[ 0 ]), inputs)
+                                                except:
+                                                    dc = 0
+
+                                            else:
+                                                flgFirstx = True
+                                                # if id == id:
+                                                # if float(row[ 1 ]) < 10000:
+                                                try:
+                                                    piecewiseFunc.append(tf.math.multiply(tf.cast(x, tf.float32),
+                                                                                          float(row[1]) * (inputs) * (
+                                                                                              nums[0] - inputs)))
+
+                                                    # inputs = tf.where(x > 0 ,
+                                                    # float(row[ 1 ]) * (inputs) * (nums[ 0 ] - inputs),inputs)
+                                                    flgs.append(flgFirstx)
+                                                except:
+                                                    dc = 0
+
+                                        except:
+                                            # if id == id:
+                                            # if float(row[ 1 ]) < 10000:
+                                            try:
+                                                piecewiseFunc.append(tf.math.multiply(tf.cast(x, tf.float32),
+                                                                                      float(row[1]) * (inputs)))
+
+                                                # inputs = tf.where(x >= 0, float(row[ 1 ]) * (inputs), inputs)
+                                            except:
+                                                dc = 0
+                                try:
+                                    # if id == id:
+                                    if flgs.count(True) == 2:
+                                        # if float(row[ 1 ])<10000:
+                                        try:
+                                            piecewiseFunc.append(tf.math.multiply(tf.cast(
+                                                tf.math.logical_and(tf.math.less(x, nums[0]),
+                                                                    tf.math.less(x, nums[1])), tf.float32),
+                                                float(row[1]) * (nums[0] - inputs) * (
+                                                    nums[1] - inputs)))
+
+                                            # inputs = tf.where(x < nums[0] and x < nums[1],
+                                            # float(row[ 1 ]) * (nums[ 0 ] - inputs) * (
+                                            # nums[ 1 ] - inputs), inputs)
+                                        except:
+                                            dc = 0
+
+                                    elif flgs.count(False) == 2:
+                                        # if float(row[ 1 ]) < 10000:
+                                        try:
+                                            piecewiseFunc.append(tf.math.multiply(tf.cast(
+                                                tf.math.logical_and(tf.math.greater(x, nums[0]),
+                                                                    tf.math.greater(x, nums[1])), tf.float32),
+                                                float(row[1]) * (inputs - nums[0]) * (
+                                                    inputs - nums[1])))
+
+                                            # inputs = tf.where(x > nums[ 0 ] and x > nums[ 1 ],
+                                            # float(row[ 1 ]) * (inputs - nums[ 0 ]) * (
+                                            # inputs - nums[ 1 ]), inputs)
+                                        except:
+                                            dc = 0
+                                    else:
+                                        try:
+                                            if flgs[0] == False:
+                                                if nums.__len__() > 1:
+                                                    # if float(row[ 1 ]) < 10000:
+                                                    try:
+                                                        piecewiseFunc.append(tf.math.multiply(tf.cast(
+                                                            tf.math.logical_and(tf.math.greater(x, nums[0]),
+                                                                                tf.math.less(x, nums[1])), tf.float32),
+                                                            float(row[1]) * (inputs - nums[0]) * (
+                                                                nums[1] - inputs)))
+
+                                                        # inputs = tf.where(x > nums[ 0 ] and x < nums[ 1 ],
+                                                        # float(row[ 1 ]) * (inputs - nums[ 0 ]) * (
+                                                        # nums[ 1 ] - inputs), inputs)
+                                                    except:
+                                                        dc = 0
+                                                else:
+                                                    # if float(row[ 1 ]) < 10000:
+                                                    try:
+                                                        piecewiseFunc.append(tf.math.multiply(tf.cast(
+                                                            tf.math.greater(x, nums[0])
+                                                            , tf.float32),
+                                                            float(row[1]) * (inputs - nums[0])))
+
+                                                        # inputs = tf.where(x > nums[0],
+                                                        # float(row[ 1 ]) * (inputs - nums[ 0 ]), inputs)
+                                                    except:
+                                                        dc = 0
+                                            else:
+                                                if nums.__len__() > 1:
+                                                    # if float(row[ 1 ]) < 10000:
+                                                    try:
+                                                        piecewiseFunc.append(tf.math.multiply(tf.cast(
+                                                            tf.math.logical_and(tf.math.less(x, nums[0]),
+                                                                                tf.math.greater(x, nums[1])),
+                                                            tf.float32),
+                                                            float(row[1]) * (nums[0] - inputs) * (
+                                                                inputs - nums[1])))
+
+                                                        # inputs = tf.where(x < nums[ 0 ] and x > nums[1],
+                                                        # float(row[ 1 ]) * (nums[ 0 ] - inputs) * (
+                                                        # inputs - nums[ 1 ]), inputs)
+                                                    except:
+                                                        dc = 0
+                                                else:
+                                                    # if float(row[ 1 ]) < 10000:
+                                                    try:
+                                                        piecewiseFunc.append(tf.math.multiply(tf.cast(
+                                                            tf.math.less(x, nums[0]), tf.float32),
+                                                            float(row[1]) * (
+                                                                inputs - nums[0])))
+
+                                                        # inputs = tf.where(x < nums[ 0 ],
+                                                        # float(row[ 1 ]) * (
+                                                        # inputs - nums[ 0 ]), inputs)
+                                                    except:
+                                                        dc = 0
+                                        except:
+                                            dc = 0
+                                except:
+                                    dc = 0
+
+                        model = {}
+                        model["id"] = id
+                        model["funcs"] = piecewiseFunc
+                        self.models["data"].append(model)
+                        # self.countTimes += 1
+            # modelId = 0 if modelId[ 'args' ] == -1 else modelId[ 'args' ]
+
+            # interc = tf.cast(x, tf.float32) + intercepts[self.modelId]
+            # funcs = [ x for x in models[ 'data' ] if x[ 'id' ] == str(modelId) ][ 0 ][ 'funcs' ]
+            # for f in funcs:
+            # inputs = f
+            # if  self.countTimes==1:
+            funcs = [x for x in self.models['data'] if x['id'] == str(self.modelId)][0]['funcs']
+            genFuncs = [x for x in self.models['data'] if x['id'] == 'Gen'][0]['funcs']
+            intercept = self.interceptsGen if self.modelId == 'Gen' else self.intercepts[int(self.modelId)]
+            # (intercept if intercept < 10000 else 0 )
+            ten = tf.keras.backend.sum(funcs, keepdims=True)
+            tenGen = tf.keras.backend.sum(genFuncs, keepdims=True)
+            SelectedFuncs = np.sum(funcs) if len(funcs) > 0 else  np.sum(genFuncs)
+            # self.countTimes+=1
+            # intercept = tf.constant()
+            # constants = intercepts[ 0 if self.modelId=='Gen' else self.modelId ]
+            # k_constants = keras.backend.variable(constants)
+            return SelectedFuncs
+
         def baseline_model():
             # create model
             model = keras.models.Sequential()
@@ -166,24 +407,34 @@ class TensorFlowWD(BasePartitionModeler):
             # model.add(keras.layers.Dense(len(partition_labels)*2, input_shape=(2,)))
             # model.add(keras.layers.Dense(len(partition_labels), input_shape=(2,) ))
             # model.add(keras.layers.Activation(custom_activation2))
-            model.add(keras.layers.Dense(len(partition_labels), input_shape=(6,)))
+            #model.add(keras.layers.Dense(len(partition_labels)*3, input_shape=(4,)))
+            #model.add(keras.layers.Dense(len(partition_labels)*2, input_shape=(4,)))
+            model.add(keras.layers.Embedding(len(partition_labels), 1, input_length=4, name='EMB'))
+            #model.add(keras.layers.Dense(len(partition_labels)*2, input_shape=(4,)))
+
+            model.add(keras.layers.Dense(len(partition_labels), input_shape=(4,)))
             #model.add(keras.layers.Dense(10, input_shape=(6,)))
             # model.add(MyLayer(5))
             # model.add(keras.layers.Dense(15, input_shape=(2,)))
 
             # model.add(keras.layers.Dense(genModelKnots, input_shape=(2,)))
-            model.add(keras.layers.Dense(5,))
+            #model.add(keras.layers.Dense(35, ))
+            model.add(keras.layers.Dense(20,))
+            #model.add(keras.layers.Activation(custom_activation2))
+            model.add(keras.layers.Dense(5))
             # model.add(keras.layers.Activation(custom_activation2(inputs=model.layers[2].output, modelId=1)))
             #model.add(keras.layers.Activation(custom_activation2))
-            model.add(keras.layers.Dense(1, ))  # activation=custom_activation
+            model.add(keras.layers.Dense(1,))  # activation=custom_activation
             # model.add(keras.layers.Activation(custom_activation))
             # model.add(keras.layers.Activation('linear'))  # activation=custom_activation
             # Compile model
-            model.compile(loss=keras.losses.mean_squared_error()+keras.losses.categorical_crossentropy(), optimizer=keras.optimizers.Adam())
+            model.compile(loss='mse', optimizer=keras.optimizers.Adam())
             return model
 
         seed = 7
         numpy.random.seed(seed)
+
+
 
         #partitionsX = X
         #partitionsY = Y
@@ -199,7 +450,7 @@ class TensorFlowWD(BasePartitionModeler):
         #partitionsX.reshape(-1, 2)
 
         estimator = baseline_model()
-        estimator.fit(X, Y, epochs=200, validation_split=0.33)
+        estimator.fit(X, Y, epochs=20, validation_split=0.33,shuffle=False)
 
         def insert_intermediate_layer_in_keras(model, layer_id, new_layer):
 
@@ -218,7 +469,7 @@ class TensorFlowWD(BasePartitionModeler):
             # .add(x)
             return new_model
 
-        def replace_intermediate_layer_in_keras(model, layer_id, new_layer):
+        def replace_intermediate_layer_in_keras(model, layer_id, new_layer,lr):
 
             layers = [l for l in model.layers]
 
@@ -230,7 +481,7 @@ class TensorFlowWD(BasePartitionModeler):
                     x = layers[i](x)
 
             new_model = keras.Model(inputs=model.input, outputs=x)
-            new_model.compile(loss='mse', optimizer=keras.optimizers.Adam())
+            new_model.compile(loss='mse', optimizer=keras.optimizers.Adam(),)
             return new_model
 
         NNmodels = []
@@ -239,15 +490,20 @@ class TensorFlowWD(BasePartitionModeler):
             #
             self.modelId = idx + 1
             modelId = idx
+            lr = 0.001 if np.std(np.array(partitionsX[idx])) < 30  else 0.2
 
-            estimatorCl=replace_intermediate_layer_in_keras(estimator, -1 ,keras.layers.Dense(5))
-            estimatorCl.fit(np.array(partitionsX[idx]), np.array(partitionsY[idx]), epochs=30)
-            #estimatorCl.save("estimatorCl_"+str(idx)+".h5")
+            if np.mean(partitionsX[idx][:,1])  > 10 :
+                estimatorCl = insert_intermediate_layer_in_keras(estimator, 0, keras.layers.Dense(len(partition_labels*2)))
+            else:
+                estimatorCl = replace_intermediate_layer_in_keras(estimator, -1, keras.layers.Dense(5), lr)
+
+            estimatorCl.fit(np.array(partitionsX[idx]), np.array(partitionsY[idx]), epochs=30,)
+            estimatorCl.save("estimatorCl_"+str(idx)+".h5")
             NNmodels.append(estimatorCl)
-            #with open('./cluster_' + str(idx) + '_.csv', mode='w') as data:
-                #for k in range(0,len(partitionsX[idx])):
-                    #data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-                    #data_writer.writerow([partitionsX[idx][k][0],partitionsX[idx][k][1],partitionsX[idx][k][2],partitionsX[idx][k][3],partitionsX[idx][k][4],partitionsX[idx][k][5] ])
+            with open('./cluster_' + str(idx) + '_.csv', mode='w') as data:
+                for k in range(0,len(partitionsX[idx])):
+                    data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+                    data_writer.writerow([partitionsX[idx][k][0],partitionsX[idx][k][1],partitionsX[idx][k][2],partitionsX[idx][k][3]])
         # Update private models
         # models=[]
         # models.append(estimator)
@@ -2032,8 +2288,8 @@ class TensorFlowW(BasePartitionModeler):
                                             #if float(row[ 1 ]) < 10000:
                                         try:
                                             piecewiseFunc.append(
-                                        tf.math.multiply(tf.cast(tf.math.greater(x, num), tf.float32),
-                                                             float(row[ 1 ]) * (inputs - num)))
+                                                tf.math.multiply(tf.cast(tf.math.less(x, num), tf.float32),
+                                                                 float(row[1]) * (num - inputs)))
                                         #if id ==  self.modelId:
                                                 #inputs = tf.where(x >= num, float(row[ 1 ]) * (inputs - num), inputs)
                                         except:
@@ -2043,9 +2299,10 @@ class TensorFlowW(BasePartitionModeler):
                                         #if id == id:
                                             #if float(row[ 1 ]) < 10000:
                                         try:
+
                                             piecewiseFunc.append(
-                                            tf.math.multiply(tf.cast(tf.math.less(x, num), tf.float32),
-                                                             float(row[ 1 ]) * (num - inputs)))
+                                                tf.math.multiply(tf.cast(tf.math.greater(x, num), tf.float32),
+                                                                 float(row[1]) * (inputs - num)))
                                         #if id == self.modelId:
                                                 #inputs = tf.where(x <= num, float(row[ 1 ]) * (num - inputs), inputs)
                                         except:
@@ -2604,10 +2861,12 @@ class TensorFlowW(BasePartitionModeler):
             #model.add(keras.layers.Dense(15, input_shape=(2,)))
             #model.add(keras.layers.Dense(1, input_shape=(2,)))  # activation=custom_activation
             #model.add(MyLayer(genModelKnots))
-            #model.add(keras.layers.Dense(2, input_shape=(2,)))
+
+            #model.add(keras.layers.Dense(5, input_shape=(2,)))
             #model.add(keras.layers.Activation(custom_activation2(inputs=model.layers[2].output, modelId=1)))
             model.add(keras.layers.Activation(custom_activation2))
             model.add(keras.layers.Dense(1, input_shape=(2,)))  # activation=custom_activation
+
 
             #model.add(keras.layers.Activation(custom_activation))
             #model.add(keras.layers.Activation('linear'))  # activation=custom_activation
@@ -2661,7 +2920,7 @@ class TensorFlowW(BasePartitionModeler):
         #y_predDeepCl = q.argmax(1)
 
         sModel=[]
-        sr = sp.Earth(max_degree=2,max_terms=5)
+        sr = sp.Earth(max_degree=2)
         sr.fit(partitionsX,partitionsY)
         sModel.append(sr)
         import csv
@@ -2751,7 +3010,7 @@ class TensorFlowW(BasePartitionModeler):
         for idx, pCurLbl in enumerate(DeepClpartitionLabels):
 
             #maxTerms = if len(DeepCLpartitionsX) > 5000
-            srM = sp.Earth(max_degree=2,max_terms=4)
+            srM = sp.Earth()
             srM.fit(np.array(DeepCLpartitionsX[idx]), np.array(DeepCLpartitionsY[idx]))
             srModels.append(srM)
         modelCount =0
@@ -2834,7 +3093,7 @@ class TensorFlowW(BasePartitionModeler):
                     x = layers[ i ](x)
 
             new_model = keras.Model(inputs=model.input, outputs=x)
-            new_model.compile(loss='mse', optimizer=keras.optimizers.Adam(),experimental_run_tf_function=False)
+            new_model.compile(loss='mse', optimizer=keras.optimizers.Adam(),)
             return new_model
 
         #for train, test in kfold.split(partitionsX[idx],partitionsY[idx]):
@@ -2861,8 +3120,8 @@ class TensorFlowW(BasePartitionModeler):
                 #estimatorCl=replace_intermediate_layer_in_keras(estimator, -1 ,MyLayer(5))
                 #len(DeepClpartitionLabels)+
                 #estimatorCl = insert_intermediate_layer_in_keras(estimator, 1, keras.layers.Dense(numOfNeurons))
-
-                estimatorCl = replace_intermediate_layer_in_keras(estimator, 0,1, keras.layers.Dense(len(DeepClpartitionLabels)+numOfNeurons) ,keras.layers.Activation(custom_activation2))
+                #lr = 0.001 if np.std(np.array(partitionsX[idx])) < 30  else 0.2
+                estimatorCl = replace_intermediate_layer_in_keras(estimator, -1,1, keras.layers.Dense(len(DeepClpartitionLabels)+numOfNeurons) ,keras.layers.Activation(custom_activation2))
                 #estimatorCl = insert_intermediate_layer_in_keras(estimator, 1, MyLayer(numOfNeurons))
                 #estimatorCl = insert_intermediate_layer_in_keras(estimator,0,keras.layers.Activation(custom_activation2))
 
@@ -2871,7 +3130,7 @@ class TensorFlowW(BasePartitionModeler):
                 #estimator.layers[3] = custom_activation2(inputs=estimator.layers[2].output, modelId=idx) if idx ==0 else estimator.layers[3]
                 #estimator.layers[3] = custom_activation2 if idx ==3 else estimator.layers[3]
 
-                estimatorCl.fit(np.array(DeepCLpartitionsX[idx]),np.array(DeepCLpartitionsY[idx]),epochs=100,)#validation_split=0.33
+                estimatorCl.fit(np.array(DeepCLpartitionsX[idx]),np.array(DeepCLpartitionsY[idx]),epochs=200,validation_split=0.33)#validation_split=0.33
 
                     #scores = estimator.score(partitionsX[idx][ test ], partitionsY[idx][ test ])
                     #print("%s: %.2f%%" % ("acc: ", scores))
