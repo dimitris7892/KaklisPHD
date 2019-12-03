@@ -26,7 +26,7 @@ def main():
         prediction = currModeler.predict(vector)
         preds.append(prediction[0][0])
 
-    print('\n'+str(preds[0]))
+    print('\n'+'FOC (tones / hour) : '+str(preds[0] * 1.44))
     return preds
 
 def initParameters():
