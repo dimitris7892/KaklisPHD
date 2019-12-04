@@ -166,20 +166,48 @@ class BaseSeriesReader:
 
     def readLarosDataFromCsvNew(self, data):
         # Load file
+        from sklearn import preprocessing
         #if self.__class__.__name__ == 'UnseenSeriesReader':
             #dt = data.sample(n=2880).values[ :90000:, 3:23 ]
             #dt = data.values[ 0:, 2:23 ]
         #else:
             #dt = data.values[0:,2:23]
+        #dataNew = data.drop(['M/E FOC (kg/min)', 'DateTime'], axis=1)
+        #names = dataNew.columns
+
+        #scaler = preprocessing.StandardScaler()
+        # Fit your data on the scaler object
+        #scaled_df = scaler.fit_transform(dataNew)
+        #scaled_df = pd.DataFrame(scaled_df, columns=names)
+        #dataNew = scaled_df
         dataNew=data.drop(['M/E FOC (kg/min)' ,'DateTime'],axis=1)
+        #dataNew=dataNew[['Draft', 'SpeedOvg']]
         dtNew = dataNew.values[ 0:, 0:4 ].astype(float)
         dtNew = dtNew[~np.isnan(dtNew).any(axis=1)]
+
         seriesX=dtNew[0:180000,:]
+        #seriesX=preprocessing.normalize([seriesX])
+        newSeriesX = []
+        #for x in seriesX:
+            #dmWS = x[0] * x[1]
+            #waSO = x[2] * x[3]
+            #newSeriesX.append([x[0],x[1],x[2],x[3],np.round(dmWS,3),np.round(waSO,3)])
+        #newSeriesX = np.array(newSeriesX)
+        ##seriesX = newSeriesX
+
         UnseenSeriesX = dtNew[190000:191000, :]
+        newUnseenSeriesX=[]
+        #for x in UnseenSeriesX:
+            #dmWS = x[0] * x[1]
+            #waSO = x[2] * x[3]
+            #newUnseenSeriesX.append([x[0], x[1], x[2], x[3], np.round(dmWS, 3), np.round(waSO, 3)])
+        #newUnseenSeriesX = np.array(newUnseenSeriesX)
+        #UnseenSeriesX = newUnseenSeriesX
 
         dt = data.values[0:, 5].astype(float)
         dt = dt[~np.isnan(dt).any(axis=0)]
         FOC = dt[0][0:180000]
+        #normalized_Y = preprocessing.normalize([FOC])
 
         unseenFOC = dt[0][190000:191000]
         #WS= np.asarray([x for x in dt[ :, 1 ] ])

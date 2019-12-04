@@ -17,16 +17,16 @@ def main():
 
     preds=[]
     listOfPoints = np.array(listOfPoints.split('[')[1].split(']')[0].split(',')).astype(np.float)
-    listOfPoints = listOfPoints.reshape(-1,6)
+    listOfPoints = listOfPoints.reshape(-1,4)
     #print('\nVector/list of vectors for prediction: ' + str(listOfPoints))
     for vector in listOfPoints:
         ind, fit =  getBestPartitionForPoint(vector, partitionsX)
         currModeler = keras.models.load_model(path + '\estimatorCl_' + str(ind) + '.h5')
-        vector = vector.reshape(-1, 6)
+        vector = vector.reshape(-1, 4)
         prediction = currModeler.predict(vector)
         preds.append(prediction[0][0])
 
-    print('\n'+'FOC (tones / hour) : '+str(preds[0] * 1.44))
+    print('\n'+'FOC (tons / day) : '+str(np.round(preds[0] * 1.44,3)))
     return preds
 
 def initParameters():
@@ -51,9 +51,9 @@ def initParameters():
         #algs=sys.argv[5]
         #cls=sys.argv[6]
     else:
-        listOfPoints = "[4.3956,13.2727,-9.7,10.6,582.0,6291.0]"
+        listOfPoints = "[4.3956,13.2727,-9.7,0]"
         path = '.\\'
-        clusters = '15'
+        clusters = '50'
 
     return listOfPoints, path , clusters
 
