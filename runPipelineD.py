@@ -10,19 +10,34 @@ def main():
     clusters = int(clusters)
     #print(path)
     partitionsX=[]
+    partitionsXrpm=[]
+    preds = [ ]
+    listOfPoints = np.array(listOfPoints.split('[')[ 1 ].split(']')[ 0 ].split(',')).astype(np.float)
+    listOfPoints = listOfPoints.reshape(-1, 4)
+
+    for cl in range(0, clusters):
+        # models.append(load_model(path+'\estimatorCl_'+str(cl)+'.h5'))
+        data = pd.read_csv('cluster_rpm' + str(cl) + '_.csv')
+        partitionsXrpm.append(readClusteredLarosDataFromCsvNew(data))
     for cl in range(0,clusters):
         #models.append(load_model(path+'\estimatorCl_'+str(cl)+'.h5'))
-        data = pd.read_csv(path+'\cluster_'+str(cl)+'_.csv')
+        data = pd.read_csv('cluster_'+str(cl)+'_.csv')
         partitionsX.append(readClusteredLarosDataFromCsvNew(data))
 
-    preds=[]
-    listOfPoints = np.array(listOfPoints.split('[')[1].split(']')[0].split(',')).astype(np.float)
-    listOfPoints = listOfPoints.reshape(-1,4)
-    #print('\nVector/list of vectors for prediction: ' + str(listOfPoints))
     for vector in listOfPoints:
-        ind, fit =  getBestPartitionForPoint(vector, partitionsX)
-        currModeler = keras.models.load_model(path + '\estimatorCl_' + str(ind) + '.h5')
+        ind, fit =getBestPartitionForPoint(vector, partitionsXrpm)
+        currModeler = keras.models.load_model('estimatorCl_rpm' + str(ind) + '.h5')
         vector = vector.reshape(-1, 4)
+        rpm = currModeler.predict(vector)
+        # preds.append(prediction[ 0 ][ 0 ])
+        pPoint = np.append(listOfPoints, [ rpm ])
+
+    #print('\nVector/list of vectors for prediction: ' + str(listOfPoints))
+    #for vector in listOfPoints:
+        vector = pPoint
+        ind, fit =  getBestPartitionForPoint(vector, partitionsX)
+        currModeler = keras.models.load_model( 'estimatorCl_' + str(ind) + '.h5')
+        vector = vector.reshape(-1, 5)
         prediction = currModeler.predict(vector)
         preds.append(prediction[0][0])
 
@@ -51,7 +66,7 @@ def initParameters():
         #algs=sys.argv[5]
         #cls=sys.argv[6]
     else:
-        listOfPoints = "[4.3956,13.2727,-9.7,0]"
+        listOfPoints = "[4.3956,0.2727,-9.7,12]"
         path = '.\\'
         clusters = '50'
 
