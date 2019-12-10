@@ -115,7 +115,7 @@ def main():
            if modeler.__class__.__name__=='TriInterpolantModeler' or modeler.__class__.__name__ == 'TensorFlow':
              partK = [1]
            else:
-             partK=[30]
+             partK=[50]
        error = {"errors": [ ]}
        #random.seed(1)
 
@@ -166,9 +166,9 @@ def main():
             # For each partition create model
             print("Creating models per partition...")
 
-            if modeler.__class__.__name__ == 'TensorFlowWD':
-                X = np.array(np.concatenate(partitionsX))
-                Y = np.array(np.concatenate(partitionsY))
+            #if modeler.__class__.__name__ == 'TensorFlowWD':
+                #X = np.array(np.concatenate(partitionsX))
+                #Y = np.array(np.concatenate(partitionsY))
             #skip_idx1 = random.sample(range(num_linesx, num_lines), (num_lines-num_linesx) - 1000)
 
             #modeler.plotRegressionLine(partitionsX, partitionsY, partitionLabels,genericModel,modelMap)
@@ -178,7 +178,7 @@ def main():
             unseenY=[]
             if modeler.__class__.__name__!= 'TriInterpolantModeler' :
                         #and modeler.__class__.__name__ != 'TensorFlow':
-                modelMap, model2,xs, output, genericModel , partitionsXDC = modeler.createModelsFor(partitionsX, partitionsY, partitionLabels,tri,partitionRepresentatives,partitioningModel)
+                modelMap, model2,xs, output, genericModel , partitionsXDC = modeler.createModelsFor(partitionsX, partitionsY, partitionLabels,tri,seriesX,targetY)
                 #if modeler.__class__.__name__ != 'TensorFlow':
                     #modelMap = dict(zip(partitionLabels, modelMap))
                 print("Creating models per partition... Done")

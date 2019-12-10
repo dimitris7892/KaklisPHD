@@ -785,17 +785,53 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
         print(np.mean(np.nan_to_num(errors)))
         return errors, np.mean(errors), np.std(lErrors)
 
+    def readClusteredLarosDataFromCsvNew(self,data):
+        # Load file
+        dtNew = data.values[ 0:, 0:5 ].astype(float)
+        dtNew = dtNew[ ~np.isnan(dtNew).any(axis=1) ]
+        seriesX = dtNew
+        UnseenSeriesX = dtNew
+        return UnseenSeriesX
+
     def evaluateKerasNN(self, unseenX, unseenY, modeler,output,xs,genericModel,partitionsX):
         lErrors = []
         #unseenX = unseenX.reshape((unseenX.shape[ 0 ], 1, unseenX.shape[ 1 ]))
+        #from sklearn.decomposition import PCA
+        #pca = PCA()
+        #pca.fit(unseenX)
+        #unseenX = pca.transform(unseenX)
+        from tensorflow import keras
+        path = '.\\'
+        clusters = '50'
+        partitionsX = [ ]
+        for cl in range(0, 50):
+            # models.append(load_model(path+'\estimatorCl_'+str(cl)+'.h5'))
+            data = pd.read_csv('cluster_rpm' + str(cl) + '_.csv')
+            partitionsX.append(self.readClusteredLarosDataFromCsvNew(data))
 
         for iCnt in range(np.shape(unseenX)[0]):
-            pPoint =unseenX[iCnt]
-            pPoint= pPoint.reshape(-1,unseenX.shape[1])
+            pPoint =unseenX[iCnt][0:4]
+            pPoint= pPoint.reshape(-1,unseenX.shape[1]-1)
+
+
+            preds = [ ]
+            #listOfPoints = np.array(listOfPoints.split('[')[ 1 ].split(']')[ 0 ].split(',')).astype(np.float)
+            #listOfPoints = listOfPoints.reshape(-1, 4)
             #pPoint = pPoint.reshape(-1,1,2)
             #pPoint = pPoint.reshape((pPoint.shape[ 0 ], 1, pPoint.shape[ 1 ]))
              # Convert to matrix
+            for vector in pPoint:
+                ind, fit = modeler.getBestPartitionForPoint(vector, partitionsX)
+                currModeler = keras.models.load_model('estimatorCl_rpm' + str(ind) + '.h5')
+                vector = vector.reshape(-1, 4)
+                rpm = currModeler.predict(vector)
+                #preds.append(prediction[ 0 ][ 0 ])
+                pPoint = np.append(pPoint, [ rpm ])
+
+            #try:
             trueVal = unseenY[iCnt]
+            #except:
+            #z=0
             #pPoint=[ pPoint for _ in range(len(modeler._models[0].input)) ]
             #trueVal = unseenY[ iCnt ]
             #prediction = modeler._models[0].model.predict([unseenX[:,0].reshape(1,unseenX.shape[0],1) , unseenX[ :, 1 ].reshape(1, unseenX.shape[ 0 ], 1)])
@@ -803,6 +839,7 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
             #cl = q.argmax(1)
             #weight= model2.layers[1].get_weights()[0][0,:][cl]
             #prediction = np.sum(model2.predict(pPoint, verbose=0)) / 5
+
             ind , fit = modeler.getBestPartitionForPoint(pPoint,partitionsX)
 
             #fits = modeler.getFitForEachPartitionForPoint(pPoint, partitionsX)
@@ -814,7 +851,10 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
 
             #prediction = modeler._models[0].predict(pPoint)
             #prediction = (modeler._models[ind].predict(pPoint)+ modeler._models[len(modeler._models)-1].predict(pPoint))/2
-            prediction = abs(modeler._models[ind].predict(pPoint))
+
+
+
+            prediction = abs(modeler._models[ind].predict(pPoint.reshape(-1,5)))
             #states_value = modeler._models[0].model.predict([unseenX[:,0].reshape(1,unseenX.shape[200],1) , unseenX[ :, 1 ].reshape(1, unseenX.shape[ 200 ], 1)])
 
             ##########

@@ -1,4 +1,4 @@
-from sklearn.cluster import KMeans
+from sklearn.cluster import KMeans , DBSCAN
 from sklearn.decomposition import PCA
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
@@ -69,7 +69,10 @@ class KMeansPartitioner(DefaultPartitioner):
         # Check if we need to use dataY
         dataUpdatedX = dataX
         #dataY=None
+        dataX = dataX.reshape(-1,1) if len(dataX.shape)==1 else dataX
         if dataY is not None:
+            #dataXcl = dataX[:,0:3]
+            #dataYcl=np.append(dataX[:,3].reshape(-1,1), np.asmatrix([dataY]).T, axis=1)
             dataUpdatedX = np.append(dataX, np.asmatrix([dataY]).T, axis=1)
 
             # Init clustering model
@@ -86,9 +89,10 @@ class KMeansPartitioner(DefaultPartitioner):
             print ("Error in clustering")
         self._dataModel = dataModel
         # Get the cluster labels
+        #labels = dataModel.labels_
         labels = dataModel.predict(dataUpdatedX)
         # Extract centroid values
-        centroids = self.getCentroids()
+        #centroids = self.getCentroids()
         from scipy.interpolate import interp1d
         import scipy as sp
         import scipy.interpolate
@@ -126,6 +130,7 @@ class KMeansPartitioner(DefaultPartitioner):
 
         print("Number of clusters: %d"%(self._nClusters))
                 # Return clusterer
+        #return DBSCAN(min_samples=2,eps=1)
         return KMeans(n_clusters=self._nClusters , random_state=self.random_state)
 
     def getCentroids(self):

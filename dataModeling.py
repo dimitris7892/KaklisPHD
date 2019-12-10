@@ -121,12 +121,14 @@ class LinearRegressionModeler(BasePartitionModeler):
 
 class TensorFlowWD(BasePartitionModeler):
     def createModelsFor(self, partitionsX, partitionsY, partition_labels, tri, X, Y):
-        from keras.callbacks import LearningRateScheduler
+        from tensorflow import keras as kr
+
+
         #import tensorflow.compat.v1 as tf
         #tf.disable_v2_behavior()
 
-        X = np.array(np.concatenate(partitionsX))
-        Y = np.array(np.concatenate(partitionsY))
+        #X = np.array(np.concatenate(partitionsX))
+        #Y = np.array(np.concatenate(partitionsY))
 
         models = []
         self.ClustersNum = len(partitionsX)
@@ -417,30 +419,26 @@ class TensorFlowWD(BasePartitionModeler):
             #model.add(keras.layers.Dense(len(partition_labels)*2, input_shape=(4,)))
             #model.add(keras.layers.Embedding(X.shape[0], 200, input_length=4))
             #model.add(keras.layers.Dense(100, input_shape=(2,)))
-            model.add(keras.layers.Dense(len(partition_labels), input_shape=(4,)))
-            #model.add(keras.layers.Dense(len(partition_labels)*2, ))
-            #model.add(keras.layers.Dense(len(partition_labels), ))
-            #model.add(keras.layers.Dense(len(partition_labels) , input_shape=(4,)))
-            #model.add(keras.layers.Dense(10, input_shape=(6,)))
-            # model.add(MyLayer(5))
-            # model.add(keras.layers.Dense(15, input_shape=(2,)))
-
-            # model.add(keras.layers.Dense(genModelKnots, input_shape=(2,)))
-            #model.add(keras.layers.Dense(35, ))
-            #model.add(keras.layers.Dense(40,))
-
+            model.add(keras.layers.Dense(30, input_shape=(5,)))
             model.add(keras.layers.Dense(20, ))
+
+            model.add(keras.layers.Reshape((1,20,), name='reshape_1'))
+            model.add(keras.layers.LSTM(20, ))
+            model.add(keras.layers.Reshape((1, 20,), name='reshape_2'))
+            model.add(keras.layers.LSTM(10, ))
+            model.add(keras.layers.Reshape((1, 10,), name='reshape_3'))
+            model.add(keras.layers.LSTM(5, ))
+
             model.add(keras.layers.Dense(10, ))
-            #model.add(keras.layers.Activation(custom_activation2))
-            model.add(keras.layers.Dense(5))
+            model.add(keras.layers.Dense(5,))
+            model.add(keras.layers.Dense(2, ))
+            #model.add(keras.layers.Dropout(0.0001, ))
             # model.add(keras.layers.Activation(custom_activation2(inputs=model.layers[2].output, modelId=1)))
             #model.add(keras.layers.Activation(custom_activation2))
             #model.add(keras.layers.Activation('relu'))
             model.add(keras.layers.Dense(1,))  # activation=custom_activation
-            # model.add(keras.layers.Activation(custom_activation))
-             # activation=custom_activation
-            # Compile model
-            model.compile(loss='mse', optimizer=keras.optimizers.SGD())
+
+            model.compile(loss='mse', optimizer=keras.optimizers.Adam())
             return model
 
         seed = 7
@@ -461,16 +459,15 @@ class TensorFlowWD(BasePartitionModeler):
 
         #partitionsX.reshape(-1, 2)
 
-        epochs = 5
-        schedule = "step"
+        epochs = 30
+        schedule = "poly"
         callbacks = []
         #schedule = None
-
         class LearningRateDecay:
             def plot(self, epochs, title="Learning Rate Schedule"):
                 # compute the set of learning rates for each corresponding
                 # epoch
-                lrs = [self(i) for i in epochs]
+                lrs = [ self(i) for i in epochs ]
 
                 # the learning rate schedule
                 plt.style.use("ggplot")
@@ -481,7 +478,7 @@ class TensorFlowWD(BasePartitionModeler):
                 plt.ylabel("Learning Rate")
 
         class PolynomialDecay(LearningRateDecay):
-            def __init__(self, maxEpochs=100, initAlpha=0.01, power=1.0):
+            def __init__(self, maxEpochs=30, initAlpha=0.01, power=1.0):
                 # store the maximum number of epochs, base learning rate,
                 # and power of the polynomial
                 self.maxEpochs = maxEpochs
@@ -497,20 +494,21 @@ class TensorFlowWD(BasePartitionModeler):
                 return float(alpha)
 
         class StepDecay(LearningRateDecay):
-             def __init__(self, initAlpha=0.01, factor=0.25, dropEvery=10):
-                    # store the base initial learning rate, drop factor, and
-                    # epochs to drop every
-                    self.initAlpha = initAlpha
-                    self.factor = factor
-                    self.dropEvery = dropEvery
+            def __init__(self, initAlpha=0.01, factor=0.25, dropEvery=10):
+                # store the base initial learning rate, drop factor, and
+                # epochs to drop every
+                self.initAlpha = initAlpha
+                self.factor = factor
+                self.dropEvery = dropEvery
 
-             def __call__(self, epoch):
-                    # compute the learning rate for the current epoch
-                    exp = np.floor((1 + epoch) / self.dropEvery)
-                    alpha = self.initAlpha * (self.factor ** exp)
+            def __call__(self, epoch):
+                # compute the learning rate for the current epoch
+                exp = np.floor((1 + epoch) / self.dropEvery)
+                alpha = self.initAlpha * (self.factor ** exp)
 
-                    # return the learning rate
-                    return float(alpha)
+                # return the learning rate
+                return float(alpha)
+
         # check to see if step-based learning rate decay should be used
         if schedule == "step":
             print("[INFO] using 'step-based' learning rate decay...")
@@ -529,15 +527,16 @@ class TensorFlowWD(BasePartitionModeler):
         # if the learning rate schedule is not empty, add it to the list of
         # callbacks
         if schedule is not None:
-            callbacks = [LearningRateScheduler(schedule)]
+            callbacks = [ kr.callbacks.LearningRateScheduler(schedule) ]
+
 
         estimator = baseline_model()
         #init_()
 
         #sess = tf.Session()
         #sess.run(init_op)
-        estimator.fit(X, Y, epochs=30, validation_split=0.33,)
-
+        estimator.fit(X, Y, epochs=30, validation_split=0.33,batch_size=200)
+        estimator.save("estimatorCl_Gen_.h5")
         def insert_intermediate_layer_in_keras(model, layer_id, new_layer):
 
             layers = [l for l in model.layers]
@@ -567,7 +566,7 @@ class TensorFlowWD(BasePartitionModeler):
                     x = layers[i](x)
 
             new_model = keras.Model(inputs=model.input, outputs=x)
-            new_model.compile(loss='mse', optimizer=keras.optimizers.Adam(),)
+            new_model.compile(loss='mse', optimizer=keras.optimizers.Adam(lr),)
             return new_model
 
         NNmodels = []
@@ -581,16 +580,19 @@ class TensorFlowWD(BasePartitionModeler):
             #if np.mean(partitionsX[idx][:,1])  > 10 :
             #estimatorCl = insert_intermediate_layer_in_keras(estimator, 0, keras.layers.Dense(len(partition_labels*2)))
             #else:
+            #sr = sp.Earth(use_fast=True)
+            #sr.fit(np.array(partitionsX[idx]), np.array(partitionsY[idx]))
             #estimatorCl = replace_intermediate_layer_in_keras(estimator, -1, keras.layers.Dense(5), lr)
 
             #estimatorCl.fit(np.array(partitionsX[idx]), np.array(partitionsY[idx]), epochs=30,)
-            #estimatorCl.save("estimatorCl_"+str(idx)+".h5")
-            estimator.fit(np.array(partitionsX[idx]), np.array(partitionsY[idx]), epochs=30)
+            #estimator=baseline_model()
+            estimator.fit(np.array(partitionsX[idx]), np.array(partitionsY[idx]), epochs=40,batch_size=200)
+            estimator.save("estimatorCl_" + str(idx) + ".h5")
             NNmodels.append(estimator)
             with open('./cluster_' + str(idx) + '_.csv', mode='w') as data:
                 for k in range(0,len(partitionsX[idx])):
                     data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-                    data_writer.writerow([partitionsX[idx][k][0],partitionsX[idx][k][1],partitionsX[idx][k][2],partitionsX[idx][k][3]])
+                    data_writer.writerow([partitionsX[idx][k][0],partitionsX[idx][k][1],partitionsX[idx][k][2],partitionsX[idx][k][3],partitionsX[idx][k][4]])
         # Update private models
         # models=[]
         # models.append(estimator)
@@ -604,7 +606,7 @@ class TensorFlowW(BasePartitionModeler):
 
 
     def initNN(self,X_data,input_dim):
-        #X=np.concatenate(partitionsX)
+        #X=n.concatenate(partitionsX)
         W_1 = tf.Variable(tf.random_uniform([ input_dim, 10 ]))
         #W_1 = np.array(W_1).reshape(-1,2)
         #weightsShape = len(W_1[0])
