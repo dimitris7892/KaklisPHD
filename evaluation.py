@@ -787,8 +787,11 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
 
     def evaluateKerasNN(self, unseenX, unseenY, modeler,output,xs,genericModel,partitionsX):
         lErrors = []
-        #unseenX = unseenX.reshape((unseenX.shape[ 0 ], 1, unseenX.shape[ 1 ]))
-
+        from sklearn.decomposition import PCA
+        #unseenX = unseenX.rfrom sklearn.decomposition import PCA
+        pca = PCA()
+        pca.fit(unseenX)
+        unseenX = pca.transform(unseenX)
         for iCnt in range(np.shape(unseenX)[0]):
             pPoint =unseenX[iCnt]
             pPoint= pPoint.reshape(-1,unseenX.shape[1])
@@ -813,8 +816,12 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
             #predX = np.mean(weightedPreds)
 
             #prediction = modeler._models[0].predict(pPoint)
-            #prediction = (modeler._models[ind].predict(pPoint)+ modeler._models[len(modeler._models)-1].predict(pPoint))/2
-            prediction = abs(modeler._models[ind].predict(pPoint))
+            #
+
+
+            #prediction = abs(modeler._models[ind].predict(pPoint))
+            prediction = (modeler._models[ind].predict(pPoint) + modeler._models[len(modeler._models) - 1].predict(
+                pPoint)) / 2
             #states_value = modeler._models[0].model.predict([unseenX[:,0].reshape(1,unseenX.shape[200],1) , unseenX[ :, 1 ].reshape(1, unseenX.shape[ 200 ], 1)])
 
             ##########

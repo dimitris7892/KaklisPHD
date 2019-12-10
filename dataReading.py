@@ -180,12 +180,25 @@ class BaseSeriesReader:
         #scaled_df = scaler.fit_transform(dataNew)
         #scaled_df = pd.DataFrame(scaled_df, columns=names)
         #dataNew = scaled_df
-        dataNew=data.drop(['M/E FOC (kg/min)' ,'DateTime'],axis=1)
+        dataNew=data.drop([ 'DateTime'],axis=1)
+        #'M/E FOC (kg/min)'
         #dataNew=dataNew[['Draft', 'SpeedOvg']]
-        dtNew = dataNew.values[ 0:, 0:4 ].astype(float)
+        dtNew = dataNew.values[ 0:, : ].astype(float)
+        dtNew = np.delete(dtNew, [i for (i, v) in enumerate(dtNew[0:, 0]) if v <= 0], 0)
+        dtNew = np.delete(dtNew, [i for (i, v) in enumerate(dtNew[0:, 3]) if v <= 7 or v >14 ], 0)
+        dtNew = np.delete(dtNew, [i for (i, v) in enumerate(dtNew[0:, 4]) if v <= 0 or v > 90], 0)
+        dtNew = np.delete(dtNew, [i for (i, v) in enumerate(dtNew[0:, 5]) if v > 0 and v <= 1], 0)
+        #dtNew = np.delete(dtNew, [i for (i, v) in enumerate(dtNew[0:, 4]) if v >= 0 and v < 1], 0)
         dtNew = dtNew[~np.isnan(dtNew).any(axis=1)]
 
-        seriesX=dtNew[0:180000,:]
+        seriesX=dtNew[0:180000,0:5]
+
+        #seriesX = dtNew[0:150000, 0:4]
+
+        #from sklearn.decomposition import PCA
+        #pca = PCA()
+        #pca.fit(seriesX)
+        #seriesX = pca.transform(seriesX)
         #seriesX=preprocessing.normalize([seriesX])
         newSeriesX = []
         #for x in seriesX:
@@ -195,7 +208,7 @@ class BaseSeriesReader:
         #newSeriesX = np.array(newSeriesX)
         ##seriesX = newSeriesX
 
-        UnseenSeriesX = dtNew[190000:191000, :]
+        UnseenSeriesX = dtNew[190000:191000, 0:5]
         newUnseenSeriesX=[]
         #for x in UnseenSeriesX:
             #dmWS = x[0] * x[1]
@@ -204,12 +217,12 @@ class BaseSeriesReader:
         #newUnseenSeriesX = np.array(newUnseenSeriesX)
         #UnseenSeriesX = newUnseenSeriesX
 
-        dt = data.values[0:, 5].astype(float)
-        dt = dt[~np.isnan(dt).any(axis=0)]
-        FOC = dt[0][0:180000]
+        #dt = dtNew.values[0:, 5].astype(float)
+        #dt = dtNew[~np.isnan(dt).any(axis=0)]
+        FOC = dtNew[0:180000,5]
         #normalized_Y = preprocessing.normalize([FOC])
 
-        unseenFOC = dt[0][190000:191000]
+        unseenFOC = dtNew[190000:191000,5]
         #WS= np.asarray([x for x in dt[ :, 1 ] ])
         #WA = np.asarray([ x for x in dt[ :, 2 ] ])
         #SO = np.asarray([ y for y in dt[ :, 3 ] ])
