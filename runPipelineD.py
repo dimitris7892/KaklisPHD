@@ -2,6 +2,8 @@ import numpy as np
 import sys
 import pandas as pd
 from tensorflow import keras
+from sklearn import preprocessing
+from sklearn.decomposition import PCA
 
 def main():
     # Init parameters based on command line
@@ -11,18 +13,36 @@ def main():
     #print(path)
     partitionsX=[]
     for cl in range(0,clusters):
-        #models.append(load_model(path+'\estimatorCl_'+str(cl)+'.h5'))
+       # models.append(load_model(path+'\estimatorCl_'+str(cl)+'.h5'))
         data = pd.read_csv(path+'\cluster_'+str(cl)+'_.csv')
         partitionsX.append(readClusteredLarosDataFromCsvNew(data))
 
     preds=[]
     listOfPoints = np.array(listOfPoints.split('[')[1].split(']')[0].split(',')).astype(np.float)
     listOfPoints = listOfPoints.reshape(-1,4)
-    #print('\nVector/list of vectors for prediction: ' + str(listOfPoints))
+
+    #data = pd.read_csv('./MT_DELTA_MARIA_data.csv')
+    #dataNew = data.drop(['DateTime'], axis=1)
+    #dtNew = dataNew.values[0:, :].astype(float)
+    #dtNew = np.delete(dtNew, [i for (i, v) in enumerate(dtNew[0:, 5]) if v >= 0 and v < 1], 0)
+    #dtNew = dtNew[~np.isnan(dtNew).any(axis=1)]
+   # seriesX = dtNew[0:180000, 0:4]
+
+    #from sklearn.decomposition import PCA
+    #pca = PCA()
+    #pca.fit(seriesX)
+
+
     for vector in listOfPoints:
-        ind, fit =  getBestPartitionForPoint(vector, partitionsX)
-        currModeler = keras.models.load_model(path + '\estimatorCl_' + str(ind) + '.h5')
+    # Fit your data on the scaler object
+        #vector = vector.reshape(-1, 1)
+        #vector = pca.fit_transform(vector)
         vector = vector.reshape(-1, 4)
+        ind, fit =  getBestPartitionForPoint(vector, partitionsX)
+        print(str(ind)+'\n')
+        currModeler = keras.models.load_model(path + '\estimator_' + 'Gen' + '.h5')
+
+
         prediction = currModeler.predict(vector)
         preds.append(prediction[0][0])
 
@@ -51,9 +71,9 @@ def initParameters():
         #algs=sys.argv[5]
         #cls=sys.argv[6]
     else:
-        listOfPoints = "[4.3956,13.2727,-9.7,0]"
+        listOfPoints = "[12.3956,23.2727,-60.7,16]"
         path = '.\\'
-        clusters = '50'
+        clusters = '40'
 
     return listOfPoints, path , clusters
 
