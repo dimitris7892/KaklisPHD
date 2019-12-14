@@ -167,6 +167,7 @@ class BaseSeriesReader:
     def readLarosDataFromCsvNew(self, data):
         # Load file
         from sklearn import preprocessing
+        from sklearn.decomposition import PCA
         #if self.__class__.__name__ == 'UnseenSeriesReader':
             #dt = data.sample(n=2880).values[ :90000:, 3:23 ]
             #dt = data.values[ 0:, 2:23 ]
@@ -175,30 +176,30 @@ class BaseSeriesReader:
         #dataNew = data.drop(['M/E FOC (kg/min)', 'DateTime'], axis=1)
         #names = dataNew.columns
 
-        #scaler = preprocessing.StandardScaler()
-        # Fit your data on the scaler object
-        #scaled_df = scaler.fit_transform(dataNew)
-        #scaled_df = pd.DataFrame(scaled_df, columns=names)
-        #dataNew = scaled_df
-        dataNew=data.drop([ 'DateTime'],axis=1)
+
+        dataNew=data.drop(['DateTime'],axis=1)
         #'M/E FOC (kg/min)'
+
         #dataNew=dataNew[['Draft', 'SpeedOvg']]
         dtNew = dataNew.values[ 0:, : ].astype(float)
-        dtNew = np.delete(dtNew, [i for (i, v) in enumerate(dtNew[0:, 0]) if v <= 0], 0)
-        dtNew = np.delete(dtNew, [i for (i, v) in enumerate(dtNew[0:, 3]) if v <= 7 or v >14 ], 0)
-        dtNew = np.delete(dtNew, [i for (i, v) in enumerate(dtNew[0:, 4]) if v <= 0 or v > 90], 0)
-        dtNew = np.delete(dtNew, [i for (i, v) in enumerate(dtNew[0:, 5]) if v > 0 and v <= 1], 0)
-        #dtNew = np.delete(dtNew, [i for (i, v) in enumerate(dtNew[0:, 4]) if v >= 0 and v < 1], 0)
+        dtNew = np.delete(dtNew, [ i for (i, v) in enumerate(dtNew[ 0:, 0 ]) if v <= 0 ], 0)
+        dtNew = np.delete(dtNew, [ i for (i, v) in enumerate(dtNew[ 0:, 3 ]) if v <= 7 or v > 14 ], 0)
+        dtNew = np.delete(dtNew, [ i for (i, v) in enumerate(dtNew[ 0:, 4 ]) if v <= 0 or v > 90 ], 0)
+        dtNew = np.delete(dtNew, [ i for (i, v) in enumerate(dtNew[ 0:, 5 ]) if v > 0 and v <= 1 ], 0)
         dtNew = dtNew[~np.isnan(dtNew).any(axis=1)]
 
-        seriesX=dtNew[0:180000,0:5]
-
-        #seriesX = dtNew[0:150000, 0:4]
-
-        #from sklearn.decomposition import PCA
+        seriesX=dtNew[0:150000,0:5]
         #pca = PCA()
         #pca.fit(seriesX)
         #seriesX = pca.transform(seriesX)
+        #scaler = preprocessing.StandardScaler()
+        # Fit your data on the scaler object
+        #scaled_df = scaler.fit_transform(seriesX)
+        #seriesX = scaled_df
+        #scaled_df = pd.DataFrame(scaled_df, columns=names)
+        #dataNew = scaled_df
+
+        #seriesX=seriesX[ 0:, 0:3 ]
         #seriesX=preprocessing.normalize([seriesX])
         newSeriesX = []
         #for x in seriesX:
@@ -208,7 +209,8 @@ class BaseSeriesReader:
         #newSeriesX = np.array(newSeriesX)
         ##seriesX = newSeriesX
 
-        UnseenSeriesX = dtNew[190000:191000, 0:5]
+
+        UnseenSeriesX = dtNew[160000:161000, 0:5]
         newUnseenSeriesX=[]
         #for x in UnseenSeriesX:
             #dmWS = x[0] * x[1]
@@ -216,13 +218,15 @@ class BaseSeriesReader:
             #newUnseenSeriesX.append([x[0], x[1], x[2], x[3], np.round(dmWS, 3), np.round(waSO, 3)])
         #newUnseenSeriesX = np.array(newUnseenSeriesX)
         #UnseenSeriesX = newUnseenSeriesX
+        ##RPM
+        Rpm = dtNew[0:150000,4]
+        unseenRpm = dtNew[160000:161000,4]
 
-        #dt = dtNew.values[0:, 5].astype(float)
-        #dt = dtNew[~np.isnan(dt).any(axis=0)]
-        FOC = dtNew[0:180000,5]
-        #normalized_Y = preprocessing.normalize([FOC])
+        ##FOC
+        FOC = dtNew[ 0:150000, 5 ]
+        # normalized_Y = preprocessing.normalize([FOC])
 
-        unseenFOC = dtNew[190000:191000,5]
+        unseenFOC = dtNew[160000:161000, 5 ]
         #WS= np.asarray([x for x in dt[ :, 1 ] ])
         #WA = np.asarray([ x for x in dt[ :, 2 ] ])
         #SO = np.asarray([ y for y in dt[ :, 3 ] ])
