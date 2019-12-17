@@ -128,14 +128,19 @@ def main():
     ########################
     partitionsX=[]
     partitionsY=[]
-    for cl in range(0,50):
+    for cl in range(0,30):
         data = pd.read_csv('cluster_'+str(cl)+'_.csv')
         partitionsX.append(readClusteredLarosDataFromCsvNew(data))
 
-    for cl in range(0,50):
+    for cl in range(0,30):
         data = pd.read_csv('cluster_foc'+str(cl)+'_.csv')
         partitionsY.append(readClusteredLarosDataFromCsvNew(data))
 
+    data = pd.read_csv('dataX_.csv')
+    X=(readClusteredLarosDataFromCsvNew(data))
+
+    data = pd.read_csv('dataY_.csv')
+    Y=(readClusteredLarosDataFromCsvNew(data))
     import matplotlib.pyplot as plt
 
     #data = pd.read_csv('./tdk_error_1.csv')
@@ -157,27 +162,33 @@ def main():
     from sklearn.preprocessing import StandardScaler
     scalerX = StandardScaler()
     scalerY = StandardScaler()
-    scalerX = scalerX.fit(np.concatenate(partitionsX))
-    scalerY = scalerY.fit(np.concatenate(partitionsY).reshape(-1, 1))
+    #scalerX = scalerX.fit(np.concatenate(partitionsX))
+    #scalerY = scalerY.fit(np.concatenate(partitionsY).reshape(-1, 1))
     try:
-        for i in range(36, len(pred)):
+        for i in range(0, len(pred)):
             #vector = seriesX[i]
             vector = Predictors.values[i]
             vector = vector.reshape(-1,5)
             #vector = np.array([vector[0],vector[2],vector[3],vector[4]]).reshape(-1, 4)
             #vector[:, 1] = abs(vector[:, 1])
             #Predictor =  np.array([Predictors.values[:,0],Predictors.values [:,2],Predictors.values [:,3],Predictors.values [:,4]]).reshape(-1, 4)
-            #vctr = np.array([vector[0][1],vector[0][3]]).reshape(-1, 2)
+            #vctr = np.array([vector[0][0],vector[0][4]]).reshape(-1, 2)
             ind, fit = getBestPartitionForPoint(vector, partitionsX)
             #if fit < 10:
             currModeler = keras.models.load_model('estimatorCl_' + str(ind) + '.h5')
             #else:
-            #currModeler = keras.models.load_model('estimatorCl_Gen_.h5')
+            #currModeler1 = keras.models.load_model('estimatorCl_Gen_.h5')
 
-            scaled = scalerX.fit_transform(vector)
+            #scaled = scalerX.fit_transform(vector)
 
-            prediction = (scalerY.inverse_transform(currModeler.predict(scaled)))#  + scalerY.inverse_transform(currModeler1.predict(scaled))) / 2
-            #prediction = (currModeler.predict(vector))  # + currModeler1.predict(vector)) / 2
+            #prediction = (scalerY.inverse_transform(currModeler.predict(scaled)))#  + scalerY.inverse_transform(currModeler1.predict(scaled))) / 2
+            prediction = abs((currModeler.predict(vector)  )[0])#+ currModeler1.predict(vector)) / 2
+            #prediction=(currModeler1.predict(vector) + np.mean(partitionsY[ ind ])) / 2
+            #if np.mean(partitionsY[ind]) - prediction > 5:
+            #prediction =abs( prediction + np.mean(partitionsY[ind]) * fit)
+            #else:
+                #predictionNew = prediction + prediction * fit
+
             tf.keras.backend.clear_session()
             lErrors.append(abs(prediction - actual[i]))
             # x=unseenX[:,0].reshape(-1,unseenX.shape[0])
@@ -236,20 +247,31 @@ def readLarosDataFromCsvNew(data):
         return seriesXnew ,FOC , UnseenSeriesX , unseenFOC
 
 def getFitnessOfPoint(partitions, cluster, point):
-    return distance.euclidean(np.mean(partitions[cluster], axis=0) , point)
-        #1 / (1 + np.linalg.norm(np.mean(partitions[cluster], axis=0) - point))
+    #return distance.euclidean(np.mean(partitions[cluster], axis=0) , point)
+    #return 1 / (1 +  np.linalg.norm(np.mean(np.array(np.append(partitions[ cluster ][ :,0 ].reshape(-1, 1), np.asmatrix(partitions[ cluster ][ :, 4 ]).T, axis=1)))- np.array([point[0][0],point[0][4]])))
+
+    #return 1 / (1 + np.linalg.norm(np.mean(np.array(partitions[ cluster ][ :,1 ].reshape(-1, 1))) - np.array(point[ 0 ][ 1 ] )))
+
+       return 1 / (1 + np.linalg.norm(np.mean(partitions[cluster], axis=0) - point))
+       #return 1 / (1 + np.linalg.norm(np.mean(partitions[cluster][:,1],axis=0) -point[:,1]))
 
 
 
 def getBestPartitionForPoint(point, partitions):
     # mBest = None
     mBest = None
-    dBestFit = sys.maxsize
+    dBestFit = 0
+    fits = {"data": [ ]}
     # For each model
     for m in range(0, len(partitions)):
         # If it is a better for the point
         dCurFit = getFitnessOfPoint(partitions, m, point)
-        if dCurFit < dBestFit:
+        fit={}
+        fit["fit"]=dCurFit
+        fit["id"]=m
+        fits[ "data" ].append(fit)
+
+        if dCurFit > dBestFit:
             # Update the selected best model and corresponding fit
             dBestFit = dCurFit
             mBest = m
