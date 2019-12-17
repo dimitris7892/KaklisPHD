@@ -87,10 +87,14 @@ class BasePartitionModeler:
         return 0.0
 
     def getFitnessOfPoint(self,partitions ,cluster, point):
+
         return 1 / (1 + np.linalg.norm(np.mean(np.array(
-        np.append(partitions[ cluster ][ :, 0 ].reshape(-1, 1),
-                  np.asmatrix([partitions[ cluster ][ :, 2 ], partitions[ cluster ][ :, 4 ]]).T,
-                  axis=1)),axis=0) - np.array([ point[ 0 ][ 0 ],point[ 0 ][ 2 ], point[ 0 ][ 4 ] ])))
+            np.append(partitions[cluster][:, 0].reshape(-1, 1), np.asmatrix(partitions[cluster][:, 4]).T, axis=1)),
+                                               axis=0) - np.array([point[0][0], point[0][4]])))
+        #return 1 / (1 + np.linalg.norm(np.mean(np.array(
+        #np.append(partitions[ cluster ][ :, 0 ].reshape(-1, 1),
+                  #np.asmatrix([partitions[ cluster ][ :, 2 ], partitions[ cluster ][ :, 4 ]]).T,
+                  #axis=1)),axis=0) - np.array([ point[ 0 ][ 0 ],point[ 0 ][ 2 ], point[ 0 ][ 4 ] ])))
         #return 1.0 / (1.0 + numpy.linalg.norm(np.mean(partitions[ cluster ]) - point))
 
 
@@ -431,7 +435,7 @@ class TensorFlowWD(BasePartitionModeler):
             model.add(keras.layers.Dense(20, ))
 
             model.add(keras.layers.Reshape((1,20,), name='reshape_1'))
-            model.add(keras.layers.LSTM(30, ))
+            model.add(keras.layers.LSTM(5, ))
             #model.add(keras.layers.Reshape((1, 20,), name='reshape_2'))
             #model.add(keras.layers.LSTM(10, ))
             #model.add(keras.layers.Reshape((1, 50,), name='reshape_3'))
