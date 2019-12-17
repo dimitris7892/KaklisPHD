@@ -7,6 +7,7 @@ import sklearn.ensemble as skl
 from scipy.spatial import Delaunay
 import random
 #from sklearn.cross_validation import train_test_split
+import csv
 import parameters
 import itertools
 #from sklearn.model_selection import KFold as kf
@@ -30,6 +31,7 @@ import metrics
 from sklearn.cluster import KMeans
 #tf.compat.v1.disable_eager_execution()
 #tf.executing_eagerly()
+from sklearn import preprocessing
 
 class BasePartitionModeler:
     def createModelsFor(self,partitionsX, partitionsY, partition_labels):
@@ -85,7 +87,11 @@ class BasePartitionModeler:
         return 0.0
 
     def getFitnessOfPoint(self,partitions ,cluster, point):
-        return 1.0 / (1.0 + numpy.linalg.norm(np.mean(partitions[ cluster ]) - point))
+        return 1 / (1 + np.linalg.norm(np.mean(np.array(
+        np.append(partitions[ cluster ][ :, 0 ].reshape(-1, 1),
+                  np.asmatrix([partitions[ cluster ][ :, 2 ], partitions[ cluster ][ :, 4 ]]).T,
+                  axis=1)),axis=0) - np.array([ point[ 0 ][ 0 ],point[ 0 ][ 2 ], point[ 0 ][ 4 ] ])))
+        #return 1.0 / (1.0 + numpy.linalg.norm(np.mean(partitions[ cluster ]) - point))
 
 
 class TriInterpolantModeler(BasePartitionModeler):
@@ -419,17 +425,18 @@ class TensorFlowWD(BasePartitionModeler):
             #model.add(keras.layers.Dense(len(partition_labels)*2, input_shape=(4,)))
             #model.add(keras.layers.Embedding(X.shape[0], 200, input_length=4))
             #model.add(keras.layers.Dense(100, input_shape=(2,)))
-            model.add(keras.layers.Dense(30, input_shape=(5,)))
+            #model.add(keras.layers.Dense(100, input_shape=(5,)))
+            model.add(keras.layers.Dense(50,  input_shape=(5,)))
             model.add(keras.layers.Dense(20, ))
 
             model.add(keras.layers.Reshape((1,20,), name='reshape_1'))
-            model.add(keras.layers.LSTM(20, ))
-            model.add(keras.layers.Reshape((1, 20,), name='reshape_2'))
-            model.add(keras.layers.LSTM(10, ))
-            model.add(keras.layers.Reshape((1, 10,), name='reshape_3'))
-            model.add(keras.layers.LSTM(5, ))
+            model.add(keras.layers.LSTM(30, ))
+            #model.add(keras.layers.Reshape((1, 20,), name='reshape_2'))
+            #model.add(keras.layers.LSTM(10, ))
+            #model.add(keras.layers.Reshape((1, 50,), name='reshape_3'))
+            #model.add(keras.layers.LSTM(5, ))
 
-            model.add(keras.layers.Dense(10, ))
+            model.add(keras.layers.Dense(10, input_shape=(5,)))
             model.add(keras.layers.Dense(5,))
             model.add(keras.layers.Dense(2, ))
             #model.add(keras.layers.Dropout(0.0001, ))
@@ -535,8 +542,31 @@ class TensorFlowWD(BasePartitionModeler):
 
         #sess = tf.Session()
         #sess.run(init_op)
-        estimator.fit(X, Y, epochs=30, validation_split=0.33,batch_size=200)
+
+        scaler = preprocessing.StandardScaler()
+        import csv
+        # Fit your data on the scaler object
+
+        with open('./dataX_.csv', mode='w') as data:
+            for  i in range(0,len(X)):
+                data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+                data_writer.writerow(X[i] )
+
+        with open('./dataY_.csv', mode='w') as data:
+            for i in range(0, len(Y)):
+                data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+                data_writer.writerow([ Y[ i ] ])
+
+
+        scaled_X = scaler.fit_transform(X)
+        seriesX = scaled_X
+
+        scaled_Y = scaler.fit_transform(Y.reshape(-1,1))
+        targetY = scaled_Y
+
+        estimator.fit(X, Y, epochs=30, validation_split=0.33,batch_size=5)
         estimator.save("estimatorCl_Gen_.h5")
+
         def insert_intermediate_layer_in_keras(model, layer_id, new_layer):
 
             layers = [l for l in model.layers]
@@ -586,13 +616,23 @@ class TensorFlowWD(BasePartitionModeler):
 
             #estimatorCl.fit(np.array(partitionsX[idx]), np.array(partitionsY[idx]), epochs=30,)
             #estimator=baseline_model()
-            estimator.fit(np.array(partitionsX[idx]), np.array(partitionsY[idx]), epochs=40,batch_size=200)
+            scaled_X = scaler.fit_transform(partitionsX[idx])
+            seriesX = scaled_X
+
+            scaled_Y = scaler.fit_transform(partitionsY[idx].reshape(-1,1))
+            targetY = scaled_Y
+
+            estimator.fit(np.array(partitionsX[idx]), np.array(partitionsY[idx]), epochs=40,batch_size=5)
             estimator.save("estimatorCl_" + str(idx) + ".h5")
             NNmodels.append(estimator)
             with open('./cluster_' + str(idx) + '_.csv', mode='w') as data:
                 for k in range(0,len(partitionsX[idx])):
                     data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
                     data_writer.writerow([partitionsX[idx][k][0],partitionsX[idx][k][1],partitionsX[idx][k][2],partitionsX[idx][k][3],partitionsX[idx][k][4]])
+            with open('./cluster_foc' + str(idx) + '_.csv', mode='w') as data:
+                for k in range(0,len(partitionsY[idx])):
+                    data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+                    data_writer.writerow([partitionsY[idx][k]])
         # Update private models
         # models=[]
         # models.append(estimator)
