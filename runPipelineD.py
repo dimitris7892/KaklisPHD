@@ -37,11 +37,7 @@ def main():
     scalerX = scalerX.fit(X)
     scalerY = scalerY.fit(Y.reshape(-1, 1))
 
-    scaler_x_filename = args.Scaler_X
-    Scaler_x = joblib.load(scaler_x_filename)
 
-    scaler_y_filename = args.Scaler_Y
-    Scaler_y = joblib.load(scaler_y_filename)
 
     for vector in listOfPoints:
         #ind, fit =getBestPartitionForPoint(vector, partitionsX)
@@ -59,7 +55,7 @@ def main():
         #vctr = np.array([ vector[ 0 ][ 0 ], vector[ 0 ][ 4 ] ]).reshape(-1, 2)
         ind, fit =  getBestPartitionForPoint(vector, partitionsX)
 
-        scaled = Scaler_x.fit_transform(vector)
+        #scaled = Scaler_x.fit_transform(vector)
 
         currModeler = keras.models.load_model( 'estimatorCl_' + str(ind) + '.h5')
         currModeler1 = keras.models.load_model('estimatorCl_Gen_.h5')
@@ -71,9 +67,9 @@ def main():
         #prediction = (Scaler_y.inverse_transform(prediction))  # + scalerY.inverse_transform(currModeler1.predict(scaled))) / 2
         #prediction1 = (Scaler_y.inverse_transform(prediction1))  # + scalerY.inverse_transform(currModeler1.predict(scaled))) / 2
         if vector[0][0] < 6:
-            scaledPred=(prediction + prediction*fit) - 5
+            scaledPred=(prediction1 + prediction*fit) - 5
         else:
-            scaledPred=(prediction + prediction*fit) + 5
+            scaledPred=(prediction1 + prediction*fit) + 5
 
         preds.append(prediction[0][0])
 
@@ -102,11 +98,11 @@ def initParameters():
         #end = sys.argv[4]
         #algs=sys.argv[5]
         #cls=sys.argv[6]
-        listOfPoints = "[3.3956,-3,2.2727,-9.7,9]"
+        #listOfPoints = "[3.3956,-3,2.2727,-9.7,9]"
         clusters = '50'
         path = '.\\'
     else:
-        listOfPoints = "[7.3956,-3,8.2727,-9.7,9]"
+        listOfPoints = "[5.3956,-3,5.2727,-9.7,12]"
         path = '.\\'
         clusters = '50'
 
@@ -125,9 +121,9 @@ def getFitForEachPartitionForPoint( point, partitions):
 
 def getFitnessOfPoint(partitions, cluster, point):
     #return distance.euclidean(np.mean(partitions[cluster], axis=0) , point)
-    #return 1 / (1 +  np.linalg.norm(np.mean(np.array(np.append(partitions[ cluster ][ :,0 ].reshape(-1, 1), np.asmatrix(partitions[ cluster ][ :, 4 ]).T, axis=1)),axis=0)- np.array([point[0][0],point[0][4]])))
+    return 1 / (1 +  np.linalg.norm(np.mean(np.array(np.append(partitions[ cluster ][ :,0 ].reshape(-1, 1), np.asmatrix(partitions[ cluster ][ :, 4 ]).T, axis=1)),axis=0)- np.array([point[0][0],point[0][4]])))
 
-    return 1 / (1 + np.linalg.norm(np.mean(np.array(partitions[ cluster ][ :,4 ].reshape(-1, 1))) - np.array(point[ 0 ][ 4 ] )))
+    #return 1 / (1 + np.linalg.norm(np.mean(np.array(partitions[ cluster ][ :,4 ].reshape(-1, 1))) - np.array(point[ 0 ][ 4 ] )))
     #return 1 / (1 + np.linalg.norm(np.mean(np.array(
         #np.append(partitions[ cluster ][ :, 0 ].reshape(-1, 1),
                   #np.asmatrix([partitions[ cluster ][ :, 2 ], partitions[ cluster ][ :, 4 ]]).T,
@@ -180,10 +176,10 @@ def readLarosDataFromCsvNew(data):
 
 # # ENTRY POINT
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
+    #parser = argparse.ArgumentParser()
 
-    parser.add_argument("Scaler_X", help="Scaler X")
-    parser.add_argument("Scaler_Y", help="Scaler Y")
+    #parser.add_argument("Scaler_X", help="Scaler X")
+    #parser.add_argument("Scaler_Y", help="Scaler Y")
 
-    args = parser.parse_args()
+    #args = parser.parse_args()
     main()
