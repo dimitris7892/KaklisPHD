@@ -39,7 +39,7 @@ def main():
     subsetsB=[]
     reader = dRead.BaseSeriesReader()
 
-    #reader.readLarosDAta(datetime.datetime(2017,1,1),datetime.datetime(2018,1,1))
+    reader.readLarosDAta(datetime.datetime(2018,1,1),datetime.datetime(2019,1,1))
     num_lines = sum(1 for l in open(sFile))
     num_linesx = num_lines
 
@@ -131,7 +131,7 @@ def main():
 
             ####################################LAROS DATA STATISTICAL TESTS
             if modeler.__class__.__name__ == 'TensorFlowWD':
-                data = pd.read_csv('./MT_DELTA_MARIA_data.csv')
+                data = pd.read_csv('./MT_DELTA_MARIA_data_1.csv')
                 seriesX, targetY,unseenFeaturesX, unseenFeaturesY = reader.readLarosDataFromCsvNew(data)
             #################
 

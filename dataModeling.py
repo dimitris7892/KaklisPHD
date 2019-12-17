@@ -419,14 +419,14 @@ class TensorFlowWD(BasePartitionModeler):
             #model.add(keras.layers.Dense(len(partition_labels)*2, input_shape=(4,)))
             #model.add(keras.layers.Embedding(X.shape[0], 200, input_length=4))
             #model.add(keras.layers.Dense(100, input_shape=(2,)))
-            model.add(keras.layers.Dense(30, input_shape=(5,)))
-            model.add(keras.layers.Dense(20, ))
+            model.add(keras.layers.Dense(100, input_shape=(5,)))
+            model.add(keras.layers.Dense(50, ))
 
-            model.add(keras.layers.Reshape((1,20,), name='reshape_1'))
-            model.add(keras.layers.LSTM(20, ))
-            model.add(keras.layers.Reshape((1, 20,), name='reshape_2'))
-            model.add(keras.layers.LSTM(10, ))
-            model.add(keras.layers.Reshape((1, 10,), name='reshape_3'))
+            #model.add(keras.layers.Reshape((1,20,), name='reshape_1'))
+            #model.add(keras.layers.LSTM(20, ))
+            #model.add(keras.layers.Reshape((1, 20,), name='reshape_2'))
+            #model.add(keras.layers.LSTM(10, ))
+            model.add(keras.layers.Reshape((1, 50,), name='reshape_3'))
             model.add(keras.layers.LSTM(5, ))
 
             model.add(keras.layers.Dense(10, ))
@@ -535,7 +535,7 @@ class TensorFlowWD(BasePartitionModeler):
 
         #sess = tf.Session()
         #sess.run(init_op)
-        estimator.fit(X, Y, epochs=30, validation_split=0.33,batch_size=200)
+        estimator.fit(X, Y, epochs=30, validation_split=0.33,batch_size=5)
         estimator.save("estimatorCl_Gen_.h5")
         def insert_intermediate_layer_in_keras(model, layer_id, new_layer):
 
