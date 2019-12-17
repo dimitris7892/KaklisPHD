@@ -12,6 +12,7 @@ from tensorflow import keras
 import tensorflow as tf
 import argparse
 import sys
+from scipy import stats
 from scipy.spatial import distance
 
 # In[ ]:
@@ -128,11 +129,11 @@ def main():
     ########################
     partitionsX=[]
     partitionsY=[]
-    for cl in range(0,30):
+    for cl in range(0,50):
         data = pd.read_csv('cluster_'+str(cl)+'_.csv')
         partitionsX.append(readClusteredLarosDataFromCsvNew(data))
 
-    for cl in range(0,30):
+    for cl in range(0,50):
         data = pd.read_csv('cluster_foc'+str(cl)+'_.csv')
         partitionsY.append(readClusteredLarosDataFromCsvNew(data))
 
@@ -162,35 +163,75 @@ def main():
     from sklearn.preprocessing import StandardScaler
     scalerX = StandardScaler()
     scalerY = StandardScaler()
+
+
+    mu = np.mean(X, axis=0)
+    trnsltedX = np.array(np.append(X[:,0].reshape(-1,1),np.asmatrix(X[:,4]).T,axis=1))
+    sigma = np.cov(X.T)
+    std = np.std(X)
+
+    import math
+    def normpdf(x, mean, sd):
+        var = float(sd) ** 2
+        denom = (2 * math.pi * var) ** .5
+        num = math.exp(-(float(x) - float(mean)) ** 2 / (2 * var))
+        return num / denom
+
+    def mahalanobis(x=None, data=None, cov=None):
+        """Compute the Mahalanobis Distance between each row of x and the data
+        x    : vector or matrix of data with, say, p columns.
+        data : ndarray of the distribution from which Mahalanobis distance of each observation of x is to be computed.
+        cov  : covariance matrix (p x p) of the distribution. If None, will be computed from data.
+        """
+        x_minus_mu = x - np.mean(data,axis=0)
+        #if not cov:
+            #cov = np.cov(data.values.T)
+        inv_covmat = np.linalg.inv(cov)
+        left_term = np.dot(x_minus_mu, inv_covmat)
+        mahal = np.dot(left_term, x_minus_mu.T)
+        return mahal.diagonal()
+            #.diagonal()
+
+    from scipy.stats import chi2
     #scalerX = scalerX.fit(np.concatenate(partitionsX))
     #scalerY = scalerY.fit(np.concatenate(partitionsY).reshape(-1, 1))
     try:
-        for i in range(0, len(pred)):
+        for i in range(35, len(pred)):
             #vector = seriesX[i]
             vector = Predictors.values[i]
             vector = vector.reshape(-1,5)
-            #vector = np.array([vector[0],vector[2],vector[3],vector[4]]).reshape(-1, 4)
-            #vector[:, 1] = abs(vector[:, 1])
-            #Predictor =  np.array([Predictors.values[:,0],Predictors.values [:,2],Predictors.values [:,3],Predictors.values [:,4]]).reshape(-1, 4)
-            #vctr = np.array([vector[0][0],vector[0][4]]).reshape(-1, 2)
+
             ind, fit = getBestPartitionForPoint(vector, partitionsX)
-            #if fit < 10:
             currModeler = keras.models.load_model('estimatorCl_' + str(ind) + '.h5')
-            #else:
-            #currModeler1 = keras.models.load_model('estimatorCl_Gen_.h5')
+            currModeler1 = keras.models.load_model('estimatorCl_Gen_.h5')
+            vector = vector.reshape(-1, 5)
+            prediction = currModeler.predict(vector)
 
-            #scaled = scalerX.fit_transform(vector)
-
-            #prediction = (scalerY.inverse_transform(currModeler.predict(scaled)))#  + scalerY.inverse_transform(currModeler1.predict(scaled))) / 2
-            prediction = abs((currModeler.predict(vector)  )[0])#+ currModeler1.predict(vector)) / 2
-            #prediction=(currModeler1.predict(vector) + np.mean(partitionsY[ ind ])) / 2
-            #if np.mean(partitionsY[ind]) - prediction > 5:
-            #prediction =abs( prediction + np.mean(partitionsY[ind]) * fit)
-            #else:
-                #predictionNew = prediction + prediction * fit
-
+            prediction1 = currModeler1.predict(vector)
             tf.keras.backend.clear_session()
-            lErrors.append(abs(prediction - actual[i]))
+            # prediction = (Scaler_y.inverse_transform(prediction))  # + scalerY.inverse_transform(currModeler1.predict(scaled))) / 2
+            # prediction1 = (Scaler_y.inverse_transform(prediction1))  # + scalerY.inverse_transform(currModeler1.predict(scaled))) / 2
+
+            mahal = mahalanobis(vector,X,sigma)
+            pValue =  1 - chi2.cdf(mahal, 3)
+            minDistance =chi2.ppf((1 - 0.001), df=4)
+            #print(chi2.ppf((1 - 0.001), df=3))
+            print("P-Value of current observation : " + str(pValue) )
+            #m_dist_x = np.dot((vector - mu), np.linalg.inv(sigma))
+            #m_dist_x = np.dot(m_dist_x.T, (vector - mu))
+            #prob = 1 - stats.chi2.cdf(m_dist_x, 3)
+            if mahal < minDistance:
+                scaledPred = prediction1
+
+            else:
+                if vector[0][0] < 14 and vector[0][4] <= 9:
+                    #scaledPred = (prediction1 + prediction * fit) - 5
+                    scaledPred = (prediction1 + (prediction - prediction * fit))
+                else:
+                    #scaledPred = (prediction1 + prediction * fit) + 5
+                    scaledPred = (prediction1 + (prediction + prediction * fit))
+
+            lErrors.append(abs(scaledPred - actual[i]))
             # x=unseenX[:,0].reshape(-1,unseenX.shape[0])
             # prediction =modeler._models[ 0 ].predict(unseenX.reshape(2,2860))
             # print np.mean(abs(prediction - unseenY))
@@ -248,11 +289,13 @@ def readLarosDataFromCsvNew(data):
 
 def getFitnessOfPoint(partitions, cluster, point):
     #return distance.euclidean(np.mean(partitions[cluster], axis=0) , point)
-    #return 1 / (1 +  np.linalg.norm(np.mean(np.array(np.append(partitions[ cluster ][ :,0 ].reshape(-1, 1), np.asmatrix(partitions[ cluster ][ :, 4 ]).T, axis=1)))- np.array([point[0][0],point[0][4]])))
-
+    return 1 / (1 + np.linalg.norm(np.mean(
+       np.array(np.append(partitions[cluster][:, 0].reshape(-1, 1), np.asmatrix(partitions[cluster][:, 4]).T, axis=1)),
+        axis=0) - np.array([point[0][0], point[0][4]])))
+    #return 1 / (1 + np.linalg.norm(np.mean(np.array(partitions[cluster][:, 4].reshape(-1, 1))) - np.array(point[0][4])))
     #return 1 / (1 + np.linalg.norm(np.mean(np.array(partitions[ cluster ][ :,1 ].reshape(-1, 1))) - np.array(point[ 0 ][ 1 ] )))
 
-       return 1 / (1 + np.linalg.norm(np.mean(partitions[cluster], axis=0) - point))
+       #return 1 / (1 + np.linalg.norm(np.mean(partitions[cluster], axis=0) - point))
        #return 1 / (1 + np.linalg.norm(np.mean(partitions[cluster][:,1],axis=0) -point[:,1]))
 
 
