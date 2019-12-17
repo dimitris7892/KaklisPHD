@@ -234,7 +234,10 @@ class BaseSeriesReader:
         #dataNew=dataNew[['Draft', 'SpeedOvg']]
         dtNew = dataNew.values[ 0:, : ].astype(float)
 
-        dtNew = np.delete(dtNew, [ i for (i, v) in enumerate(dtNew[ 0:, 0 ]) if v <= 0 ], 0)
+        draftMean = (dtNew[:, 1] + dtNew[:, 2]) / 2
+        dtNew[:, 0] = draftMean
+
+        dtNew = np.delete(dtNew, [ i for (i, v) in enumerate(dtNew[ 0:, 0 ]) if v <= 6 ], 0)
         dtNew = np.delete(dtNew, [ i for (i, v) in enumerate(dtNew[ 0:, 5 ]) if v <= 8 or v > 14 ], 0)
         dtNew = np.delete(dtNew, [ i for (i, v) in enumerate(dtNew[ 0:, 6 ]) if v <= 0 or (v>0 and v <=10) or v > 90], 0)
         dtNew = np.delete(dtNew, [ i for (i, v) in enumerate(dtNew[ 0:, 7 ]) if v <= 7 ], 0)
@@ -242,114 +245,95 @@ class BaseSeriesReader:
         dtNew = dtNew[~np.isnan(dtNew).any(axis=1)]
 
         trim = (dtNew[:,1] - dtNew[:,2])
+
+
         dtNew1 =np.array(np.append(dtNew[:,0].reshape(-1,1),np.asmatrix([np.round(trim,3),dtNew[:,3],dtNew[:,4],dtNew[:,5],dtNew[:,7]]).T,axis=1))
 
         ##statistics STD
         #draftSmaller6 = np.array([drft for drft in dtNew1 if drft[0]< 6])
         #draftBigger6 = np.array([ drft for drft in dtNew1 if drft[0] > 6 ])
-        #########DRAFT < 6
-        stw8DrftS4 = np.array([i for i in dtNew1 if i[4]>=8 and i[4]<8.5 and i[0]<6])
-        stw8DrftS4=stw8DrftS4[ abs(stw8DrftS4[ :, 5 ] - np.mean(stw8DrftS4[ :, 5 ])) < 2 * np.std(stw8DrftS4[ :, 5 ]) ]
+        #########DRAFT < 9
+        stw8DrftS4 = np.array([i for i in dtNew1 if i[4]>=8 and i[4]<8.5 and i[0]<=9])
+        stw8DrftS4=np.delete(stw8DrftS4, [ i for (i, v) in enumerate(stw8DrftS4[:,5]) if  v < (np.mean(stw8DrftS4[ :, 5 ]) - np.std(stw8DrftS4[ :, 5 ])) or   v > np.mean(stw8DrftS4[ :, 5 ]) + np.std(stw8DrftS4[ :, 5 ]) ], 0)
 
-        stw9DrftS4 = np.array([ i for i in dtNew1 if i[ 4 ] >= 8.5 and i[ 4 ] < 9 and i[ 0 ] < 4 ])
-        stw9DrftS4=stw9DrftS4[ abs(stw9DrftS4[ :, 5 ] - np.mean(stw9DrftS4[ :, 5 ])) < 2 * np.std(stw9DrftS4[ :, 5 ]) ]
+        stw9DrftS4 = np.array([ i for i in dtNew1 if i[ 4 ] >= 8.5 and i[ 4 ] < 9 and i[ 0 ] <= 9 ])
+        stw9DrftS4=np.delete(stw9DrftS4, [ i for (i, v) in enumerate(stw9DrftS4[:,5]) if  v < (np.mean(stw9DrftS4[ :, 5 ]) - np.std(stw9DrftS4[ :, 5 ])) or   v > np.mean(stw9DrftS4[ :, 5 ]) + np.std(stw9DrftS4[ :, 5 ]) ], 0)
 
-        stw10DrftS4 = np.array([ i for i in dtNew1 if i[ 4 ] >= 9 and i[ 4 ] < 9.5 and i[ 0 ] < 4 ])
-        stw10DrftS4 = stw10DrftS4[abs(stw10DrftS4[ :, 5 ] - np.mean(stw10DrftS4[ :, 5 ])) < 2 * np.std(stw10DrftS4[ :, 5 ]) ]
+        stw10DrftS4 = np.array([ i for i in dtNew1 if i[ 4 ] >= 9 and i[ 4 ] < 9.5 and i[ 0 ] <= 9 ])
+        stw10DrftS4 = np.delete(stw10DrftS4, [ i for (i, v) in enumerate(stw10DrftS4[:,5]) if  v < (np.mean(stw10DrftS4[ :, 5 ]) - np.std(stw10DrftS4[ :, 5 ])) or   v > np.mean(stw10DrftS4[ :, 5 ]) + np.std(stw10DrftS4[ :, 5 ]) ], 0)
 
-        stw11DrftS4 = np.array([ i for i in dtNew1 if i[ 4 ] >= 9.5 and i[ 4 ] < 10 and i[ 0 ] < 4 ])
-        stw11DrftS4 = stw11DrftS4[
-            abs(stw11DrftS4[ :, 5 ] - np.mean(stw11DrftS4[ :, 5 ])) < 2 * np.std(stw11DrftS4[ :, 5 ]) ]
+        stw11DrftS4 = np.array([ i for i in dtNew1 if i[ 4 ] >= 9.5 and i[ 4 ] < 10 and i[ 0 ] <= 9 ])
+        stw11DrftS4 = np.delete(stw11DrftS4, [ i for (i, v) in enumerate(stw11DrftS4[:,5]) if  v < (np.mean(stw11DrftS4[ :, 5 ]) - np.std(stw11DrftS4[ :, 5 ])) or   v > np.mean(stw11DrftS4[ :, 5 ]) + np.std(stw11DrftS4[ :, 5 ]) ], 0)
 
-        stw12DrftS4 = np.array([ i for i in dtNew1 if i[ 4 ] >= 10 and i[ 4 ] < 10.5 and i[ 0 ] < 4 ])
-        stw12DrftS4 = stw12DrftS4[
-            abs(stw12DrftS4[ :, 5 ] - np.mean(stw12DrftS4[ :, 5 ])) < 2 * np.std(stw12DrftS4[ :, 5 ]) ]
+        stw12DrftS4 = np.array([ i for i in dtNew1 if i[ 4 ] >= 10 and i[ 4 ] < 10.5 and i[ 0 ] <= 9 ])
+        stw12DrftS4 =  np.delete(stw12DrftS4, [ i for (i, v) in enumerate(stw12DrftS4[:,5]) if  v < (np.mean(stw12DrftS4[ :, 5 ]) - np.std(stw12DrftS4[ :, 5 ])) or   v > np.mean(stw12DrftS4[ :, 5 ]) + np.std(stw12DrftS4[ :, 5 ]) ], 0)
 
-        stw13DrftS4 = np.array([ i for i in dtNew1 if i[ 4 ] >= 10.5 and i[ 4 ] < 11 and i[ 0 ] < 4 ])
-        stw13DrftS4 = stw13DrftS4[
-            abs(stw13DrftS4[ :, 5 ] - np.mean(stw13DrftS4[ :, 5 ])) < 2 * np.std(stw13DrftS4[ :, 5 ]) ]
+        stw13DrftS4 = np.array([ i for i in dtNew1 if i[ 4 ] >= 10.5 and i[ 4 ] < 11 and i[ 0 ] <= 9 ])
+        stw13DrftS4 =np.delete(stw13DrftS4, [ i for (i, v) in enumerate(stw13DrftS4[:,5]) if  v < (np.mean(stw13DrftS4[ :, 5 ]) - np.std(stw13DrftS4[ :, 5 ])) or   v > np.mean(stw13DrftS4[ :, 5 ]) + np.std(stw13DrftS4[ :, 5 ]) ], 0)
 
-        stw14DrftS4 = np.array([ i for i in dtNew1 if i[ 4 ] >= 11 and i[ 4 ] < 11.5 and i[ 0 ] < 4 ])
-        stw14DrftS4 = stw14DrftS4[
-            abs(stw14DrftS4[ :, 5 ] - np.mean(stw14DrftS4[ :, 5 ])) < 2 * np.std(stw14DrftS4[ :, 5 ]) ]
+        stw14DrftS4 = np.array([ i for i in dtNew1 if i[ 4 ] >= 11 and i[ 4 ] < 11.5 and i[ 0 ] <= 9 ])
+        stw14DrftS4 = np.delete(stw14DrftS4, [ i for (i, v) in enumerate(stw14DrftS4[:,5]) if  v < (np.mean(stw14DrftS4[ :, 5 ]) - np.std(stw14DrftS4[ :, 5 ])) or   v > np.mean(stw14DrftS4[ :, 5 ]) + np.std(stw14DrftS4[ :, 5 ]) ], 0)
 
-        stw15DrftS4 = np.array([ i for i in dtNew1 if i[ 4 ] >= 11.5 and i[ 4 ] < 12 and i[ 0 ] < 4 ])
-        stw15DrftS4 = stw15DrftS4[
-            abs(stw15DrftS4[ :, 5 ] - np.mean(stw15DrftS4[ :, 5 ])) < 2 * np.std(stw15DrftS4[ :, 5 ]) ]
+        stw15DrftS4 = np.array([ i for i in dtNew1 if i[ 4 ] >= 11.5 and i[ 4 ] < 12 and i[ 0 ] <= 9 ])
+        stw15DrftS4 = np.delete(stw15DrftS4, [ i for (i, v) in enumerate(stw15DrftS4[:,5]) if  v < (np.mean(stw15DrftS4[ :, 5 ]) - np.std(stw15DrftS4[ :, 5 ])) or   v > np.mean(stw15DrftS4[ :, 5 ]) + np.std(stw15DrftS4[ :, 5 ]) ], 0)
 
-        stw16DrftS4 = np.array([ i for i in dtNew1 if i[ 4 ] >= 12 and i[ 4 ] < 12.5 and i[ 0 ] < 4 ])
-        stw16DrftS4 = stw16DrftS4[
-            abs(stw16DrftS4[ :, 5 ] - np.mean(stw16DrftS4[ :, 5 ])) < 2 * np.std(stw16DrftS4[ :, 5 ]) ]
+        stw16DrftS4 = np.array([ i for i in dtNew1 if i[ 4 ] >= 12 and i[ 4 ] < 12.5 and i[ 0 ] <= 9 ])
+        stw16DrftS4 = np.delete(stw16DrftS4, [ i for (i, v) in enumerate(stw16DrftS4[:,5]) if  v < (np.mean(stw16DrftS4[ :, 5 ]) - np.std(stw16DrftS4[ :, 5 ])) or   v > np.mean(stw16DrftS4[ :, 5 ]) + np.std(stw16DrftS4[ :, 5 ]) ], 0)
 
-        stw17DrftS4 = np.array([ i for i in dtNew1 if i[ 4 ] >= 12.5 and i[ 4 ] < 13 and i[ 0 ] < 4 ])
-        stw17DrftS4 = stw17DrftS4[
-            abs(stw17DrftS4[ :, 5 ] - np.mean(stw17DrftS4[ :, 5 ])) < 2 * np.std(stw17DrftS4[ :, 5 ]) ]
+        stw17DrftS4 = np.array([ i for i in dtNew1 if i[ 4 ] >= 12.5 and i[ 4 ] < 13 and i[ 0 ] <= 9 ])
+        stw17DrftS4 = np.delete(stw17DrftS4, [ i for (i, v) in enumerate(stw17DrftS4[:,5]) if  v < (np.mean(stw17DrftS4[ :, 5 ]) - np.std(stw17DrftS4[ :, 5 ])) or   v > np.mean(stw17DrftS4[ :, 5 ]) + np.std(stw17DrftS4[ :, 5 ]) ], 0)
 
-        stw18DrftS4 = np.array([ i for i in dtNew1 if i[ 4 ] >= 13 and i[ 4 ] < 13.5 and i[ 0 ] < 4 ])
-        stw18DrftS4 = stw18DrftS4[
-            abs(stw18DrftS4[ :, 5 ] - np.mean(stw18DrftS4[ :, 5 ])) < 2 * np.std(stw18DrftS4[ :, 5 ]) ]
+        stw18DrftS4 = np.array([ i for i in dtNew1 if i[ 4 ] >= 13 and i[ 4 ] < 13.5 and i[ 0 ] <= 9 ])
+        stw18DrftS4 = np.delete(stw18DrftS4, [ i for (i, v) in enumerate(stw18DrftS4[:,5]) if  v < (np.mean(stw18DrftS4[ :, 5 ]) - np.std(stw18DrftS4[ :, 5 ])) or   v > np.mean(stw18DrftS4[ :, 5 ]) + np.std(stw18DrftS4[ :, 5 ]) ], 0)
 
-        stw19DrftS4 = np.array([ i for i in dtNew1 if i[ 4 ] >= 13.5 and i[ 4 ] < 14 and i[ 0 ] < 4 ])
-        stw19DrftS4 = stw19DrftS4[
-            abs(stw19DrftS4[ :, 5 ] - np.mean(stw19DrftS4[ :, 5 ])) < 2 * np.std(stw19DrftS4[ :, 5 ]) ]
+        stw19DrftS4 = np.array([ i for i in dtNew1 if i[ 4 ] >= 13.5 and i[ 4 ] < 14 and i[ 0 ] <= 9 ])
+        stw19DrftS4 = np.delete(stw19DrftS4, [ i for (i, v) in enumerate(stw19DrftS4[:,5]) if  v < (np.mean(stw19DrftS4[ :, 5 ]) - np.std(stw19DrftS4[ :, 5 ])) or   v > np.mean(stw19DrftS4[ :, 5 ]) + np.std(stw19DrftS4[ :, 5 ]) ], 0)
 
         ##################################################################################
         ######################################################
-        #########DRAFT > 6
-        stw8DrftB4 = np.array([ i for i in dtNew1 if i[ 4 ] >= 8 and i[ 4 ] < 8.5 and i[ 0 ] > 4 ])
-        stw8DrftB4 = stw8DrftB4[
-            abs(stw8DrftB4[ :, 5 ] - np.mean(stw8DrftB4[ :, 5 ])) < 2 * np.std(stw8DrftB4[ :, 5 ]) ]
+        #########DRAFT > 9
+        stw8DrftB4 = np.array([ i for i in dtNew1 if i[ 4 ] >= 8 and i[ 4 ] < 8.5 and i[ 0 ] > 9 ])
+        stw8DrftB4 = np.delete(stw8DrftB4, [ i for (i, v) in enumerate(stw8DrftB4[:,5]) if  v < (np.mean(stw8DrftB4[ :, 5 ]) - np.std(stw8DrftB4[ :, 5 ])) or   v > np.mean(stw8DrftB4[ :, 5 ]) + np.std(stw8DrftB4[ :, 5 ]) ], 0)
 
-        stw9DrftB4 = np.array([ i for i in dtNew1 if i[ 4 ] >= 8.5 and i[ 4 ] < 9 and i[ 0 ] > 4 ])
-        stw9DrftB4 = stw9DrftB4[
-            abs(stw9DrftB4[ :, 5 ] - np.mean(stw9DrftB4[ :, 5 ])) < 2 * np.std(stw9DrftB4[ :, 5 ]) ]
+        stw9DrftB4 = np.array([ i for i in dtNew1 if i[ 4 ] >= 8.5 and i[ 4 ] < 9 and i[ 0 ] > 9 ])
+        stw9DrftB4 = np.delete(stw9DrftB4, [ i for (i, v) in enumerate(stw9DrftB4[:,5]) if  v < (np.mean(stw9DrftB4[ :, 5 ]) - np.std(stw9DrftB4[ :, 5 ])) or   v > np.mean(stw9DrftB4[ :, 5 ]) + np.std(stw9DrftB4[ :, 5 ]) ], 0)
 
-        stw10DrftB4 = np.array([ i for i in dtNew1 if i[ 4 ] >= 9 and i[ 4 ] < 9.5 and i[ 0 ] > 4 ])
-        stw10DrftB4 = stw10DrftB4[
-            abs(stw10DrftB4[ :, 5 ] - np.mean(stw10DrftB4[ :, 5 ])) < 2 * np.std(stw10DrftB4[ :, 5 ]) ]
+        stw10DrftB4 = np.array([ i for i in dtNew1 if i[ 4 ] >= 9 and i[ 4 ] < 9.5 and i[ 0 ] > 9 ])
+        stw10DrftB4 = np.delete(stw10DrftB4, [ i for (i, v) in enumerate(stw10DrftB4[:,5]) if  v < (np.mean(stw10DrftB4[ :, 5 ]) - np.std(stw10DrftB4[ :, 5 ])) or   v > np.mean(stw10DrftB4[ :, 5 ]) + np.std(stw10DrftB4[ :, 5 ]) ], 0)
 
-        stw11DrftB4 = np.array([ i for i in dtNew1 if i[ 4 ] >= 9.5 and i[ 4 ] < 10 and i[ 0 ] > 4 ])
-        stw11DrftB4 = stw11DrftB4[
-            abs(stw11DrftB4[ :, 5 ] - np.mean(stw11DrftB4[ :, 5 ])) < 2 * np.std(stw11DrftB4[ :, 5 ]) ]
+        stw11DrftB4 = np.array([ i for i in dtNew1 if i[ 4 ] >= 9.5 and i[ 4 ] < 10 and i[ 0 ] > 9 ])
+        stw11DrftB4 = np.delete(stw11DrftB4, [ i for (i, v) in enumerate(stw11DrftB4[:,5]) if  v < (np.mean(stw11DrftB4[ :, 5 ]) - np.std(stw11DrftB4[ :, 5 ])) or   v > np.mean(stw11DrftB4[ :, 5 ]) + np.std(stw11DrftB4[ :, 5 ]) ], 0)
 
-        stw12DrftB4 = np.array([ i for i in dtNew1 if i[ 4 ] >= 10 and i[ 4 ] < 10.5 and i[ 0 ] > 4 ])
-        stw12DrftB4 = stw12DrftB4[
-            abs(stw12DrftB4[ :, 5 ] - np.mean(stw12DrftB4[ :, 5 ])) < 2 * np.std(stw12DrftB4[ :, 5 ]) ]
+        stw12DrftB4 = np.array([ i for i in dtNew1 if i[ 4 ] >= 10 and i[ 4 ] < 10.5 and i[ 0 ] > 9 ])
+        stw12DrftB4 = np.delete(stw12DrftB4, [ i for (i, v) in enumerate(stw12DrftB4[:,5]) if  v < (np.mean(stw12DrftB4[ :, 5 ]) - np.std(stw12DrftB4[ :, 5 ])) or   v > np.mean(stw12DrftB4[ :, 5 ]) + np.std(stw12DrftB4[ :, 5 ]) ], 0)
 
-        stw13DrftB4 = np.array([ i for i in dtNew1 if i[ 4 ] >= 10.5 and i[ 4 ] < 11 and i[ 0 ] > 4 ])
-        stw13DrftB4 = stw13DrftB4[
-            abs(stw13DrftB4[ :, 5 ] - np.mean(stw13DrftB4[ :, 5 ])) < 2 * np.std(stw13DrftB4[ :, 5 ]) ]
+        stw13DrftB4 = np.array([ i for i in dtNew1 if i[ 4 ] >= 10.5 and i[ 4 ] < 11 and i[ 0 ] > 9 ])
+        stw13DrftB4 =np.delete(stw13DrftB4, [ i for (i, v) in enumerate(stw13DrftB4[:,5]) if  v < (np.mean(stw13DrftB4[ :, 5 ]) - np.std(stw13DrftB4[ :, 5 ])) or   v > np.mean(stw13DrftB4[ :, 5 ]) + np.std(stw13DrftB4[ :, 5 ]) ], 0)
 
-        stw14DrftB4 = np.array([ i for i in dtNew1 if i[ 4 ] >= 11 and i[ 4 ] < 11.5 and i[ 0 ] > 4 ])
-        stw14DrftB4 = stw14DrftB4[
-            abs(stw14DrftB4[ :, 5 ] - np.mean(stw14DrftB4[ :, 5 ])) < 2 * np.std(stw14DrftB4[ :, 5 ]) ]
+        stw14DrftB4 = np.array([ i for i in dtNew1 if i[ 4 ] >= 11 and i[ 4 ] < 11.5 and i[ 0 ] > 9 ])
+        stw14DrftB4 = np.delete(stw14DrftB4, [ i for (i, v) in enumerate(stw14DrftB4[:,5]) if  v < (np.mean(stw14DrftB4[ :, 5 ]) - np.std(stw14DrftB4[ :, 5 ])) or   v > np.mean(stw14DrftB4[ :, 5 ]) + np.std(stw14DrftB4[ :, 5 ]) ], 0)
 
-        stw15DrftB4 = np.array([ i for i in dtNew1 if i[ 4 ] >= 11.5 and i[ 4 ] < 12 and i[ 0 ] > 4 ])
-        stw15DrftB4 = stw15DrftB4[
-            abs(stw15DrftB4[ :, 5 ] - np.mean(stw15DrftB4[ :, 5 ])) < 2 * np.std(stw15DrftB4[ :, 5 ]) ]
+        stw15DrftB4 = np.array([ i for i in dtNew1 if i[ 4 ] >= 11.5 and i[ 4 ] < 12 and i[ 0 ] > 9 ])
+        stw15DrftB4 = np.delete(stw15DrftB4, [ i for (i, v) in enumerate(stw15DrftB4[:,5]) if  v < (np.mean(stw15DrftB4[ :, 5 ]) - np.std(stw15DrftB4[ :, 5 ])) or   v > np.mean(stw15DrftB4[ :, 5 ]) + np.std(stw15DrftB4[ :, 5 ]) ], 0)
 
-        stw16DrftB4 = np.array([ i for i in dtNew1 if i[ 4 ] >= 12 and i[ 4 ] < 12.5 and i[ 0 ] > 4 ])
-        stw16DrftB4 = stw16DrftB4[
-            abs(stw16DrftB4[ :, 5 ] - np.mean(stw16DrftB4[ :, 5 ])) < 2 * np.std(stw16DrftB4[ :, 5 ]) ]
+        stw16DrftB4 = np.array([ i for i in dtNew1 if i[ 4 ] >= 12 and i[ 4 ] < 12.5 and i[ 0 ] > 9 ])
+        stw16DrftB4 =np.delete(stw16DrftB4, [ i for (i, v) in enumerate(stw16DrftB4[:,5]) if  v < (np.mean(stw16DrftB4[ :, 5 ]) - np.std(stw16DrftB4[ :, 5 ])) or   v > np.mean(stw16DrftB4[ :, 5 ]) + np.std(stw16DrftB4[ :, 5 ]) ], 0)
 
-        stw17DrftB4 = np.array([ i for i in dtNew1 if i[ 4 ] >= 12.5 and i[ 4 ] < 13 and i[ 0 ] > 4 ])
-        stw17DrftB4 = stw17DrftB4[
-            abs(stw17DrftB4[ :, 5 ] - np.mean(stw17DrftB4[ :, 5 ])) < 2 * np.std(stw17DrftB4[ :, 5 ]) ]
+        stw17DrftB4 = np.array([ i for i in dtNew1 if i[ 4 ] >= 12.5 and i[ 4 ] < 13 and i[ 0 ] > 9 ])
+        stw17DrftB4 = np.delete(stw17DrftB4, [ i for (i, v) in enumerate(stw17DrftB4[:,5]) if  v < (np.mean(stw17DrftB4[ :, 5 ]) - np.std(stw17DrftB4[ :, 5 ])) or   v > np.mean(stw17DrftB4[ :, 5 ]) + np.std(stw17DrftB4[ :, 5 ]) ], 0)
 
-        stw18DrftB4 = np.array([ i for i in dtNew1 if i[ 4 ] >= 13 and i[ 4 ] < 13.5 and i[ 0 ] > 4 ])
-        stw18DrftB4 = stw18DrftB4[
-            abs(stw18DrftB4[ :, 5 ] - np.mean(stw18DrftB4[ :, 5 ])) < 2 * np.std(stw18DrftB4[ :, 5 ]) ]
+        stw18DrftB4 = np.array([ i for i in dtNew1 if i[ 4 ] >= 13 and i[ 4 ] < 13.5 and i[ 0 ] > 9 ])
+        stw18DrftB4 = np.delete(stw18DrftB4, [ i for (i, v) in enumerate(stw18DrftB4[:,5]) if  v < (np.mean(stw18DrftB4[ :, 5 ]) - np.std(stw18DrftB4[ :, 5 ])) or   v > np.mean(stw18DrftB4[ :, 5 ]) + np.std(stw18DrftB4[ :, 5 ]) ], 0)
 
-        stw19DrftB4 = np.array([ i for i in dtNew1 if i[ 4 ] >= 13.5 and i[ 4 ] < 14 and i[ 0 ] > 4 ])
-        stw19DrftB4 = stw19DrftB4[
-            abs(stw19DrftB4[ :, 5 ] - np.mean(stw19DrftB4[ :, 5 ])) < 2 * np.std(stw19DrftB4[ :, 5 ]) ]
+        stw19DrftB4 = np.array([ i for i in dtNew1 if i[ 4 ] >= 13.5 and i[ 4 ] < 14 and i[ 0 ] > 9 ])
+        stw19DrftB4 = np.delete(stw19DrftB4, [ i for (i, v) in enumerate(stw19DrftB4[:,5]) if  v < (np.mean(stw19DrftB4[ :, 5 ]) - np.std(stw19DrftB4[ :, 5 ])) or   v > np.mean(stw19DrftB4[ :, 5 ]) + np.std(stw19DrftB4[ :, 5 ]) ], 0)
 
         ################################################
         concatS = np.concatenate([stw8DrftS4,stw9DrftS4,stw10DrftS4,stw11DrftS4,stw12DrftS4,stw13DrftS4,stw14DrftS4,stw15DrftS4,stw16DrftS4,stw17DrftS4,stw18DrftS4,stw19DrftS4])
         concatB = np.concatenate(
             [ stw8DrftB4, stw9DrftB4, stw10DrftB4, stw11DrftB4, stw12DrftB4, stw13DrftB4, stw14DrftB4, stw15DrftB4,
               stw16DrftB4, stw17DrftB4, stw18DrftB4, stw19DrftB4 ])
-        #dtNew1 = np.concatenate([concatB,concatS])
+        dtNew1 = np.concatenate([concatB,concatS])
         #partitions = np.append([concatB,concatS])
         #stdFOC4_89 = np.std(stw8DrftS4[:,5])
 

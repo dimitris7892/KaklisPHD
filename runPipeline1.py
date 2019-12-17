@@ -39,7 +39,7 @@ def main():
     subsetsB=[]
     reader = dRead.BaseSeriesReader()
 
-    reader.readLarosDAta(datetime.datetime(2018,1,1),datetime.datetime(2019,1,1))
+    #reader.readLarosDAta(datetime.datetime(2018,1,1),datetime.datetime(2019,1,1))
     num_lines = sum(1 for l in open(sFile))
     num_linesx = num_lines
 
