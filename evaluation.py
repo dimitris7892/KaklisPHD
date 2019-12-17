@@ -802,16 +802,28 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
         #unseenX = pca.transform(unseenX)
         from tensorflow import keras
         path = '.\\'
-        clusters = '50'
+        clusters = '30'
         partitionsX = [ ]
-        for cl in range(0, 50):
+        partitionsY = [ ]
+        for cl in range(0,30):
             # models.append(load_model(path+'\estimatorCl_'+str(cl)+'.h5'))
-            data = pd.read_csv('cluster_rpm' + str(cl) + '_.csv')
+            data = pd.read_csv('cluster_' + str(cl) + '_.csv')
             partitionsX.append(self.readClusteredLarosDataFromCsvNew(data))
 
+        for cl in range(0,30):
+            # models.append(load_model(path+'\estimatorCl_'+str(cl)+'.h5'))
+            data = pd.read_csv('cluster_foc' + str(cl) + '_.csv')
+            partitionsY.append(self.readClusteredLarosDataFromCsvNew(data))
+
+        from sklearn import preprocessing
+        scalerX = preprocessing.StandardScaler()
+        scalerY =preprocessing.StandardScaler()
+        scalerX = scalerX.fit(np.concatenate(partitionsX))
+        scalerY = scalerY.fit(np.concatenate(partitionsY).reshape(-1, 1))
+
         for iCnt in range(np.shape(unseenX)[0]):
-            pPoint =unseenX[iCnt][0:4]
-            pPoint= pPoint.reshape(-1,unseenX.shape[1]-1)
+            pPoint =unseenX[iCnt]
+            pPoint= pPoint.reshape(-1,unseenX.shape[1])
 
 
             preds = [ ]
@@ -820,13 +832,13 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
             #pPoint = pPoint.reshape(-1,1,2)
             #pPoint = pPoint.reshape((pPoint.shape[ 0 ], 1, pPoint.shape[ 1 ]))
              # Convert to matrix
-            for vector in pPoint:
-                ind, fit = modeler.getBestPartitionForPoint(vector, partitionsX)
-                currModeler = keras.models.load_model('estimatorCl_rpm' + str(ind) + '.h5')
-                vector = vector.reshape(-1, 4)
-                rpm = currModeler.predict(vector)
+            #for vector in pPoint:
+                #ind, fit = modeler.getBestPartitionForPoint(vector, partitionsX)
+                #currModeler = keras.models.load_model('estimatorCl_rpm' + str(ind) + '.h5')
+                #vector = vector.reshape(-1, 4)
+                #rpm = currModeler.predict(vector)
                 #preds.append(prediction[ 0 ][ 0 ])
-                pPoint = np.append(pPoint, [ rpm ])
+                #pPoint = np.append(pPoint, [ rpm ])
 
             #try:
             trueVal = unseenY[iCnt]
@@ -842,6 +854,9 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
 
             ind , fit = modeler.getBestPartitionForPoint(pPoint,partitionsX)
 
+            #scaledPoint = scalerX.fit_transform(pPoint)
+
+
             #fits = modeler.getFitForEachPartitionForPoint(pPoint, partitionsX)
             #weightedPreds=[]
             #for n,model in enumerate(modeler._models):
@@ -854,7 +869,8 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
 
 
 
-            prediction = abs(modeler._models[ind].predict(pPoint.reshape(-1,5)))
+            prediction = abs(modeler._models[ind].predict(pPoint))
+            #prediction = (scalerY.inverse_transform(prediction))  # + scalerY.inverse_transform(currModeler1.predict(scaled))) / 2
             #states_value = modeler._models[0].model.predict([unseenX[:,0].reshape(1,unseenX.shape[200],1) , unseenX[ :, 1 ].reshape(1, unseenX.shape[ 200 ], 1)])
 
             ##########

@@ -132,7 +132,7 @@ def main():
             ####################################LAROS DATA STATISTICAL TESTS
             if modeler.__class__.__name__ == 'TensorFlowWD':
                 data = pd.read_csv('./MT_DELTA_MARIA_data_1.csv')
-                seriesX, targetY,unseenFeaturesX, unseenFeaturesY = reader.readLarosDataFromCsvNew(data)
+                seriesX, targetY,unseenFeaturesX, unseenFeaturesY  , drftB6 , drftS6 , drftTargetB6 , drftTargetS6, partitionsX, partitionsY,partitionLabels = reader.readLarosDataFromCsvNew(data)
             #################
 
             #seriesX, targetY ,targetW= reader.readStatDifferentSubsets(data,subsetsX,subsetsY,2880)
@@ -159,8 +159,15 @@ def main():
             if modeler.__class__.__name__ != 'TensorFlowWD':
                 partitionsX, partitionsY, partitionLabels, partitionRepresentatives, partitioningModel , tri  = partitioner.clustering(X, Y, W ,NUM_OF_CLUSTERS, True,k)
             else:
+               #partitionLabels=23
                 partitionsX, partitionsY, partitionLabels, partitionRepresentatives, partitioningModel, tri = partitioner.clustering(
                     seriesX, targetY, None, NUM_OF_CLUSTERS, True, k)
+
+                #partitionsXDB6, partitionsYDB6, partitionLabels, partitionRepresentatives, partitioningModel, tri = partitioner.clustering(
+                    #drftB6, targetY, None, 25, True, k)
+
+                #partitionsXDBS6, partitionsYDS6, partitionLabels, partitionRepresentatives, partitioningModel, tri = partitioner.clustering(
+                    #drftS6, targetY, None, 25, True, k)
 
             print("Partitioning training set... Done.")
             # For each partition create model
@@ -178,7 +185,7 @@ def main():
             unseenY=[]
             if modeler.__class__.__name__!= 'TriInterpolantModeler' :
                         #and modeler.__class__.__name__ != 'TensorFlow':
-                modelMap, model2,xs, output, genericModel , partitionsXDC = modeler.createModelsFor(partitionsX, partitionsY, partitionLabels,tri,seriesX,targetY)
+                modelMap, model2,xs, output, genericModel , partitionsXDC = modeler.createModelsFor(partitionsX, partitionsY, partitionLabels,None,seriesX,targetY)
                 #if modeler.__class__.__name__ != 'TensorFlow':
                     #modelMap = dict(zip(partitionLabels, modelMap))
                 print("Creating models per partition... Done")

@@ -73,8 +73,8 @@ class KMeansPartitioner(DefaultPartitioner):
         if dataY is not None:
             #dataXcl = dataX[:,0:3]
             #dataYcl=np.append(dataX[:,3].reshape(-1,1), np.asmatrix([dataY]).T, axis=1)
-            #trnslatedDatax = np.array(np.append(dataX[:,0].reshape(-1,1),np.asmatrix(dataX[:,3]).T,axis=1))
-            dataUpdatedX = np.append(dataX, np.asmatrix([dataY]).T, axis=1)
+            trnslatedDatax = np.array(np.append(dataX[:,0].reshape(-1,1),np.asmatrix([dataX[:,4]]).T,axis=1))
+            dataUpdatedX = np.append(trnslatedDatax, np.asmatrix([dataY]).T, axis=1)
 
             # Init clustering model
         self._nClusters = nClusters
