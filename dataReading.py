@@ -43,99 +43,104 @@ class BaseSeriesReader:
         foc={"data": [ ]}
         foct = {"data": [ ]}
         dateD={"data":[ ]}
-        with open('./MT_DELTA_MARIA_2.txt') as csv_file:
+        print(sum(1 for line in open('./MT_DELTA_MARIA.txt')))
+        with open('./MT_DELTA_MARIA.txt') as csv_file:
 
             csv_reader = csv.reader(csv_file, delimiter=';')
             line_count = 0
             for row in csv_reader:
-                if row[1] == "STATUS_PARAMETER_ID":
-                    continue
-                id = row[1]
-                date = row[4].split(" ")[0]
-                hhMMss = row[4].split(" ")[1]
-                newDate = date + " " + ":".join(hhMMss.split(":")[0:2])
-                dt = datetime.datetime.strptime(newDate, '%Y-%m-%d %H:%M')
-                value = row[3]
-                siteId=row[2]
+             try:
+                    if row[1] == "STATUS_PARAMETER_ID":
+                        continue
+                    id = row[1]
+                    date = row[4].split(" ")[0]
+                    hhMMss = row[4].split(" ")[1]
+                    newDate = date + " " + ":".join(hhMMss.split(":")[0:2])
+                    dt = datetime.datetime.strptime(newDate, '%Y-%m-%d %H:%M')
+                    value = row[3]
+                    siteId=row[2]
 
-                datt = {}
-                datt[ "value" ] = 0
-                datt[ "dt" ] = dt
-                dateD[ "data" ].append(datt)
+                    datt = {}
+                    datt[ "value" ] = 0
+                    datt[ "dt" ] = dt
+                    dateD[ "data" ].append(datt)
 
-                if id=='21' :
-                    drftA={}
-                    drftA["value"]=value
-                    drftA["dt"]=dt
-                    draftAFT[ "data" ].append(drftA)
-                if id == '67':
-                    stw = {}
-                    stw[ "value" ] = value
-                    stw[ "dt" ] = dt
-                    STW[ "data" ].append(stw)
+                    if id=='21' :
+                        drftA={}
+                        drftA["value"]=value
+                        drftA["dt"]=dt
+                        draftAFT[ "data" ].append(drftA)
+                    if id == '67':
+                        stw = {}
+                        stw[ "value" ] = value
+                        stw[ "dt" ] = dt
+                        STW[ "data" ].append(stw)
 
-                if id=='22':
-                    drftF={}
-                    drftF["value"]=value
-                    drftF["dt"]=dt
-                    draftFORE[ "data" ].append(drftF)
+                    if id=='22':
+                        drftF={}
+                        drftF["value"]=value
+                        drftF["dt"]=dt
+                        draftFORE[ "data" ].append(drftF)
 
-                if id=='61' :
-                    drft={}
-                    drft["value"]=value
-                    drft["dt"]=dt
-                    draft[ "data" ].append(drft)
+                    if id=='61' :
+                        drft={}
+                        drft["value"]=value
+                        drft["dt"]=dt
+                        draft[ "data" ].append(drft)
 
-                if id == '81':
-                    wa={}
-                    wa[ "value" ] = value
-                    wa[ "dt" ] = dt
-                    windAngle[ "data" ].append(wa)
+                    if id == '81':
+                        wa={}
+                        wa[ "value" ] = value
+                        wa[ "dt" ] = dt
+                        windAngle[ "data" ].append(wa)
 
-                if id == '82' :
-                    ws={}
-                    ws[ "value" ] = value
-                    ws[ "dt" ] = dt
-                    windSpeed[ "data" ].append(ws)
+                    if id == '82' :
+                        ws={}
+                        ws[ "value" ] = value
+                        ws[ "dt" ] = dt
+                        windSpeed[ "data" ].append(ws)
 
-                if id == '84' :
-                    so={}
-                    so[ "value" ] = value
-                    so[ "dt" ] = dt
-                    SpeedOvg[ "data" ].append(so)
+                    if id == '84' :
+                        so={}
+                        so[ "value" ] = value
+                        so[ "dt" ] = dt
+                        SpeedOvg[ "data" ].append(so)
 
-                if id == '89' :
-                    rpms={}
-                    rpms[ "value" ] = value
-                    rpms[ "dt" ] = dt
-                    rpm[ "data" ].append(rpms)
+                    if id == '89' :
+                        rpms={}
+                        rpms[ "value" ] = value
+                        rpms[ "dt" ] = dt
+                        rpm[ "data" ].append(rpms)
 
-                if id == '137' :
-                    fo={}
-                    fo[ "value" ] = value
-                    fo[ "dt" ] = dt
-                    foc[ "data" ].append(fo)
+                    if id == '137' :
+                        fo={}
+                        fo[ "value" ] = value
+                        fo[ "dt" ] = dt
+                        foc[ "data" ].append(fo)
 
-                if id == '136' :
-                    fot={}
-                    fot[ "value" ] = value
-                    fot[ "dt" ] = dt
-                    foct[ "data" ].append(fot)
-
-
-                if id == '353' :
-                    pow={}
-                    pow[ "value" ] = value
-                    pow[ "dt" ] = dt
-                    power[ "data" ].append(pow)
-
-                line_count+=1
-                if int(id) >353 : break
-            print('Processed '+str(line_count)+ ' lines.')
+                    if id == '136' :
+                        fot={}
+                        fot[ "value" ] = value
+                        fot[ "dt" ] = dt
+                        foct[ "data" ].append(fot)
 
 
+                    if id == '353' :
+                        pow={}
+                        pow[ "value" ] = value
+                        pow[ "dt" ] = dt
+                        power[ "data" ].append(pow)
 
-        with open('./MT_DELTA_MARIA_data_2.csv', mode='w') as data:
+                    line_count+=1
+                    #if int(id) >353 : break
+                    #print('Processed '+str(line_count)+ ' lines.')
+             except:
+                p=0
+                print('Processed ' + str(line_count) + ' lines.')
+
+
+
+        with open('./MT_DELTA_MARIA_data_1.csv', mode='w') as data:
             data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
             data_writer.writerow(['Draft','DrfAft', 'DrftFore','WindSpeed', 'WindAngle', 'SpeedOvg','STW','Rpm' ,'M/E FOC (kg/min)',
                                  'FOC Total', 'Power','DateTime' ])
@@ -214,7 +219,623 @@ class BaseSeriesReader:
                     #####
                     data_writer.writerow([value,value7,value8,value2,value1,value6,value9,value5,value4,value10,value3,str(dt)])
 
+    def readLarosDataFromCsvNewExtractExcels(self, data):
+        # Load file
+        dataNew = data.drop(['SpeedOvg'], axis=1)
+        dtNew = dataNew.values[0:, :]
 
+        daysSincelastPropClean = []
+        daysSinceLastDryDock = []
+
+
+        ##############################################
+
+        with open('./daysSincelastPropClean.csv') as csv_file:
+            csv_reader = csv.reader(csv_file, delimiter=',')
+            line_count = 0
+            for row in csv_reader:
+                if row.__len__()==1:
+                    daysSincelastPropClean.append(float(row[0]))
+        with open('./daysSinceLastDryDock.csv') as csv_file:
+            csv_reader = csv.reader(csv_file, delimiter=',')
+            line_count = 0
+            for row in csv_reader:
+                if row.__len__() == 1:
+                    daysSinceLastDryDock.append(float(row[0]))
+
+        daysSincelastPropClean = np.array(daysSincelastPropClean).reshape(-1,).astype(float)
+        daysSinceLastDryDock = np.array(daysSinceLastDryDock).reshape(-1,).astype(float)
+
+        dataNew = data.drop(['SpeedOvg', 'DateTime'], axis=1)
+        dtNew = dataNew.values[0:, :].astype(float)
+
+        draftMean = (dtNew[:, 1] + dtNew[:, 2]) / 2
+        dtNew[:, 0] = np.round(draftMean, 3)
+
+        dtNew = dtNew[~np.isnan(dtNew).any(axis=1)]
+
+        trim = (dtNew[:, 1] - dtNew[:, 2])
+
+        dtNew1 = np.array(np.append(dtNew[:, 0].reshape(-1, 1), np.asmatrix(
+            [np.round(trim, 3), dtNew[:, 3], dtNew[:, 4], dtNew[:, 5],dtNew[:, 6], daysSincelastPropClean , daysSinceLastDryDock ,  dtNew[:, 7]] ).T, axis=1))
+
+        dtNew1 = np.delete(dtNew1, [i for (i, v) in enumerate(dtNew1[0:, 0]) if v <= 6], 0)
+        dtNew1 = np.delete(dtNew1, [i for (i, v) in enumerate(dtNew1[0:, 4]) if v <= 8 or v > 14], 0)
+
+        rpmB = np.array([i for i in dtNew1 if i[5] > 90 and i[7] < 100 ])
+
+        dtNew1 = np.delete(dtNew1, [i for (i, v) in enumerate(dtNew1[0:, 5]) if v <= 0 or v > 90], 0)  # or (v>0 and v <=10)
+        # dtNew = np.delete(dtNew, [ i for (i, v) in enumerate(dtNew[ 0:, 7 ]) ], 0) # if v <= 7
+
+        ##statistics STD
+        # draftSmaller6 = np.array([drft for drft in dtNew1 if drft[0]< 6])
+        # draftBigger6 = np.array([ drft for drft in dtNew1 if drft[0] > 6 ])
+        #########DRAFT < 9
+        drftStw8 = []
+        stw8DrftS4 = np.array([i for i in dtNew1 if i[4] >= 8 and i[4] < 8.5 and i[0] <= 9])
+        with open('./MT_DELTA_MARIA_draftS_9_analysis.csv', mode='w') as rows:
+            for dr in range(6, 9):
+                stw8DrftS4 = np.array([i for i in dtNew1 if i[4] >= 8 and i[4] < 8.5 and i[0] > dr and i[0] <= dr + 1])
+                stw8DrftS4 = np.delete(stw8DrftS4, [i for (i, v) in enumerate(stw8DrftS4[:, 8]) if v < (
+                np.mean(stw8DrftS4[:, 8]) - np.std(stw8DrftS4[:, 8])) or v > np.mean(stw8DrftS4[:, 8]) + np.std(
+                    stw8DrftS4[:, 8])], 0)
+
+                data_writer = csv.writer(rows, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+                data_writer.writerow(
+                    [str(dr) + ' < DRAFT < ' + str(dr + 1) + '   ' + ' 8 < STW < 8.5                   '], )
+                data_writer.writerow([], )
+                data_writer.writerow(['Draft', 'Trim', 'WindSpeed', 'WindAngle', 'STW','RPM'
+                                     ,'DaysSinceLastPropCleaning','DaysSinceLastDryDock', 'M/E FOC (kg/min)'])
+                for data in stw8DrftS4:
+                    data_writer.writerow([data[0], data[1], data[2], data[3], data[4], data[5],data[6],data[7],data[8]])
+                data_writer.writerow([], )
+            data_writer.writerow([], )
+            data_writer.writerow([], )
+            #drftStw8.append(stw8DrftS4)
+
+            drftStw9 = []
+            stw9DrftS4 = np.array([i for i in dtNew1 if i[4] >= 8.5 and i[4] < 9 and i[0] <= 9])
+
+            for dr in range(6, 9):
+                stw9DrftS4 = np.array([i for i in dtNew1 if i[4] >= 8.5 and i[4] < 9 and i[0] > dr and i[0] <= dr + 1])
+                stw9DrftS4 = np.delete(stw9DrftS4, [i for (i, v) in enumerate(stw9DrftS4[:, 8]) if v < (
+                np.mean(stw9DrftS4[:, 8]) - np.std(stw9DrftS4[:, 8])) or v > np.mean(stw9DrftS4[:, 8]) + np.std(
+                    stw9DrftS4[:, 8])], 0)
+                drftStw9.append(stw9DrftS4)
+
+                data_writer = csv.writer(rows, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+                data_writer.writerow(
+                    [str(dr) + ' < DRAFT < ' + str(dr + 1) + '   ' + ' 8.5 < STW < 9                   '], )
+                data_writer.writerow([], )
+                data_writer.writerow(['Draft', 'Trim', 'WindSpeed', 'WindAngle', 'STW','RPM'
+                                     ,'DaysSinceLastPropCleaning','DaysSinceLastDryDock', 'M/E FOC (kg/min)'])
+                for data in stw9DrftS4:
+                    data_writer.writerow([data[0], data[1], data[2], data[3], data[4], data[5],data[6],data[7],data[8]])
+                data_writer.writerow([], )
+            data_writer.writerow([], )
+            data_writer.writerow([], )
+
+            drftStw10 = []
+            stw10DrftS4 = np.array([i for i in dtNew1 if i[4] >= 9 and i[4] < 9.5 and i[0] <= 9])
+
+            for dr in range(6, 9):
+                stw10DrftS4 = np.array([i for i in dtNew1 if i[4] >= 9 and i[4] < 9.5 and i[0] > dr and i[0] <= dr + 1])
+                stw10DrftS4 = np.delete(stw10DrftS4, [i for (i, v) in enumerate(stw10DrftS4[:, 8]) if v < (
+                np.mean(stw10DrftS4[:, 8]) - np.std(stw10DrftS4[:, 8])) or v > np.mean(stw10DrftS4[:, 8]) + np.std(
+                    stw10DrftS4[:, 8])], 0)
+                drftStw10.append(stw10DrftS4)
+
+                data_writer = csv.writer(rows, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+                data_writer.writerow(
+                    [str(dr) + ' < DRAFT < ' + str(dr + 1) + '   ' + ' 9 < STW < 9.5                   '], )
+                data_writer.writerow([], )
+                data_writer.writerow(['Draft', 'Trim', 'WindSpeed', 'WindAngle', 'STW','RPM'
+                                     ,'DaysSinceLastPropCleaning','DaysSinceLastDryDock', 'M/E FOC (kg/min)'])
+                for data in stw10DrftS4:
+                    data_writer.writerow([data[0], data[1], data[2], data[3], data[4], data[5],data[6],data[7],data[8]])
+                data_writer.writerow([], )
+            data_writer.writerow([], )
+            data_writer.writerow([], )
+
+            drftStw11 = []
+            stw11DrftS4 = np.array([i for i in dtNew1 if i[4] >= 9.5 and i[4] < 10 and i[0] <= 9])
+
+            for dr in range(6, 9):
+                stw11DrftS4 = np.array(
+                    [i for i in dtNew1 if i[4] >= 9.5 and i[4] < 10 and i[0] > dr and i[0] <= dr + 1])
+                stw11DrftS4 = np.delete(stw10DrftS4, [i for (i, v) in enumerate(stw11DrftS4[:, 8]) if v < (
+                np.mean(stw11DrftS4[:, 8]) - np.std(stw11DrftS4[:, 8])) or v > np.mean(stw11DrftS4[:, 8]) + np.std(
+                    stw11DrftS4[:, 8])], 0)
+                drftStw11.append(stw11DrftS4)
+
+                data_writer = csv.writer(rows, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+                data_writer.writerow(
+                    [str(dr) + ' < DRAFT < ' + str(dr + 1) + '   ' + ' 9.5 < STW < 10                   '], )
+                data_writer.writerow([], )
+                data_writer.writerow(['Draft', 'Trim', 'WindSpeed', 'WindAngle', 'STW','RPM'
+                                     ,'DaysSinceLastPropCleaning','DaysSinceLastDryDock', 'M/E FOC (kg/min)'])
+                for data in stw11DrftS4:
+                    data_writer.writerow([data[0], data[1], data[2], data[3], data[4], data[5],data[6],data[7],data[8]])
+                data_writer.writerow([], )
+            data_writer.writerow([], )
+            data_writer.writerow([], )
+
+            drftStw12 = []
+            stw12DrftS4 = np.array([i for i in dtNew1 if i[4] >= 10 and i[4] < 10.5 and i[0] <= 9])
+
+            for dr in range(6, 9):
+                stw12DrftS4 = np.array(
+                    [i for i in dtNew1 if i[4] >= 10 and i[4] < 10.5 and i[0] > dr and i[0] <= dr + 1])
+                stw12DrftS4 = np.delete(stw12DrftS4, [i for (i, v) in enumerate(stw12DrftS4[:, 8]) if v < (
+                np.mean(stw12DrftS4[:, 8]) - np.std(stw12DrftS4[:, 8])) or v > np.mean(stw12DrftS4[:, 8]) + np.std(
+                    stw12DrftS4[:, 8])], 0)
+                drftStw12.append(stw11DrftS4)
+
+                data_writer = csv.writer(rows, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+                data_writer.writerow(
+                    [str(dr) + ' < DRAFT < ' + str(dr + 1) + '   ' + ' 10 < STW < 10.5                   '], )
+                data_writer.writerow([], )
+                data_writer.writerow(['Draft', 'Trim', 'WindSpeed', 'WindAngle', 'STW','RPM'
+                                     ,'DaysSinceLastPropCleaning','DaysSinceLastDryDock', 'M/E FOC (kg/min)'])
+                for data in stw12DrftS4:
+                    data_writer.writerow([data[0], data[1], data[2], data[3], data[4], data[5],data[6],data[7],data[8]])
+                data_writer.writerow([], )
+            data_writer.writerow([], )
+            data_writer.writerow([], )
+
+            drftStw13 = []
+            #stw13DrftS4 = np.array([i for i in dtNew1 if i[4] >= 10.5 and i[4] < 11 and i[0] <= 9])
+
+            for dr in range(6, 9):
+                stw13DrftS4 = np.array(
+                    [i for i in dtNew1 if i[4] >= 10.5 and i[4] < 11 and i[0] > dr and i[0] <= dr + 1])
+                stw13DrftS4 = np.delete(stw13DrftS4, [i for (i, v) in enumerate(stw13DrftS4[:, 8]) if v < (
+                np.mean(stw13DrftS4[:, 8]) - np.std(stw13DrftS4[:, 8])) or v > np.mean(stw13DrftS4[:, 8]) + np.std(
+                    stw13DrftS4[:, 8])], 0)
+                drftStw13.append(drftStw13)
+
+                data_writer = csv.writer(rows, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+                data_writer.writerow(
+                    [str(dr) + ' < DRAFT < ' + str(dr + 1) + '   ' + ' 10.5 < STW < 11                   '], )
+                data_writer.writerow([], )
+                data_writer.writerow(['Draft', 'Trim', 'WindSpeed', 'WindAngle', 'STW','RPM'
+                                     ,'DaysSinceLastPropCleaning','DaysSinceLastDryDock', 'M/E FOC (kg/min)'])
+                for data in stw13DrftS4:
+                    data_writer.writerow([data[0], data[1], data[2], data[3], data[4], data[5],data[6],data[7],data[8]])
+                data_writer.writerow([], )
+            data_writer.writerow([], )
+            data_writer.writerow([], )
+
+            drftStw14 = []
+            #stw14DrftS4 = np.array([i for i in dtNew1 if i[4] >= 11 and i[4] < 11.5 and i[0] <= 9])
+
+            for dr in range(6, 9):
+                stw14DrftS4 = np.array(
+                    [i for i in dtNew1 if i[4] >= 11 and i[4] < 11.5 and i[0] > dr and i[0] <= dr + 1])
+                stw14DrftS4 = np.delete(stw14DrftS4, [i for (i, v) in enumerate(stw14DrftS4[:, 8]) if v < (
+                np.mean(stw14DrftS4[:, 8]) - np.std(stw14DrftS4[:, 8])) or v > np.mean(stw14DrftS4[:, 8]) + np.std(
+                    stw14DrftS4[:, 8])], 0)
+                drftStw14.append(stw14DrftS4)
+
+                data_writer = csv.writer(rows, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+                data_writer.writerow(
+                    [str(dr) + ' < DRAFT < ' + str(dr + 1) + '   ' + ' 11 < STW < 11.5                   '], )
+                data_writer.writerow([], )
+                data_writer.writerow(['Draft', 'Trim', 'WindSpeed', 'WindAngle', 'STW','RPM'
+                                     ,'DaysSinceLastPropCleaning','DaysSinceLastDryDock', 'M/E FOC (kg/min)'])
+                for data in stw14DrftS4:
+                    data_writer.writerow([data[0], data[1], data[2], data[3], data[4], data[5],data[6],data[7],data[8]])
+                data_writer.writerow([], )
+            data_writer.writerow([], )
+            data_writer.writerow([], )
+
+            drftStw15 = []
+            #stw15DrftS4 = np.array([i for i in dtNew1 if i[4] >= 11.5 and i[4] < 12 and i[0] <= 9])
+
+            for dr in range(6, 9):
+                stw15DrftS4 = np.array(
+                    [i for i in dtNew1 if i[4] >= 11.5 and i[4] < 12 and i[0] > dr and i[0] <= dr + 1])
+                stw15DrftS4 = np.delete(stw15DrftS4, [i for (i, v) in enumerate(stw15DrftS4[:, 8]) if v < (
+                np.mean(stw15DrftS4[:, 8]) - np.std(stw15DrftS4[:, 8])) or v > np.mean(stw15DrftS4[:, 8]) + np.std(
+                    stw15DrftS4[:, 8])], 0)
+                drftStw15.append(stw15DrftS4)
+                data_writer = csv.writer(rows, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+                data_writer.writerow(
+                    [str(dr) + ' < DRAFT < ' + str(dr + 1) + '   ' + ' 11.5 < STW < 12                   '], )
+                data_writer.writerow([], )
+                data_writer.writerow(['Draft', 'Trim', 'WindSpeed', 'WindAngle', 'STW','RPM'
+                                     ,'DaysSinceLastPropCleaning','DaysSinceLastDryDock', 'M/E FOC (kg/min)'])
+                for data in stw15DrftS4:
+                    data_writer.writerow([data[0], data[1], data[2], data[3], data[4], data[5],data[6],data[7],data[8]])
+                data_writer.writerow([], )
+            data_writer.writerow([], )
+            data_writer.writerow([], )
+
+            drftStw16 = []
+            #stw16DrftS4 = np.array([i for i in dtNew1 if i[4] >= 12 and i[4] < 12.5 and i[0] <= 9])
+
+            for dr in range(6, 9):
+                stw16DrftS4 = np.array(
+                    [i for i in dtNew1 if i[4] >= 12 and i[4] < 12.5 and i[0] > dr and i[0] <= dr + 1])
+                stw16DrftS4 = np.delete(stw16DrftS4, [i for (i, v) in enumerate(stw16DrftS4[:, 8]) if v < (
+                np.mean(stw16DrftS4[:, 8]) - np.std(stw16DrftS4[:, 8])) or v > np.mean(stw16DrftS4[:, 8]) + np.std(
+                    stw16DrftS4[:, 8])], 0)
+                drftStw16.append(stw16DrftS4)
+
+                data_writer = csv.writer(rows, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+                data_writer.writerow(
+                    [str(dr) + ' < DRAFT < ' + str(dr + 1) + '   ' + ' 12 < STW < 12.5                   '], )
+                data_writer.writerow([], )
+                data_writer.writerow(['Draft', 'Trim', 'WindSpeed', 'WindAngle', 'STW','RPM'
+                                     ,'DaysSinceLastPropCleaning','DaysSinceLastDryDock', 'M/E FOC (kg/min)'])
+                for data in stw16DrftS4:
+                    data_writer.writerow([data[0], data[1], data[2], data[3], data[4], data[5]])
+                data_writer.writerow([], )
+            data_writer.writerow([], )
+            data_writer.writerow([], )
+
+            drftStw17 = []
+            #stw17DrftS4 = np.array([i for i in dtNew1 if i[4] >= 12.5 and i[4] < 13 and i[0] <= 9])
+
+            for dr in range(6, 9):
+                stw17DrftS4 = np.array(
+                    [i for i in dtNew1 if i[4] >= 12 and i[4] < 12.5 and i[0] > dr and i[0] <= dr + 1])
+                stw17DrftS4 = np.delete(stw17DrftS4, [i for (i, v) in enumerate(stw17DrftS4[:, 8]) if v < (
+                np.mean(stw17DrftS4[:, 8]) - np.std(stw17DrftS4[:, 8])) or v > np.mean(stw17DrftS4[:, 8]) + np.std(
+                    stw17DrftS4[:, 8])], 0)
+                drftStw17.append(drftStw17)
+
+                data_writer = csv.writer(rows, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+                data_writer.writerow(
+                    [str(dr) + ' < DRAFT < ' + str(dr + 1) + '   ' + ' 12 < STW < 12.5                   '], )
+                data_writer.writerow([], )
+                data_writer.writerow(['Draft', 'Trim', 'WindSpeed', 'WindAngle', 'STW','RPM'
+                                     ,'DaysSinceLastPropCleaning','DaysSinceLastDryDock', 'M/E FOC (kg/min)'])
+                for data in stw17DrftS4:
+                    data_writer.writerow([data[0], data[1], data[2], data[3], data[4], data[5],data[6],data[7],data[8]])
+                data_writer.writerow([], )
+            data_writer.writerow([], )
+            data_writer.writerow([], )
+
+            drftStw18 = []
+            #stw18DrftS4 = np.array([i for i in dtNew1 if i[4] >= 13 and i[4] < 13.5 and i[0] <= 9])
+
+            for dr in range(6, 9):
+                stw18DrftS4 = np.array(
+                    [i for i in dtNew1 if i[4] >= 13 and i[4] < 13.5 and i[0] > dr and i[0] <= dr + 1])
+
+                data_writer = csv.writer(rows, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+                data_writer.writerow(
+                    [str(dr) + ' < DRAFT < ' + str(dr + 1) + '   ' + ' 13 < STW < 13.5                   '], )
+                if stw18DrftS4.shape[0]!=0:
+                    stw18DrftS4 = np.delete(stw18DrftS4, [i for (i, v) in enumerate(stw18DrftS4[:, 8]) if v < (
+                np.mean(stw18DrftS4[:, 8]) - np.std(stw18DrftS4[:, 8])) or v > np.mean(stw18DrftS4[:, 8]) + np.std(
+                    stw18DrftS4[:, 8])], 0)
+                    drftStw18.append(stw18DrftS4)
+
+                    data_writer.writerow([], )
+                    data_writer.writerow(['Draft', 'Trim', 'WindSpeed', 'WindAngle', 'STW',
+                                          'M/E FOC (kg/min)','DaysSinceLastPropCleaning','DaysSinceLastDryDock'])
+                    for data in stw18DrftS4:
+                        data_writer.writerow([data[0], data[1], data[2], data[3], data[4], data[5],data[6],data[7],data[8]])
+                    data_writer.writerow([], )
+                data_writer.writerow([], )
+                data_writer.writerow([], )
+
+            drftStw19 = []
+            #stw19DrftS4 = np.array([i for i in dtNew1 if i[4] >= 13.5 and i[4] < 14 and i[0] <= 9])
+
+            for dr in range(6, 9):
+                stw19DrftS4 = np.array(
+                    [i for i in dtNew1 if i[4] >= 13.5 and i[4] < 14 and i[0] > dr and i[0] <= dr + 1])
+                data_writer.writerow(
+                    [str(dr) + ' < DRAFT < ' + str(dr + 1) + '   ' + ' 13.5 < STW < 14                   '], )
+
+                if stw19DrftS4.shape[0]!=0:
+                    stw19DrftS4 = np.delete(stw19DrftS4, [i for (i, v) in enumerate(stw19DrftS4[:, 8]) if v < (
+                    np.mean(stw19DrftS4[:, 8]) - np.std(stw19DrftS4[:, 8])) or v > np.mean(stw19DrftS4[:, 8]) + np.std(
+                        stw19DrftS4[:, 8])], 0)
+                    drftStw19.append(stw19DrftS4)
+
+                    data_writer = csv.writer(rows, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+
+                    data_writer.writerow([], )
+                    data_writer.writerow(['Draft', 'Trim', 'WindSpeed', 'WindAngle', 'STW','RPM'
+                                         ,'DaysSinceLastPropCleaning','DaysSinceLastDryDock', 'M/E FOC (kg/min)'])
+                    for data in stw19DrftS4:
+                        data_writer.writerow([data[0], data[1], data[2], data[3], data[4], data[5],data[6],data[7],data[8]])
+                data_writer.writerow([], )
+            data_writer.writerow([], )
+            data_writer.writerow([], )
+
+        ########################################################################################################################################
+        ########################################################################################################################################
+        ########################################################################################################################################
+        ########################################################################################################################################
+
+
+        drftStw8 = []
+        #stw8DrftB4 = np.array([i for i in dtNew1 if i[4] >= 8 and i[4] < 8.5 and i[0] > 9])
+        with open('./MT_DELTA_MARIA_draftB_9_analysis.csv', mode='w') as rows:
+            for dr in range(9, 14):
+                stw8DrftB4 = np.array([i for i in dtNew1 if i[4] >= 8 and i[4] < 8.5 and i[0] > dr and i[0] <= dr + 1])
+                stw8DrftB4 = np.delete(stw8DrftB4, [i for (i, v) in enumerate(stw8DrftB4[:, 8]) if v < (
+                np.mean(stw8DrftB4[:, 8]) - np.std(stw8DrftB4[:, 8])) or v > np.mean(stw8DrftB4[:, 8]) + np.std(
+                    stw8DrftB4[:, 8])], 0)
+                drftStw8.append(stw8DrftB4)
+
+                data_writer = csv.writer(rows, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+                data_writer.writerow(
+                    [str(dr) + ' < DRAFT < ' + str(dr + 1) + '   ' + ' 8 < STW < 8.5                   '], )
+                data_writer.writerow([], )
+                data_writer.writerow([ 'Draft', 'Trim', 'WindSpeed', 'WindAngle', 'STW','RPM'
+                                     ,'DaysSinceLastPropCleaning','DaysSinceLastDryDock', 'M/E FOC (kg/min)'])
+                for data in stw8DrftB4:
+                    data_writer.writerow([data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7], data[8]])
+                data_writer.writerow([], )
+            data_writer.writerow([], )
+            data_writer.writerow([], )
+
+        #stw8DrftB4 = np.concatenate(stw8DrftB4)
+
+            drftStw9 = []
+            #stw9DrftB4 = np.array([i for i in dtNew1 if i[4] >= 8.5 and i[4] < 9 and i[0] > 9])
+            for dr in range(9, 14):
+                stw9DrftB4 = np.array([i for i in dtNew1 if i[4] >= 8.5 and i[4] < 9 and i[0] > dr and i[0] <= dr + 1])
+                stw9DrftB4 = np.delete(stw9DrftB4, [i for (i, v) in enumerate(stw9DrftB4[:, 8]) if v < (
+                np.mean(stw9DrftB4[:, 8]) - np.std(stw9DrftB4[:, 8])) or v > np.mean(stw9DrftB4[:, 8]) + np.std(
+                    stw9DrftB4[:, 8])], 0)
+                drftStw9.append(stw9DrftB4)
+
+                data_writer = csv.writer(rows, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+                data_writer.writerow(
+                    [str(dr) + ' < DRAFT < ' + str(dr + 1) + '   ' + ' 8.5 < STW < 9                   '], )
+                data_writer.writerow([], )
+                data_writer.writerow([ 'Draft', 'Trim', 'WindSpeed', 'WindAngle', 'STW','RPM'
+                                     ,'DaysSinceLastPropCleaning','DaysSinceLastDryDock', 'M/E FOC (kg/min)'])
+                for data in stw9DrftB4:
+                    data_writer.writerow([data[0], data[1], data[2], data[3], data[4], data[5],data[6],data[7],data[8]])
+                data_writer.writerow([], )
+            data_writer.writerow([], )
+            data_writer.writerow([], )
+
+        #stw9DrftB4 = np.concatenate(drftStw9)
+
+        #drftStw10 = []
+        #stw10DrftB4 = np.array([i for i in dtNew1 if i[4] >= 9 and i[4] < 9.5 and i[0] > 9])
+            for dr in range(9, 14):
+                stw10DrftB4 = np.array([i for i in dtNew1 if i[4] >= 9 and i[4] < 9.5 and i[0] > dr and i[0] <= dr + 1])
+                stw10DrftB4 = np.delete(stw10DrftB4, [i for (i, v) in enumerate(stw10DrftB4[:, 8]) if v < (
+                np.mean(stw10DrftB4[:, 8]) - np.std(stw10DrftB4[:, 8])) or v > np.mean(stw10DrftB4[:, 8]) + np.std(
+                    stw10DrftB4[:, 8])], 0)
+                drftStw10.append(stw10DrftB4)
+
+                data_writer = csv.writer(rows, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+                data_writer.writerow(
+                    [str(dr) + ' < DRAFT < ' + str(dr + 1) + '   ' + ' 9 < STW < 9.5                  '], )
+                data_writer.writerow([], )
+                data_writer.writerow([ 'Draft', 'Trim', 'WindSpeed', 'WindAngle', 'STW','RPM'
+                                     ,'DaysSinceLastPropCleaning','DaysSinceLastDryDock', 'M/E FOC (kg/min)'])
+                for data in stw10DrftB4:
+                    data_writer.writerow([data[0], data[1], data[2], data[3], data[4], data[5],data[6],data[7],data[8]])
+                data_writer.writerow([], )
+            data_writer.writerow([], )
+            data_writer.writerow([], )
+        #stw10DrftB4 = np.concatenate(drftStw10)
+
+        #drftStw11 = []
+        #stw11DrftB4 = np.array([i for i in dtNew1 if i[4] >= 9.5 and i[4] < 10 and i[0] > 9])
+            for dr in range(9, 14):
+                stw11DrftB4 = np.array([i for i in dtNew1 if i[4] >= 9.5 and i[4] < 10 and i[0] > dr and i[0] <= dr + 1])
+                stw11DrftB4 = np.delete(stw11DrftB4, [i for (i, v) in enumerate(stw11DrftB4[:, 8]) if v < (
+                np.mean(stw11DrftB4[:, 8]) - np.std(stw11DrftB4[:, 8])) or v > np.mean(stw11DrftB4[:, 8]) + np.std(
+                    stw11DrftB4[:, 8])], 0)
+                drftStw11.append(stw11DrftB4)
+
+                data_writer = csv.writer(rows, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+                data_writer.writerow(
+                    [str(dr) + ' < DRAFT < ' + str(dr + 1) + '   ' + ' 9.5 < STW < 10                   '], )
+                data_writer.writerow([], )
+                data_writer.writerow([ 'Draft', 'Trim', 'WindSpeed', 'WindAngle', 'STW','RPM'
+                                     ,'DaysSinceLastPropCleaning','DaysSinceLastDryDock', 'M/E FOC (kg/min)'])
+                for data in stw11DrftB4:
+                    data_writer.writerow([data[0], data[1], data[2], data[3], data[4], data[5],data[6],data[7],data[8]])
+                data_writer.writerow([], )
+            data_writer.writerow([], )
+            data_writer.writerow([], )
+
+        #stw11DrftB4 = np.concatenate(drftStw11)
+
+        #drftStw12 = []
+        #stw12DrftB4 = np.array([i for i in dtNew1 if i[4] >= 10 and i[4] < 10.5 and i[0] > 9])
+            for dr in range(9, 14):
+                stw12DrftB4 = np.array([i for i in dtNew1 if i[4] >= 10 and i[4] < 10.5 and i[0] > dr and i[0] <= dr + 1])
+                stw12DrftB4 = np.delete(stw12DrftB4, [i for (i, v) in enumerate(stw12DrftB4[:, 8]) if v < (
+                np.mean(stw12DrftB4[:, 8]) - np.std(stw12DrftB4[:, 8])) or v > np.mean(stw12DrftB4[:, 8]) + np.std(
+                    stw12DrftB4[:, 8])], 0)
+                drftStw12.append(drftStw12)
+
+                data_writer = csv.writer(rows, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+                data_writer.writerow(
+                    [str(dr) + ' < DRAFT < ' + str(dr + 1) + '   ' + ' 10 < STW < 10.5                   '], )
+                data_writer.writerow([], )
+                data_writer.writerow([ 'Draft', 'Trim', 'WindSpeed', 'WindAngle', 'STW','RPM'
+                                     ,'DaysSinceLastPropCleaning','DaysSinceLastDryDock', 'M/E FOC (kg/min)'])
+                for data in stw12DrftB4:
+                    data_writer.writerow([data[0], data[1], data[2], data[3], data[4], data[5],data[6],data[7],data[8]])
+                data_writer.writerow([], )
+            data_writer.writerow([], )
+            data_writer.writerow([], )
+        #stw12DrftB4 = np.concatenate(drftStw12)
+
+        #drftStw13 = []
+        #stw13DrftB4 = np.array([i for i in dtNew1 if i[4] >= 10.5 and i[4] < 11 and i[0] > 9])
+            for dr in range(9, 14):
+                stw13DrftB4 = np.array([i for i in dtNew1 if i[4] >= 10.5 and i[4] < 11 and i[0] > dr and i[0] <= dr + 1])
+                stw13DrftB4 = np.delete(stw13DrftB4, [i for (i, v) in enumerate(stw13DrftB4[:, 8]) if v < (
+                np.mean(stw13DrftB4[:, 8]) - np.std(stw13DrftB4[:, 8])) or v > np.mean(stw13DrftB4[:, 8]) + np.std(
+                    stw13DrftB4[:, 8])], 0)
+                drftStw13.append(stw13DrftB4)
+
+                data_writer = csv.writer(rows, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+                data_writer.writerow(
+                    [str(dr) + ' < DRAFT < ' + str(dr + 1) + '   ' + ' 10.5 < STW < 11                 '], )
+                data_writer.writerow([], )
+                data_writer.writerow([ 'Draft', 'Trim', 'WindSpeed', 'WindAngle', 'STW','RPM'
+                                     ,'DaysSinceLastPropCleaning','DaysSinceLastDryDock', 'M/E FOC (kg/min)'])
+                for data in stw13DrftB4:
+                    data_writer.writerow([data[0], data[1], data[2], data[3], data[4], data[5],data[6],data[7],data[8]])
+                data_writer.writerow([], )
+            data_writer.writerow([], )
+            data_writer.writerow([], )
+        #stw13DrftB4 = np.concatenate(drftStw13)
+
+        #drftStw14 = []
+        #stw14DrftB4 = np.array([i for i in dtNew1 if i[4] >= 11 and i[4] < 11.5 and i[0] > 9])
+            for dr in range(9, 14):
+                stw14DrftB4 = np.array([i for i in dtNew1 if i[4] >= 11 and i[4] < 11.5 and i[0] > dr and i[0] <= dr + 1])
+                stw14DrftB4 = np.delete(stw14DrftB4, [i for (i, v) in enumerate(stw14DrftB4[:, 8]) if v < (
+                np.mean(stw14DrftB4[:, 8]) - np.std(stw14DrftB4[:, 8])) or v > np.mean(stw14DrftB4[:, 8]) + np.std(
+                    stw14DrftB4[:, 8])], 0)
+                drftStw14.append(stw14DrftB4)
+
+                data_writer = csv.writer(rows, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+                data_writer.writerow(
+                    [str(dr) + ' < DRAFT < ' + str(dr + 1) + '   ' + ' 11 < STW < 11.5                   '], )
+                data_writer.writerow([], )
+                data_writer.writerow([ 'Draft', 'Trim', 'WindSpeed', 'WindAngle', 'STW','RPM'
+                                     ,'DaysSinceLastPropCleaning','DaysSinceLastDryDock', 'M/E FOC (kg/min)'])
+                for data in stw14DrftB4:
+                    data_writer.writerow([data[0], data[1], data[2], data[3], data[4], data[5],data[6],data[7],data[8]])
+                data_writer.writerow([], )
+            data_writer.writerow([], )
+            data_writer.writerow([], )
+        #stw14DrftB4 = np.concatenate(drftStw14)
+
+        #drftStw15 = []
+        #stw15DrftB4 = np.array([i for i in dtNew1 if i[4] >= 11.5 and i[4] < 12 and i[0] > 9])
+            for dr in range(9, 14):
+                stw15DrftB4 = np.array([i for i in dtNew1 if i[4] >= 11.5 and i[4] < 12 and i[0] > dr and i[0] <= dr + 1])
+                stw15DrftB4 = np.delete(stw15DrftB4, [i for (i, v) in enumerate(stw15DrftB4[:, 8]) if v < (
+                np.mean(stw15DrftB4[:, 8]) - np.std(stw15DrftB4[:, 8])) or v > np.mean(stw15DrftB4[:, 8]) + np.std(
+                    stw15DrftB4[:, 8])], 0)
+                drftStw15.append(stw15DrftB4)
+
+                data_writer = csv.writer(rows, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+                data_writer.writerow(
+                    [str(dr) + ' < DRAFT < ' + str(dr + 1) + '   ' + ' 11.5 < STW < 12                  '], )
+                data_writer.writerow([], )
+                data_writer.writerow([ 'Draft', 'Trim', 'WindSpeed', 'WindAngle', 'STW','RPM'
+                                     ,'DaysSinceLastPropCleaning','DaysSinceLastDryDock', 'M/E FOC (kg/min)'])
+                for data in stw15DrftB4:
+                    data_writer.writerow([data[0], data[1], data[2], data[3], data[4], data[5],data[6],data[7],data[8]])
+                data_writer.writerow([], )
+            data_writer.writerow([], )
+            data_writer.writerow([], )
+
+        #stw15DrftB4 = np.concatenate(drftStw15)
+
+        #drftStw16 = []
+        #stw16DrftB4 = np.array([i for i in dtNew1 if i[4] >= 12 and i[4] < 12.5 and i[0] > 9])
+            for dr in range(9, 14):
+                stw16DrftB4 = np.array([i for i in dtNew1 if i[4] >= 12 and i[4] < 12.5 and i[0] > dr and i[0] <= dr + 1])
+                stw16DrftB4 = np.delete(stw16DrftB4, [i for (i, v) in enumerate(stw16DrftB4[:, 8]) if v < (
+                np.mean(stw16DrftB4[:, 8]) - np.std(stw16DrftB4[:, 8])) or v > np.mean(stw16DrftB4[:, 8]) + np.std(
+                    stw16DrftB4[:, 8])], 0)
+                drftStw16.append(stw16DrftB4)
+
+                data_writer = csv.writer(rows, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+                data_writer.writerow(
+                    [str(dr) + ' < DRAFT < ' + str(dr + 1) + '   ' + ' 12 < STW < 12.5                   '], )
+                data_writer.writerow([], )
+                data_writer.writerow([ 'Draft', 'Trim', 'WindSpeed', 'WindAngle', 'STW','RPM'
+                                     ,'DaysSinceLastPropCleaning','DaysSinceLastDryDock', 'M/E FOC (kg/min)'])
+                for data in stw16DrftB4:
+                    data_writer.writerow([data[0], data[1], data[2], data[3], data[4], data[5],data[6],data[7],data[8]])
+                data_writer.writerow([], )
+            data_writer.writerow([], )
+            data_writer.writerow([], )
+
+        #stw16DrftB4 = np.concatenate(drftStw16)
+
+        #drftStw17 = []
+        #stw17DrftB4 = np.array([i for i in dtNew1 if i[4] >= 12.5 and i[4] < 13 and i[0] > 9])
+            for dr in range(9, 14):
+                stw17DrftB4 = np.array([i for i in dtNew1 if i[4] >= 12.5 and i[4] < 13 and i[0] > dr and i[0] <= dr + 1])
+                data_writer.writerow(
+                    [str(dr) + ' < DRAFT < ' + str(dr + 1) + '   ' + ' 12.5 < STW < 13                 '], )
+
+                if stw17DrftB4.shape[0]!=0:
+                    stw17DrftB4 = np.delete(stw17DrftB4, [i for (i, v) in enumerate(stw17DrftB4[:, 8]) if v < (
+                    np.mean(stw17DrftB4[:, 8]) - np.std(stw17DrftB4[:, 8])) or v > np.mean(stw17DrftB4[:, 8]) + np.std(
+                        stw17DrftB4[:, 8])], 0)
+                    drftStw17.append(stw17DrftB4)
+
+                    data_writer = csv.writer(rows, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+
+                    data_writer.writerow([], )
+                    data_writer.writerow(['Draft', 'Trim', 'WindSpeed', 'WindAngle', 'STW',
+                                          'M/E FOC (kg/min)', 'DaysSinceLastPropCleaning', 'DaysSinceLastDryDock'])
+                    for data in stw17DrftB4:
+                        data_writer.writerow([data[0], data[1], data[2], data[3], data[4], data[5],data[6],data[7],data[8]])
+                data_writer.writerow([], )
+            data_writer.writerow([], )
+            data_writer.writerow([], )
+
+        #stw17DrftB4 = np.concatenate(drftStw17)
+
+        #drftStw18 = []
+        #stw18DrftB4 = np.array([i for i in dtNew1 if i[4] >= 13 and i[4] < 13.5 and i[0] > 9])
+            for dr in range(9, 14):
+                stw18DrftB4 = np.array([i for i in dtNew1 if i[4] >= 13 and i[4] < 13.5 and i[0] > dr and i[0] <= dr + 1])
+                data_writer.writerow(
+                    [str(dr) + ' < DRAFT < ' + str(dr + 1) + '   ' + ' 13 < STW < 13.5                 '], )
+
+                if stw18DrftB4.shape[0] != 0:
+                    stw18DrftB4 = np.delete(stw18DrftB4, [i for (i, v) in enumerate(stw18DrftB4[:, 8]) if v < (
+                    np.mean(stw18DrftB4[:, 8]) - np.std(stw18DrftB4[:, 8])) or v > np.mean(stw18DrftB4[:, 8]) + np.std(
+                        stw18DrftB4[:, 8])], 0)
+                    drftStw18.append(stw18DrftB4)
+
+                    data_writer = csv.writer(rows, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+
+                    data_writer.writerow([], )
+                    data_writer.writerow(['Draft', 'Trim', 'WindSpeed', 'WindAngle', 'STW',
+                                          'M/E FOC (kg/min)', 'DaysSinceLastPropCleaning', 'DaysSinceLastDryDock'])
+                    for data in stw18DrftB4:
+                        data_writer.writerow([data[0], data[1], data[2], data[3], data[4], data[5],data[6],data[7],data[8]])
+                data_writer.writerow([], )
+            data_writer.writerow([], )
+            data_writer.writerow([], )
+
+        #stw18DrftB4 = np.concatenate(drftStw18)
+
+        #drftStw19 = []
+        #stw19DrftB4 = np.array([i for i in dtNew1 if i[4] >= 13.5 and i[4] < 14 and i[0] > 9])
+            for dr in range(9, 14):
+                stw19DrftB4 = np.array([i for i in dtNew1 if i[4] >= 13.5 and i[4] < 14 and i[0] > dr and i[0] <= dr + 1])
+                data_writer.writerow(
+                    [str(dr) + ' < DRAFT < ' + str(dr + 1) + '   ' + ' 13.5 < STW < 14                 '], )
+                if stw19DrftB4.shape[0] != 0:
+                    stw19DrftB4 = np.delete(stw19DrftB4, [i for (i, v) in enumerate(stw19DrftB4[:, 8]) if v < (
+                    np.mean(stw19DrftB4[:, 8]) - np.std(stw19DrftB4[:, 8])) or v > np.mean(stw19DrftB4[:, 8]) + np.std(
+                        stw19DrftB4[:, 8])], 0)
+                    drftStw19.append(stw19DrftB4)
+
+                    data_writer = csv.writer(rows, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+
+                    data_writer.writerow([], )
+                    data_writer.writerow([ 'Draft', 'Trim', 'WindSpeed', 'WindAngle', 'STW','RPM'
+                                         ,'DaysSinceLastPropCleaning','DaysSinceLastDryDock', 'M/E FOC (kg/min)'])
+                    for data in stw19DrftB4:
+                        data_writer.writerow([data[0], data[1], data[2], data[3], data[4], data[5],data[6],data[7],data[8]])
+                data_writer.writerow([], )
+            data_writer.writerow([], )
+            data_writer.writerow([], )
+
+        #tw19DrftB4 = np.concatenate(drftStw19)
+
+        x=0
     def readLarosDataFromCsvNew(self, data):
         # Load file
         from sklearn import preprocessing
@@ -232,15 +853,15 @@ class BaseSeriesReader:
         #'M/E FOC (kg/min)'
 
         #dataNew=dataNew[['Draft', 'SpeedOvg']]
-        dtNew = dataNew.values[ 0:, : ].astype(float)
+        dtNew = dataNew.values[ 0:, : ]#.astype(float)
 
         draftMean = (dtNew[:, 1] + dtNew[:, 2]) / 2
-        dtNew[:, 0] = draftMean
+        dtNew[:, 0] = np.round(draftMean,3)
 
         dtNew = np.delete(dtNew, [ i for (i, v) in enumerate(dtNew[ 0:, 0 ]) if v <= 6 ], 0)
         dtNew = np.delete(dtNew, [ i for (i, v) in enumerate(dtNew[ 0:, 5 ]) if v <= 8 or v > 14 ], 0)
-        dtNew = np.delete(dtNew, [ i for (i, v) in enumerate(dtNew[ 0:, 6 ]) if v <= 0 or (v>0 and v <=10) or v > 90], 0)
-        dtNew = np.delete(dtNew, [ i for (i, v) in enumerate(dtNew[ 0:, 7 ]) if v <= 7 ], 0)
+        dtNew = np.delete(dtNew, [ i for (i, v) in enumerate(dtNew[ 0:, 6 ]) if v <= 0  or v > 90], 0) # or (v>0 and v <=10)
+        #dtNew = np.delete(dtNew, [ i for (i, v) in enumerate(dtNew[ 0:, 7 ]) ], 0) # if v <= 7
 
         dtNew = dtNew[~np.isnan(dtNew).any(axis=1)]
 
@@ -253,80 +874,234 @@ class BaseSeriesReader:
         #draftSmaller6 = np.array([drft for drft in dtNew1 if drft[0]< 6])
         #draftBigger6 = np.array([ drft for drft in dtNew1 if drft[0] > 6 ])
         #########DRAFT < 9
-        stw8DrftS4 = np.array([i for i in dtNew1 if i[4]>=8 and i[4]<8.5 and i[0]<=9])
-        stw8DrftS4=np.delete(stw8DrftS4, [ i for (i, v) in enumerate(stw8DrftS4[:,5]) if  v < (np.mean(stw8DrftS4[ :, 5 ]) - np.std(stw8DrftS4[ :, 5 ])) or   v > np.mean(stw8DrftS4[ :, 5 ]) + np.std(stw8DrftS4[ :, 5 ]) ], 0)
+        drftStw8 = []
+        #stw8DrftS4 = np.array([i for i in dtNew1 if i[4]>=8 and i[4]<8.5 and i[0]<=9])
 
+        for dr in range(6,9):
+            stw8DrftS4 =np.array([ i for i in dtNew1  if i[4]>=8 and i[4]<8.5 and i[ 0 ] > dr and  i[ 0 ] <= dr+1 ])
+            if stw8DrftS4.shape[0] != 0:
+                stw8DrftS4 = np.delete(stw8DrftS4, [ i for (i, v) in enumerate(stw8DrftS4[:,5]) if  v < (np.mean(stw8DrftS4[ :, 5 ]) - np.std(stw8DrftS4[ :, 5 ])) or   v > np.mean(stw8DrftS4[ :, 5 ]) + np.std(stw8DrftS4[ :, 5 ]) ], 0)
+                drftStw8.append(stw8DrftS4)
+        stw8DrftS4 = np.concatenate(drftStw8)
+
+        drftStw9 = []
         stw9DrftS4 = np.array([ i for i in dtNew1 if i[ 4 ] >= 8.5 and i[ 4 ] < 9 and i[ 0 ] <= 9 ])
-        stw9DrftS4=np.delete(stw9DrftS4, [ i for (i, v) in enumerate(stw9DrftS4[:,5]) if  v < (np.mean(stw9DrftS4[ :, 5 ]) - np.std(stw9DrftS4[ :, 5 ])) or   v > np.mean(stw9DrftS4[ :, 5 ]) + np.std(stw9DrftS4[ :, 5 ]) ], 0)
 
-        stw10DrftS4 = np.array([ i for i in dtNew1 if i[ 4 ] >= 9 and i[ 4 ] < 9.5 and i[ 0 ] <= 9 ])
-        stw10DrftS4 = np.delete(stw10DrftS4, [ i for (i, v) in enumerate(stw10DrftS4[:,5]) if  v < (np.mean(stw10DrftS4[ :, 5 ]) - np.std(stw10DrftS4[ :, 5 ])) or   v > np.mean(stw10DrftS4[ :, 5 ]) + np.std(stw10DrftS4[ :, 5 ]) ], 0)
+        for dr in range(6,9):
+                stw9DrftS4 =np.array([ i for i in dtNew1  if i[ 4 ] >= 8.5 and i[ 4 ] < 9 and i[ 0 ] > dr and  i[ 0 ] <= dr+1 ])
+                stw9DrftS4 = np.delete(stw9DrftS4, [ i for (i, v) in enumerate(stw9DrftS4[:,5]) if  v < (np.mean(stw9DrftS4[ :, 5 ]) - np.std(stw9DrftS4[ :, 5 ])) or   v > np.mean(stw9DrftS4[ :, 5 ]) + np.std(stw9DrftS4[ :, 5 ]) ], 0)
+                drftStw9.append(stw9DrftS4)
 
-        stw11DrftS4 = np.array([ i for i in dtNew1 if i[ 4 ] >= 9.5 and i[ 4 ] < 10 and i[ 0 ] <= 9 ])
-        stw11DrftS4 = np.delete(stw11DrftS4, [ i for (i, v) in enumerate(stw11DrftS4[:,5]) if  v < (np.mean(stw11DrftS4[ :, 5 ]) - np.std(stw11DrftS4[ :, 5 ])) or   v > np.mean(stw11DrftS4[ :, 5 ]) + np.std(stw11DrftS4[ :, 5 ]) ], 0)
+        stw9DrftS4 = np.concatenate(drftStw9)
 
-        stw12DrftS4 = np.array([ i for i in dtNew1 if i[ 4 ] >= 10 and i[ 4 ] < 10.5 and i[ 0 ] <= 9 ])
-        stw12DrftS4 =  np.delete(stw12DrftS4, [ i for (i, v) in enumerate(stw12DrftS4[:,5]) if  v < (np.mean(stw12DrftS4[ :, 5 ]) - np.std(stw12DrftS4[ :, 5 ])) or   v > np.mean(stw12DrftS4[ :, 5 ]) + np.std(stw12DrftS4[ :, 5 ]) ], 0)
+        drftStw10 = []
+        #stw10DrftS4 = np.array([ i for i in dtNew1 if i[ 4 ] >= 9 and i[ 4 ] < 9.5 and i[ 0 ] <= 9 ])
 
-        stw13DrftS4 = np.array([ i for i in dtNew1 if i[ 4 ] >= 10.5 and i[ 4 ] < 11 and i[ 0 ] <= 9 ])
-        stw13DrftS4 =np.delete(stw13DrftS4, [ i for (i, v) in enumerate(stw13DrftS4[:,5]) if  v < (np.mean(stw13DrftS4[ :, 5 ]) - np.std(stw13DrftS4[ :, 5 ])) or   v > np.mean(stw13DrftS4[ :, 5 ]) + np.std(stw13DrftS4[ :, 5 ]) ], 0)
+        for dr in range(6,9):
+                stw10DrftS4 =np.array([ i for i in dtNew1  if i[ 4 ] >= 9 and i[ 4 ] < 9.5 and i[ 0 ] > dr and  i[ 0 ] <= dr+1 ])
+                stw10DrftS4 = np.delete(stw10DrftS4, [ i for (i, v) in enumerate(stw10DrftS4[:,5]) if  v < (np.mean(stw10DrftS4[ :, 5 ]) - np.std(stw10DrftS4[ :, 5 ])) or   v > np.mean(stw10DrftS4[ :, 5 ]) + np.std(stw10DrftS4[ :, 5 ]) ], 0)
+                drftStw10.append(stw10DrftS4)
 
-        stw14DrftS4 = np.array([ i for i in dtNew1 if i[ 4 ] >= 11 and i[ 4 ] < 11.5 and i[ 0 ] <= 9 ])
-        stw14DrftS4 = np.delete(stw14DrftS4, [ i for (i, v) in enumerate(stw14DrftS4[:,5]) if  v < (np.mean(stw14DrftS4[ :, 5 ]) - np.std(stw14DrftS4[ :, 5 ])) or   v > np.mean(stw14DrftS4[ :, 5 ]) + np.std(stw14DrftS4[ :, 5 ]) ], 0)
+        stw10DrftS4 = np.concatenate(drftStw10)
 
+        drftStw11 = []
+        #stw11DrftS4 = np.array([ i for i in dtNew1 if i[ 4 ] >= 9.5 and i[ 4 ] < 10 and i[ 0 ] <= 9 ])
+
+        for dr in range(6,9):
+                stw11DrftS4 =np.array([ i for i in dtNew1  if i[ 4 ] >= 9.5 and i[ 4 ] < 10 and i[ 0 ] > dr and  i[ 0 ] <= dr+1 ])
+                stw11DrftS4 = np.delete(stw10DrftS4, [ i for (i, v) in enumerate(stw11DrftS4[:,5]) if  v < (np.mean(stw11DrftS4[ :, 5 ]) - np.std(stw11DrftS4[ :, 5 ])) or   v > np.mean(stw11DrftS4[ :, 5 ]) + np.std(stw11DrftS4[ :, 5 ]) ], 0)
+                drftStw11.append(stw11DrftS4)
+
+        stw11DrftS4 = np.concatenate(drftStw11)
+
+        drftStw12 = []
+        #stw12DrftS4 = np.array([ i for i in dtNew1 if i[ 4 ] >= 10 and i[ 4 ] < 10.5 and i[ 0 ] <= 9 ])
+
+        for dr in range(6,9):
+                stw12DrftS4 =np.array([ i for i in dtNew1  if i[ 4 ] >= 10 and i[ 4 ] < 10.5 and i[ 0 ] > dr and  i[ 0 ] <= dr+1 ])
+                stw12DrftS4 = np.delete(stw12DrftS4, [ i for (i, v) in enumerate(stw12DrftS4[:,5]) if  v < (np.mean(stw12DrftS4[ :, 5 ]) - np.std(stw12DrftS4[ :, 5 ])) or   v > np.mean(stw12DrftS4[ :, 5 ]) + np.std(stw12DrftS4[ :, 5 ]) ], 0)
+                drftStw12.append(stw12DrftS4)
+
+        stw12DrftS4 = np.concatenate(drftStw12)
+
+        drftStw13 = []
+        #stw13DrftS4 = np.array([ i for i in dtNew1 if i[ 4 ] >= 10.5 and i[ 4 ] < 11 and i[ 0 ] <= 9 ])
+
+        for dr in range(6,9):
+                stw13DrftS4 =np.array([ i for i in dtNew1  if i[ 4 ] >= 10.5 and i[ 4 ] < 11 and i[ 0 ] > dr and  i[ 0 ] <= dr+1 ])
+                stw13DrftS4 = np.delete(stw13DrftS4, [ i for (i, v) in enumerate(stw13DrftS4[:,5]) if  v < (np.mean(stw13DrftS4[ :, 5 ]) - np.std(stw13DrftS4[ :, 5 ])) or   v > np.mean(stw13DrftS4[ :, 5 ]) + np.std(stw13DrftS4[ :, 5 ]) ], 0)
+                drftStw13.append(stw13DrftS4)
+
+        stw13DrftS4 = np.concatenate(drftStw13)
+
+        drftStw14 = []
+        #stw14DrftS4 = np.array([ i for i in dtNew1 if i[ 4 ] >= 11 and i[ 4 ] < 11.5 and i[ 0 ] <= 9 ])
+
+        for dr in range(6,9):
+                stw14DrftS4 =np.array([ i for i in dtNew1  if i[ 4 ] >= 11 and i[ 4 ] < 11.5 and i[ 0 ] > dr and  i[ 0 ] <= dr+1 ])
+                stw14DrftS4 = np.delete(stw14DrftS4, [ i for (i, v) in enumerate(stw14DrftS4[:,5]) if  v < (np.mean(stw14DrftS4[ :, 5 ]) - np.std(stw14DrftS4[ :, 5 ])) or   v > np.mean(stw14DrftS4[ :, 5 ]) + np.std(stw14DrftS4[ :, 5 ]) ], 0)
+                drftStw14.append(stw14DrftS4)
+
+        stw14DrftS4 = np.concatenate(drftStw14)
+
+
+        drftStw15 = []
         stw15DrftS4 = np.array([ i for i in dtNew1 if i[ 4 ] >= 11.5 and i[ 4 ] < 12 and i[ 0 ] <= 9 ])
-        stw15DrftS4 = np.delete(stw15DrftS4, [ i for (i, v) in enumerate(stw15DrftS4[:,5]) if  v < (np.mean(stw15DrftS4[ :, 5 ]) - np.std(stw15DrftS4[ :, 5 ])) or   v > np.mean(stw15DrftS4[ :, 5 ]) + np.std(stw15DrftS4[ :, 5 ]) ], 0)
 
-        stw16DrftS4 = np.array([ i for i in dtNew1 if i[ 4 ] >= 12 and i[ 4 ] < 12.5 and i[ 0 ] <= 9 ])
-        stw16DrftS4 = np.delete(stw16DrftS4, [ i for (i, v) in enumerate(stw16DrftS4[:,5]) if  v < (np.mean(stw16DrftS4[ :, 5 ]) - np.std(stw16DrftS4[ :, 5 ])) or   v > np.mean(stw16DrftS4[ :, 5 ]) + np.std(stw16DrftS4[ :, 5 ]) ], 0)
+        for dr in range(6,9):
+                stw15DrftS4 =np.array([ i for i in dtNew1  if i[ 4 ] >= 11.5 and i[ 4 ] < 12 and i[ 0 ] > dr and  i[ 0 ] <= dr+1 ])
+                stw15DrftS4 = np.delete(stw15DrftS4, [ i for (i, v) in enumerate(stw15DrftS4[:,5]) if  v < (np.mean(stw15DrftS4[ :, 5 ]) - np.std(stw15DrftS4[ :, 5 ])) or   v > np.mean(stw15DrftS4[ :, 5 ]) + np.std(stw15DrftS4[ :, 5 ]) ], 0)
+                drftStw15.append(stw15DrftS4)
 
-        stw17DrftS4 = np.array([ i for i in dtNew1 if i[ 4 ] >= 12.5 and i[ 4 ] < 13 and i[ 0 ] <= 9 ])
-        stw17DrftS4 = np.delete(stw17DrftS4, [ i for (i, v) in enumerate(stw17DrftS4[:,5]) if  v < (np.mean(stw17DrftS4[ :, 5 ]) - np.std(stw17DrftS4[ :, 5 ])) or   v > np.mean(stw17DrftS4[ :, 5 ]) + np.std(stw17DrftS4[ :, 5 ]) ], 0)
+        stw15DrftS4 = np.concatenate(drftStw15)
 
-        stw18DrftS4 = np.array([ i for i in dtNew1 if i[ 4 ] >= 13 and i[ 4 ] < 13.5 and i[ 0 ] <= 9 ])
-        stw18DrftS4 = np.delete(stw18DrftS4, [ i for (i, v) in enumerate(stw18DrftS4[:,5]) if  v < (np.mean(stw18DrftS4[ :, 5 ]) - np.std(stw18DrftS4[ :, 5 ])) or   v > np.mean(stw18DrftS4[ :, 5 ]) + np.std(stw18DrftS4[ :, 5 ]) ], 0)
+        drftStw16 = []
+        #stw16DrftS4 = np.array([ i for i in dtNew1 if i[ 4 ] >= 12 and i[ 4 ] < 12.5 and i[ 0 ] <= 9 ])
+        for dr in range(6,9):
+                stw16DrftS4 =np.array([ i for i in dtNew1  if i[ 4 ] >= 12 and i[ 4 ] < 12.5 and i[ 0 ] > dr and  i[ 0 ] <= dr+1 ])
+                stw16DrftS4 = np.delete(stw16DrftS4, [ i for (i, v) in enumerate(stw16DrftS4[:,5]) if  v < (np.mean(stw16DrftS4[ :, 5 ]) - np.std(stw16DrftS4[ :, 5 ])) or   v > np.mean(stw16DrftS4[ :, 5 ]) + np.std(stw16DrftS4[ :, 5 ]) ], 0)
+                drftStw16.append(stw16DrftS4)
 
-        stw19DrftS4 = np.array([ i for i in dtNew1 if i[ 4 ] >= 13.5 and i[ 4 ] < 14 and i[ 0 ] <= 9 ])
-        stw19DrftS4 = np.delete(stw19DrftS4, [ i for (i, v) in enumerate(stw19DrftS4[:,5]) if  v < (np.mean(stw19DrftS4[ :, 5 ]) - np.std(stw19DrftS4[ :, 5 ])) or   v > np.mean(stw19DrftS4[ :, 5 ]) + np.std(stw19DrftS4[ :, 5 ]) ], 0)
+        stw16DrftS4 = np.concatenate(drftStw16)
+
+        drftStw17 = []
+        #stw17DrftS4 = np.array([i for i in dtNew1 if i[4] >= 12.5 and i[4] < 13 and i[0] <= 9])
+
+        for dr in range(6,9):
+                stw17DrftS4 =np.array([ i for i in dtNew1  if i[ 4 ] >= 12 and i[ 4 ] < 12.5 and i[ 0 ] > dr and  i[ 0 ] <= dr+1 ])
+                if stw17DrftS4.shape[0] != 0:
+                    stw17DrftS4 = np.delete(stw17DrftS4, [ i for (i, v) in enumerate(stw17DrftS4[:,5]) if  v < (np.mean(stw17DrftS4[ :, 5 ]) - np.std(stw17DrftS4[ :, 5 ])) or   v > np.mean(stw17DrftS4[ :, 5 ]) + np.std(stw17DrftS4[ :, 5 ]) ], 0)
+                    drftStw17.append(stw17DrftS4)
+
+        stw17DrftS4 = np.concatenate(drftStw17)
+
+        drftStw18 = []
+        #stw18DrftS4 = np.array([ i for i in dtNew1 if i[ 4 ] >= 13 and i[ 4 ] < 13.5 and i[ 0 ] <= 9 ])
+        for dr in range(6,9):
+            stw18DrftS4 =np.array([ i for i in dtNew1  if i[ 4 ] >= 13 and i[ 4 ] < 13.5 and i[ 0 ] > dr and  i[ 0 ] <= dr+1 ])
+            if stw18DrftS4.shape[0] != 0:
+                stw18DrftS4 = np.delete(stw18DrftS4, [ i for (i, v) in enumerate(stw18DrftS4[:,5]) if  v < (np.mean(stw18DrftS4[ :, 5 ]) - np.std(stw18DrftS4[ :, 5 ])) or   v > np.mean(stw18DrftS4[ :, 5 ]) + np.std(stw18DrftS4[ :, 5 ]) ], 0)
+                drftStw18.append(stw18DrftS4)
+
+        stw18DrftS4 = np.concatenate(drftStw18)
+
+
+        drftStw19 = []
+       # stw19DrftS4 = np.array([ i for i in dtNew1 if i[ 4 ] >= 13.5 and i[ 4 ] < 14 and i[ 0 ] <= 9 ])
+        for dr in range(6,9):
+                stw19DrftS4 =np.array([ i for i in dtNew1  if i[ 4 ] >= 13.5 and i[ 4 ] < 14 and i[ 0 ] > dr and  i[ 0 ] <= dr+1 ])
+                if stw19DrftS4.shape[0] != 0:
+                    stw19DrftS4 = np.delete(stw19DrftS4, [ i for (i, v) in enumerate(stw19DrftS4[:,5]) if  v < (np.mean(stw19DrftS4[ :, 5 ]) - np.std(stw19DrftS4[ :, 5 ])) or   v > np.mean(stw19DrftS4[ :, 5 ]) + np.std(stw19DrftS4[ :, 5 ]) ], 0)
+                    drftStw19.append(stw19DrftS4)
+
+        stw19DrftS4 = np.concatenate(drftStw19)
+
 
         ##################################################################################
-        ######################################################
+        ##################################################################################
+        ##################################################################################
         #########DRAFT > 9
-        stw8DrftB4 = np.array([ i for i in dtNew1 if i[ 4 ] >= 8 and i[ 4 ] < 8.5 and i[ 0 ] > 9 ])
-        stw8DrftB4 = np.delete(stw8DrftB4, [ i for (i, v) in enumerate(stw8DrftB4[:,5]) if  v < (np.mean(stw8DrftB4[ :, 5 ]) - np.std(stw8DrftB4[ :, 5 ])) or   v > np.mean(stw8DrftB4[ :, 5 ]) + np.std(stw8DrftB4[ :, 5 ]) ], 0)
+        drftStw8=[]
+        stw8DrftB4 = np.array([ i for i in dtNew1 if i[ 4 ] >= 8 and i[ 4 ] < 8.5 and i[ 0 ] > 9   ])
+        for dr in range(9,14):
+                stw8DrftB4 =np.array([ i for i in dtNew1 if i[ 4 ] >= 8 and i[ 4 ] < 8.5 and i[ 0 ] > dr and  i[ 0 ] <= dr+1 ])
+                stw8DrftB4 = np.delete(stw8DrftB4, [ i for (i, v) in enumerate(stw8DrftB4[:,5]) if  v < (np.mean(stw8DrftB4[ :, 5 ]) - np.std(stw8DrftB4[ :, 5 ])) or   v > np.mean(stw8DrftB4[ :, 5 ]) + np.std(stw8DrftB4[ :, 5 ]) ], 0)
+                drftStw8.append(stw8DrftB4)
+        stw8DrftB4 = np.concatenate(drftStw8)
 
-        stw9DrftB4 = np.array([ i for i in dtNew1 if i[ 4 ] >= 8.5 and i[ 4 ] < 9 and i[ 0 ] > 9 ])
-        stw9DrftB4 = np.delete(stw9DrftB4, [ i for (i, v) in enumerate(stw9DrftB4[:,5]) if  v < (np.mean(stw9DrftB4[ :, 5 ]) - np.std(stw9DrftB4[ :, 5 ])) or   v > np.mean(stw9DrftB4[ :, 5 ]) + np.std(stw9DrftB4[ :, 5 ]) ], 0)
+        drftStw9 = []
+        stw9DrftB4 = np.array([ i for i in dtNew1 if i[ 4 ] >= 8.5 and i[ 4 ] <9 and i[ 0 ] > 9 ])
+        for dr in range(9,14):
+                stw9DrftB4 =np.array([ i for i in dtNew1 if i[ 4 ] >= 8.5 and i[ 4 ] <9  and i[ 0 ] > dr and  i[ 0 ] <= dr+1 ])
+                stw9DrftB4 = np.delete(stw9DrftB4, [i for (i, v) in enumerate(stw9DrftB4[:, 5]) if v < (np.mean(stw9DrftB4[:, 5]) - np.std(stw9DrftB4[:, 5])) or v > np.mean(stw9DrftB4[:, 5]) + np.std(stw9DrftB4[:, 5])], 0)
+                drftStw9.append(stw9DrftB4)
 
+        stw9DrftB4 = np.concatenate(drftStw9)
+
+        drftStw10=[]
         stw10DrftB4 = np.array([ i for i in dtNew1 if i[ 4 ] >= 9 and i[ 4 ] < 9.5 and i[ 0 ] > 9 ])
-        stw10DrftB4 = np.delete(stw10DrftB4, [ i for (i, v) in enumerate(stw10DrftB4[:,5]) if  v < (np.mean(stw10DrftB4[ :, 5 ]) - np.std(stw10DrftB4[ :, 5 ])) or   v > np.mean(stw10DrftB4[ :, 5 ]) + np.std(stw10DrftB4[ :, 5 ]) ], 0)
+        for dr in range(9,14):
+                stw10DrftB4 =np.array([ i for i in dtNew1 if i[ 4 ] >= 9 and i[ 4 ] < 9.5  and i[ 0 ] > dr and  i[ 0 ] <= dr+1 ])
+                stw10DrftB4 = np.delete(stw10DrftB4, [i for (i, v) in enumerate(stw10DrftB4[:, 5]) if v < (np.mean(stw10DrftB4[:, 5]) - np.std(stw10DrftB4[:, 5])) or v > np.mean(stw10DrftB4[:, 5]) + np.std(stw10DrftB4[:, 5])], 0)
+                drftStw10.append(stw10DrftB4)
+        stw10DrftB4 = np.concatenate(drftStw10)
 
+        drftStw11 = []
         stw11DrftB4 = np.array([ i for i in dtNew1 if i[ 4 ] >= 9.5 and i[ 4 ] < 10 and i[ 0 ] > 9 ])
-        stw11DrftB4 = np.delete(stw11DrftB4, [ i for (i, v) in enumerate(stw11DrftB4[:,5]) if  v < (np.mean(stw11DrftB4[ :, 5 ]) - np.std(stw11DrftB4[ :, 5 ])) or   v > np.mean(stw11DrftB4[ :, 5 ]) + np.std(stw11DrftB4[ :, 5 ]) ], 0)
+        for dr in range(9,14):
+                stw11DrftB4 =np.array([ i for i in dtNew1 if i[ 4 ] >= 9.5 and i[ 4 ] < 10 and i[ 0 ] > dr and  i[ 0 ] <= dr+1 ])
+                stw11DrftB4 = np.delete(stw11DrftB4, [i for (i, v) in enumerate(stw11DrftB4[:, 5]) if v < (np.mean(stw11DrftB4[:, 5]) - np.std(stw11DrftB4[:, 5])) or v > np.mean(stw11DrftB4[:, 5]) + np.std(stw11DrftB4[:, 5])], 0)
+                drftStw11.append(stw11DrftB4)
+        stw11DrftB4 = np.concatenate(drftStw11)
 
+        drftStw12 = []
         stw12DrftB4 = np.array([ i for i in dtNew1 if i[ 4 ] >= 10 and i[ 4 ] < 10.5 and i[ 0 ] > 9 ])
-        stw12DrftB4 = np.delete(stw12DrftB4, [ i for (i, v) in enumerate(stw12DrftB4[:,5]) if  v < (np.mean(stw12DrftB4[ :, 5 ]) - np.std(stw12DrftB4[ :, 5 ])) or   v > np.mean(stw12DrftB4[ :, 5 ]) + np.std(stw12DrftB4[ :, 5 ]) ], 0)
+        for dr in range(9,14):
+            stw12DrftB4 =np.array([ i for i in dtNew1 if i[ 4 ] >= 10 and i[ 4 ] < 10.5 and i[ 0 ] > dr and  i[ 0 ] <= dr+1 ])
+            stw12DrftB4 = np.delete(stw12DrftB4, [i for (i, v) in enumerate(stw12DrftB4[:, 5]) if v < (np.mean(stw12DrftB4[:, 5]) - np.std(stw12DrftB4[:, 5])) or v > np.mean(stw12DrftB4[:, 5]) + np.std(stw12DrftB4[:, 5])], 0)
+            drftStw12.append(stw12DrftB4)
 
+        stw12DrftB4 = np.concatenate(drftStw12)
+
+        drftStw13 = []
         stw13DrftB4 = np.array([ i for i in dtNew1 if i[ 4 ] >= 10.5 and i[ 4 ] < 11 and i[ 0 ] > 9 ])
-        stw13DrftB4 =np.delete(stw13DrftB4, [ i for (i, v) in enumerate(stw13DrftB4[:,5]) if  v < (np.mean(stw13DrftB4[ :, 5 ]) - np.std(stw13DrftB4[ :, 5 ])) or   v > np.mean(stw13DrftB4[ :, 5 ]) + np.std(stw13DrftB4[ :, 5 ]) ], 0)
+        for dr in range(9,14):
+            stw13DrftB4 =np.array([ i for i in dtNew1 if i[ 4 ] >= 10.5 and i[ 4 ] < 11 and i[ 0 ] > dr and  i[ 0 ] <= dr+1 ])
+            stw13DrftB4 = np.delete(stw13DrftB4, [i for (i, v) in enumerate(stw13DrftB4[:, 5]) if v < (np.mean(stw13DrftB4[:, 5]) - np.std(stw13DrftB4[:, 5])) or v > np.mean(stw13DrftB4[:, 5]) + np.std(stw13DrftB4[:, 5])], 0)
+            drftStw13.append(stw13DrftB4)
+        stw13DrftB4 = np.concatenate(drftStw13)
 
+        drftStw14 = []
         stw14DrftB4 = np.array([ i for i in dtNew1 if i[ 4 ] >= 11 and i[ 4 ] < 11.5 and i[ 0 ] > 9 ])
-        stw14DrftB4 = np.delete(stw14DrftB4, [ i for (i, v) in enumerate(stw14DrftB4[:,5]) if  v < (np.mean(stw14DrftB4[ :, 5 ]) - np.std(stw14DrftB4[ :, 5 ])) or   v > np.mean(stw14DrftB4[ :, 5 ]) + np.std(stw14DrftB4[ :, 5 ]) ], 0)
+        for dr in range(9,14):
+            stw14DrftB4 =np.array([ i for i in dtNew1 if i[ 4 ] >= 11 and i[ 4 ] < 11.5 and i[ 0 ] > dr and  i[ 0 ] <= dr+1 ])
+            stw14DrftB4 = np.delete(stw14DrftB4, [i for (i, v) in enumerate(stw14DrftB4[:, 5]) if v < (np.mean(stw14DrftB4[:, 5]) - np.std(stw14DrftB4[:, 5])) or v > np.mean(stw14DrftB4[:, 5]) + np.std(stw14DrftB4[:, 5])], 0)
+            drftStw14.append(stw14DrftB4)
+        stw14DrftB4 = np.concatenate(drftStw14)
 
+        drftStw15 = []
         stw15DrftB4 = np.array([ i for i in dtNew1 if i[ 4 ] >= 11.5 and i[ 4 ] < 12 and i[ 0 ] > 9 ])
-        stw15DrftB4 = np.delete(stw15DrftB4, [ i for (i, v) in enumerate(stw15DrftB4[:,5]) if  v < (np.mean(stw15DrftB4[ :, 5 ]) - np.std(stw15DrftB4[ :, 5 ])) or   v > np.mean(stw15DrftB4[ :, 5 ]) + np.std(stw15DrftB4[ :, 5 ]) ], 0)
+        for dr in range(9,14):
+            stw15DrftB4 =np.array([ i for i in dtNew1 if i[ 4 ] >= 11.5 and i[ 4 ] < 12 and i[ 0 ] > dr and  i[ 0 ] <= dr+1 ])
+            stw15DrftB4 = np.delete(stw15DrftB4, [i for (i, v) in enumerate(stw15DrftB4[:, 5]) if v < (np.mean(stw15DrftB4[:, 5]) - np.std(stw15DrftB4[:, 5])) or v > np.mean(stw15DrftB4[:, 5]) + np.std(stw15DrftB4[:, 5])], 0)
+            drftStw15.append(stw15DrftB4)
+        stw15DrftB4 = np.concatenate(drftStw15)
 
+        drftStw16 = []
         stw16DrftB4 = np.array([ i for i in dtNew1 if i[ 4 ] >= 12 and i[ 4 ] < 12.5 and i[ 0 ] > 9 ])
-        stw16DrftB4 =np.delete(stw16DrftB4, [ i for (i, v) in enumerate(stw16DrftB4[:,5]) if  v < (np.mean(stw16DrftB4[ :, 5 ]) - np.std(stw16DrftB4[ :, 5 ])) or   v > np.mean(stw16DrftB4[ :, 5 ]) + np.std(stw16DrftB4[ :, 5 ]) ], 0)
+        for dr in range(9,14):
+            stw16DrftB4 =np.array([ i for i in dtNew1 if i[ 4 ] >= 12 and i[ 4 ] < 12.5 and i[ 0 ] > dr and  i[ 0 ] <= dr+1 ])
+            stw16DrftB4 = np.delete(stw16DrftB4, [i for (i, v) in enumerate(stw16DrftB4[:, 5]) if v < (np.mean(stw16DrftB4[:, 5]) - np.std(stw16DrftB4[:, 5])) or v > np.mean(stw16DrftB4[:, 5]) + np.std(stw16DrftB4[:, 5])], 0)
+            drftStw16.append(stw16DrftB4)
+        stw16DrftB4 = np.concatenate(drftStw16)
 
+        drftStw17 = []
         stw17DrftB4 = np.array([ i for i in dtNew1 if i[ 4 ] >= 12.5 and i[ 4 ] < 13 and i[ 0 ] > 9 ])
-        stw17DrftB4 = np.delete(stw17DrftB4, [ i for (i, v) in enumerate(stw17DrftB4[:,5]) if  v < (np.mean(stw17DrftB4[ :, 5 ]) - np.std(stw17DrftB4[ :, 5 ])) or   v > np.mean(stw17DrftB4[ :, 5 ]) + np.std(stw17DrftB4[ :, 5 ]) ], 0)
+        for dr in range(9,14):
+            stw17DrftB4 =np.array([ i for i in dtNew1 if i[ 4 ] >= 12.5 and i[ 4 ] < 13 and i[ 0 ] > dr and  i[ 0 ] <= dr+1 ])
+            if stw17DrftB4.shape[0]!=0:
+                stw17DrftB4 = np.delete(stw17DrftB4, [i for (i, v) in enumerate(stw17DrftB4[:, 5]) if v < (np.mean(stw17DrftB4[:, 5]) - np.std(stw17DrftB4[:, 5])) or v > np.mean(stw17DrftB4[:, 5]) + np.std(stw17DrftB4[:, 5])], 0)
+                drftStw17.append(stw17DrftB4)
+        stw17DrftB4 = np.concatenate(drftStw17)
 
+        drftStw18 = []
         stw18DrftB4 = np.array([ i for i in dtNew1 if i[ 4 ] >= 13 and i[ 4 ] < 13.5 and i[ 0 ] > 9 ])
-        stw18DrftB4 = np.delete(stw18DrftB4, [ i for (i, v) in enumerate(stw18DrftB4[:,5]) if  v < (np.mean(stw18DrftB4[ :, 5 ]) - np.std(stw18DrftB4[ :, 5 ])) or   v > np.mean(stw18DrftB4[ :, 5 ]) + np.std(stw18DrftB4[ :, 5 ]) ], 0)
+        for dr in range(9,14):
+            stw18DrftB4 =np.array([ i for i in dtNew1 if i[ 4 ] >= 13 and i[ 4 ] < 13.5  and i[ 0 ] > dr and  i[ 0 ] <= dr+1 ])
+            if stw18DrftB4.shape[0] != 0:
+                stw18DrftB4 = np.delete(stw18DrftB4, [i for (i, v) in enumerate(stw18DrftB4[:, 5]) if v < (np.mean(stw18DrftB4[:, 5]) - np.std(stw18DrftB4[:, 5])) or v > np.mean(stw18DrftB4[:, 5]) + np.std(stw18DrftB4[:, 5])], 0)
+                drftStw18.append(stw18DrftB4)
+        stw18DrftB4 = np.concatenate(drftStw18)
 
+        drftStw19 = []
         stw19DrftB4 = np.array([ i for i in dtNew1 if i[ 4 ] >= 13.5 and i[ 4 ] < 14 and i[ 0 ] > 9 ])
-        stw19DrftB4 = np.delete(stw19DrftB4, [ i for (i, v) in enumerate(stw19DrftB4[:,5]) if  v < (np.mean(stw19DrftB4[ :, 5 ]) - np.std(stw19DrftB4[ :, 5 ])) or   v > np.mean(stw19DrftB4[ :, 5 ]) + np.std(stw19DrftB4[ :, 5 ]) ], 0)
+        for dr in range(9,14):
+            stw19DrftB4 =np.array([ i for i in dtNew1 if i[ 4 ] >= 13.5 and i[ 4 ] < 14 and i[ 0 ] > dr and  i[ 0 ] <= dr+1 ])
+            if stw19DrftB4.shape[0] != 0:
+                stw19DrftB4 = np.delete(stw19DrftB4, [i for (i, v) in enumerate(stw19DrftB4[:, 5]) if v < (np.mean(stw19DrftB4[:, 5]) - np.std(stw19DrftB4[:, 5])) or v > np.mean(stw19DrftB4[:, 5]) + np.std(stw19DrftB4[:, 5])], 0)
+                drftStw19.append(stw19DrftB4)
+        stw19DrftB4 = np.concatenate(drftStw19)
+
 
         ################################################
         concatS = np.concatenate([stw8DrftS4,stw9DrftS4,stw10DrftS4,stw11DrftS4,stw12DrftS4,stw13DrftS4,stw14DrftS4,stw15DrftS4,stw16DrftS4,stw17DrftS4,stw18DrftS4,stw19DrftS4])
@@ -377,7 +1152,7 @@ class BaseSeriesReader:
         ##seriesX = newSeriesX
 
 
-        UnseenSeriesX = dtNew1[140000:141000, 0:5]
+        UnseenSeriesX = dtNew1[10000:11000, 0:5]
         newUnseenSeriesX=[]
         #for x in UnseenSeriesX:
             #dmWS = x[0] * x[1]
@@ -395,7 +1170,7 @@ class BaseSeriesReader:
         #FOC = scaled_df
         # normalized_Y = preprocessing.normalize([FOC])
 
-        unseenFOC = dtNew1[140000:141000, 5 ]
+        unseenFOC = dtNew1[10000:11000, 5 ]
         #WS= np.asarray([x for x in dt[ :, 1 ] ])
         #WA = np.asarray([ x for x in dt[ :, 2 ] ])
         #SO = np.asarray([ y for y in dt[ :, 3 ] ])

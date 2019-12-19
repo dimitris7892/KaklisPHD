@@ -73,7 +73,7 @@ def main():
 
         preds.append(prediction[0][0])
 
-    print('\n'+'FOC (tons / day) : '+str(np.round(scaledPred * 1.44,3)))
+    print('\n'+'FOC (tons / day) : '+str(np.round(prediction1 ,3)))
     return preds
 
 def initParameters():
@@ -102,7 +102,7 @@ def initParameters():
         clusters = '50'
         path = '.\\'
     else:
-        listOfPoints = "[5.3956,-3,5.2727,-9.7,12]"
+        listOfPoints = "[11.3956,-1,5.2727,-9.7,13]"
         path = '.\\'
         clusters = '50'
 
