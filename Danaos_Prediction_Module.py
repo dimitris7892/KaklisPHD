@@ -196,7 +196,7 @@ def main():
     #scalerX = scalerX.fit(np.concatenate(partitionsX))
     #scalerY = scalerY.fit(np.concatenate(partitionsY).reshape(-1, 1))
     try:
-        for i in range(35, len(pred)):
+        for i in range(0, len(pred)):
             #vector = seriesX[i]
             vector = Predictors.values[i]
             vector = vector.reshape(-1,5)
@@ -213,10 +213,10 @@ def main():
             # prediction1 = (Scaler_y.inverse_transform(prediction1))  # + scalerY.inverse_transform(currModeler1.predict(scaled))) / 2
 
             mahal = mahalanobis(vector,X,sigma)
-            pValue =  1 - chi2.cdf(mahal, 3)
+            #pValue =  1 - chi2.cdf(mahal, 3)
             minDistance =chi2.ppf((1 - 0.001), df=4)
             #print(chi2.ppf((1 - 0.001), df=3))
-            print("P-Value of current observation : " + str(pValue) )
+            #print("P-Value of current observation : " + str(pValue) )
             #m_dist_x = np.dot((vector - mu), np.linalg.inv(sigma))
             #m_dist_x = np.dot(m_dist_x.T, (vector - mu))
             #prob = 1 - stats.chi2.cdf(m_dist_x, 3)
@@ -224,7 +224,7 @@ def main():
                 scaledPred = prediction1
 
             else:
-                if vector[0][0] < 14 and vector[0][4] <= 9:
+                if vector[0][0] < 9.5 and vector[0][4] <= 9.5:
                     #scaledPred = (prediction1 + prediction * fit) - 5
                     scaledPred = (prediction1 + (prediction - prediction * fit))
                 else:
