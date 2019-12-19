@@ -434,8 +434,8 @@ class TensorFlowWD(BasePartitionModeler):
             model.add(keras.layers.Dense(50,  input_shape=(5,)))
             model.add(keras.layers.Dense(20, ))
 
-            model.add(keras.layers.Reshape((1,20,), name='reshape_1'))
-            model.add(keras.layers.LSTM(5, ))
+            #model.add(keras.layers.Reshape((1,20,), name='reshape_1'))
+            #model.add(keras.layers.LSTM(5, ))
             #model.add(keras.layers.Reshape((1, 20,), name='reshape_2'))
             #model.add(keras.layers.LSTM(10, ))
             #model.add(keras.layers.Reshape((1, 50,), name='reshape_3'))
@@ -571,7 +571,7 @@ class TensorFlowWD(BasePartitionModeler):
         targetY = scaled_Y
 
 
-        estimator.fit(X, Y, epochs=30, validation_split=0.33,batch_size=5)
+        estimator.fit(X, Y, epochs=30, validation_split=0.33,)
         estimator.save("estimatorCl_Gen_.h5")
 
         def insert_intermediate_layer_in_keras(model, layer_id, new_layer):
@@ -629,7 +629,7 @@ class TensorFlowWD(BasePartitionModeler):
             scaled_Y = scaler.fit_transform(partitionsY[idx].reshape(-1,1))
             targetY = scaled_Y
 
-            estimator.fit(np.array(partitionsX[idx]), np.array(partitionsY[idx]), epochs=40,batch_size=5)
+            estimator.fit(np.array(partitionsX[idx]), np.array(partitionsY[idx]), epochs=40,)
             estimator.save("estimatorCl_" + str(idx) + ".h5")
             NNmodels.append(estimator)
             with open('./cluster_' + str(idx) + '_.csv', mode='w') as data:

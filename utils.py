@@ -3,6 +3,40 @@ import matplotlib as mpl
 import matplotlib.cm as cm
 ##############################################
 
+for row in dtNew[:, 9]:
+    date = row.split(" ")[0]
+    # hhMMss = row.split(" ")[1]
+    # newDate = date + " " + ":".join(hhMMss.split(":")[0:2])
+    dt = datetime.datetime.strptime(date, '%Y-%m-%d')
+
+    if dt > datetime.datetime.strptime('2018-04-30', '%Y-%m-%d') and dt < datetime.datetime.strptime('2018-10-31',
+                                                                                                     '%Y-%m-%d'):
+        daysSincelastPropClean.append((dt - datetime.datetime.strptime('2018-04-30', '%Y-%m-%d')).days)
+    elif dt > datetime.datetime.strptime('2018-10-31', '%Y-%m-%d') and dt < datetime.datetime.strptime('2019-04-07',
+                                                                                                       '%Y-%m-%d'):
+        daysSincelastPropClean.append((dt - datetime.datetime.strptime('2018-10-31', '%Y-%m-%d')).days)
+    elif dt > datetime.datetime.strptime('2019-04-07', '%Y-%m-%d'):
+        daysSincelastPropClean.append((dt - datetime.datetime.strptime('2019-04-07', '%Y-%m-%d')).days)
+    else:
+        daysSincelastPropClean.append((dt - datetime.datetime.strptime('2015-04-18', '%Y-%m-%d')).days)
+    ##########################################
+    if dt > datetime.datetime.strptime('2019-04-07', '%Y-%m-%d'):
+        daysSinceLastDryDock.append((dt - datetime.datetime.strptime('2015-04-18', '%Y-%m-%d')).days)
+    else:
+        daysSinceLastDryDock.append((dt - datetime.datetime.strptime('2015-04-18', '%Y-%m-%d')).days)
+
+daysSincelastPropClean = np.array(daysSincelastPropClean).reshape(-1, 1).astype(float)
+daysSinceLastDryDock = np.array(daysSinceLastDryDock).reshape(-1, 1).astype(float)
+
+with open('./daysSincelastPropClean.csv', mode='w') as dataw:
+    for k in range(0, len(daysSincelastPropClean)):
+        data_writer = csv.writer(dataw, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+        data_writer.writerow([daysSincelastPropClean[k][0]])
+
+with open('./daysSinceLastDryDock.csv', mode='w') as dataw:
+    for k in range(0, len(daysSinceLastDryDock)):
+        data_writer = csv.writer(dataw, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+        data_writer.writerow([daysSinceLastDryDock[k][0]])
 
 for models in srModels:
     modelSummary = str(models.summary()).split("\n")[ 4: ]
