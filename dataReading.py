@@ -30,7 +30,7 @@ class BaseSeriesReader:
 
 
     def readLarosDAta(self,dtFrom,dtTo):
-
+        UNK = {"data": []}
         draft={"data": [ ]}
         draftAFT = {"data": [ ]}
         draftFORE = {"data": [ ]}
@@ -59,11 +59,18 @@ class BaseSeriesReader:
                     dt = datetime.datetime.strptime(newDate, '%Y-%m-%d %H:%M')
                     value = row[3]
                     siteId=row[2]
-
+                    if dt >  datetime.datetime.strptime('2018-05-20', '%Y-%m-%d'):
+                        print(dt)
                     datt = {}
                     datt[ "value" ] = 0
                     datt[ "dt" ] = dt
                     dateD[ "data" ].append(datt)
+
+                    if id == '7':
+                        unknown = {}
+                        unknown["value"] = value
+                        unknown["dt"] = dt
+                        UNK["data"].append(unknown)
 
                     if id=='21' :
                         drftA={}
@@ -147,7 +154,7 @@ class BaseSeriesReader:
             #data_writer.writerow(
                 #['Draft','DateTime' ])
 
-            for i in range(0,len(draft['data'])):
+            for i in range(0,len(UNK['data'])):
                     dt = dateD['data'][i]['dt']
                     value=""
 
