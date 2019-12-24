@@ -1,8 +1,124 @@
 import numpy as np
 import matplotlib as mpl
 import matplotlib.cm as cm
-##############################################
+########################################################
+windDirsVmapped.append(float(row[ 0 ]))
 
+with open('./windSpeedMapped.csv', mode='w') as dataw:
+    for k in range(0, len(windSpeedVmapped)):
+        data_writer = csv.writer(dataw, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+        data_writer.writerow([ windSpeedVmapped[ k ][ 0 ] ])
+with open('./windDirMapped.csv', mode='w') as dataw:
+    for k in range(0, len(windDirsVmapped)):
+        data_writer = csv.writer(dataw, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+        data_writer.writerow([ windDirsVmapped[ k ][ 0 ] ])
+
+################################
+# dtNew = dtNew[ :, 0 ]
+dateTimesV = [ ]
+for row in dtNew[ :, 0 ]:
+    date = row.split(" ")[ 0 ]
+    hhMMss = row.split(" ")[ 1 ]
+    newDate = date + " " + ":".join(hhMMss.split(":")[ 0:2 ])
+    dt = datetime.datetime.strptime(newDate, '%Y-%m-%d %H:%M')
+    dateTimesV.append(dt)
+
+data = pd.read_excel('./Penelope TrackReport.xls')
+WdtNew = data.values[ 0:, : ]
+dateTimesW = [ ]
+ws = [ ]
+
+for i in range(0, len(WdtNew[ :, 1 ])):
+    date = WdtNew[ i, 1 ].split(" ")[ 0 ]
+    month = date.split('.')[ 1 ]
+    day = date.split('.')[ 0 ]
+    year = date.split('.')[ 2 ]
+
+    hhMMss = WdtNew[ i, 1 ].split(" ")[ 1 ]
+    newDate = year + "-" + month + "-" + day + " " + ":".join(hhMMss.split(":")[ 0:2 ])
+    dt = datetime.datetime.strptime(newDate, '%Y-%m-%d %H:%M')
+    if WdtNew[ i, 7 ] != 'No data' and WdtNew[ i, 8 ] != 'No data':
+        dateTimesW.append(dt)
+
+windSpeedVmapped = [ ]
+windDirsVmapped = [ ]
+for i in range(0, len(dateTimesV)):
+
+    dtDiff = {}
+    datesWs = [ ]
+
+    date = str(dateTimesV[ i ]).split(" ")[ 0 ]
+    month = date.split('-')[ 1 ]
+    day = date.split('-')[ 2 ]
+    year = date.split('-')[ 0 ]
+    dt = dateTimesV[ i ]
+
+    filteredDTWs = [ d for d in dateTimesW if month == str(d).split(' ')[ 0 ].split('-')[ 1 ] and day ==
+                     str(d).split(' ')[ 0 ].split('-')[ 2 ] and year == str(d).split(' ')[ 0 ].split('-')[ 0 ] ]
+
+    for k in range(0, len(filteredDTWs)):
+        # dtDiff[filteredDTWs[k]]=abs((filteredDTWs[k]-dt).total_seconds() / 60.0)
+        date = str(filteredDTWs[ k ]).split(" ")[ 0 ]
+        month = date.split('-')[ 1 ]
+        day = date.split('-')[ 2 ]
+        year = date.split('-')[ 0 ]
+        hhMMss = str(filteredDTWs[ k ]).split(" ")[ 1 ]
+        newDate = day + "." + month + "." + year + " " + ":".join(hhMMss.split(":")[ 0:2 ])
+        datesWs.append(newDate)
+
+    # firstMin = min(dtDiff.items(), key=lambda x: x[1])
+    # del dtDiff[ firstMin[ 0 ] ]
+    # secMin = min(dtDiff.items(), key=lambda x: x[ 1 ] )
+
+    windSpeeds = [ ]
+    windDirs = [ ]
+    for date in datesWs:
+        ws = np.array(data.loc[ data[ 'Date' ] == date + " Z" ].values)[ 0 ][ 7 ]
+        wd = np.array(data.loc[ data[ 'Date' ] == date + " Z" ].values)[ 0 ][ 8 ]
+        if ws != 'No data':
+            windSpeeds.append(float(ws.split('m')[ 0 ]))
+        if wd != 'No data':
+            windDirs.append(float(wd[ :len(wd) - 1 ]))
+
+    # df = pd.DataFrame([ws1,None,ws2], index=[firstMin,dt,secMin])
+    # resampled = df.resample('S')
+    # df.head()
+    # interp = df.interpolate()
+    # print(interp.head())
+    # windSpeedVmapped.append(interp.values[1])
+    from scipy.interpolate import interp1d
+
+    y = np.array(windSpeeds)
+    x = matplotlib.dates.date2num(filteredDTWs)
+    f = sp.Earth(max_degree=3)
+    f.fit(x.reshape(-1, 1), y.reshape(-1, 1))
+    pred = f.predict(np.array(matplotlib.dates.date2num(dt)).reshape(-1, 1))
+    windSpeedVmapped.append(pred)
+
+    y = np.array(windDirs)
+    x = matplotlib.dates.date2num(filteredDTWs)
+    f = sp.Earth(max_degree=3)
+
+    f.fit(x.reshape(-1, 1), y.reshape(-1, 1))
+    pred = f.predict(np.array(matplotlib.dates.date2num(dt)).reshape(-1, 1))
+    # f=interp1d(list(x), list(y), kind='cubic')
+    windDirsVmapped.append(pred)
+
+##############################################
+date = str(firstMin[ 0 ]).split(" ")[ 0 ]
+month = date.split('-')[ 1 ]
+day = date.split('-')[ 2 ]
+year = date.split('-')[ 0 ]
+hhMMss = str(firstMin[ 0 ]).split(" ")[ 1 ]
+newDate = day + "." + month + "." + year + " " + ":".join(hhMMss.split(":")[ 0:2 ])
+# dt = datetime.datetime.strptime(newDate, '%d-%m-%d %H:%M')
+date = str(secMin[ 0 ]).split(" ")[ 0 ]
+month = date.split('-')[ 1 ]
+day = date.split('-')[ 2 ]
+year = date.split('-')[ 0 ]
+hhMMss = str(firstMin[ 0 ]).split(" ")[ 1 ]
+newDate1 = day + "." + month + "." + year + " " + ":".join(hhMMss.split(":")[ 0:2 ])
+###################################################
 for row in dtNew[:, 9]:
     date = row.split(" ")[0]
     # hhMMss = row.split(" ")[1]
