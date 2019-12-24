@@ -3,6 +3,8 @@ import numpy as np
 import pandas as pd
 from scipy.stats import ks_2samp,chisquare,chi2_contingency
 import math
+import pyearth as sp
+import matplotlib
 import random
 import csv
 import datetime
@@ -27,6 +29,39 @@ class BaseSeriesReader:
             W = dt[ 100000:103000, 0]
 
         return np.nan_to_num(X.astype(float)),np.nan_to_num(Y.astype(float)) , np.nan_to_num(W.astype(float))
+
+    def readNewDataset(self):
+        dataV = pd.read_csv('./PENELOPE_1-30_11_19.csv')
+        dataV=dataV.drop([ 't_stamp', 'vessel status' ], axis=1)
+        dtNew = dataV.values
+        #pred = f(matplotlib.dates.date2num(dt))
+        data = pd.read_excel('./Penelope TrackReport.xls')
+        WdtNew = data.values[ 0:, : ]
+            #print(pred)
+        windSpeedVmapped = []
+        windDirsVmapped=[]
+
+        with open('./windSpeedMapped.csv') as csv_file:
+            csv_reader = csv.reader(csv_file, delimiter=',')
+            for row in csv_reader:
+                windSpeedVmapped.append(float(row[ 0 ]))
+        with open('./windDirMapped.csv') as csv_file:
+            csv_reader = csv.reader(csv_file, delimiter=',')
+            for row in csv_reader:
+                windDirsVmapped.append(float(row[0]))
+
+        newMappedData= np.array(np.append(dtNew[ :, : ], np.asmatrix([ np.array(windSpeedVmapped), np.array(windDirsVmapped) ]).T,
+                       axis=1)).astype(float)
+        Vcourse = newMappedData[:,2]
+        Vstw = newMappedData[:,1]
+        windDir = newMappedData[:,27]
+        windSpeed = newMappedData[ :, 26 ]
+        ###projection of vector wind speed direction vector into vessel speed direction orthogonal system of coordinates
+        x= np.array([Vstw[0],Vcourse[0]])
+        y = np.array([windSpeed[0],windDir[0]])
+
+        vecproj = y * np.dot(x, y) / np.dot(y, y)
+
 
 
     def readLarosDAta(self,dtFrom,dtTo):
