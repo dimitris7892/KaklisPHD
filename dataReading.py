@@ -264,13 +264,11 @@ class BaseSeriesReader:
     def readLarosDataFromCsvNewExtractExcels(self, data):
         # Load file
         dataNew = data.drop(['SpeedOvg'], axis=1)
-        dtNew = dataNew.values[0:, :]
+        dtNew = dataNew.values[484362:569386, :]
 
         daysSincelastPropClean = []
         daysSinceLastDryDock = []
 
-
-        ##############################################
 
         with open('./daysSincelastPropClean.csv') as csv_file:
             csv_reader = csv.reader(csv_file, delimiter=',')
@@ -289,24 +287,24 @@ class BaseSeriesReader:
         daysSinceLastDryDock = np.array(daysSinceLastDryDock).reshape(-1,).astype(float)
 
         dataNew = data.drop(['SpeedOvg', 'DateTime'], axis=1)
-        dtNew = dataNew.values[0:, :].astype(float)
+        dtNew = dataNew.values[ 484362:569386, : ].astype(float)
 
         draftMean = (dtNew[:, 1] + dtNew[:, 2]) / 2
         dtNew[:, 0] = np.round(draftMean, 3)
 
-        dtNew = dtNew[~np.isnan(dtNew).any(axis=1)]
+        #dtNew = dtNew[~np.isnan(dtNew).any(axis=1)]
 
         trim = (dtNew[:, 1] - dtNew[:, 2])
 
         dtNew1 = np.array(np.append(dtNew[:, 0].reshape(-1, 1), np.asmatrix(
             [np.round(trim, 3), dtNew[:, 3], dtNew[:, 4], dtNew[:, 5],dtNew[:, 6], daysSincelastPropClean , daysSinceLastDryDock ,  dtNew[:, 7]] ).T, axis=1))
 
-        dtNew1 = np.delete(dtNew1, [i for (i, v) in enumerate(dtNew1[0:, 0]) if v <= 6], 0)
-        dtNew1 = np.delete(dtNew1, [i for (i, v) in enumerate(dtNew1[0:, 4]) if v <= 8 or v > 14], 0)
+        #dtNew1 = np.delete(dtNew1, [i for (i, v) in enumerate(dtNew1[0:, 0]) if v <= 6], 0)
+        dtNew1 = np.delete(dtNew1, [i for (i, v) in enumerate(dtNew1[0:, 4]) if v <=0], 0)
 
         rpmB = np.array([i for i in dtNew1 if i[5] > 90 and i[7] < 100 ])
 
-        dtNew1 = np.delete(dtNew1, [i for (i, v) in enumerate(dtNew1[0:, 5]) if v <= 0 or v > 90], 0)  # or (v>0 and v <=10)
+        #dtNew1 = np.delete(dtNew1, [i for (i, v) in enumerate(dtNew1[0:, 5]) if v <= 0 or v > 90], 0)  # or (v>0 and v <=10)
         # dtNew = np.delete(dtNew, [ i for (i, v) in enumerate(dtNew[ 0:, 7 ]) ], 0) # if v <= 7
 
         ##statistics STD
@@ -314,7 +312,7 @@ class BaseSeriesReader:
         # draftBigger6 = np.array([ drft for drft in dtNew1 if drft[0] > 6 ])
         #########DRAFT < 9
         drftStw8 = []
-        stw8DrftS4 = np.array([i for i in dtNew1 if i[4] >= 8 and i[4] < 8.5 and i[0] <= 9])
+        #stw8DrftS4 = np.array([i for i in dtNew1 if i[4] >= 8 and i[4] < 8.5 and i[0] <= 9])
         with open('./MT_DELTA_MARIA_draftS_9_analysis.csv', mode='w') as rows:
             for dr in range(6, 9):
                 stw8DrftS4 = np.array([i for i in dtNew1 if i[4] >= 8 and i[4] < 8.5 and i[0] > dr and i[0] <= dr + 1])
@@ -895,7 +893,7 @@ class BaseSeriesReader:
         #'M/E FOC (kg/min)'
 
         #dataNew=dataNew[['Draft', 'SpeedOvg']]
-        dtNew = dataNew.values[ 0:, : ]#.astype(float)
+        dtNew = dataNew.values[ 484362:569386, : ].astype(float)
 
         draftMean = (dtNew[:, 1] + dtNew[:, 2]) / 2
         dtNew[:, 0] = np.round(draftMean,3)
