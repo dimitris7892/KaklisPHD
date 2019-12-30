@@ -131,7 +131,8 @@ def main():
 
             ####################################LAROS DATA STATISTICAL TESTS
             if modeler.__class__.__name__ == 'TensorFlowWD':
-                reader.readNewDataset()
+                reader.readExtractNewDataset()
+                #reader.readNewDataset()
                 #data = pd.read_csv('./MT_DELTA_MARIA_data_1.csv')
                 #reader.readLarosDataFromCsvNewExtractExcels(data)
                 seriesX, targetY,unseenFeaturesX, unseenFeaturesY  , drftB6 , drftS6 , drftTargetB6 , drftTargetS6, partitionsX, partitionsY,partitionLabels = reader.readLarosDataFromCsvNew(data)

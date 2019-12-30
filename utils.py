@@ -1,6 +1,35 @@
 import numpy as np
 import matplotlib as mpl
 import matplotlib.cm as cm
+######################
+###################
+windSpeedVmapped = [ ]
+windDirsVmapped = [ ]
+
+with open('./windSpeedMapped.csv') as csv_file:
+    csv_reader = csv.reader(csv_file, delimiter=',')
+    for row in csv_reader:
+        windSpeedVmapped.append(float(row[ 0 ]))
+with open('./windDirMapped.csv') as csv_file:
+    csv_reader = csv.reader(csv_file, delimiter=',')
+    for row in csv_reader:
+        windDirsVmapped.append(float(row[ 0 ]))
+
+newMappedData = np.array(
+    np.append(dtNew[ :, : ], np.asmatrix([ np.array(windSpeedVmapped), np.array(windDirsVmapped) ]).T,
+              axis=1)).astype(float)
+Vcourse = newMappedData[ :, 2 ]
+Vstw = newMappedData[ :, 1 ]
+windDir = newMappedData[ :, 27 ]
+windSpeed = newMappedData[ :, 26 ]
+###projection of vector wind speed direction vector into vessel speed direction orthogonal system of coordinates
+##convert vessel speed (knots) to m/s
+x = np.array([ Vstw[ 0 ], Vcourse[ 0 ] ])
+y = np.array([ windSpeed[ 0 ], windDir[ 0 ] ])
+
+vecproj = y * np.dot(x, y) / np.dot(y, y)
+
+
 ########################################################
 windDirsVmapped.append(float(row[ 0 ]))
 
