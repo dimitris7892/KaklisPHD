@@ -244,7 +244,7 @@ class BaseSeriesReader:
             datesWs = [ ]
 
             date = str(dateTimesV[ i ]).split(" ")[ 0 ]
-            month = date.split('-')[ 1 ]
+           month = date.split('-')[ 1 ]
 
             day = date.split('-')[ 2 ]
 
