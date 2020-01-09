@@ -34,16 +34,30 @@ class BaseSeriesReader:
 
         ####STATSTICAL ANALYSIS PENELOPE
 
-        data = pd.read_csv('./PENELOPE_mapped.csv')
-        data1 = pd.read_csv('./PENELOPE_mapped_1.csv')
-        dtNew = data.values.astype(float)
-        dtNew1 = data1.values.astype(float)
-        dataNew = np.concatenate([ dtNew, dtNew1 ])
+        data = pd.read_csv('./PERSEFONE_mapped.csv')
+        data1 = pd.read_csv('./PERSEFONE_mapped_1.csv')
+        data2 = pd.read_csv('./PERSEFONE_mapped_2.csv')
+        data3 = pd.read_csv('./PERSEFONE_mapped_3.csv')
+        data4 = pd.read_csv('./PERSEFONE_mapped_4.csv')
+        data5 = pd.read_csv('./PERSEFONE_mapped_5.csv')
+        data6 = pd.read_csv('./PERSEFONE_mapped_6.csv')
+        data7 = pd.read_csv('./PERSEFONE_mapped_7.csv')
+        dtNew = data.values#.astype(float)
+        dtNew1 = data1.values#.astype(float)
+        dtNew2 = data2.values
+        dtNew3 = data3.values
+        dtNew4 = data4.values
+        dtNew5 = data5.values
+        dtNew6 = data6.values
+        dtNew7 = data7.values
 
+        dataNew = np.concatenate([ dtNew, dtNew1,dtNew2,dtNew3 , dtNew4 , dtNew5 , dtNew6 , dtNew7])
+        ballastDt = np.array([k for k in dataNew if k[5]=='B'])[:,0:5].astype(float)
+        ladenDt = np.array([ k for k in dataNew if k[ 5 ] == 'L' ])[ :, 0:5 ].astype(float)
         ####################
         ####################
         ####################
-        dataV = pd.read_csv('./data/PENELOPE_1-28_02_19.csv')
+        dataV = pd.read_csv('./data/PENELOPE_1-31_11_19.csv')
         dataV=dataV.drop([ 't_stamp', 'vessel status' ], axis=1)
         dtNew = dataV.values.astype(float)
 
@@ -116,9 +130,172 @@ class BaseSeriesReader:
         ####################
         ####################
         ####################
-        dataV = pd.read_csv('./data/PENELOPE_1-30_11_19.csv')
+        dataV = pd.read_csv('./data/Persefone/PERSEFONE_1-31_03_19.csv')
         #dataV=dataV.drop([ 't_stamp', 'vessel status' ], axis=1)
         dtNew = dataV.values#.astype(float)
+
+        ######DRAFT
+        dateTimesV = [ ]
+        for row in dtNew[ :, 0 ]:
+            date = row.split(" ")[ 0 ]
+            hhMMss = row.split(" ")[ 1 ]
+            newDate = date + " " + ":".join(hhMMss.split(":")[ 0:2 ])
+            dt = datetime.datetime.strptime(newDate, '%Y-%m-%d %H:%M')
+            dateTimesV.append(dt)
+
+        data = pd.read_csv('./export telegram.csv', sep='\t')
+        DdtNew = data.values[ 0:, : ]
+        dateTimesW = [ ]
+        ws = [ ]
+
+        for i in range(0, len(DdtNew[ :, 1 ])):
+            if DdtNew[ i, 0 ] == 'T004':
+                date = DdtNew[ i, 1 ].split(" ")[ 0 ]
+                month = date.split('/')[ 1 ]
+                day = date.split('/')[ 0 ]
+                year = date.split('/')[ 2 ]
+
+                hhMMss = DdtNew[ i, 1 ].split(" ")[ 1 ]
+                newDate = year + "-" + month + "-" + day + " " + ":".join(hhMMss.split(":")[ 0:2 ])
+                dt = datetime.datetime.strptime(newDate, '%Y-%m-%d %H:%M')
+                # if DdtNew[ i, 7 ] != 'No data' and DdtNew[ i, 8 ] != 'No data':
+                dateTimesW.append(dt)
+
+        draftsVmapped = [ ]
+        ballastLadenFlagsVmapped = [ ]
+        for i in range(0, len(dateTimesV)):
+
+            datesWs = [ ]
+
+            date = str(dateTimesV[ i ]).split(" ")[ 0 ]
+            month = date.split('-')[ 1 ]
+
+            day = date.split('-')[ 2 ]
+
+            year = date.split('-')[ 0 ]
+            dt = dateTimesV[ i ]
+
+            filteredDTWs = [ d for d in dateTimesW if month == str(d).split(' ')[ 0 ].split('-')[ 1 ] and day ==
+                             str(d).split(' ')[ 0 ].split('-')[ 2 ] and year == str(d).split(' ')[ 0 ].split('-')[ 0 ] ]
+
+            date2numFiltered = {}
+            sorted = [ ]
+
+            for k in range(0, len(filteredDTWs)):
+                # dtDiff[filteredDTWs[k]]=abs((filteredDTWs[k]-dt).total_seconds() / 60.0)
+                date = str(filteredDTWs[ k ]).split(" ")[ 0 ]
+                month = date.split('-')[ 1 ]
+                month = month[ 1 ] if month[ 0 ] == '0' else month
+                day = date.split('-')[ 2 ]
+                day = day[ 1 ] if day[ 0 ] == '0' else day
+                year = date.split('-')[ 0 ]
+                hhMMss = str(filteredDTWs[ k ]).split(" ")[ 1 ]
+                # newDate = month + "/" + day + "/" + year + " " + ":".join(hhMMss.split(":")[ 0:2 ])
+                newDate = day + "/" + month + "/" + year + " " + ":".join(hhMMss.split(":"))
+                datesWs.append(newDate)
+
+                date2numFilteredList = [ ]
+
+                sorted.append(newDate)
+                # date2numFiltered.append(matplotlib.dates.date2num(k))
+
+                # dtFiltered[ filteredDTWs[ k ] ] = matplotlib.dates.date2num(k)
+                # dt2num = matplotlib.dates.date2num(dt)
+                # date2numFiltered.append(dt2num)
+            date = str(dt).split(" ")[ 0 ]
+            month = date.split('-')[ 1 ]
+            month = month[ 1 ] if month[ 0 ] == '0' else month
+            day = date.split('-')[ 2 ]
+            day = day[ 1 ] if day[ 0 ] == '0' else day
+            year = date.split('-')[ 0 ]
+            hhMMss = str(dt).split(" ")[ 1 ]
+            # newDate = month + "/" + day + "/" + year + " " + ":".join(hhMMss.split(":")[ 0:2 ])
+            newDate = day + "/" + month + "/" + year + " " + ":".join(hhMMss.split(":"))
+            sorted.append(newDate)
+            sorted.sort()
+            for i in range(0, len(sorted)):
+                if sorted[ i ] == newDate:
+                    try:
+                        if i > 0:
+                            if i == len(sorted) - 1:
+                                previous = sorted[ i - 1 ]
+                                blFlag = np.array(data.loc[ data[ 'telegram_date' ] == previous ].values)[ 0 ][ 49 ]
+                                if blFlag == 'B':
+                                    ballastLadenFlagsVmapped.append('B')
+                                else:
+                                    ballastLadenFlagsVmapped.append('L')
+                            else:
+                                try:
+                                    previous = sorted[ i - 1 ]
+                                    next = sorted[ i + 1 ]
+
+                                    # date1 = {k: v for k, v in dtFiltered.items() if v == previous}
+                                    # date2 = {k: v for k, v in dtFiltered.items() if v == next}
+                                    blFlag1 = np.array(data.loc[ data[ 'telegram_date' ] == previous ].values)[ 0 ][ 49 ]
+                                    blFlag2 = np.array(data.loc[ data[ 'telegram_date' ] == next ].values)[ 0 ][ 49 ]
+                                except:
+                                    x = 0
+                                if blFlag1 == 'L' and blFlag2 == 'L':
+                                    ballastLadenFlagsVmapped.append('L')
+                                elif blFlag1 == 'L' and blFlag2 == 'B':
+                                    ballastLadenFlagsVmapped.append('L')
+                                elif blFlag1 == 'B' and blFlag2 == 'L':
+                                    ballastLadenFlagsVmapped.append('B')
+                                else:
+                                    ballastLadenFlagsVmapped.append('B')
+
+                        elif i == 0:
+                            next = sorted[ i + 1 ]
+                            blFlag = np.array(data.loc[ data[ 'telegram_date' ] == next ].values)[ 0 ][ 49 ]
+                            if blFlag == 'B':
+                                ballastLadenFlagsVmapped.append('B')
+                            else:
+                                ballastLadenFlagsVmapped.append('L')
+                        elif i == len(sorted) - 1:
+                            previous = sorted[ i - 1 ]
+                            blFlag = np.array(data.loc[ data[ 'telegram_date' ] == previous ].values)[ 0 ][ 49 ]
+                            if blFlag == 'B':
+                                ballastLadenFlagsVmapped.append('B')
+                            else:
+                                ballastLadenFlagsVmapped.append('L')
+                    except:
+                        ballastLadenFlagsVmapped.append('N')
+                            # firstMin = min(dtDiff.items(), key=lambda x: x[1])
+            # del dtDiff[ firstMin[ 0 ] ]
+            # secMin = min(dtDiff.items(), key=lambda x: x[ 1 ] )
+
+            drafts = [ ]
+            for date in datesWs:
+
+                    drftAFT = str(np.nan_to_num(np.array(data.loc[ data[ 'telegram_date' ] == date ].values)[ 0 ][ 27 ]))
+                    drftFORE = str(np.nan_to_num(np.array(data.loc[ data[ 'telegram_date' ] == date ].values)[ 0 ][ 28 ]))
+
+                    drftAFT = float(drftAFT.split(',')[ 0 ] + "." + drftAFT.split(',')[ 1 ]) if drftAFT.__contains__(
+                            ',') else float(drftAFT)
+                    drftFORE = float(
+                            drftFORE.split(',')[ 0 ] + "." + drftFORE.split(',')[ 1 ]) if drftFORE.__contains__(
+                            ',') else float(drftFORE)
+
+                    drft = (drftAFT + drftFORE) / 2
+                    drafts.append(float(drft))
+            if len(datesWs)>1:
+                x=0
+            try:
+                y = np.array(drafts)
+                x = matplotlib.dates.date2num(filteredDTWs)
+                f = sp.Earth()
+                f.fit(x.reshape(-1, 1), y.reshape(-1, 1))
+                pred = f.predict(np.array(matplotlib.dates.date2num(dt)).reshape(-1, 1))
+                draftsVmapped.append(pred)
+            except:
+                x=0
+                    #if np.nan_to_num(np.array(data.loc[ data[ 'telegram_date' ] == date ].values)[ 0 ][ 27 ]).__len__()==0 or \
+                        #np.nan_to_num(np.array(data.loc[ data[ 'telegram_date' ] == date ].values)[ 0 ][ 28 ]).__len__() == 0:
+
+                draftsVmapped.append([0])
+
+
+        ##########
 
         windSpeedVmapped = [ ]
         windDirsVmapped = [ ]
@@ -131,7 +308,7 @@ class BaseSeriesReader:
             dt = datetime.datetime.strptime(newDate, '%Y-%m-%d %H:%M')
             dateTimesV.append(dt)
 
-        data = pd.read_excel('./Penelope TrackReport.xls')
+        data = pd.read_excel('./data/Persefone/Persefone TrackReport.xls')
         WdtNew = data.values[ 0:, : ]
         dateTimesW = [ ]
         ws = [ ]
@@ -150,7 +327,7 @@ class BaseSeriesReader:
 
         for i in range(0, len(dateTimesV)):
 
-            dtDiff = {}
+            dtFiltered = {}
             datesWs = [ ]
 
             date = str(dateTimesV[ i ]).split(" ")[ 0 ]
@@ -161,20 +338,17 @@ class BaseSeriesReader:
 
             filteredDTWs = [ d for d in dateTimesW if month == str(d).split(' ')[ 0 ].split('-')[ 1 ] and day ==
                              str(d).split(' ')[ 0 ].split('-')[ 2 ] and year == str(d).split(' ')[ 0 ].split('-')[ 0 ] ]
+            date2numFiltered = {}
 
             for k in range(0, len(filteredDTWs)):
-                # dtDiff[filteredDTWs[k]]=abs((filteredDTWs[k]-dt).total_seconds() / 60.0)
                 date = str(filteredDTWs[ k ]).split(" ")[ 0 ]
                 month = date.split('-')[ 1 ]
                 day = date.split('-')[ 2 ]
                 year = date.split('-')[ 0 ]
                 hhMMss = str(filteredDTWs[ k ]).split(" ")[ 1 ]
                 newDate = day + "." + month + "." + year + " " + ":".join(hhMMss.split(":")[ 0:2 ])
-                datesWs.append(newDate)
 
-            # firstMin = min(dtDiff.items(), key=lambda x: x[1])
-            # del dtDiff[ firstMin[ 0 ] ]
-            # secMin = min(dtDiff.items(), key=lambda x: x[ 1 ] )
+                datesWs.append(newDate)
 
             windSpeeds = [ ]
             windDirs = [ ]
@@ -185,162 +359,92 @@ class BaseSeriesReader:
                     windSpeeds.append(float(ws.split('m')[ 0 ]))
                 if wd != 'No data':
                     windDirs.append(float(wd[ :len(wd) - 1 ]))
+            try:
+                y = np.array(windSpeeds)
+                x = matplotlib.dates.date2num(filteredDTWs)
+                f = sp.Earth(max_degree=2)
+                f.fit(x.reshape(-1, 1), y.reshape(-1, 1))
+                pred = f.predict(np.array(matplotlib.dates.date2num(dt)).reshape(-1, 1))
+                windSpeedVmapped.append(pred)
+            except:
+                windSpeedVmapped.append(None)
 
-            # df = pd.DataFrame([ws1,None,ws2], index=[firstMin,dt,secMin])
-            # resampled = df.resample('S')
-            # df.head()
-            # interp = df.interpolate()
-            # print(interp.head())
-            # windSpeedVmapped.append(interp.values[1])
-            from scipy.interpolate import interp1d
+            try:
+                y = np.array(windDirs)
+                x = matplotlib.dates.date2num(filteredDTWs)
+                f = sp.Earth(max_degree=2)
 
-            y = np.array(windSpeeds)
-            x = matplotlib.dates.date2num(filteredDTWs)
-            f = sp.Earth(max_degree=2)
-            f.fit(x.reshape(-1, 1), y.reshape(-1, 1))
-            pred = f.predict(np.array(matplotlib.dates.date2num(dt)).reshape(-1, 1))
-            windSpeedVmapped.append(pred)
-
-            y = np.array(windDirs)
-            x = matplotlib.dates.date2num(filteredDTWs)
-            f = sp.Earth(max_degree=2)
-
-            f.fit(x.reshape(-1, 1), y.reshape(-1, 1))
-            pred = f.predict(np.array(matplotlib.dates.date2num(dt)).reshape(-1, 1))
-            # f=interp1d(list(x), list(y), kind='cubic')
-            windDirsVmapped.append(pred)
-
-        ######DRAFT
-        dateTimesV = [ ]
-        for row in dtNew[ :, 0 ]:
-            date = row.split(" ")[ 0 ]
-            hhMMss = row.split(" ")[ 1 ]
-            newDate = date + " " + ":".join(hhMMss.split(":")[ 0:2 ])
-            dt = datetime.datetime.strptime(newDate, '%Y-%m-%d %H:%M')
-            dateTimesV.append(dt)
-
-        data = pd.read_csv('./export telegram.csv', sep='\t')
-        DdtNew = data.values[ 0:, : ]
-        dateTimesW = [ ]
-        ws = [ ]
-
-        for i in range(0, len(DdtNew[ :, 1 ])):
-            if DdtNew[ i, 0 ] == 'T003':
-                date = DdtNew[ i, 1 ].split(" ")[ 0 ]
-                month = date.split('/')[ 1 ]
-                day = date.split('/')[ 0 ]
-                year = date.split('/')[ 2 ]
-
-                hhMMss = DdtNew[ i, 1 ].split(" ")[ 1 ]
-                newDate = year + "-" + month + "-" + day + " " + ":".join(hhMMss.split(":")[ 0:2 ])
-                dt = datetime.datetime.strptime(newDate, '%Y-%m-%d %H:%M')
-                # if DdtNew[ i, 7 ] != 'No data' and DdtNew[ i, 8 ] != 'No data':
-                dateTimesW.append(dt)
-
-        draftsVmapped = [ ]
-
-        for i in range(0, len(dateTimesV)):
-
-            datesWs = [ ]
-
-            date = str(dateTimesV[ i ]).split(" ")[ 0 ]
-            month = date.split('-')[ 1 ]
-
-            day = date.split('-')[ 2 ]
-
-            year = date.split('-')[ 0 ]
-            dt = dateTimesV[ i ]
-
-            filteredDTWs = [ d for d in dateTimesW if month == str(d).split(' ')[ 0 ].split('-')[ 1 ] and day ==
-                             str(d).split(' ')[ 0 ].split('-')[ 2 ] and year == str(d).split(' ')[ 0 ].split('-')[ 0 ] ]
-
-            for k in range(0, len(filteredDTWs)):
-                # dtDiff[filteredDTWs[k]]=abs((filteredDTWs[k]-dt).total_seconds() / 60.0)
-                date = str(filteredDTWs[ k ]).split(" ")[ 0 ]
-                month = date.split('-')[ 1 ]
-                month = month[ 1 ] if month[ 0 ] == '0' else month
-                day = date.split('-')[ 2 ]
-                day = day[ 1 ] if day[ 0 ] == '0' else day
-                year = date.split('-')[ 0 ]
-                hhMMss = str(filteredDTWs[ k ]).split(" ")[ 1 ]
-                # newDate = month + "/" + day + "/" + year + " " + ":".join(hhMMss.split(":")[ 0:2 ])
-                newDate = day + "/" + month + "/" + year + " " + ":".join(hhMMss.split(":"))
-                datesWs.append(newDate)
-
-            # firstMin = min(dtDiff.items(), key=lambda x: x[1])
-            # del dtDiff[ firstMin[ 0 ] ]
-            # secMin = min(dtDiff.items(), key=lambda x: x[ 1 ] )
-
-            drafts = [ ]
-            for date in datesWs:
-                drftAFT = np.array(data.loc[ data[ 'telegram_date' ] == date ].values)[ 0 ][ 27 ]
-                drftFORE = np.array(data.loc[ data[ 'telegram_date' ] == date ].values)[ 0 ][ 28 ]
-
-                drftAFT = float(drftAFT.split(',')[ 0 ] + "." + drftAFT.split(',')[ 1 ]) if drftAFT.__contains__(
-                    ',') else float(drftAFT)
-                drftFORE = float(drftFORE.split(',')[ 0 ] + "." + drftFORE.split(',')[ 1 ]) if drftFORE.__contains__(
-                    ',') else float(drftFORE)
-
-                drft = (drftAFT + drftFORE) / 2
-                drafts.append(float(drft))
-
-            y = np.array(drafts)
-            x = matplotlib.dates.date2num(filteredDTWs)
-            f = sp.Earth()
-            f.fit(x.reshape(-1, 1), y.reshape(-1, 1))
-            pred = f.predict(np.array(matplotlib.dates.date2num(dt)).reshape(-1, 1))
-            draftsVmapped.append(pred)
-
-        ##########
-        #pred = f(matplotlib.dates.date2num(dt))
-        #data = pd.read_excel('./Penelope TrackReport.xls')
-        #WdtNew = data.values[ 0:, : ]
-            #print(pred)
+                f.fit(x.reshape(-1, 1), y.reshape(-1, 1))
+                pred = f.predict(np.array(matplotlib.dates.date2num(dt)).reshape(-1, 1))
+                # f=interp1d(list(x), list(y), kind='cubic')
+                windDirsVmapped.append(pred)
+            except:
+                windDirsVmapped.append(None)
+        # pred = f(matplotlib.dates.date2num(dt))
+        # data = pd.read_excel('./Penelope TrackReport.xls')
+        # WdtNew = data.values[ 0:, : ]
+        # print(pred)
         with open('./windSpeedMapped.csv', mode='w') as dataw:
             for k in range(0, len(windSpeedVmapped)):
                 data_writer = csv.writer(dataw, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-                data_writer.writerow([ windSpeedVmapped[ k ][ 0 ] ])
+                data_writer.writerow([windSpeedVmapped[k] if windSpeedVmapped[k]==None else windSpeedVmapped[ k ][ 0 ] ])
         with open('./windDirMapped.csv', mode='w') as dataw:
             for k in range(0, len(windDirsVmapped)):
                 data_writer = csv.writer(dataw, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-                data_writer.writerow([ windDirsVmapped[ k ][ 0 ] ])
+                data_writer.writerow([windDirsVmapped[k] if windDirsVmapped[k]==None else windDirsVmapped[ k ][ 0 ] ])
 
         with open('./draftsMapped.csv', mode='w') as dataw:
             for k in range(0, len(draftsVmapped)):
                 data_writer = csv.writer(dataw, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
                 data_writer.writerow([ draftsVmapped[ k ][ 0 ] ])
 
+        with open('./blFlagsMapped.csv', mode='w') as dataw:
+            for k in range(0, len(ballastLadenFlagsVmapped)):
+                data_writer = csv.writer(dataw, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+                data_writer.writerow([ ballastLadenFlagsVmapped[ k ][ 0 ] ])
+
+
         windSpeedVmapped = [ ]
         windDirsVmapped = [ ]
-        draftsVmapped=[]
+        draftsVmapped = [ ]
+        ballastLadenFlagsVmapped = [ ]
+
         with open('./windSpeedMapped.csv') as csv_file:
             csv_reader = csv.reader(csv_file, delimiter=',')
             for row in csv_reader:
-                windSpeedVmapped.append(float(row[ 0 ]))
+                try:
+                    windSpeedVmapped.append(None if row[0]==None or row[0]=='' else float(row[ 0 ]))
+                except:
+                    x=0
         with open('./windDirMapped.csv') as csv_file:
             csv_reader = csv.reader(csv_file, delimiter=',')
             for row in csv_reader:
-                windDirsVmapped.append(float(row[ 0 ]))
+                windDirsVmapped.append(None if row[0]==None or row[0]=='' else float(row[ 0 ]))
 
         with open('./draftsMapped.csv') as csv_file:
             csv_reader = csv.reader(csv_file, delimiter=',')
             for row in csv_reader:
                 draftsVmapped.append(float(row[ 0 ]))
 
+        with open('./blFlagsMapped.csv') as csv_file:
+            csv_reader = csv.reader(csv_file, delimiter=',')
+            for row in csv_reader:
+                ballastLadenFlagsVmapped.append(row[ 0 ])
 
 
 
-        dataV = pd.read_csv('./data/PENELOPE_1-30_11_19.csv')
+
+        dataV = pd.read_csv('./data/Persefone/PERSEFONE_1-31_01_19.csv')
         dataV=dataV.drop([ 't_stamp', 'vessel status' ], axis=1)
         dtNew = dataV.values.astype(float)
 
         newMappedData = np.array(
-            np.append(dtNew[ :, : ], np.asmatrix([ np.array(windSpeedVmapped), np.array(windDirsVmapped) ]).T,
-                      axis=1)).astype(float)
-        Vcourse = newMappedData[ :, 2 ]
-        Vstw = newMappedData[ :, 1 ]
-        windDir = newMappedData[ :, 27 ]
-        windSpeed = newMappedData[ :, 26 ]
+            np.append(dtNew[ :, : ], np.asmatrix([ np.array(windSpeedVmapped), np.array(windDirsVmapped) , np.array(ballastLadenFlagsVmapped)[0:8641] ]).T,
+                      axis=1))
+        Vcourse = np.array(newMappedData[ :, 2 ]).astype(float)
+        Vstw = np.array(newMappedData[ :, 1 ]).astype(float)
+        windDir = np.array(newMappedData[ :, 26 ]).astype(float)
+        windSpeed = np.array(newMappedData[ :, 25 ]).astype(float)
         ###projection of vector wind speed direction vector into vessel speed direction orthogonal system of coordinates
         ##convert vessel speed (knots) to m/s
         relWindSpeeds = [ ]
@@ -369,19 +473,19 @@ class BaseSeriesReader:
             relWindSpeeds.append(relWindSpeed)
         newMappedData = np.array(
             np.append(dtNew[ :, : ],
-                      np.asmatrix([ np.array(relWindSpeeds), np.array(relWindDirs), np.array(draftsVmapped) ]).T,
-                      axis=1)).astype(float)
+                      np.asmatrix([ np.array(relWindSpeeds), np.array(relWindDirs), np.array(draftsVmapped) ,np.array(ballastLadenFlagsVmapped)[0:8641]]).T,
+                      axis=1))#.astype(float)
 
         #####################
         ############################MAP TELEGRAM DATES FOR DRAFT
 
         ####STATSTICAL ANALYSIS PENELOPE
-        with open('./PENELOPE_mapped_1.csv', mode='w') as dataw:
+        with open('./PERSEFONE_mapped_7.csv', mode='w') as dataw:
             data_writer = csv.writer(dataw, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
             data_writer.writerow([ 'STW',  'WindSpeed', 'WindAngle', 'Draft'
-                                     , 'M/E FOC (MT/days)' ])
+                                     , 'M/E FOC (MT/days)' ,'B/L Flag'])
             for k in range(0, len(newMappedData)):
-                data_writer.writerow([ newMappedData[ k ][ 1 ],newMappedData[ k ][ 26 ],newMappedData[ k ][ 27 ],newMappedData[ k ][ 28 ],newMappedData[ k ][ 9 ]  ])
+                data_writer.writerow([ newMappedData[ k ][ 1 ],newMappedData[ k ][ 25 ],newMappedData[ k ][ 26 ],newMappedData[ k ][ 27 ],newMappedData[ k ][ 9 ] ,newMappedData[ k ][ 28 ] ])
         x = 0
 
     def readLarosDAta(self,dtFrom,dtTo):
