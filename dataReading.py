@@ -42,6 +42,9 @@ class BaseSeriesReader:
         data5 = pd.read_csv('./PERSEFONE_mapped_5.csv')
         data6 = pd.read_csv('./PERSEFONE_mapped_6.csv')
         data7 = pd.read_csv('./PERSEFONE_mapped_7.csv')
+        data8 = pd.read_csv('./PERSEFONE_mapped_8.csv')
+        data9 = pd.read_csv('./PERSEFONE_mapped_9.csv')
+        data10 = pd.read_csv('./PERSEFONE_mapped_10.csv')
         dtNew = data.values#.astype(float)
         dtNew1 = data1.values#.astype(float)
         dtNew2 = data2.values
@@ -50,8 +53,34 @@ class BaseSeriesReader:
         dtNew5 = data5.values
         dtNew6 = data6.values
         dtNew7 = data7.values
+        dtNew8 = data8.values
+        dtNew9 = data9.values
+        dtNew10 = data10.values
 
-        dataNew = np.concatenate([ dtNew, dtNew1,dtNew2,dtNew3 , dtNew4 , dtNew5 , dtNew6 , dtNew7])
+        data = pd.read_csv('./PENELOPE_mapped.csv')
+        data1 = pd.read_csv('./PENELOPE_mapped_1.csv')
+        data2 = pd.read_csv('./PENELOPE_mapped_2.csv')
+        data3 = pd.read_csv('./PENELOPE_mapped_3.csv')
+        data4 = pd.read_csv('./PENELOPE_mapped_4.csv')
+        data5 = pd.read_csv('./PENELOPE_mapped_5.csv')
+        data6 = pd.read_csv('./PENELOPE_mapped_6.csv')
+        data7 = pd.read_csv('./PENELOPE_mapped_7.csv')
+
+        data10 = pd.read_csv('./PENELOPE_mapped_10.csv')
+        dtNew = data.values  # .astype(float)
+        dtNew1 = data1.values  # .astype(float)
+        dtNew2 = data2.values
+        dtNew3 = data3.values
+        dtNew4 = data4.values
+        dtNew5 = data5.values
+        dtNew6 = data6.values
+        dtNew7 = data7.values
+
+        dtNew10 = data10.values
+
+
+
+        dataNew = np.concatenate([ dtNew, dtNew1,dtNew2,dtNew3 , dtNew4 , dtNew5 , dtNew6 , dtNew7 ,  dtNew10])
         ballastDt = np.array([k for k in dataNew if k[5]=='B'])[:,0:5].astype(float)
         ladenDt = np.array([ k for k in dataNew if k[ 5 ] == 'L' ])[ :, 0:5 ].astype(float)
         ####################
@@ -130,7 +159,7 @@ class BaseSeriesReader:
         ####################
         ####################
         ####################
-        dataV = pd.read_csv('./data/Persefone/PERSEFONE_1-31_03_19.csv')
+        dataV = pd.read_csv('./data/Penelope/PENELOPE_1-31_07_19.csv')
         #dataV=dataV.drop([ 't_stamp', 'vessel status' ], axis=1)
         dtNew = dataV.values#.astype(float)
 
@@ -149,7 +178,7 @@ class BaseSeriesReader:
         ws = [ ]
 
         for i in range(0, len(DdtNew[ :, 1 ])):
-            if DdtNew[ i, 0 ] == 'T004':
+            if DdtNew[ i, 0 ] == 'T003':
                 date = DdtNew[ i, 1 ].split(" ")[ 0 ]
                 month = date.split('/')[ 1 ]
                 day = date.split('/')[ 0 ]
@@ -308,7 +337,7 @@ class BaseSeriesReader:
             dt = datetime.datetime.strptime(newDate, '%Y-%m-%d %H:%M')
             dateTimesV.append(dt)
 
-        data = pd.read_excel('./data/Persefone/Persefone TrackReport.xls')
+        data = pd.read_excel('./data/Penelope/Penelope TrackReport.xls')
         WdtNew = data.values[ 0:, : ]
         dateTimesW = [ ]
         ws = [ ]
@@ -434,7 +463,7 @@ class BaseSeriesReader:
 
 
 
-        dataV = pd.read_csv('./data/Persefone/PERSEFONE_1-31_01_19.csv')
+        dataV = pd.read_csv('./data/Penelope/PENELOPE_1-31_07_19.csv')
         dataV=dataV.drop([ 't_stamp', 'vessel status' ], axis=1)
         dtNew = dataV.values.astype(float)
 
@@ -480,7 +509,7 @@ class BaseSeriesReader:
         ############################MAP TELEGRAM DATES FOR DRAFT
 
         ####STATSTICAL ANALYSIS PENELOPE
-        with open('./PERSEFONE_mapped_7.csv', mode='w') as dataw:
+        with open('./PENELOPE_mapped_10.csv', mode='w') as dataw:
             data_writer = csv.writer(dataw, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
             data_writer.writerow([ 'STW',  'WindSpeed', 'WindAngle', 'Draft'
                                      , 'M/E FOC (MT/days)' ,'B/L Flag'])
