@@ -80,7 +80,7 @@ class BaseSeriesReader:
 
 
 
-        dataNew = np.concatenate([ dtNew, dtNew1,dtNew2,dtNew3 , dtNew4 , dtNew5 , dtNew6 , dtNew7 ,  dtNew10])
+        dataNew = np.concatenate([ dtNew , dtNew1 , dtNew2, dtNew3 , dtNew4 , dtNew5 , dtNew6 , dtNew7 ,  dtNew10])
         ballastDt = np.array([k for k in dataNew if k[5]=='B'])[:,0:5].astype(float)
         ladenDt = np.array([ k for k in dataNew if k[ 5 ] == 'L' ])[ :, 0:5 ].astype(float)
         ####################
@@ -159,7 +159,7 @@ class BaseSeriesReader:
         ####################
         ####################
         ####################
-        dataV = pd.read_csv('./data/Penelope/PENELOPE_1-31_07_19.csv')
+        dataV = pd.read_csv('./data/Penelope/PENELOPE_1-31_05_19.csv')
         #dataV=dataV.drop([ 't_stamp', 'vessel status' ], axis=1)
         dtNew = dataV.values#.astype(float)
 
@@ -448,7 +448,12 @@ class BaseSeriesReader:
         with open('./windDirMapped.csv') as csv_file:
             csv_reader = csv.reader(csv_file, delimiter=',')
             for row in csv_reader:
-                windDirsVmapped.append(None if row[0]==None or row[0]=='' else float(row[ 0 ]))
+                try:
+                    windDirsVmapped.append(None if row[0]==None or row[0]=='' else float(row[ 0 ]))
+                except:
+                    x=0
+
+
 
         with open('./draftsMapped.csv') as csv_file:
             csv_reader = csv.reader(csv_file, delimiter=',')
@@ -463,7 +468,7 @@ class BaseSeriesReader:
 
 
 
-        dataV = pd.read_csv('./data/Penelope/PENELOPE_1-31_07_19.csv')
+        dataV = pd.read_csv('./data/Penelope/PENELOPE_1-31_05_19.csv')
         dataV=dataV.drop([ 't_stamp', 'vessel status' ], axis=1)
         dtNew = dataV.values.astype(float)
 
