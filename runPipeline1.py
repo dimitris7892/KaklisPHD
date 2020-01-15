@@ -115,7 +115,7 @@ def main():
            if modeler.__class__.__name__=='TriInterpolantModeler' or modeler.__class__.__name__ == 'TensorFlow':
              partK = [1]
            else:
-             partK=[50]
+             partK=[20]
        error = {"errors": [ ]}
        #random.seed(1)
 
@@ -188,7 +188,7 @@ def main():
             unseenY=[]
             if modeler.__class__.__name__!= 'TriInterpolantModeler' :
                         #and modeler.__class__.__name__ != 'TensorFlow':
-                modelMap, model2,xs, output, genericModel , partitionsXDC = modeler.createModelsFor(partitionsX, partitionsY, partitionLabels,None,seriesX,targetY)
+                modelMap, model2,xs, output, genericModel , partitionsXDC = modeler.createModelsFor(partitionsX, partitionsY, partitionLabels,None,X,Y)
                 #if modeler.__class__.__name__ != 'TensorFlow':
                     #modelMap = dict(zip(partitionLabels, modelMap))
                 print("Creating models per partition... Done")
@@ -294,7 +294,7 @@ def initParameters():
     end = 17000
     startU = 30000
     endU = 31000
-    algs=['NNWD']
+    algs=['NNW']
     # ['SR','LR','RF','NN','NNW','TRI']
 
 

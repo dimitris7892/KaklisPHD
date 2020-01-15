@@ -803,23 +803,23 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
         from tensorflow import keras
         path = '.\\'
         clusters = '30'
-        partitionsX = [ ]
-        partitionsY = [ ]
-        for cl in range(0,30):
+        #partitionsX = [ ]
+        #partitionsY = [ ]
+        #for cl in range(0,30):
             # models.append(load_model(path+'\estimatorCl_'+str(cl)+'.h5'))
-            data = pd.read_csv('cluster_' + str(cl) + '_.csv')
-            partitionsX.append(self.readClusteredLarosDataFromCsvNew(data))
+            #data = pd.read_csv('cluster_' + str(cl) + '_.csv')
+            #partitionsX.append(self.readClusteredLarosDataFromCsvNew(data))
 
-        for cl in range(0,30):
+        #for cl in range(0,30):
             # models.append(load_model(path+'\estimatorCl_'+str(cl)+'.h5'))
-            data = pd.read_csv('cluster_foc' + str(cl) + '_.csv')
-            partitionsY.append(self.readClusteredLarosDataFromCsvNew(data))
+            #data = pd.read_csv('cluster_foc' + str(cl) + '_.csv')
+            #partitionsY.append(self.readClusteredLarosDataFromCsvNew(data))
 
-        from sklearn import preprocessing
-        scalerX = preprocessing.StandardScaler()
-        scalerY =preprocessing.StandardScaler()
-        scalerX = scalerX.fit(np.concatenate(partitionsX))
-        scalerY = scalerY.fit(np.concatenate(partitionsY).reshape(-1, 1))
+        #from sklearn import preprocessing
+        #scalerX = preprocessing.StandardScaler()
+        #scalerY =preprocessing.StandardScaler()
+        ##scalerX = scalerX.fit(np.concatenate(partitionsX))
+        #scalerY = scalerY.fit(np.concatenate(partitionsY).reshape(-1, 1))
 
         for iCnt in range(np.shape(unseenX)[0]):
             pPoint =unseenX[iCnt]
