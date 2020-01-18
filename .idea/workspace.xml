@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="9e10e853-69bc-4a18-9c9f-e2f3d9527f23" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/draftsMapped.csv" afterPath="$PROJECT_DIR$/draftsMapped.csv" />
-    </list>
+    <list default="true" id="9e10e853-69bc-4a18-9c9f-e2f3d9527f23" name="Default" comment="" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -71,10 +69,10 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="dataReading.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="dataReading.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/dataReading.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1411">
+            <state relative-caret-position="1105">
               <caret line="104" column="27" lean-forward="true" selection-start-line="104" selection-start-column="27" selection-end-line="104" selection-end-column="27" />
               <folding>
                 <element signature="e#27#45#0" expanded="true" />
@@ -87,11 +85,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="evaluation.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="evaluation.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/evaluation.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="986">
-              <caret line="878" column="84" lean-forward="false" selection-start-line="878" selection-start-column="84" selection-end-line="878" selection-end-column="84" />
+            <state relative-caret-position="391">
+              <caret line="843" column="35" lean-forward="true" selection-start-line="843" selection-start-column="35" selection-end-line="843" selection-end-column="35" />
               <folding />
             </state>
           </provider>
@@ -777,9 +775,17 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/evaluation.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="391">
+          <caret line="843" column="35" lean-forward="true" selection-start-line="843" selection-start-column="35" selection-end-line="843" selection-end-column="35" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/dataReading.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1411">
+        <state relative-caret-position="1105">
           <caret line="104" column="27" lean-forward="true" selection-start-line="104" selection-start-column="27" selection-end-line="104" selection-end-column="27" />
           <folding>
             <element signature="e#27#45#0" expanded="true" />
@@ -788,14 +794,6 @@
             <marker date="1579373887225" expanded="false" signature="91451:93095" ph="..." />
             <marker date="1579373887225" expanded="false" signature="93168:93619" ph="..." />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/evaluation.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="986">
-          <caret line="878" column="84" lean-forward="false" selection-start-line="878" selection-start-column="84" selection-end-line="878" selection-end-column="84" />
-          <folding />
         </state>
       </provider>
     </entry>
