@@ -163,7 +163,9 @@ def main():
                 partitionsX, partitionsY, partitionLabels, partitionRepresentatives, partitioningModel  , centroids  = partitioner.clustering(X, Y, W ,NUM_OF_CLUSTERS, True,k)
             else:
                #partitionLabels=23
+
                 partitionsX, partitionsY, partitionLabels, partitionRepresentatives, partitioningModel, tri  = partitioner.clustering(
+
                     seriesX, targetY, None, NUM_OF_CLUSTERS, True, k)
 
                 #partitionsXDB6, partitionsYDB6, partitionLabels, partitionRepresentatives, partitioningModel, tri = partitioner.clustering(
@@ -294,7 +296,7 @@ def initParameters():
     end = 17000
     startU = 30000
     endU = 31000
-    algs=['NNWD']
+    algs=['NNW']
     # ['SR','LR','RF','NN','NNW','TRI']
 
 
