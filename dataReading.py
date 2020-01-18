@@ -45,6 +45,7 @@ class BaseSeriesReader:
         #data8 = pd.read_csv('./Mapped_data/PERSEFONE_mapped_8.csv')
         #data9 = pd.read_csv('./Mapped_data/PERSEFONE_mapped_9.csv')
         #data10 = pd.read_csv('./Mapped_data/PERSEFONE_mapped_10.csv')
+
         dtNew = data.values#.astype(float)
         dtNew1 = data1.values#.astype(float)
         dtNew2 = data2.values
@@ -53,6 +54,7 @@ class BaseSeriesReader:
         dtNew5 = data5.values
         dtNew6 = data6.values
         dtNew7 = data7.values
+
         #dtNew8 = data8.values
         #dtNew9 = data9.values
         #dtNew10 = data10.values
@@ -68,6 +70,7 @@ class BaseSeriesReader:
         ####################
         ####################
         dataV = pd.read_csv('./data/PENELOPE_1-31_03_19.csv')
+
         dataV=dataV.drop([ 't_stamp', 'vessel status' ], axis=1)
         dtNew = dataV.values.astype(float)
 
@@ -140,6 +143,7 @@ class BaseSeriesReader:
         ####################
         ####################
         ####################
+
         dataV = pd.read_csv('./data/Persefone/PERSEFONE_1-31_03_19.csv')
         #dataV=dataV.drop([ 't_stamp', 'vessel status' ], axis=1)
         dtNew = dataV.values#.astype(float)
@@ -159,6 +163,8 @@ class BaseSeriesReader:
 
                 hhMMss = DdtNew[i, 1].split(" ")[1]
                 newDate = year + "-" + month + "-" + day + " " + ":".join(hhMMss.split(":")[0:2])
+
+
                 dt = datetime.datetime.strptime(newDate, '%Y-%m-%d %H:%M')
                 # if DdtNew[ i, 7 ] != 'No data' and DdtNew[ i, 8 ] != 'No data':
                 dateTimesW.append(dt)
@@ -196,6 +202,7 @@ class BaseSeriesReader:
 
             ############################
 
+
         draftsVmapped = [ ]
         ballastLadenFlagsVmapped = [ ]
         for i in range(0, len(dateTimesV)):
@@ -206,7 +213,9 @@ class BaseSeriesReader:
             month = date.split('-')[ 1 ]
 
             day = date.split('-')[ 2 ]
+
             hhMMssV = str(dateTimesV[ i ]).split(" ")[1]
+
             year = date.split('-')[ 0 ]
             dt = dateTimesV[ i ]
 
@@ -243,7 +252,9 @@ class BaseSeriesReader:
             day = date.split('-')[ 2 ]
             day = day[ 1 ] if day[ 0 ] == '0' else day
             year = date.split('-')[ 0 ]
+
             hhMMss = hhMMssV
+
             # newDate = month + "/" + day + "/" + year + " " + ":".join(hhMMss.split(":")[ 0:2 ])
             newDate = day + "/" + month + "/" + year + " " + ":".join(hhMMss.split(":"))
             sorted.append(newDate)
@@ -294,8 +305,10 @@ class BaseSeriesReader:
                             else:
                                 ballastLadenFlagsVmapped.append('L')
                     except:
+
                         d=0
                         #ballastLadenFlagsVmapped.append('N')
+
                             # firstMin = min(dtDiff.items(), key=lambda x: x[1])
             # del dtDiff[ firstMin[ 0 ] ]
             # secMin = min(dtDiff.items(), key=lambda x: x[ 1 ] )
@@ -327,8 +340,10 @@ class BaseSeriesReader:
                 x=0
                     #if np.nan_to_num(np.array(data.loc[ data[ 'telegram_date' ] == date ].values)[ 0 ][ 27 ]).__len__()==0 or \
                         #np.nan_to_num(np.array(data.loc[ data[ 'telegram_date' ] == date ].values)[ 0 ][ 28 ]).__len__() == 0:
+
                 if drafts.__len__()==0:
                     draftsVmapped.append([0])
+
 
 
         ##########
@@ -345,6 +360,7 @@ class BaseSeriesReader:
             dateTimesV.append(dt)
 
         data = pd.read_excel('./data/Persefone/Persefone TrackReport.xls')
+
         WdtNew = data.values[ 0:, : ]
         dateTimesW = [ ]
         ws = [ ]
@@ -403,8 +419,10 @@ class BaseSeriesReader:
                 pred = f.predict(np.array(matplotlib.dates.date2num(dt)).reshape(-1, 1))
                 windSpeedVmapped.append(pred)
             except:
+
                 if windSpeeds.__len__() == 0:
                     windSpeedVmapped.append(None)
+
 
             try:
                 y = np.array(windDirs)
@@ -416,21 +434,27 @@ class BaseSeriesReader:
                 # f=interp1d(list(x), list(y), kind='cubic')
                 windDirsVmapped.append(pred)
             except:
+
                 if windDirs.__len__()==0:
                     windDirsVmapped.append(None)
+
+
         # pred = f(matplotlib.dates.date2num(dt))
         # data = pd.read_excel('./Penelope TrackReport.xls')
         # WdtNew = data.values[ 0:, : ]
         # print(pred)
 
-
         dataV = pd.read_csv('./data/Persefone/PERSEFONE_1-31_03_19.csv')
+
+
         dataV=dataV.drop([ 't_stamp', 'vessel status' ], axis=1)
         dtNew = dataV.values.astype(float)
 
         newMappedData = np.array(
+
             np.append(dtNew[ :, : ], np.asmatrix([ np.array(windSpeedVmapped).reshape(-1), np.array(windDirsVmapped).reshape(-1) , np.array(ballastLadenFlagsVmapped)[0:len(draftsVmapped)] ]).T,
         axis=1))
+
         Vcourse = np.array(newMappedData[ :, 2 ]).astype(float)
         Vstw = np.array(newMappedData[ :, 1 ]).astype(float)
         windDir = np.array(newMappedData[ :, 26 ]).astype(float)
@@ -444,7 +468,9 @@ class BaseSeriesReader:
             y = np.array([ windSpeed[ i ], windDir[ i ] ])
             ##convert cartesian coordinates to polar
             x = np.array([x[0] * np.cos(x[1]),x[0]* np.sin(x[1])])
+
             y = np.array([ y[ 0 ] * np.cos(y[ 1 ]), y[ 0 ] * np.sin(y[ 1 ])])
+
 
             x_norm = np.sqrt(sum(x ** 2))
 
@@ -463,19 +489,25 @@ class BaseSeriesReader:
             relWindSpeeds.append(relWindSpeed)
         newMappedData = np.array(
             np.append(dtNew[ :, : ],
+
                       np.asmatrix([ np.array(relWindSpeeds), np.array(relWindDirs), np.array(draftsVmapped).reshape(-1) ,np.array(ballastLadenFlagsVmapped)[0:len(draftsVmapped)]]).T,
+
                       axis=1))#.astype(float)
 
         #####################
         ############################MAP TELEGRAM DATES FOR DRAFT
 
         ####STATSTICAL ANALYSIS PENELOPE
+
         with open('./PERSEFONE_mapped_7.csv', mode='w') as dataw:
+
             data_writer = csv.writer(dataw, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
             data_writer.writerow([ 'STW',  'WindSpeed', 'WindAngle', 'Draft'
                                      , 'M/E FOC (MT/days)' ,'B/L Flag'])
             for k in range(0, len(newMappedData)):
+
                 data_writer.writerow([ newMappedData[ k ][ 1 ],newMappedData[ k ][ 25 ],newMappedData[ k ][ 26 ],newMappedData[ k ][ 27 ],newMappedData[ k ][ 8 ] ,newMappedData[ k ][ 28 ] ])
+
         x = 0
 
     def readLarosDAta(self,dtFrom,dtTo):
@@ -588,7 +620,9 @@ class BaseSeriesReader:
                         power[ "data" ].append(pow)
 
                     line_count+=1
+
                     if int(id) >353 : break
+
                     #print('Processed '+str(line_count)+ ' lines.')
              except:
                 p=0
@@ -678,10 +712,13 @@ class BaseSeriesReader:
     def readLarosDataFromCsvNewExtractExcels(self, data):
         # Load file
         dataNew = data.drop(['SpeedOvg'], axis=1)
+
         dtNew = dataNew.values[484362:569386, :]
+
 
         daysSincelastPropClean = []
         daysSinceLastDryDock = []
+
 
 
         with open('./daysSincelastPropClean.csv') as csv_file:
@@ -701,17 +738,22 @@ class BaseSeriesReader:
         daysSinceLastDryDock = np.array(daysSinceLastDryDock).reshape(-1,).astype(float)
 
         dataNew = data.drop(['SpeedOvg', 'DateTime'], axis=1)
+
         dtNew = dataNew.values[ 484362:569386, : ].astype(float)
+
 
         draftMean = (dtNew[:, 1] + dtNew[:, 2]) / 2
         dtNew[:, 0] = np.round(draftMean, 3)
 
+
         #dtNew = dtNew[~np.isnan(dtNew).any(axis=1)]
+
 
         trim = (dtNew[:, 1] - dtNew[:, 2])
 
         dtNew1 = np.array(np.append(dtNew[:, 0].reshape(-1, 1), np.asmatrix(
             [np.round(trim, 3), dtNew[:, 3], dtNew[:, 4], dtNew[:, 5],dtNew[:, 6], daysSincelastPropClean , daysSinceLastDryDock ,  dtNew[:, 7]] ).T, axis=1))
+
 
         #dtNew1 = np.delete(dtNew1, [i for (i, v) in enumerate(dtNew1[0:, 0]) if v <= 6], 0)
         dtNew1 = np.delete(dtNew1, [i for (i, v) in enumerate(dtNew1[0:, 4]) if v <=0], 0)
@@ -719,6 +761,7 @@ class BaseSeriesReader:
         rpmB = np.array([i for i in dtNew1 if i[5] > 90 and i[7] < 100 ])
 
         #dtNew1 = np.delete(dtNew1, [i for (i, v) in enumerate(dtNew1[0:, 5]) if v <= 0 or v > 90], 0)  # or (v>0 and v <=10)
+
         # dtNew = np.delete(dtNew, [ i for (i, v) in enumerate(dtNew[ 0:, 7 ]) ], 0) # if v <= 7
 
         ##statistics STD
@@ -726,7 +769,9 @@ class BaseSeriesReader:
         # draftBigger6 = np.array([ drft for drft in dtNew1 if drft[0] > 6 ])
         #########DRAFT < 9
         drftStw8 = []
+
         #stw8DrftS4 = np.array([i for i in dtNew1 if i[4] >= 8 and i[4] < 8.5 and i[0] <= 9])
+
         with open('./MT_DELTA_MARIA_draftS_9_analysis.csv', mode='w') as rows:
             for dr in range(6, 9):
                 stw8DrftS4 = np.array([i for i in dtNew1 if i[4] >= 8 and i[4] < 8.5 and i[0] > dr and i[0] <= dr + 1])
@@ -735,6 +780,7 @@ class BaseSeriesReader:
                     stw8DrftS4[:, 8])], 0)
 
                 data_writer = csv.writer(rows, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+
                 data_writer.writerow(
                     [str(dr) + ' < DRAFT < ' + str(dr + 1) + '   ' + ' 8 < STW < 8.5                   '], )
                 data_writer.writerow([], )
@@ -960,6 +1006,7 @@ class BaseSeriesReader:
 
                 data_writer = csv.writer(rows, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
                 data_writer.writerow(
+
                     [str(dr) + ' < DRAFT < ' + str(dr + 1) + '   ' + ' 13 < STW < 13.5                   '], )
                 if stw18DrftS4.shape[0]!=0:
                     stw18DrftS4 = np.delete(stw18DrftS4, [i for (i, v) in enumerate(stw18DrftS4[:, 8]) if v < (
@@ -1308,7 +1355,9 @@ class BaseSeriesReader:
         #'M/E FOC (kg/min)'
 
         #dataNew=dataNew[['Draft', 'SpeedOvg']]
+
         dtNew = dataNew.values[ 484362:569386, : ].astype(float)
+
 
         draftMean = (dtNew[:, 1] + dtNew[:, 2]) / 2
         dtNew[:, 0] = np.round(draftMean,3)

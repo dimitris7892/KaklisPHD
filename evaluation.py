@@ -857,6 +857,9 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
             #scaledPoint = scalerX.fit_transform(pPoint)
 
 
+            #scaledPoint = scalerX.fit_transform(pPoint)
+
+
             #fits = modeler.getFitForEachPartitionForPoint(pPoint, partitionsX)
             #weightedPreds=[]
             #for n,model in enumerate(modeler._models):
@@ -869,7 +872,9 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
 
 
 
+
             prediction = abs(modeler._models[ind].predict(pPoint)) if fit > 0.5 else  modeler._models[len(modeler._models)-1].predict(pPoint)
+
             #prediction = (scalerY.inverse_transform(prediction))  # + scalerY.inverse_transform(currModeler1.predict(scaled))) / 2
             #states_value = modeler._models[0].model.predict([unseenX[:,0].reshape(1,unseenX.shape[200],1) , unseenX[ :, 1 ].reshape(1, unseenX.shape[ 200 ], 1)])
 
