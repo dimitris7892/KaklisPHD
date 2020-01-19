@@ -93,7 +93,7 @@ class KMeansPartitioner(DefaultPartitioner):
         #labels = dataModel.labels_
         labels = dataModel.predict(dataUpdatedX)
         # Extract centroid values
-        #centroids = self.getCentroids()
+        centroids = self.getCentroids()
         from scipy.interpolate import interp1d
         import scipy as sp
         import scipy.interpolate
@@ -118,7 +118,7 @@ class KMeansPartitioner(DefaultPartitioner):
         #for k in partitionLabels:
             #print("RPM variance of cluster "+str(k) +": " + str(np.var(partitionsY[k]))+
             #"\n"+ "Velocity variance of cluster "+str(k)+": "+str(np.var(partitionsX[k])))
-        return partitionsX, partitionsY, partitionLabels , dataX , dataY,None
+        return partitionsX, partitionsY, partitionLabels , dataX , dataY,centroids
 
 
     def getClusterer(self, dataX=None, dataY = None):

@@ -82,6 +82,8 @@ class BasePartitionModeler:
                 return 0,0
             else:
                 return mBest , dBestFit
+    def getFitofPointIncluster(self,point,centroid):
+        return 1.0 / (1.0 + numpy.linalg.norm(point - centroid))
 
     def  getFitnessOfModelForPoint(self, model, point):
         return 0.0
@@ -3186,7 +3188,7 @@ class TensorFlowW(BasePartitionModeler):
 
         estimator = baseline_model()
 
-        #estimator.fit(partitionsX, partitionsY, epochs=100, validation_split=0.33)
+        estimator.fit(partitionsX, partitionsY, epochs=100, validation_split=0.33)
 
         #for i in range(0,len(partitionsX)):
             #self.triRpm = preTrainedWeights(partitionsX[i])
@@ -3271,7 +3273,7 @@ class TensorFlowW(BasePartitionModeler):
                 #estimator.layers[3] = custom_activation2(inputs=estimator.layers[2].output, modelId=idx) if idx ==0 else estimator.layers[3]
                 #estimator.layers[3] = custom_activation2 if idx ==3 else estimator.layers[3]
 
-                estimatorCl.fit(np.array(DeepCLpartitionsX[idx]),np.array(DeepCLpartitionsY[idx]),epochs=200,validation_split=0.33)#validation_split=0.33
+                estimatorCl.fit(np.array(DeepCLpartitionsX[idx]),np.array(DeepCLpartitionsY[idx]),epochs=100,validation_split=0.33)#validation_split=0.33
 
                     #scores = estimator.score(partitionsX[idx][ test ], partitionsY[idx][ test ])
                     #print("%s: %.2f%%" % ("acc: ", scores))
@@ -3280,7 +3282,7 @@ class TensorFlowW(BasePartitionModeler):
                 #self._partitionsPerModel[ estimator ] = partitionsX[idx]
         # Update private models
         #models=[]
-        #NNmodels.append(estimator)
+        NNmodels.append(estimator)
 
         #NNmodels.append(estimator)
         self._models = NNmodels
