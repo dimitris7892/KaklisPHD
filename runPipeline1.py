@@ -160,10 +160,12 @@ def main():
             NUM_OF_FOLDS=6
             #if modeler!='TRI':
             if modeler.__class__.__name__ != 'TensorFlowWD':
-                partitionsX, partitionsY, partitionLabels, partitionRepresentatives, partitioningModel , tri  = partitioner.clustering(X, Y, W ,NUM_OF_CLUSTERS, True,k)
+                partitionsX, partitionsY, partitionLabels, partitionRepresentatives, partitioningModel  , centroids  = partitioner.clustering(X, Y, W ,NUM_OF_CLUSTERS, True,k)
             else:
                #partitionLabels=23
-                partitionsX, partitionsY, partitionLabels, partitionRepresentatives, partitioningModel, tri = partitioner.clustering(
+
+                partitionsX, partitionsY, partitionLabels, partitionRepresentatives, partitioningModel, tri  = partitioner.clustering(
+
                     seriesX, targetY, None, NUM_OF_CLUSTERS, True, k)
 
                 #partitionsXDB6, partitionsYDB6, partitionLabels, partitionRepresentatives, partitioningModel, tri = partitioner.clustering(
@@ -242,7 +244,7 @@ def main():
                 _, meanError, sdError = eval.MeanAbsoluteErrorEvaluation.evaluateKerasNN(
                     eval.MeanAbsoluteErrorEvaluation(),unseenFeaturesX,
                     unseenFeaturesY,
-                    modeler,output, xs,genericModel,partitionsXDC)
+                    modeler,output, xs,genericModel,partitionsXDC , centroids)
             else:
                 if flagEvalTri == False:
                     Errors, meanError, sdError = eval.MeanAbsoluteErrorEvaluation.evaluateTriInterpolant(
