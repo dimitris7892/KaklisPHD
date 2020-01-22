@@ -126,7 +126,7 @@ class LinearRegressionModeler(BasePartitionModeler):
         self._models = models
 
         # Return list of models
-        return models , numpy.empty ,numpy.empty , None
+        return models , numpy.empty ,numpy.empty , None,None
 
     def getFitnessOfModelForPoint(self, model, point):
         return 1.0 / (1.0 + numpy.linalg.norm(np.mean(self._partitionsPerModel[ model ]) - point))
@@ -2395,6 +2395,9 @@ class TensorFlowW(BasePartitionModeler):
             # k_constants = keras.backend.variable(constants)
             return SelectedFuncs
 
+
+
+
         def custom_activation2(inputs):
 
             x = inputs
@@ -2430,7 +2433,7 @@ class TensorFlowW(BasePartitionModeler):
                                         try:
                                             piecewiseFunc.append(
                                                 tf.math.multiply(tf.cast(tf.math.less(x, num), tf.float32),
-                                                                 float(row[1]) * (num - inputs)))
+                                                                  (num - inputs)))
                                         #if id ==  self.modelId:
                                                 #inputs = tf.where(x >= num, float(row[ 1 ]) * (inputs - num), inputs)
                                         except:
@@ -2443,7 +2446,7 @@ class TensorFlowW(BasePartitionModeler):
 
                                             piecewiseFunc.append(
                                                 tf.math.multiply(tf.cast(tf.math.greater(x, num), tf.float32),
-                                                                 float(row[1]) * (inputs - num)))
+                                                                (inputs - num)))
                                         #if id == self.modelId:
                                                 #inputs = tf.where(x <= num, float(row[ 1 ]) * (num - inputs), inputs)
                                         except:
@@ -2453,7 +2456,7 @@ class TensorFlowW(BasePartitionModeler):
                                         #if float(row[ 1 ]) < 10000:
                                     try:
                                         piecewiseFunc.append(tf.math.multiply(tf.cast(x, tf.float32),
-                                                                          float(row[ 1 ]) * (inputs)))
+                                                                           (inputs)))
 
                                             #inputs = tf.where(x >= 0, float(row[ 1 ]) * inputs, inputs)
                                     # continue
@@ -2484,7 +2487,7 @@ class TensorFlowW(BasePartitionModeler):
                                                     #if float(row[ 1 ]) < 10000:
                                                 try:
                                                     piecewiseFunc.append(tf.math.multiply(tf.cast(x, tf.float32),
-                                                                                      float(row[ 1 ]) * (inputs) * (
+                                                                                      (inputs) * (
                                                                                               inputs - nums[ 0 ])))
 
                                                         #inputs = tf.where(x >= 0,
@@ -2498,7 +2501,7 @@ class TensorFlowW(BasePartitionModeler):
                                                     #if float(row[ 1 ]) < 10000:
                                                 try:
                                                     piecewiseFunc.append(tf.math.multiply(tf.cast(x, tf.float32),
-                                                                                      float(row[ 1 ]) * (inputs) * (
+                                                                                      (inputs) * (
                                                                                               nums[ 0 ] - inputs)))
 
                                                         #inputs = tf.where(x > 0 ,
@@ -2512,7 +2515,7 @@ class TensorFlowW(BasePartitionModeler):
                                                # if float(row[ 1 ]) < 10000:
                                             try:
                                                 piecewiseFunc.append(tf.math.multiply(tf.cast(x, tf.float32),
-                                                                                  float(row[ 1 ]) * (inputs)))
+                                                                                 (inputs)))
 
                                                     #inputs = tf.where(x >= 0, float(row[ 1 ]) * (inputs), inputs)
                                             except:
@@ -2525,7 +2528,7 @@ class TensorFlowW(BasePartitionModeler):
                                             piecewiseFunc.append(tf.math.multiply(tf.cast(
                                         tf.math.logical_and(tf.math.less(x, nums[ 0 ]),
                                                             tf.math.less(x,nums[ 1 ])), tf.float32),
-                                        float(row[ 1 ]) * (nums[ 0 ] - inputs) * (
+                                         (nums[ 0 ] - inputs) * (
                                                 nums[ 1 ] - inputs)))
 
                                             #inputs = tf.where(x < nums[0] and x < nums[1],
@@ -2540,7 +2543,7 @@ class TensorFlowW(BasePartitionModeler):
                                             piecewiseFunc.append(tf.math.multiply(tf.cast(
                                             tf.math.logical_and(tf.math.greater(x, nums[ 0 ]),
                                                                 tf.math.greater(x,nums[ 1 ])), tf.float32),
-                                            float(row[ 1 ]) * (inputs - nums[0]) * (
+                                            (inputs - nums[0]) * (
                                                     inputs - nums[ 1 ])))
 
                                             #inputs = tf.where(x > nums[ 0 ] and x > nums[ 1 ],
@@ -2557,7 +2560,7 @@ class TensorFlowW(BasePartitionModeler):
                                                         piecewiseFunc.append(tf.math.multiply(tf.cast(
                                                     tf.math.logical_and(tf.math.greater(x, nums[ 0 ]),
                                                                         tf.math.less( x,nums[1])), tf.float32),
-                                                    float(row[ 1 ]) * ( inputs -nums[ 0 ] ) * (
+                                                    ( inputs -nums[ 0 ] ) * (
                                                             nums[ 1 ]- inputs)))
 
                                                     #inputs = tf.where(x > nums[ 0 ] and x < nums[ 1 ],
@@ -2571,7 +2574,7 @@ class TensorFlowW(BasePartitionModeler):
                                                         piecewiseFunc.append(tf.math.multiply(tf.cast(
                                                         tf.math.greater(x, nums[ 0 ])
                                                                             , tf.float32),
-                                                        float(row[ 1 ]) * (inputs - nums[ 0 ]) ))
+                                                         (inputs - nums[ 0 ]) ))
 
                                                         #inputs = tf.where(x > nums[0],
                                                                           #float(row[ 1 ]) * (inputs - nums[ 0 ]), inputs)
@@ -2584,7 +2587,7 @@ class TensorFlowW(BasePartitionModeler):
                                                         piecewiseFunc.append(tf.math.multiply(tf.cast(
                                                     tf.math.logical_and(tf.math.less(x, nums[ 0 ]),
                                                                         tf.math.greater( x,nums[ 1 ])), tf.float32),
-                                                    float(row[ 1 ]) * (nums[ 0 ] - inputs) * (
+                                                   (nums[ 0 ] - inputs) * (
                                                             inputs - nums[ 1 ] )))
 
                                                         #inputs = tf.where(x < nums[ 0 ] and x > nums[1],
@@ -2597,7 +2600,7 @@ class TensorFlowW(BasePartitionModeler):
                                                     try:
                                                         piecewiseFunc.append(tf.math.multiply(tf.cast(
                                                         tf.math.less(x, nums[ 0 ]), tf.float32),
-                                                        float(row[ 1 ]) *  (
+                                                          (
                                                                 inputs - nums[ 0 ])))
 
                                                         #inputs = tf.where(x < nums[ 0 ],
@@ -2628,8 +2631,8 @@ class TensorFlowW(BasePartitionModeler):
             #(intercept if intercept < 10000 else 0 )
             ten = tf.keras.backend.sum(funcs, keepdims=True)
             tenGen = tf.keras.backend.sum(genFuncs,keepdims=True)
-            #SelectedFuncs =  np.sum(funcs) if len(funcs)>0 else  np.sum(genFuncs)
-            SelectedFuncs=tf.keras.backend.sum(funcs,keepdims=True) if len(funcs)>0 else  tf.keras.backend.sum(genFuncs,keepdims=True)
+            SelectedFuncs =  np.sum(funcs) if self.modelId!='Gen' else np.sum(genFuncs)
+            #SelectedFuncs=tf.keras.backend.sum(funcs,keepdims=True) if len(funcs)>0 else  tf.keras.backend.sum(genFuncs,keepdims=True)
             #self.countTimes+=1
             #intercept = tf.constant()
             #constants = intercepts[ 0 if self.modelId=='Gen' else self.modelId ]
@@ -2998,25 +3001,46 @@ class TensorFlowW(BasePartitionModeler):
             #model.add(keras.layers.Dense(len(partition_labels)*3, input_shape=(2,)))
             #model.add(keras.layers.Dense(len(partition_labels) * 2, input_shape=(2,)))
 
-            model.add(keras.layers.Dense(partition_labels, input_shape=(2,)))
+            model.add(keras.layers.Dense(25, input_shape=(2,)))
+
             #model.add(keras.layers.Activation(custom_activation2))
             #model.add(MyLayer(genModelKnots))
             #model.add(keras.layers.Dense(15, input_shape=(2,)))
             #model.add(keras.layers.Dense(1, input_shape=(2,)))  # activation=custom_activation
             #model.add(MyLayer(genModelKnots))
 
-            model.add(keras.layers.Dense(5, input_shape=(2,)))
+            #model.add(keras.layers.Activation(custom_activation2))
+
+            #model.add(keras.layers.Dense(5, input_shape=(2,)))
+            #model.add(keras.layers.Activation(custom_activation2))
             #model.add(keras.layers.Activation(custom_activation2(inputs=model.layers[2].output, modelId=1)))
 
-            model.add(keras.layers.Dense(1, input_shape=(2,)))  # activation=custom_activation
+            #model.add(keras.layers.Dense(1, input_shape=(2,)))  # activation=custom_activation
+            #model.add(keras.layers.Activation(custom_activation2))
+            #model.add(keras.layers.Dense(2, input_shape=(2,)))
+            model.add(keras.layers.Activation(custom_activation2))
+            model.add(keras.layers.Dense(1,))
 
 
-            #model.add(keras.layers.Activation(custom_activation))
             #model.add(keras.layers.Activation('linear'))  # activation=custom_activation
             # Compile model
             model.compile(loss='mse', optimizer=keras.optimizers.Adam(),)#experimental_run_tf_function=False )
             return model
 
+        def baseline_model1():
+            # create model
+            model = keras.models.Sequential()
+
+
+            model.add(keras.layers.Dense(25, input_shape=(2,)))
+
+
+            model.add(keras.layers.Activation(custom_activation2))
+            model.add(keras.layers.Dense(1))
+
+
+            model.compile(loss='mse', optimizer=keras.optimizers.Adam(), )  # experimental_run_tf_function=False )
+            return model
 
         seed = 7
         numpy.random.seed(seed)
@@ -3246,6 +3270,11 @@ class TensorFlowW(BasePartitionModeler):
         #models[ 300 ] = estimator
 
         NNmodels=[]
+        scores=[]
+        #tf.keras.backend.clear_session()
+        estimatorGen = baseline_model1()
+
+        estimatorGen.fit(partitionsX, partitionsY, epochs=100, validation_split=0.33,verbose=1)
         for idx, pCurLbl in enumerate(DeepClpartitionLabels):
                 #partitionsX[ idx ]=partitionsX[idx].reshape(-1,2)
 
@@ -3255,7 +3284,9 @@ class TensorFlowW(BasePartitionModeler):
                 self.countTimes+=1
                 #modelId=idx
 
-                estimatorCl = baseline_model()
+                #estimatorCl = baseline_model()
+                #estimatorCl.fit(np.array(DeepCLpartitionsX[ idx ]), np.array(DeepCLpartitionsY[ idx ]), epochs=100,
+                                #validation_split=0.33)  # validation_split=0.33
                 #if idx==0:
                     #estimator.add(keras.layers.Activation(custom_activation2))
                 #else:
@@ -3264,7 +3295,7 @@ class TensorFlowW(BasePartitionModeler):
                 #len(DeepClpartitionLabels)+
                 #estimatorCl = insert_intermediate_layer_in_keras(estimator, 1, keras.layers.Dense(numOfNeurons))
                 #lr = 0.001 if np.std(np.array(partitionsX[idx])) < 30  else 0.2
-                #estimatorCl = replace_intermediate_layer_in_keras(estimator, -1,1, keras.layers.Dense(len(DeepClpartitionLabels)+numOfNeurons) ,keras.layers.Activation(custom_activation2))
+                estimatorCl = replace_intermediate_layer_in_keras(estimatorGen, 0, 1 , keras.layers.Dense(numOfNeurons,input_shape=(2,)) ,keras.layers.Activation(custom_activation2))
                 #estimatorCl = insert_intermediate_layer_in_keras(estimator, 1, MyLayer(numOfNeurons))
                 #estimatorCl = insert_intermediate_layer_in_keras(estimator,0,keras.layers.Activation(custom_activation2))
 
@@ -3275,8 +3306,9 @@ class TensorFlowW(BasePartitionModeler):
 
                 estimatorCl.fit(np.array(DeepCLpartitionsX[idx]),np.array(DeepCLpartitionsY[idx]),epochs=100,validation_split=0.33)#validation_split=0.33
 
-                    #scores = estimator.score(partitionsX[idx][ test ], partitionsY[idx][ test ])
-                    #print("%s: %.2f%%" % ("acc: ", scores))
+                score = estimatorCl.evaluate(np.array(DeepCLpartitionsX[idx]),np.array(DeepCLpartitionsY[idx]),verbose=1)
+                print("%s: %.2f%%" % ("acc: ", score))
+                scores.append(score)
                 NNmodels.append(estimatorCl)
                 #models[pCurLbl]=estimator
                 #self._partitionsPerModel[ estimator ] = partitionsX[idx]
@@ -3288,7 +3320,7 @@ class TensorFlowW(BasePartitionModeler):
         self._models = NNmodels
 
         # Return list of models
-        return estimator, kmeans ,numpy.empty, numpy.empty , estimator , DeepCLpartitionsX
+        return estimator, kmeans ,scores, numpy.empty,None #, estimator , DeepCLpartitionsX
 
     def createModelsForConv(self,partitionsX, partitionsY, partition_labels):
         ##Conv1D NN
@@ -5014,7 +5046,7 @@ class RandomForestModeler(BasePartitionModeler):
         self._models = models
 
         # Return list of models
-        return models, numpy.empty, numpy.empty , None
+        return models, numpy.empty, numpy.empty , None , None
 
     def getFitnessOfModelForPoint(self, model, point):
         return 1.0 / (1.0 + numpy.linalg.norm(np.mean(self._partitionsPerModel[ model ]) - point))
@@ -5077,7 +5109,7 @@ class SplineRegressionModeler(BasePartitionModeler):
         self._models = models
 
         # Return list of models
-        return models,numpy.empty ,numpy.empty,None
+        return models,numpy.empty ,numpy.empty,None,None
 
     def getFitnessOfModelForPoint(self, model, point):
         return 1.0 / (1.0 + numpy.linalg.norm(np.mean(self._partitionsPerModel[ model ]) - point))

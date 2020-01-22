@@ -793,7 +793,7 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
         UnseenSeriesX = dtNew
         return UnseenSeriesX
 
-    def evaluateKerasNN(self, unseenX, unseenY, modeler,output,xs,genericModel,partitionsX , centroids):
+    def evaluateKerasNN(self, unseenX, unseenY, modeler,output,xs,genericModel,partitionsX , scores):
         lErrors = []
         #unseenX = unseenX.reshape((unseenX.shape[ 0 ], 1, unseenX.shape[ 1 ]))
         #from sklearn.decomposition import PCA
@@ -868,12 +868,12 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
             #predX = np.mean(weightedPreds)
 
             #prediction = modeler._models[0].predict(pPoint)
-            #prediction = (modeler._models[ind].predict(pPoint)+ modeler._models[len(modeler._models)-1].predict(pPoint))/2
+            #prediction = modeler._models[len(modeler._models)-1].predict(pPoint)
 
 
 
 
-            prediction = abs(modeler._models[ind].predict(pPoint)) if fit > 0.5 else  modeler._models[len(modeler._models)-1].predict(pPoint)
+            prediction = abs(modeler._models[ind].predict(pPoint)) if fit > 0.5 and float(scores[ind])<10 else  modeler._models[len(modeler._models)-1].predict(pPoint)
 
             #prediction = (scalerY.inverse_transform(prediction))  # + scalerY.inverse_transform(currModeler1.predict(scaled))) / 2
             #states_value = modeler._models[0].model.predict([unseenX[:,0].reshape(1,unseenX.shape[200],1) , unseenX[ :, 1 ].reshape(1, unseenX.shape[ 200 ], 1)])
@@ -911,7 +911,7 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
         #print(self.kw_dunn(groups,[(0,1),(0,2)]))
 
         #dataf = pd.DataFrame.from_dict(df, orient='index')
-        df.to_csv('./NEWres.csv', index=False)
+        df.to_csv('./NEWres_1.csv', index=False)
         #df.melt(var_name='groups', value_name='values')
         df=pd.melt(df,var_name='groups', value_name='values')
         print(df)

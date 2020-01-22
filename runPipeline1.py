@@ -95,7 +95,7 @@ def main():
     histTr=[]
     counter=0
 
-    K = range(1,30)
+    K = range(1,3)
     print("Number of Statistically ind. subsets for training: " + str(len(subsetsX)))
     subsetsX=[subsetsX[0:5]] if len(subsetsX) > 5 else subsetsX
     subsetsY = [ subsetsY[ 0:5 ] ] if len(subsetsY) > 5 else subsetsY
@@ -113,9 +113,9 @@ def main():
                  #[0.6]
        if partitioner.__class__.__name__=='KMeansPartitioner':
            if modeler.__class__.__name__=='TriInterpolantModeler' or modeler.__class__.__name__ == 'TensorFlow':
-             partK = [1]
+             partK = [2]
            else:
-             partK=[20]
+             partK=K
        error = {"errors": [ ]}
        #random.seed(1)
 
@@ -131,8 +131,8 @@ def main():
 
             ####################################LAROS DATA STATISTICAL TESTS
             if modeler.__class__.__name__ == 'TensorFlowWD':
-                reader.readNewDataset()
-                #reader.readExtractNewDataset()
+                #reader.readNewDataset()
+                reader.readExtractNewDataset()
                 #data = pd.read_csv('./MT_DELTA_MARIA_data_1.csv')
                 #reader.readLarosDataFromCsvNewExtractExcels(data)
                 seriesX, targetY,unseenFeaturesX, unseenFeaturesY  , drftB6 , drftS6 , drftTargetB6 , drftTargetS6, partitionsX, partitionsY,partitionLabels = reader.readLarosDataFromCsvNew(data)
@@ -190,7 +190,8 @@ def main():
             unseenY=[]
             if modeler.__class__.__name__!= 'TriInterpolantModeler' :
                         #and modeler.__class__.__name__ != 'TensorFlow':
-                modelMap, model2,xs, output, genericModel , partitionsXDC = modeler.createModelsFor(partitionsX, partitionsY, partitionLabels,None,X,Y)
+                modelMap, model2,scores, output,genericModel = modeler.createModelsFor(partitionsX, partitionsY, partitionLabels,None,X,Y)
+                        #, genericModel , partitionsXDC
                 #if modeler.__class__.__name__ != 'TensorFlow':
                     #modelMap = dict(zip(partitionLabels, modelMap))
                 print("Creating models per partition... Done")
@@ -237,20 +238,20 @@ def main():
             print("Evaluating on unseen data...")
             if modeler.__class__.__name__ != 'TensorFlow' and modeler.__class__.__name__ != 'TensorFlowW' and modeler.__class__.__name__ != 'TriInterpolantModeler' and modeler.__class__.__name__ != 'TensorFlowWD':
                 Errors, meanError, sdError = eval.MeanAbsoluteErrorEvaluation.evaluate(eval.MeanAbsoluteErrorEvaluation(),
-                                                                                  unseenFeaturesX, unseenFeaturesY, modeler,genericModel)
+                                                                                  unseenFeaturesX, unseenFeaturesY, modeler,None)
 
 
             elif modeler.__class__.__name__ == 'TensorFlow' or modeler.__class__.__name__ == 'TensorFlowW' or  modeler.__class__.__name__ == 'TensorFlowWD':
                 _, meanError, sdError = eval.MeanAbsoluteErrorEvaluation.evaluateKerasNN(
                     eval.MeanAbsoluteErrorEvaluation(),unseenFeaturesX,
                     unseenFeaturesY,
-                    modeler,output, xs,genericModel,partitionsXDC , centroids)
+                    modeler,output, None,None,partitionsX , scores)
             else:
                 if flagEvalTri == False:
                     Errors, meanError, sdError = eval.MeanAbsoluteErrorEvaluation.evaluateTriInterpolant(
                     eval.MeanAbsoluteErrorEvaluation(),
                     unseenFeaturesX, unseenFeaturesY, partitionsX, partitionsY, partitionRepresentatives,
-                    partitioningModel, tri, modelers[0])
+                    partitioningModel, None, modelers[0])
 
                     flagEvalTri = True
 

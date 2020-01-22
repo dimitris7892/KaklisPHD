@@ -218,7 +218,8 @@ class BaseSeriesReader:
 
             year = date.split('-')[ 0 ]
             dt = dateTimesV[ i ]
-
+            day = '0'+day if day.__len__()==1 else day
+            month = '0' + month if month.__len__() == 1 else month
             filteredDTWs = [ d for d in dateTimesW if month == str(d).split(' ')[ 0 ].split('-')[ 1 ] and day ==
                              str(d).split(' ')[ 0 ].split('-')[ 2 ] and year == str(d).split(' ')[ 0 ].split('-')[ 0 ] ]
 
@@ -291,8 +292,38 @@ class BaseSeriesReader:
                                     ballastLadenFlagsVmapped.append('B')
 
                         elif i == 0:
-                            next = sorted[ i + 1 ]
-                            blFlag = np.array(data.loc[ data[ 'telegram_date' ] == next ].values)[ 0 ][ 49 ]
+                            #day =
+                            #day = float(day)-1
+                            #filteredDTWs=[]
+                            #for i in range(0,len(dateTimesW)):
+                                #yearW =  str(dateTimesW[i]).split(' ')[ 0 ].split('-')[ 0 ]
+                                #monthW =  str(dateTimesW[i]).split(' ')[ 0 ].split('-')[ 1 ]
+                                #dayW = str(dateTimesW[i]).split(' ')[ 0 ].split('-')[ 2 ]
+                                #while filteredDTWs.__len__()==0:
+                                    #if month==monthW and day ==dayW and year==yearW:
+                                        #filteredDTWs.append(dateTimesW[i])
+                            newDate = dateTimesV[ i ] - datetime.timedelta(1)
+
+                            date = str(newDate).split(" ")[ 0 ]
+                            month = date.split('-')[ 1 ]
+
+                            day = date.split('-')[ 2 ]
+
+                            hhMMssV = str(newDate).split(" ")[ 1 ]
+
+                            year = date.split('-')[ 0 ]
+                            dt = dateTimesV[ i ]
+                            day = '0' + day if day.__len__() == 1 else day
+                            month = '0' + month if month.__len__() == 1 else month
+                            filteredDTWs = [ d for d in dateTimesW if
+                                             month == str(d).split(' ')[ 0 ].split('-')[ 1 ] and day ==
+                                             str(d).split(' ')[ 0 ].split('-')[ 2 ] and year ==
+                                             str(d).split(' ')[ 0 ].split('-')[ 0 ] ]
+
+
+                            #next = sorted[ i + 1 ]
+                            previous = filteredDTWs[len(filteredDTWs)-1]
+                            blFlag = np.array(data.loc[ data[ 'telegram_date' ] == previous ].values)[ 0 ][ 49 ]
                             if blFlag == 'B':
                                 ballastLadenFlagsVmapped.append('B')
                             else:
