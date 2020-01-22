@@ -1,0 +1,9 @@
+clusters,error,models,partitioners,var
+1,1.63878355511,LinearRegressionModeler,KMeansPartitioner,49.5168263401
+2,1.63270580122,LinearRegressionModeler,KMeansPartitioner,49.5168263401
+1,2.78380334268,SplineRegressionModeler,KMeansPartitioner,49.5168263401
+2,2.41325274308,SplineRegressionModeler,KMeansPartitioner,49.5168263401
+1,2.79649123348,RandomForestModeler,KMeansPartitioner,49.5168263401
+2,2.79191883005,RandomForestModeler,KMeansPartitioner,49.5168263401
+1,2.2361946106,TensorFlowW,KMeansPartitioner,49.5168263401
+2,1.91129350662,TensorFlowW,KMeansPartitioner,49.5168263401
