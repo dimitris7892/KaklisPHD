@@ -30,21 +30,25 @@ class BaseSeriesReader:
 
         return np.nan_to_num(X.astype(float)),np.nan_to_num(Y.astype(float)) , np.nan_to_num(W.astype(float))
 
+    def insertDataAtDb(self):
+        x=0
+
+
     def readNewDataset(self):
 
         ####STATSTICAL ANALYSIS PENELOPE
 
-        data = pd.read_csv('./Mapped_data/PERSEFONE_mapped.csv')
-        data1 = pd.read_csv('./Mapped_data/PERSEFONE_mapped_1.csv')
-        data2 = pd.read_csv('./Mapped_data/PERSEFONE_mapped_2.csv')
+        data = pd.read_csv('./Mapped_data/PERSEFONE_mapped_new.csv')
+        data1 = pd.read_csv('./Mapped_data/PERSEFONE_mapped_new_1.csv')
+        data2 = pd.read_csv('./Mapped_data/PERSEFONE_mapped_new_2.csv')
         data3 = pd.read_csv('./Mapped_data/PERSEFONE_mapped_3.csv')
         data4 = pd.read_csv('./Mapped_data/PERSEFONE_mapped_4.csv')
         data5 = pd.read_csv('./Mapped_data/PERSEFONE_mapped_5.csv')
         data6 = pd.read_csv('./Mapped_data/PERSEFONE_mapped_6.csv')
         data7 = pd.read_csv('./Mapped_data/PERSEFONE_mapped_7.csv')
-        #data8 = pd.read_csv('./Mapped_data/PERSEFONE_mapped_8.csv')
-        #data9 = pd.read_csv('./Mapped_data/PERSEFONE_mapped_9.csv')
-        #data10 = pd.read_csv('./Mapped_data/PERSEFONE_mapped_10.csv')
+        data8 = pd.read_csv('./Mapped_data/PERSEFONE_mapped_8.csv')
+        data9 = pd.read_csv('./Mapped_data/PERSEFONE_mapped_9.csv')
+        data10 = pd.read_csv('./Mapped_data/PERSEFONE_mapped_10.csv')
 
         dtNew = data.values#.astype(float)
         dtNew1 = data1.values#.astype(float)
@@ -55,21 +59,19 @@ class BaseSeriesReader:
         dtNew6 = data6.values
         dtNew7 = data7.values
 
-        #dtNew8 = data8.values
-        #dtNew9 = data9.values
-        #dtNew10 = data10.values
+        dtNew8 = data8.values
+        dtNew9 = data9.values
+        dtNew10 = data10.values
 
 
 
-
-
-        dataNew = np.concatenate([ dtNew , dtNew1 , dtNew2, dtNew3 , dtNew4 , dtNew5 , dtNew6  , dtNew7 ])
-        ballastDt = np.array([k for k in dataNew if k[5]=='B' if k[4]>0.8])[:,0:5].astype(float)
+        dataNew = np.concatenate([ dtNew,dtNew1 , dtNew2])
+        ballastDt = np.array([k for k in dataNew if k[5]=='B' ])[:,0:5].astype(float)
         ladenDt = np.array([ k for k in dataNew if k[ 5 ] == 'L'  ])[ :, 0:5 ].astype(float)
         ####################
         ####################
         ####################
-        dataV = pd.read_csv('./data/PENELOPE_1-31_03_19.csv')
+        dataV = pd.read_csv('./data/PENELOPE_1-28_02_19.csv')
 
         dataV=dataV.drop([ 't_stamp', 'vessel status' ], axis=1)
         dtNew = dataV.values.astype(float)
@@ -120,10 +122,10 @@ class BaseSeriesReader:
 
             vecproj = np.dot(y, x) / np.dot(y, y) * y
             relWindSpeed = proj_of_y_on_x[ 0 ] + windSpeed[ i ]
-            if relWindSpeed > 40:
-                d = 0
+
             relDir = windDir[ i ] - Vcourse[ i ]
             relDir += 360 if relDir < 0 else relDir
+            #################################################
             relWindDirs.append(relDir)
             relWindSpeeds.append(relWindSpeed)
         newMappedData = np.array(
@@ -144,32 +146,54 @@ class BaseSeriesReader:
         ####################
         ####################
 
-        dataV = pd.read_csv('./data/Persefone/PERSEFONE_1-31_03_19.csv')
+        dataV = pd.read_csv('./data/PERSEFONE/PERSEFONE_1-30_06_19.csv')
         #dataV=dataV.drop([ 't_stamp', 'vessel status' ], axis=1)
         dtNew = dataV.values#.astype(float)
 
 
         data = pd.read_csv('./export telegram.csv', sep='\t')
-        DdtNew = data.values[0:, :]
+        DTLGtNew = data.values[0:, :]
         dateTimesW = []
         ws = []
+        arrivalsDate=[]
+        departuresDate = []
 
-        for i in range(0, len(DdtNew[:, 1])):
-            if DdtNew[i, 0] == 'T004':
-                date = DdtNew[i, 1].split(" ")[0]
+        for i in range(0, len(DTLGtNew[:, 1])):
+            if DTLGtNew[i, 0] == 'T004':
+                tlgType = DTLGtNew[i,2]
+
+                date = DTLGtNew[i, 1].split(" ")[0]
                 month = date.split('/')[1]
                 day = date.split('/')[0]
                 year = date.split('/')[2]
 
-                hhMMss = DdtNew[i, 1].split(" ")[1]
+                hhMMss = DTLGtNew[i, 1].split(" ")[1]
                 newDate = year + "-" + month + "-" + day + " " + ":".join(hhMMss.split(":")[0:2])
+                dtObj = datetime.datetime.strptime(newDate, '%Y-%m-%d %H:%M')
+                if tlgType == 'A':
+                    arrivalsDate.append(dtObj)
+                    for k in range(i, len(DTLGtNew[:, 1])):
+                        if DTLGtNew[k, 0] == 'T004':
+                            if DTLGtNew[k,2] == 'D':
+                                date = DTLGtNew[k, 1].split(" ")[0]
+                                month = date.split('/')[1]
+                                day = date.split('/')[0]
+                                year = date.split('/')[2]
 
+                                hhMMss = DTLGtNew[k, 1].split(" ")[1]
+                                newDate = year + "-" + month + "-" + day + " " + ":".join(hhMMss.split(":")[0:2])
+                                dtObj = datetime.datetime.strptime(newDate, '%Y-%m-%d %H:%M')
+                                departuresDate.append(dtObj)
+                                break
+                #elif tlgType == 'D':
+                    #departuresDate.append(dtObj)
 
                 dt = datetime.datetime.strptime(newDate, '%Y-%m-%d %H:%M')
                 # if DdtNew[ i, 7 ] != 'No data' and DdtNew[ i, 8 ] != 'No data':
                 dateTimesW.append(dt)
 
         dateTimesV = []
+        dateTimesVstr=[]
         for row in dtNew[:, 0]:
             date = row.split(" ")[0]
             hhMMss = row.split(" ")[1]
@@ -186,7 +210,10 @@ class BaseSeriesReader:
             ##find dateTimesV at sea
             filteredDTWs = [d for d in dateTimesW if month == str(d).split(' ')[0].split('-')[1] and day ==
                             str(d).split(' ')[0].split('-')[2] and year == str(d).split(' ')[0].split('-')[0]]
-            dateTimesV.append(dtV)
+            for i in range(0,len(arrivalsDate)):
+                if  dtV > arrivalsDate[i] and dtV < departuresDate[i]:
+                    dateTimesV.append(dtV)
+                    dateTimesVstr.append(str(dtV))
             #for filteredDate in filteredDTWs:
                 #date = str(filteredDate).split(" ")[0]
                 #month = date.split('-')[1]
@@ -199,6 +226,7 @@ class BaseSeriesReader:
                 #newDate = day + "/" + month + "/" + year + " " + ":".join(hhMMss.split(":"))
                 #tlgType=np.array(data.loc[ data[ 'telegram_date' ] == newDate ].values)[ 0 ][ 2 ]
                 #if tlgType == 'A' or tlgType=='N':
+                    #x=0
 
             ############################
 
@@ -315,14 +343,26 @@ class BaseSeriesReader:
                             dt = dateTimesV[ i ]
                             day = '0' + day if day.__len__() == 1 else day
                             month = '0' + month if month.__len__() == 1 else month
-                            filteredDTWs = [ d for d in dateTimesW if
+
+
+
+                            filteredDTWsBL = [ d for d in dateTimesW if
                                              month == str(d).split(' ')[ 0 ].split('-')[ 1 ] and day ==
                                              str(d).split(' ')[ 0 ].split('-')[ 2 ] and year ==
                                              str(d).split(' ')[ 0 ].split('-')[ 0 ] ]
 
 
                             #next = sorted[ i + 1 ]
-                            previous = filteredDTWs[len(filteredDTWs)-1]
+                            previous = str(filteredDTWsBL[len(filteredDTWsBL)-1])
+                            dtBL = previous.split(' ')[0]
+                            month = dtBL.split('-')[1]
+                            month = month[1] if month[0] == '0' else month
+                            day = dtBL.split('-')[2]
+                            day = day[1] if day[0] == '0' else day
+                            year = dtBL.split('-')[0]
+                            hhMMss = str(previous).split(" ")[1]
+                            previous = day + "/" + month + "/" + year + " " + ":".join(hhMMss.split(":"))
+
                             blFlag = np.array(data.loc[ data[ 'telegram_date' ] == previous ].values)[ 0 ][ 49 ]
                             if blFlag == 'B':
                                 ballastLadenFlagsVmapped.append('B')
@@ -335,10 +375,11 @@ class BaseSeriesReader:
                                 ballastLadenFlagsVmapped.append('B')
                             else:
                                 ballastLadenFlagsVmapped.append('L')
-                    except:
+                    except Exception as e:
 
                         d=0
-                        #ballastLadenFlagsVmapped.append('N')
+                        print(e)
+                        ballastLadenFlagsVmapped.append('N')
 
                             # firstMin = min(dtDiff.items(), key=lambda x: x[1])
             # del dtDiff[ firstMin[ 0 ] ]
@@ -359,7 +400,7 @@ class BaseSeriesReader:
                     drft = (drftAFT + drftFORE) / 2
                     drafts.append(float(drft))
             if len(datesWs)>1:
-                x=0
+                dx=0
             try:
                 y = np.array(drafts)
                 x = matplotlib.dates.date2num(filteredDTWs)
@@ -367,11 +408,11 @@ class BaseSeriesReader:
                 f.fit(x.reshape(-1, 1), y.reshape(-1, 1))
                 pred = f.predict(np.array(matplotlib.dates.date2num(dt)).reshape(-1, 1))
                 draftsVmapped.append(pred)
-            except:
-                x=0
+            except Exception as e:
+                dx=0
                     #if np.nan_to_num(np.array(data.loc[ data[ 'telegram_date' ] == date ].values)[ 0 ][ 27 ]).__len__()==0 or \
                         #np.nan_to_num(np.array(data.loc[ data[ 'telegram_date' ] == date ].values)[ 0 ][ 28 ]).__len__() == 0:
-
+                print(e)
                 if drafts.__len__()==0:
                     draftsVmapped.append([0])
 
@@ -382,20 +423,20 @@ class BaseSeriesReader:
         windSpeedVmapped = [ ]
         windDirsVmapped = [ ]
 
-        dateTimesV = [ ]
-        for row in dtNew[ :, 0 ]:
-            date = row.split(" ")[ 0 ]
-            hhMMss = row.split(" ")[ 1 ]
-            newDate = date + " " + ":".join(hhMMss.split(":")[ 0:2 ])
-            dt = datetime.datetime.strptime(newDate, '%Y-%m-%d %H:%M')
-            dateTimesV.append(dt)
+        #dateTimesV = [ ]
+        #for row in dtNew[ :, 0 ]:
+            #date = row.split(" ")[ 0 ]
+            #hhMMss = row.split(" ")[ 1 ]
+            #newDate = date + " " + ":".join(hhMMss.split(":")[ 0:2 ])
+            #dt = datetime.datetime.strptime(newDate, '%Y-%m-%d %H:%M')
+            #dateTimesV.append(dt)
 
         data = pd.read_excel('./data/Persefone/Persefone TrackReport.xls')
 
         WdtNew = data.values[ 0:, : ]
         dateTimesW = [ ]
         ws = [ ]
-
+        newDataset = []
         for i in range(0, len(WdtNew[ :, 1 ])):
             date = WdtNew[ i, 1 ].split(" ")[ 0 ]
             month = date.split('.')[ 1 ]
@@ -408,9 +449,17 @@ class BaseSeriesReader:
             if WdtNew[ i, 7 ] != 'No data' and WdtNew[ i, 8 ] != 'No data':
                 dateTimesW.append(dt)
 
+
+
+        for i in range(0, len(dtNew)):
+
+            #dtFiltered = {}
+            #########################
+            if str(dtNew[i][0].split(".")[0]) in dateTimesVstr:
+                newDataset.append(dtNew[i,:].reshape(1,-1))
+
         for i in range(0, len(dateTimesV)):
 
-            dtFiltered = {}
             datesWs = [ ]
 
             date = str(dateTimesV[ i ]).split(" ")[ 0 ]
@@ -475,15 +524,17 @@ class BaseSeriesReader:
         # WdtNew = data.values[ 0:, : ]
         # print(pred)
 
-        dataV = pd.read_csv('./data/Persefone/PERSEFONE_1-31_03_19.csv')
+        dataV = pd.read_csv('./data/Persefone/PERSEFONE_1-30_06_19.csv')
+        newDataset = np.array(newDataset).reshape(-1, dtNew.shape[1])
 
-
-        dataV=dataV.drop([ 't_stamp', 'vessel status' ], axis=1)
+        dataV = dataV.drop(['t_stamp', 'vessel status'], axis=1)
         dtNew = dataV.values.astype(float)
+
+
 
         newMappedData = np.array(
 
-            np.append(dtNew[ :, : ], np.asmatrix([ np.array(windSpeedVmapped).reshape(-1), np.array(windDirsVmapped).reshape(-1) , np.array(ballastLadenFlagsVmapped)[0:len(draftsVmapped)] ]).T,
+            np.append(newDataset, np.asmatrix([ np.array(windSpeedVmapped).reshape(-1), np.array(windDirsVmapped).reshape(-1) , np.array(ballastLadenFlagsVmapped)[0:len(draftsVmapped)] ]).T,
         axis=1))
 
         Vcourse = np.array(newMappedData[ :, 2 ]).astype(float)
@@ -519,7 +570,7 @@ class BaseSeriesReader:
             relWindDirs.append(relDir)
             relWindSpeeds.append(relWindSpeed)
         newMappedData = np.array(
-            np.append(dtNew[ :, : ],
+            np.append(newDataset,
 
                       np.asmatrix([ np.array(relWindSpeeds), np.array(relWindDirs), np.array(draftsVmapped).reshape(-1) ,np.array(ballastLadenFlagsVmapped)[0:len(draftsVmapped)]]).T,
 
@@ -530,7 +581,7 @@ class BaseSeriesReader:
 
         ####STATSTICAL ANALYSIS PENELOPE
 
-        with open('./PERSEFONE_mapped_7.csv', mode='w') as dataw:
+        with open('./PERSEFONE_mapped_new_3.csv', mode='w') as dataw:
 
             data_writer = csv.writer(dataw, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
             data_writer.writerow([ 'STW',  'WindSpeed', 'WindAngle', 'Draft'
