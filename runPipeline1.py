@@ -95,7 +95,7 @@ def main():
     histTr=[]
     counter=0
 
-    K = range(1,3)
+    K = range(1,31)
     print("Number of Statistically ind. subsets for training: " + str(len(subsetsX)))
     subsetsX=[subsetsX[0:5]] if len(subsetsX) > 5 else subsetsX
     subsetsY = [ subsetsY[ 0:5 ] ] if len(subsetsY) > 5 else subsetsY
@@ -131,8 +131,9 @@ def main():
 
             ####################################LAROS DATA STATISTICAL TESTS
             if modeler.__class__.__name__ == 'TensorFlowWD':
+                #reader.insertDataAtDb()
                 #reader.readNewDataset()
-                reader.readExtractNewDataset()
+                reader.readExtractNewDataset('MILLENIA')
                 #data = pd.read_csv('./MT_DELTA_MARIA_data_1.csv')
                 #reader.readLarosDataFromCsvNewExtractExcels(data)
                 seriesX, targetY,unseenFeaturesX, unseenFeaturesY  , drftB6 , drftS6 , drftTargetB6 , drftTargetS6, partitionsX, partitionsY,partitionLabels = reader.readLarosDataFromCsvNew(data)
@@ -297,7 +298,7 @@ def initParameters():
     end = 17000
     startU = 30000
     endU = 31000
-    algs=['NNWD']
+    algs=['NNW']
     # ['SR','LR','RF','NN','NNW','TRI']
 
 
