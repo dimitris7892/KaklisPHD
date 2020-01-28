@@ -31,7 +31,17 @@ class BaseSeriesReader:
         return np.nan_to_num(X.astype(float)),np.nan_to_num(Y.astype(float)) , np.nan_to_num(W.astype(float))
 
     def insertDataAtDb(self):
-        x=0
+        
+        conn = pyodbc.connect('Driver={SQL Server};'
+                              'Server=WEATHESERVER_DEV;'
+                              'Database=db_name;'
+                              'Trusted_Connection=yes;')
+
+        cursor = conn.cursor()
+        cursor.execute('SELECT * FROM db_name.Table')
+
+        for row in cursor:
+            print(row)
 
 
     def readNewDataset(self):
