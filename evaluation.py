@@ -853,6 +853,7 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
             #prediction = np.sum(model2.predict(pPoint, verbose=0)) / 5
 
             ind , fit = modeler.getBestPartitionForPoint(pPoint,partitionsX)
+            #fits = modeler.getFitsOfPoint(partitionsX,pPoint)
             #fit  = modeler.getFitofPointIncluster(pPoint,centroids[ind])
             #scaledPoint = scalerX.fit_transform(pPoint)
 
@@ -869,17 +870,22 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
 
             #prediction = modeler._models[0].predict(pPoint)
             #prediction = modeler._models[len(modeler._models)-1].predict(pPoint)
+            #from scipy.special import softmax
+            #fits = softmax(fits)
+            #pred=modeler._models[len(modeler._models)-1].predict(pPoint)
+            #for i in range(0,len(fits)):
+                #pred+=fits[i]*modeler._models[i].predict(pPoint)
 
-
-
-
-            prediction = abs(modeler._models[ind].predict(pPoint)) if fit > 0.5 and float(scores[ind])<10 else  modeler._models[len(modeler._models)-1].predict(pPoint)
+            #prediction = abs(modeler._models[ ind ].predict(pPoint))
+            prediction = abs(modeler._models[ind].predict(pPoint)) if fit > 0.5 else  modeler._models[len(modeler._models)-1].predict(pPoint)
 
             #prediction = (scalerY.inverse_transform(prediction))  # + scalerY.inverse_transform(currModeler1.predict(scaled))) / 2
             #states_value = modeler._models[0].model.predict([unseenX[:,0].reshape(1,unseenX.shape[200],1) , unseenX[ :, 1 ].reshape(1, unseenX.shape[ 200 ], 1)])
 
             ##########
             lErrors.append(abs(prediction - trueVal))
+            if abs(prediction - trueVal)>10:
+                w=0
         #x=unseenX[:,0].reshape(-1,unseenX.shape[0])
         #prediction =modeler._models[ 0 ].predict(unseenX.reshape(2,2860))
         #print np.mean(abs(prediction - unseenY))

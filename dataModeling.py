@@ -30,8 +30,9 @@ from time import time
 import metrics
 from sklearn.cluster import KMeans
 #tf.compat.v1.disable_eager_execution()
-#tf.executing_eagerly()
+tf.executing_eagerly()
 from sklearn import preprocessing
+##NEW ONE
 
 class BasePartitionModeler:
     def createModelsFor(self,partitionsX, partitionsY, partition_labels):
@@ -87,6 +88,12 @@ class BasePartitionModeler:
 
     def  getFitnessOfModelForPoint(self, model, point):
         return 0.0
+
+    def getFitsOfPoint(self, partitions, point):
+        fits = [ ]
+        for i in range(0, len(partitions)):
+            fits.append(numpy.linalg.norm(np.mean(partitions[ i ]) - point))
+        return fits
 
     def getFitnessOfPoint(self,partitions ,cluster, point):
 
@@ -1657,7 +1664,7 @@ class TensorFlowW(BasePartitionModeler):
 
         self.ClustersNum=len(partitionsX)
         self.modelId = -1
-        partition_labels = len(partitionsX)
+        #partition_labels = len(partitionsX)
         # Init model to partition map
         self._partitionsPerModel = {}
         def SplinesCoef(partitionsX, partitionsY):
@@ -2395,8 +2402,8 @@ class TensorFlowW(BasePartitionModeler):
             # k_constants = keras.backend.variable(constants)
             return SelectedFuncs
 
-
-
+        def custom_activation2x(inputs):
+            return np.sum(self.genF)
 
         def custom_activation2(inputs):
 
@@ -2627,6 +2634,7 @@ class TensorFlowW(BasePartitionModeler):
             #if  self.countTimes==1:
             funcs=[ x for x in self.models[ 'data' ] if x[ 'id' ] == str(self.modelId) ][ 0 ][ 'funcs' ]
             genFuncs = [ x for x in self.models[ 'data' ] if x[ 'id' ] =='Gen' ][ 0 ][ 'funcs' ]
+            self.genF = genFuncs
             intercept = self.interceptsGen if self.modelId=='Gen' else self.intercepts[int(self.modelId)]
             #(intercept if intercept < 10000 else 0 )
             ten = tf.keras.backend.sum(funcs, keepdims=True)
@@ -3001,7 +3009,7 @@ class TensorFlowW(BasePartitionModeler):
             #model.add(keras.layers.Dense(len(partition_labels)*3, input_shape=(2,)))
             #model.add(keras.layers.Dense(len(partition_labels) * 2, input_shape=(2,)))
 
-            model.add(keras.layers.Dense(25, input_shape=(2,)))
+            model.add(keras.layers.Dense(len(partition_labels), input_shape=(2,)))
 
             #model.add(keras.layers.Activation(custom_activation2))
             #model.add(MyLayer(genModelKnots))
@@ -3024,71 +3032,34 @@ class TensorFlowW(BasePartitionModeler):
 
             #model.add(keras.layers.Activation('linear'))  # activation=custom_activation
             # Compile model
-            model.compile(loss='mse', optimizer=keras.optimizers.Adam(),)#experimental_run_tf_function=False )
+            model.compile(loss=keras.losses.mean_squared_error, optimizer=keras.optimizers.Adam(),)#experimental_run_tf_function=False )
             return model
 
         def baseline_model1():
             # create model
             model = keras.models.Sequential()
 
+            #model.add(keras.layers.Dense(1, input_shape=(2,)))
+            model.add(keras.layers.Dense(len(partition_labels), input_shape=(2,)))
 
-            model.add(keras.layers.Dense(25, input_shape=(2,)))
 
-
-            model.add(keras.layers.Activation(custom_activation2))
+            #model.add(keras.layers.Activation(custom_activation2))
+            #model.add(keras.layers.Activation(keras.activations.softmax))
             model.add(keras.layers.Dense(1))
 
 
-            model.compile(loss='mse', optimizer=keras.optimizers.Adam(), )  # experimental_run_tf_function=False )
+            model.compile(loss=keras.losses.mean_squared_error, optimizer=keras.optimizers.Adam(), )  # experimental_run_tf_function=False )
+            print(model.summary())
             return model
 
         seed = 7
         numpy.random.seed(seed)
 
-
-
-        partitionsX=X
-        partitionsY=Y
-        #weights = preTrainedWeights()
-
-        dims = [ 2 ,1000,500,200 , 100, partition_labels ]
-        init = keras.initializers.VarianceScaling(scale=1. / 3., mode='fan_in',
-                                                  distribution='uniform')
-        # pretrain_optimizer =keras.optimizers.SGD(lr=1, momentum=0.9)
-        seed = 7
-        numpy.random.seed(seed)
-
-
-        pretrain_epochs = 3
-        batch_size = 100
-
-        #autoencoder, encoder = self.autoencoder(dims, init=init)
-        partitionsX.reshape(-1,2)
-        #dataUpdatedX = np.append(partitionsX, np.asmatrix([partitionsY]).T, axis=1)
-        #autoencoder.compile(optimizer=keras.optimizers.Adam(), loss='mse')
-        #autoencoder.fit(partitionsX, partitionsX, batch_size=batch_size, epochs=pretrain_epochs)  # , callbacks=cb)
-        #autoencoder.fit(partitionsX, partitionsX, batch_size=batch_size,
-                        #epochs=3)
-        # autoencoder.save_weights(save_dir + '/ae_weights.h5')
-
-        #clustering_layer = ClusteringLayer(len(partition_labels), name='clustering')(encoder.output)
-        #model1 = keras.models.Model(inputs=encoder.input, outputs=clustering_layer)
-
-        #model1.compile(optimizer=keras.optimizers.Adam(), loss='kld')
-        #SGD(0.01, 0.9)
-        #dataUpdatedX = np.append(partitionsX, np.asmatrix([ partitionsY ]).T, axis=1)
-        kmeans = KMeans(n_clusters=20)
-        #dataUpdatedX = partitionsX.reshape(-1, 2)
-        y_predDeepCl = kmeans.fit_predict( partitionsX)
-        #cl_centers=np.array([np.mean(k) for k in kmeans.cluster_centers_]).reshape(-1,1)
-        #model1.get_layer(name='clustering').set_weights([ cl_centers ])
-
-        #q = model1.predict(partitionsX, verbose=0)
-        #y_predDeepCl = q.argmax(1)
+        self.genF=None
 
         sModel=[]
         sr = sp.Earth(max_degree=2)
-        sr.fit(partitionsX,partitionsY)
+        sr.fit(X,Y)
         sModel.append(sr)
         import csv
         csvModels = [ ]
@@ -3114,7 +3085,7 @@ class TensorFlowW(BasePartitionModeler):
                         basis = row[ 0 ]
                         pruned = row[ 1 ]
                         coeff = row[ 2 ]
-
+                        #if basis=='x0' :continue
                         if pruned == "No":
                             data_writer.writerow([ basis, coeff ])
                             genModelKnots.append(basis)
@@ -3136,49 +3107,14 @@ class TensorFlowW(BasePartitionModeler):
             self.count += 1
             return (tf.losses.mean_squared_error(yTrue,(yPred + self.triRpm)/2 ))
 
-        #def customLoss(yTrue, yPred):
-            #return tf.losses.categorical_crossentropy(yTrue,yPred) +  tf.losses.kullback_leibler_divergence(yTrue,yPred)
-                     #+ tf.losses.kullback_leibler_divergence(yTrue,yPred))
-        #
-        ###############
-        #X_train, X_test, y_train, y_test = train_test_split(partitionsX, partitionsY, test_size=0.33, random_state=seed)
-        #estimatorD = baseline_modelDeepCl()
-        #dataUpdatedX = np.append(partitionsX, np.asmatrix([partitionsY]).T, axis=1)
 
-        #estimatorD.fit(partitionsX, partitionsY, epochs=100)
-
-        #model2 = keras.models.Model(inputs=estimatorD.input, outputs=estimatorD.layers[-2].output)
-
-        #model2.compile(optimizer=keras.optimizers.Adam(), loss=customLoss)
-        #model2.fit(partitionsX,partitionsY,epochs=100)
-        #q = model2.predict(partitionsX, verbose=0)
-
-        #y_predDeepCl = q.argmax(1)
-
-        #pred =np.sum(model2.predict(partitionsX[0].reshape(1,2), verbose=0))/15
-
-        DeepCLpartitionsX = [ ]
-        DeepCLpartitionsY = [ ]
-        DeepClpartitionLabels = [ ]
-        # For each label
-        x2 = partitionsX.reshape(-1, 2)
-        y2 = partitionsY.reshape(-1, 1)
-        for curLbl in np.unique(y_predDeepCl):
-            # Create a partition for X using records with corresponding label equal to the current
-            if np.asarray(x2[ y_predDeepCl == curLbl ]).__len__() < 10:
-                continue
-            DeepCLpartitionsX.append(np.asarray(x2[ y_predDeepCl == curLbl ]))
-            # Create a partition for Y using records with corresponding label equal to the current
-            DeepCLpartitionsY.append(np.asarray(y2[ y_predDeepCl == curLbl ]))
-            # Keep partition label to ascertain same order of results
-            DeepClpartitionLabels.append(curLbl)
 
         srModels = []
-        for idx, pCurLbl in enumerate(DeepClpartitionLabels):
+        for idx, pCurLbl in enumerate(partition_labels):
 
             #maxTerms = if len(DeepCLpartitionsX) > 5000
-            srM = sp.Earth()
-            srM.fit(np.array(DeepCLpartitionsX[idx]), np.array(DeepCLpartitionsY[idx]))
+            srM = sp.Earth(max_degree=2)
+            srM.fit(np.array(partitionsX[idx]), np.array(partitionsY[idx]))
             srModels.append(srM)
         modelCount =0
         import csv
@@ -3199,6 +3135,7 @@ class TensorFlowW(BasePartitionModeler):
                         basis = row[0]
                         pruned = row[1]
                         coeff = row[2]
+                        #if basis == 'x0' : continue
                         if pruned == "No":
                             data_writer.writerow([basis, coeff])
                             basisM.append(basis)
@@ -3209,11 +3146,12 @@ class TensorFlowW(BasePartitionModeler):
                 model[ "funcs" ] = len(basisM)
                 ClModels[ "data" ].append(model)
             modelCount+=1
+        self.flagGen=False
 
         estimator = baseline_model()
 
-        estimator.fit(partitionsX, partitionsY, epochs=100, validation_split=0.33)
-
+        estimator.fit(X, Y, epochs=100, validation_split=0.33)
+        self.flagGen = True
         #for i in range(0,len(partitionsX)):
             #self.triRpm = preTrainedWeights(partitionsX[i])
         #checkpoint =keras.callbacks.ModelCheckpoint("best_model.hdf5", monitor='loss', verbose=1,
@@ -3272,55 +3210,68 @@ class TensorFlowW(BasePartitionModeler):
         NNmodels=[]
         scores=[]
         #tf.keras.backend.clear_session()
+        #tf.keras.backend.clear_session()
         estimatorGen = baseline_model1()
 
-        estimatorGen.fit(partitionsX, partitionsY, epochs=100, validation_split=0.33,verbose=1)
-        for idx, pCurLbl in enumerate(DeepClpartitionLabels):
+        estimatorGen.fit(X, Y, epochs=100, validation_split=0.33,verbose=1)
+
+        for idx, pCurLbl in enumerate(partition_labels):
                 #partitionsX[ idx ]=partitionsX[idx].reshape(-1,2)
 
                 #estimator = baseline_model()
-
+                #try:
                 self.modelId =idx
                 self.countTimes+=1
-                #modelId=idx
 
-                #estimatorCl = baseline_model()
-                #estimatorCl.fit(np.array(DeepCLpartitionsX[ idx ]), np.array(DeepCLpartitionsY[ idx ]), epochs=100,
-                                #validation_split=0.33)  # validation_split=0.33
-                #if idx==0:
-                    #estimator.add(keras.layers.Activation(custom_activation2))
-                #else:
+                    #modelId=idx
+
+                #estimatorCl = baseline_model1()
+                    #estimatorCl.fit(np.array(DeepCLpartitionsX[ idx ]), np.array(DeepCLpartitionsY[ idx ]), epochs=100,
+                                    #validation_split=0.33)  # validation_split=0.33
+                    #if idx==0:
+                        #estimator.add(keras.layers.Activation(custom_activation2))
+                    #else:
                 numOfNeurons = [x for x in ClModels['data'] if x['id']==idx][0]['funcs']
-                #estimatorCl=replace_intermediate_layer_in_keras(estimator, -1 ,MyLayer(5))
-                #len(DeepClpartitionLabels)+
-                #estimatorCl = insert_intermediate_layer_in_keras(estimator, 1, keras.layers.Dense(numOfNeurons))
-                #lr = 0.001 if np.std(np.array(partitionsX[idx])) < 30  else 0.2
-                estimatorCl = replace_intermediate_layer_in_keras(estimatorGen, 0, 1 , keras.layers.Dense(numOfNeurons,input_shape=(2,)) ,keras.layers.Activation(custom_activation2))
-                #estimatorCl = insert_intermediate_layer_in_keras(estimator, 1, MyLayer(numOfNeurons))
-                #estimatorCl = insert_intermediate_layer_in_keras(estimator,0,keras.layers.Activation(custom_activation2))
+                    #estimatorCl=replace_intermediate_layer_in_keras(estimator, -1 ,MyLayer(5))
+                    #len(DeepClpartitionLabels)+
+                    #estimatorCl = insert_intermediate_layer_in_keras(estimator, 1, keras.layers.Dense(numOfNeurons))
+                    #lr = 0.001 if np.std(np.array(partitionsX[idx])) < 30  else 0.2
+                try:
+                    estimatorCl = replace_intermediate_layer_in_keras(estimatorGen, 0, -11 , keras.layers.Dense(numOfNeurons,input_shape=(2,)),keras.layers.Activation(custom_activation2) )
+                except:
+                    self.modelId = 'Gen'
+                    estimatorCl = replace_intermediate_layer_in_keras(estimatorGen, 0, -1,
+                                                                      keras.layers.Dense(numOfNeurons,
+                                                                                         input_shape=(2,)),
+                                                                      keras.layers.Activation(custom_activation2))
+                    #estimatorCl = insert_intermediate_layer_in_keras(estimatorGen, 1,keras.layers.Activation(custom_activation2))
+                    #estimatorCl = insert_intermediate_layer_in_keras(estimator,0,keras.layers.Activation(custom_activation2))
 
-                #estimatorCl.add(keras.layers.Activation(custom_activation2))
-                #estimator.compile()
-                #estimator.layers[3] = custom_activation2(inputs=estimator.layers[2].output, modelId=idx) if idx ==0 else estimator.layers[3]
-                #estimator.layers[3] = custom_activation2 if idx ==3 else estimator.layers[3]
+                    #estimatorCl.add(keras.layers.Activation(custom_activation2))
+                    #estimator.compile()
+                    #estimator.layers[3] = custom_activation2(inputs=estimator.layers[2].output, modelId=idx) if idx ==0 else estimator.layers[3]
+                    #estimator.layers[3] = custom_activation2 if idx ==3 else estimator.layers[3]
 
-                estimatorCl.fit(np.array(DeepCLpartitionsX[idx]),np.array(DeepCLpartitionsY[idx]),epochs=100,validation_split=0.33)#validation_split=0.33
+                estimatorCl.fit(np.array(partitionsX[idx]),np.array(partitionsY[idx]),epochs=100,validation_split=0.33)#validation_split=0.33
 
-                score = estimatorCl.evaluate(np.array(DeepCLpartitionsX[idx]),np.array(DeepCLpartitionsY[idx]),verbose=1)
+                score = estimatorCl.evaluate(np.array(partitionsX[idx]),np.array(partitionsY[idx]),verbose=1)
                 print("%s: %.2f%%" % ("acc: ", score))
                 scores.append(score)
                 NNmodels.append(estimatorCl)
+                #except Exception as e:
+                    #print(str(e))
+                    #return
                 #models[pCurLbl]=estimator
                 #self._partitionsPerModel[ estimator ] = partitionsX[idx]
         # Update private models
         #models=[]
-        NNmodels.append(estimator)
 
-        #NNmodels.append(estimator)
+
+        NNmodels.append(estimator)
         self._models = NNmodels
 
         # Return list of models
-        return estimator, kmeans ,scores, numpy.empty,None #, estimator , DeepCLpartitionsX
+        return estimator, None ,scores, numpy.empty,None #, estimator , DeepCLpartitionsX
 
     def createModelsForConv(self,partitionsX, partitionsY, partition_labels):
         ##Conv1D NN
