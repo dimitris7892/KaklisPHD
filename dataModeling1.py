@@ -87,6 +87,11 @@ class BasePartitionModeler:
     def getFitnessOfPoint(self,partitions ,cluster, point):
         return 1.0 / (1.0 + numpy.linalg.norm(np.mean(partitions[ cluster ]) - point))
 
+    def getFitsOfPoint(self,partitions , point):
+        fits=[]
+        for i in range(0,len(partitions)):
+            fits.append( 1.0 / (1.0 + numpy.linalg.norm(np.mean(partitions[ i ]) - point)))
+        return fits
 
 class TriInterpolantModeler(BasePartitionModeler):
 
@@ -1236,6 +1241,24 @@ class TensorFlowW(BasePartitionModeler):
 
         # Return list of models
         return models, numpy.empty, numpy.empty , None
+
+    def getBestPartitionForPoint(self, point, partitions):
+        # mBest = None
+        mBest = None
+        dBestFit = 0
+        # For each model
+        for m in range(0, len(partitions)):
+            # If it is a better for the point
+            dCurFit = self.getFitnessOfPoint(partitions, m, point)
+            if dCurFit > dBestFit:
+                # Update the selected best model and corresponding fit
+                dBestFit = dCurFit
+                mBest = m
+
+        if mBest == None:
+            return 0, 0
+        else:
+            return mBest, dBestFit
 
     def getBestPartitionForPoint(self, point, partitions):
         # mBest = None
@@ -4022,7 +4045,6 @@ class TensorFlow(BasePartitionModeler):
 
         # Return list of models
         return models, numpy.empty, numpy.empty , None
-
 
 
     def createModelsFor(self, partitionsX, partitionsY, partition_labels,tri,X,Y):
