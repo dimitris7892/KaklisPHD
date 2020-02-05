@@ -3019,9 +3019,11 @@ class TensorFlowW(BasePartitionModeler):
 
             #model.add(keras.layers.Activation(custom_activation2))
 
+
             #model.add(keras.layers.Dense(5, input_shape=(2,)))
             #model.add(keras.layers.Activation(custom_activation2))
             #model.add(keras.layers.Activation(custom_activation2(inputs=model.layers[2].output, modelId=1)))
+
 
             #model.add(keras.layers.Dense(1, input_shape=(2,)))  # activation=custom_activation
             #model.add(keras.layers.Activation(custom_activation2))
@@ -3041,7 +3043,10 @@ class TensorFlowW(BasePartitionModeler):
 
             #model.add(keras.layers.Dense(1, input_shape=(2,)))
 
+
+
             model.add(keras.layers.Dense(len(partition_labels), input_shape=(2,)))
+
 
             model.add(keras.layers.Dense(10, input_shape=(2,)))
 
@@ -3058,6 +3063,7 @@ class TensorFlowW(BasePartitionModeler):
 
         seed = 7
         numpy.random.seed(seed)
+
 
         self.genF=None
 
@@ -3241,7 +3247,9 @@ class TensorFlowW(BasePartitionModeler):
                     #estimatorCl = insert_intermediate_layer_in_keras(estimator, 1, keras.layers.Dense(numOfNeurons))
                     #lr = 0.001 if np.std(np.array(partitionsX[idx])) < 30  else 0.2
                 try:
+
                     estimatorCl = replace_intermediate_layer_in_keras(estimatorGen, 0, -1 , keras.layers.Dense(numOfNeurons,input_shape=(2,)),keras.layers.Activation(custom_activation2) )
+
                 except:
                     self.modelId = 'Gen'
                     estimatorCl = replace_intermediate_layer_in_keras(estimatorGen, 0, -1,

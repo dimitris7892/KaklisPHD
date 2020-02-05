@@ -86,7 +86,7 @@ def main():
         subsetsW.append(targetW)
         subsetsB.append(targetB)
         var.append(np.var(seriesX))
-        if len(subsetsX)>=1:
+        if len(subsetsX)>=5:
             break
     #subsetsX=[subsetsX[0]]
     #subsetsY=[subsetsY[0]]
@@ -107,6 +107,7 @@ def main():
     for subsetX, subsetY in zip(subsetsX, subsetsY):
       skip_idxx = random.sample(range((rangeSubs * 1000) + 10, num_lines), 12000)
         # Read the data
+
       data1 = pd.read_csv(sFile, skiprows=skip_idxx)
       for modeler in modelers:
         for partitioner in partitioners:
@@ -289,6 +290,7 @@ def main():
                 err["error"] = meanError
                 err["k"]=k
                 error["errors"].append(err)
+
 
     eval.MeanAbsoluteErrorEvaluation.ANOVAtest(eval.MeanAbsoluteErrorEvaluation(), clusters, varTr, errors,models,part)
 
