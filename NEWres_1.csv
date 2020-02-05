@@ -1,7 +1,11 @@
 clusters,var,error,partitioners,models
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 6,49.51682634011101,14.7445650100708,KMeansPartitioner,TensorFlowW
+=======
+11,49.51682634011101,2.2122342586517334,KMeansPartitioner,TensorFlowW
+>>>>>>> d9bc679174a8552bd3a10a3e592f823823ffcb32
 =======
 11,49.51682634011101,2.2122342586517334,KMeansPartitioner,TensorFlowW
 >>>>>>> d9bc679174a8552bd3a10a3e592f823823ffcb32
