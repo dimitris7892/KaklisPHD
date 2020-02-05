@@ -40,6 +40,9 @@ def main():
     reader = dRead.BaseSeriesReader()
 
     #reader.readLarosDAta(datetime.datetime(2018,1,1),datetime.datetime(2019,1,1))
+    #return
+    #reader.ExtractLAROSDataset()
+    ####
     num_lines = sum(1 for l in open(sFile))
     num_linesx = num_lines
 
@@ -67,7 +70,7 @@ def main():
     data = pd.read_csv(sFile)
     meanBTr=[]
     meanVTr=[]
-    random.seed(1)
+    #random.seed(1)
     subsetsW=[]
     data = pd.read_csv(sFile)
     for k in range(0,200):
@@ -83,7 +86,7 @@ def main():
         subsetsW.append(targetW)
         subsetsB.append(targetB)
         var.append(np.var(seriesX))
-        if len(subsetsX)>=5:
+        if len(subsetsX)>=1:
             break
     #subsetsX=[subsetsX[0]]
     #subsetsY=[subsetsY[0]]
@@ -102,190 +105,190 @@ def main():
     #K=[10]
 
     for subsetX, subsetY in zip(subsetsX, subsetsY):
-     skip_idxx = random.sample(range((rangeSubs * 1000) + 10, num_lines), 12000)
+      skip_idxx = random.sample(range((rangeSubs * 1000) + 10, num_lines), 12000)
         # Read the data
-     data1 = pd.read_csv(sFile, skiprows=skip_idxx)
-     for modeler in modelers:
-      for partitioner in partitioners:
-       if partitioner.__class__.__name__=='DelaunayTriPartitioner':
-             partK=[0.5]
-             #np.linspace(0.1,1,11)
-                 #[0.6]
-       if partitioner.__class__.__name__=='KMeansPartitioner':
-           if modeler.__class__.__name__=='TriInterpolantModeler' or modeler.__class__.__name__ == 'TensorFlow':
-             partK = [1]
-           else:
-             partK=K
-       error = {"errors": [ ]}
-       #random.seed(1)
+      data1 = pd.read_csv(sFile, skiprows=skip_idxx)
+      for modeler in modelers:
+        for partitioner in partitioners:
+           if partitioner.__class__.__name__=='DelaunayTriPartitioner':
+                 partK=[0.5]
+                 #np.linspace(0.1,1,11)
+                     #[0.6]
+           if partitioner.__class__.__name__=='KMeansPartitioner':
+               if modeler.__class__.__name__=='TriInterpolantModeler' or modeler.__class__.__name__ == 'TensorFlow':
+                 partK = [1]
+               else:
+                 partK=[16]
+           error = {"errors": [ ]}
+           #random.seed(1)
 
-       flagEvalTri = False
-       for k in partK:
-            if modeler.__class__.__name__ == 'TensorFlowW' and K==1: continue
+           flagEvalTri = False
+           for k in partK:
+                if modeler.__class__.__name__ == 'TensorFlowW' and K==1: continue
 
-            #if  modeler.__class__.__name__ == 'TensorFlow' and k>1: continue
-            print(modeler.__class__.__name__)
-            print("Reading data...")
-            reader = dRead.BaseSeriesReader()
-            trSize=80000
+                #if  modeler.__class__.__name__ == 'TensorFlow' and k>1: continue
+                print(modeler.__class__.__name__)
+                print("Reading data...")
+                reader = dRead.BaseSeriesReader()
+                trSize=80000
 
-            ####################################LAROS DATA STATISTICAL TESTS
-            if modeler.__class__.__name__ == 'TensorFlowWD':
-                #reader.insertDataAtDb()
-                #reader.readNewDataset()
-                reader.readExtractNewDataset('MILLENIA')
-                #data = pd.read_csv('./MT_DELTA_MARIA_data_1.csv')
-                #reader.readLarosDataFromCsvNewExtractExcels(data)
-                seriesX, targetY,unseenFeaturesX, unseenFeaturesY  , drftB6 , drftS6 , drftTargetB6 , drftTargetS6, partitionsX, partitionsY,partitionLabels = reader.readLarosDataFromCsvNew(data)
-            #################
+                ####################################LAROS DATA STATISTICAL TESTS
+                if modeler.__class__.__name__ == 'TensorFlowWD':
+                    #reader.insertDataAtDb()
+                    #reader.readNewDataset()
+                    reader.readExtractNewDataset('MILLENIA')
+                    #data = pd.read_csv('./MT_DELTA_MARIA_data_1.csv')
+                    #reader.readLarosDataFromCsvNewExtractExcels(data)
+                    seriesX, targetY,unseenFeaturesX, unseenFeaturesY  , drftB6 , drftS6 , drftTargetB6 , drftTargetS6, partitionsX, partitionsY,partitionLabels = reader.readLarosDataFromCsvNew(data)
+                #################
 
-            #seriesX, targetY ,targetW= reader.readStatDifferentSubsets(data,subsetsX,subsetsY,2880)
-            if modeler.__class__.__name__ != 'TensorFlowWD':
-                seriesX, targetY, targetW,targetB = subsetX,subsetY,subsetsW[0],subsetsB[0]
-            counter=+1
+                #seriesX, targetY ,targetW= reader.readStatDifferentSubsets(data,subsetsX,subsetsY,2880)
+                if modeler.__class__.__name__ != 'TensorFlowWD':
+                    seriesX, targetY, targetW,targetB = subsetX,subsetY,subsetsW[0],subsetsB[0]
+                counter=+1
 
-            print("Reading data... Done.")
+                print("Reading data... Done.")
 
-            # Extract features
-            if modeler.__class__.__name__ != 'TensorFlowWD':
-                print("Extracting features from training set...")
-                featureExtractor = fCalc.BaseFeatureExtractor()
-                X, Y , W = featureExtractor.extractFeatures(modeler,seriesX, targetY,targetW,targetB,history)
-                print("Extracting features from training set... Done.")
+                # Extract features
+                if modeler.__class__.__name__ != 'TensorFlowWD':
+                    print("Extracting features from training set...")
+                    featureExtractor = fCalc.BaseFeatureExtractor()
+                    X, Y , W = featureExtractor.extractFeatures(modeler,seriesX, targetY,targetW,targetB,history)
+                    print("Extracting features from training set... Done.")
 
-            #partitionsX, partitionsY , partitionLabels=X,Y,W
-            #if modeler.__class__.__name__!='TensorFlow':
-            # Partition data
-            print("Partitioning training set...")
-            NUM_OF_CLUSTERS =k# TODO: Read from command line
-            NUM_OF_FOLDS=6
-            #if modeler!='TRI':
-            if modeler.__class__.__name__ != 'TensorFlowWD':
-                partitionsX, partitionsY, partitionLabels, partitionRepresentatives, partitioningModel  , centroids  = partitioner.clustering(X, Y, W ,NUM_OF_CLUSTERS, True,k)
-            else:
-               #partitionLabels=23
+                #partitionsX, partitionsY , partitionLabels=X,Y,W
+                #if modeler.__class__.__name__!='TensorFlow':
+                # Partition data
+                print("Partitioning training set...")
+                NUM_OF_CLUSTERS =k# TODO: Read from command line
+                NUM_OF_FOLDS=6
+                #if modeler!='TRI':
+                if modeler.__class__.__name__ != 'TensorFlowWD':
+                    partitionsX, partitionsY, partitionLabels, partitionRepresentatives, partitioningModel  , centroids  = partitioner.clustering(X, Y, W ,NUM_OF_CLUSTERS, True,k)
+                else:
+                   #partitionLabels=23
 
-                partitionsX, partitionsY, partitionLabels, partitionRepresentatives, partitioningModel, tri  = partitioner.clustering(
+                    partitionsX, partitionsY, partitionLabels, partitionRepresentatives, partitioningModel, tri  = partitioner.clustering(
 
-                    seriesX, targetY, None, NUM_OF_CLUSTERS, True, k)
+                        seriesX, targetY, None, NUM_OF_CLUSTERS, True, k)
 
-                #partitionsXDB6, partitionsYDB6, partitionLabels, partitionRepresentatives, partitioningModel, tri = partitioner.clustering(
-                    #drftB6, targetY, None, 25, True, k)
+                    #partitionsXDB6, partitionsYDB6, partitionLabels, partitionRepresentatives, partitioningModel, tri = partitioner.clustering(
+                        #drftB6, targetY, None, 25, True, k)
 
-                #partitionsXDBS6, partitionsYDS6, partitionLabels, partitionRepresentatives, partitioningModel, tri = partitioner.clustering(
-                    #drftS6, targetY, None, 25, True, k)
+                    #partitionsXDBS6, partitionsYDS6, partitionLabels, partitionRepresentatives, partitioningModel, tri = partitioner.clustering(
+                        #drftS6, targetY, None, 25, True, k)
 
-            print("Partitioning training set... Done.")
-            # For each partition create model
-            print("Creating models per partition...")
+                print("Partitioning training set... Done.")
+                # For each partition create model
+                print("Creating models per partition...")
 
-            #if modeler.__class__.__name__ == 'TensorFlowWD':
-                #X = np.array(np.concatenate(partitionsX))
-                #Y = np.array(np.concatenate(partitionsY))
-            #skip_idx1 = random.sample(range(num_linesx, num_lines), (num_lines-num_linesx) - 1000)
+                #if modeler.__class__.__name__ == 'TensorFlowWD':
+                    #X = np.array(np.concatenate(partitionsX))
+                    #Y = np.array(np.concatenate(partitionsY))
+                #skip_idx1 = random.sample(range(num_linesx, num_lines), (num_lines-num_linesx) - 1000)
 
-            #modeler.plotRegressionLine(partitionsX, partitionsY, partitionLabels,genericModel,modelMap)
-            # ...and keep them in a dict, connecting label to model
-            #modelMap, xs, output, genericModel =None,None,None,None
-            unseenX=[]
-            unseenY=[]
-            if modeler.__class__.__name__!= 'TriInterpolantModeler' :
-                        #and modeler.__class__.__name__ != 'TensorFlow':
-                modelMap, model2,scores, output,genericModel = modeler.createModelsFor(partitionsX, partitionsY, partitionLabels,None,X,Y)
-                        #, genericModel , partitionsXDC
-                #if modeler.__class__.__name__ != 'TensorFlow':
-                    #modelMap = dict(zip(partitionLabels, modelMap))
-                print("Creating models per partition... Done")
+                #modeler.plotRegressionLine(partitionsX, partitionsY, partitionLabels,genericModel,modelMap)
+                # ...and keep them in a dict, connecting label to model
+                #modelMap, xs, output, genericModel =None,None,None,None
+                unseenX=[]
+                unseenY=[]
+                if modeler.__class__.__name__!= 'TriInterpolantModeler' :
+                            #and modeler.__class__.__name__ != 'TensorFlow':
+                    modelMap, model2,scores, output,genericModel = modeler.createModelsFor(partitionsX, partitionsY, partitionLabels,None,X,Y)
+                            #, genericModel , partitionsXDC
+                    #if modeler.__class__.__name__ != 'TensorFlow':
+                        #modelMap = dict(zip(partitionLabels, modelMap))
+                    print("Creating models per partition... Done")
 
-                # Get unseen data
-                print("Reading unseen data...")
-            if modeler.__class__.__name__ != 'TensorFlowWD':
+                    # Get unseen data
+                    print("Reading unseen data...")
+                if modeler.__class__.__name__ != 'TensorFlowWD':
 
-                unseenX,unseenY , unseenW,unseenB = dRead.UnseenSeriesReader.readRandomSeriesDataFromFile(dRead.UnseenSeriesReader(),data1)
-            # and their features
-            ##
-                unseenX=unseenX[0:2880]
-                unseenY=unseenY[0:2880]
-                unseenW = unseenW[ 0:2880 ]
-                stdInU.append(np.std(unseenX))
-            ##
-                featureExtractor=fCalc.UnseenFeaturesExtractor()
-                unseenFeaturesX, unseenFeaturesY , unseenFeaturesW = featureExtractor.extractFeatures(modeler,unseenX, unseenY,unseenW,unseenB,history)
-            print("Reading unseen data... Done")
+                    unseenX,unseenY , unseenW,unseenB = dRead.UnseenSeriesReader.readRandomSeriesDataFromFile(dRead.UnseenSeriesReader(),data1)
+                # and their features
+                ##
+                    unseenX=unseenX[0:2880]
+                    unseenY=unseenY[0:2880]
+                    unseenW = unseenW[ 0:2880 ]
+                    stdInU.append(np.std(unseenX))
+                ##
+                    featureExtractor=fCalc.UnseenFeaturesExtractor()
+                    unseenFeaturesX, unseenFeaturesY , unseenFeaturesW = featureExtractor.extractFeatures(modeler,unseenX, unseenY,unseenW,unseenB,history)
+                print("Reading unseen data... Done")
 
-            # Predict and evaluate on seen data
-            if modeler.__class__.__name__  != 'TriInterpolantModeler':
-                print("Evaluating on seen data...")
+                # Predict and evaluate on seen data
+                if modeler.__class__.__name__  != 'TriInterpolantModeler':
+                    print("Evaluating on seen data...")
 
-                if modeler.__class__.__name__ != 'TensorFlow'and modeler.__class__.__name__ != 'TensorFlowW' and modeler.__class__.__name__ != 'TriInterpolantModeler' and modeler.__class__.__name__ != 'TensorFlowWD':
-                    x=1
-                    _, meanError, sdError = eval.MeanAbsoluteErrorEvaluation.evaluate(eval.MeanAbsoluteErrorEvaluation(), X,
-                                                                                      Y,
-                                                                                      modeler, genericModel)
-
-
-                elif modeler.__class__.__name__ == 'TensorFlow' or modeler.__class__.__name__ == 'TensorFlowW' or modeler.__class__.__name__ == 'TensorFlowWD':
-                    #_,meanError, sdError = eval.MeanAbsoluteErrorEvaluation.evaluateKerasNN(
-                        #eval.MeanAbsoluteErrorEvaluation(), X,
-                        #Y,
-                        #modeler, output, xs,genericModel,partitionsXDC)
+                    if modeler.__class__.__name__ != 'TensorFlow'and modeler.__class__.__name__ != 'TensorFlowW' and modeler.__class__.__name__ != 'TriInterpolantModeler' and modeler.__class__.__name__ != 'TensorFlowWD':
                         x=1
-
-                #print ("Mean absolute error on training data: %4.2f (+/- %4.2f standard error)" % (
-                    #meanError, sdError / sqrt(unseenFeaturesY.shape[ 0 ])))
-                #print("Evaluating on seen data... Done.")
-
-            # Predict and evaluate on unseen data
-            print("Evaluating on unseen data...")
-            if modeler.__class__.__name__ != 'TensorFlow' and modeler.__class__.__name__ != 'TensorFlowW' and modeler.__class__.__name__ != 'TriInterpolantModeler' and modeler.__class__.__name__ != 'TensorFlowWD':
-                Errors, meanError, sdError = eval.MeanAbsoluteErrorEvaluation.evaluate(eval.MeanAbsoluteErrorEvaluation(),
-                                                                                  unseenFeaturesX, unseenFeaturesY, modeler,None)
+                        _, meanError, sdError = eval.MeanAbsoluteErrorEvaluation.evaluate(eval.MeanAbsoluteErrorEvaluation(), X,
+                                                                                          Y,
+                                                                                          modeler, genericModel)
 
 
-            elif modeler.__class__.__name__ == 'TensorFlow' or modeler.__class__.__name__ == 'TensorFlowW' or  modeler.__class__.__name__ == 'TensorFlowWD':
-                _, meanError, sdError = eval.MeanAbsoluteErrorEvaluation.evaluateKerasNN(
-                    eval.MeanAbsoluteErrorEvaluation(),unseenFeaturesX,
-                    unseenFeaturesY,
-                    modeler,output, None,None,partitionsX , scores)
-            else:
-                if flagEvalTri == False:
-                    Errors, meanError, sdError = eval.MeanAbsoluteErrorEvaluation.evaluateTriInterpolant(
-                    eval.MeanAbsoluteErrorEvaluation(),
-                    unseenFeaturesX, unseenFeaturesY, partitionsX, partitionsY, partitionRepresentatives,
-                    partitioningModel, None, modelers[0])
+                    elif modeler.__class__.__name__ == 'TensorFlow' or modeler.__class__.__name__ == 'TensorFlowW' or modeler.__class__.__name__ == 'TensorFlowWD':
+                        #_,meanError, sdError = eval.MeanAbsoluteErrorEvaluation.evaluateKerasNN(
+                            #eval.MeanAbsoluteErrorEvaluation(), X,
+                            #Y,
+                            #modeler, output, xs,genericModel,partitionsXDC)
+                            x=1
 
-                    flagEvalTri = True
+                    #print ("Mean absolute error on training data: %4.2f (+/- %4.2f standard error)" % (
+                        #meanError, sdError / sqrt(unseenFeaturesY.shape[ 0 ])))
+                    #print("Evaluating on seen data... Done.")
 
-
-            print ("Mean absolute error on unseen data: %4.2f (+/- %4.2f standard error)"%(meanError, sdError/sqrt(unseenFeaturesY.shape[0])))
-            print("Evaluating on unseen data... Done.")
-
-            print("Standard Deviation of training Data: %4.2f" % (np.std(X)))
-            print("Standard Deviation of unseen Data: %4.2f" % (np.std(unseenX)))
-            #varExpl=np.sum(np.square(subsetX-unseenX)) / np.square(np.sum(subsetX)-np.sum(unseenX))*100
-            #print("Percentage of variance in Training data explained in Unseen Dataset: %4.2f" % (
-                    #(varExpl)) + " %")
-            # # Evaluate performance
-            numOfclusters= len(partitionsX)
-            if partitioner.__class__.__name__ == 'DelaunayTriPartitioner' and numOfclusters==1:
-                break
-            clusters.append(numOfclusters)
-            varTr.append(np.var(subsetX))
-            if modeler.__class__.__name__  != 'TriInterpolantModeler':
-                models.append(modeler.__class__.__name__)
-            else:
-                models.append('Analytical method')
-            part.append(partitioner.__class__.__name__)
-            #meanVTr.append(np.mean(s ubsetX))
-            #meanBTr.append(np.mean(X[:,2]))
-            errors.append(meanError)
+                # Predict and evaluate on unseen data
+                print("Evaluating on unseen data...")
+                if modeler.__class__.__name__ != 'TensorFlow' and modeler.__class__.__name__ != 'TensorFlowW' and modeler.__class__.__name__ != 'TriInterpolantModeler' and modeler.__class__.__name__ != 'TensorFlowWD':
+                    Errors, meanError, sdError = eval.MeanAbsoluteErrorEvaluation.evaluate(eval.MeanAbsoluteErrorEvaluation(),
+                                                                                      unseenFeaturesX, unseenFeaturesY, modeler,None)
 
 
-            err={}
-            err["model"] =modeler.__class__.__name__
-            err["error"] = meanError
-            err["k"]=k
-            error["errors"].append(err)
+                elif modeler.__class__.__name__ == 'TensorFlow' or modeler.__class__.__name__ == 'TensorFlowW' or  modeler.__class__.__name__ == 'TensorFlowWD':
+                    _, meanError, sdError = eval.MeanAbsoluteErrorEvaluation.evaluateKerasNN(
+                        eval.MeanAbsoluteErrorEvaluation(),unseenFeaturesX,
+                        unseenFeaturesY,
+                        modeler,output, None,None,partitionsX , scores)
+                else:
+                    if flagEvalTri == False:
+                        Errors, meanError, sdError = eval.MeanAbsoluteErrorEvaluation.evaluateTriInterpolant(
+                        eval.MeanAbsoluteErrorEvaluation(),
+                        unseenFeaturesX, unseenFeaturesY, partitionsX, partitionsY, partitionRepresentatives,
+                        partitioningModel, None, modelers[0])
+
+                        flagEvalTri = True
+
+
+                print ("Mean absolute error on unseen data: %4.2f (+/- %4.2f standard error)"%(meanError, sdError/sqrt(unseenFeaturesY.shape[0])))
+                print("Evaluating on unseen data... Done.")
+
+                print("Standard Deviation of training Data: %4.2f" % (np.std(X)))
+                print("Standard Deviation of unseen Data: %4.2f" % (np.std(unseenX)))
+                #varExpl=np.sum(np.square(subsetX-unseenX)) / np.square(np.sum(subsetX)-np.sum(unseenX))*100
+                #print("Percentage of variance in Training data explained in Unseen Dataset: %4.2f" % (
+                        #(varExpl)) + " %")
+                # # Evaluate performance
+                numOfclusters= len(partitionsX)
+                if partitioner.__class__.__name__ == 'DelaunayTriPartitioner' and numOfclusters==1:
+                    break
+                clusters.append(numOfclusters)
+                varTr.append(np.var(subsetX))
+                if modeler.__class__.__name__  != 'TriInterpolantModeler':
+                    models.append(modeler.__class__.__name__)
+                else:
+                    models.append('Analytical method')
+                part.append(partitioner.__class__.__name__)
+                #meanVTr.append(np.mean(s ubsetX))
+                #meanBTr.append(np.mean(X[:,2]))
+                errors.append(meanError)
+
+
+                err={}
+                err["model"] =modeler.__class__.__name__
+                err["error"] = meanError
+                err["k"]=k
+                error["errors"].append(err)
 
     eval.MeanAbsoluteErrorEvaluation.ANOVAtest(eval.MeanAbsoluteErrorEvaluation(), clusters, varTr, errors,models,part)
 

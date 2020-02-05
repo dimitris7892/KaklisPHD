@@ -34,17 +34,17 @@ class BaseSeriesReader:
     def insertDataAtDb(self):
 
         x=0
-        #conn = pyodbc.connect('DRIVER={SQL Server};SERVER=WEATHERSERVER_DEV;'
-                              #'DATABASE=millenia;'
-                             #'UID=sa;'
-                              #'PWD=sa1!')
+        conn = pyodbc.connect('DRIVER={SQL Server};SERVER=WEATHERSERVER_DEV;'
+                              'DATABASE=millenia;'
+                             'UID=sa;'
+                              'PWD=sa1!')
 
-        #cursor = conn.cursor()
-        #cursor.execute('SELECT * FROM millenia.dbo.data')
+        cursor = conn.cursor()
+        cursor.execute('SELECT * FROM millenia.dbo.data')
 
 
-        #for row in cursor:
-            #print(row)
+        for row in cursor:
+            print(row)
 
 
     def readNewDataset(self):
@@ -152,6 +152,264 @@ class BaseSeriesReader:
 
 
         x = 0
+    def GenericParserForDataExtraction(self,company,systemType,fileType,granularity,fileName):
+
+        if systemType=='LAROS':
+
+            UNK = {"data": []}
+            draft = {"data": []}
+            draftAFT = {"data": []}
+            draftFORE = {"data": []}
+            windSpeed = {"data": []}
+            windAngle = {"data": []}
+            SpeedOvg = {"data": []}
+            STW = {"data": []}
+            rpm = {"data": []}
+            power = {"data": []}
+            foc = {"data": []}
+            foct = {"data": []}
+            dateD = {"data": []}
+            latitude = {"data":[]}
+            longitude = {"data": []}
+            vcourse = {"data": []}
+            #print(sum(1 for line in open('.data/LAROS/'+fileName)))
+            with open('./data/LAROS/'+fileName) as csv_file:
+
+                csv_reader = csv.reader(csv_file, delimiter=';')
+                line_count = 0
+                for row in csv_reader:
+                    try:
+                        if row[1] == "STATUS_PARAMETER_ID":
+                            continue
+                        id = row[1]
+                        date = row[4].split(" ")[0]
+                        hhMMss = row[4].split(" ")[1]
+                        newDate = date + " " + ":".join(hhMMss.split(":")[0:2])
+                        dt = datetime.datetime.strptime(newDate, '%Y-%m-%d %H:%M')
+                        value = row[3]
+                        siteId = row[2]
+                        #if dt > datetime.datetime.strptime('2018-05-20', '%Y-%m-%d'):
+                            #print(dt)
+                        datt = {}
+                        datt["value"] = 0
+                        datt["dt"] = dt
+                        dateD["data"].append(datt)
+
+                        if id == '7':
+                            unknown = {}
+                            unknown["value"] = value
+                            unknown["dt"] = dt
+                            UNK["data"].append(unknown)
+
+                        if id == '35':
+                            lat = {}
+                            lat["value"] = value
+                            lat["dt"] = dt
+                            latitude["data"].append(lat)
+                        if id == '38':
+                            lon = {}
+                            lon["value"] = value
+                            lon["dt"] = dt
+                            longitude["data"].append(lon)
+
+                        if id == '65':
+                            course = {}
+                            course["value"] = value
+                            course["dt"] = dt
+                            vcourse["data"].append(course)
+
+                        if id == '21':
+                            drftA = {}
+                            drftA["value"] = value
+                            drftA["dt"] = dt
+                            draftAFT["data"].append(drftA)
+                        if id == '67':
+                            stw = {}
+                            stw["value"] = value
+                            stw["dt"] = dt
+                            STW["data"].append(stw)
+
+                        if id == '22':
+                            drftF = {}
+                            drftF["value"] = value
+                            drftF["dt"] = dt
+                            draftFORE["data"].append(drftF)
+
+                        if id == '61':
+                            drft = {}
+                            drft["value"] = value
+                            drft["dt"] = dt
+                            draft["data"].append(drft)
+
+                        if id == '81':
+                            wa = {}
+                            wa["value"] = value
+                            wa["dt"] = dt
+                            windAngle["data"].append(wa)
+
+                        if id == '82':
+                            ws = {}
+                            ws["value"] = value
+                            ws["dt"] = dt
+                            windSpeed["data"].append(ws)
+
+                        if id == '84':
+                            so = {}
+                            so["value"] = value
+                            so["dt"] = dt
+                            SpeedOvg["data"].append(so)
+
+                        if id == '89':
+                            rpms = {}
+                            rpms["value"] = value
+                            rpms["dt"] = dt
+                            rpm["data"].append(rpms)
+
+                        if id == '137':
+                            fo = {}
+                            fo["value"] = value * 144 ## converion of kg/h to MT/day
+                            fo["dt"] = dt
+                            foc["data"].append(fo)
+
+                        if id == '136':
+                            fot = {}
+                            fot["value"] = value
+                            fot["dt"] = dt
+                            foct["data"].append(fot)
+
+                        if id == '353':
+                            pow = {}
+                            pow["value"] = value
+                            pow["dt"] = dt
+                            power["data"].append(pow)
+
+                        line_count += 1
+
+                        if int(id) > 353: break
+
+                        # print('Processed '+str(line_count)+ ' lines.')
+                    except:
+                        p = 0
+                        print('Processed ' + str(line_count) + ' lines.')
+            LAT = ""
+            LON = ""
+            dt=""
+            with open(fileName+'.csv', mode='w') as data:
+                data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+                data_writer.writerow(
+                    ['Lat','Lon','DateTime','Vessel Course','Speed Ovg','Draft','Trim' ,'WindSpeed', 'WindAngle',  'STW', 'Rpm', 'M/E FOC (MT/day)'])
+
+                for i in range(0, len(UNK['data'])):
+                    dt = dateD['data'][i]['dt']
+                    DRAFT = ""
+                    LAT=""
+                    LON=""
+                    COURSE=""
+                    DRAFT_AFT = ""
+                    DRAFT_FORE = ""
+                    TRIM = ""
+                    RPM = ""
+                    SOVG = ""
+                    SPEED_TW = ""
+                    FOC = ""
+                    WA = ""
+                    WS = ""
+
+
+                    try:
+                        LAT = latitude['data'][i]['value']
+                    except:
+                        x = 0
+
+                    try:
+                        LON = longitude['data'][i]['value']
+                    except:
+                        x = 0
+                    try:
+                        COURSE = vcourse['data'][i]['value']
+                    except:
+                        x = 0
+
+                    try:
+                        DRAFT = draft['data'][i]['value']
+                    except:
+                        x = 0
+                    try:
+                        DRAFT_AFT = draftAFT['data'][i]['value']
+                    except:
+                        x = 0
+
+                    try:
+                        DRAFT_FORE = draftFORE['data'][i]['value']
+                    except:
+                        x = 0
+
+                    try:
+                        SPEED_TW = STW['data'][i]['value']
+                    except:
+                        x = 0
+
+                    try:
+                        FOC = foct['data'][i]['value']
+                    except:
+                        x = 0
+
+                    try:
+                        WA = windAngle['data'][i]['value']
+                    except:
+                        x = 0
+                    try:
+                        WS = windSpeed['data'][i]['value']
+                    except:
+                        x = 0
+
+                    try:
+                        RPM = rpm['data'][i]['value']
+                    except:
+                        x = 0
+                    try:
+                        SOVG = SpeedOvg['data'][i]['value']
+                    except:
+                        x = 0
+                    #####
+                    TRIM =DRAFT_AFT-DRAFT_FORE
+
+                    data_writer.writerow(
+                        [LAT, LON, str(dt), COURSE, SOVG, DRAFT, TRIM, WS, WA, SPEED_TW, RPM, FOC])
+
+            date = str(dt).split(" ")[0]
+            day = '0'+ date.split("/")[0] if date.split("/")[0].__len__()==1 else date.split("/")[0]
+            month = '0'+ date.split("/")[1] if date.split("/")[1].__len__()==1 else date.split("/")[1]
+            year = date.split("/")[2]
+            hhMM = str(dt).split(" ")[1]
+            h = int(hhMM.split(":")[0])
+            M = int(hhMM.split(":")[1])
+            if int(M) > 30:
+                h =+ 1
+            if h%3==2:
+                h =+ 1
+            else:
+                h = h- h % 3
+            dbDate = year + month + day + str(h)
+
+            conn = pyodbc.connect('DRIVER={SQL Server};SERVER=WEATHERSERVER;'
+                                  'DATABASE=WeatherHistoryDB;'
+                                  'UID=sa;'
+                                  'PWD=sa1!')
+
+            cursor = conn.cursor()
+            cursor.execute('SELECT * FROM WeatherHistoryDB.dbo.'+dbDate+' WHERE lat='+LAT+'and lon='+LON)
+
+            conn = pyodbc.connect('DRIVER={SQL Server};SERVER=WEATHERSERVER_DEV;'
+                                  'DATABASE=millenia;'
+                                  'UID=sa;'
+                                  'PWD=sa1!')
+
+            cursor = conn.cursor()
+            cursor.execute('SELECT * FROM millenia.dbo.data')
+
+
+
 
     def readExtractNewDataset(self,company):
 
@@ -726,121 +984,587 @@ class BaseSeriesReader:
         foc={"data": [ ]}
         foct = {"data": [ ]}
         dateD={"data":[ ]}
-        print(sum(1 for line in open('./MT_DELTA_MARIA.txt')))
+        #print(sum(1 for line in open('./MT_DELTA_MARIA.txt')))
         with open('./MT_DELTA_MARIA.txt') as csv_file:
 
             csv_reader = csv.reader(csv_file, delimiter=';')
             line_count = 0
+
             for row in csv_reader:
-             try:
-                    if row[1] == "STATUS_PARAMETER_ID":
-                        continue
-                    id = row[1]
-                    date = row[4].split(" ")[0]
-                    hhMMss = row[4].split(" ")[1]
-                    newDate = date + " " + ":".join(hhMMss.split(":")[0:2])
-                    dt = datetime.datetime.strptime(newDate, '%Y-%m-%d %H:%M')
-                    value = row[3]
-                    siteId=row[2]
-                    if dt >  datetime.datetime.strptime('2018-05-20', '%Y-%m-%d'):
-                        print(dt)
-                    datt = {}
-                    datt[ "value" ] = 0
-                    datt[ "dt" ] = dt
-                    dateD[ "data" ].append(datt)
+                 try:
 
-                    if id == '7':
-                        unknown = {}
-                        unknown["value"] = value
-                        unknown["dt"] = dt
-                        UNK["data"].append(unknown)
+                        if row[1] == "STATUS_PARAMETER_ID":
+                            continue
+                        if row[2]=='122':
+                            x=0
+                        id = row[1]
+                        date = row[4].split(" ")[0]
+                        hhMMss = row[4].split(" ")[1]
+                        newDate = date + " " + ":".join(hhMMss.split(":")[0:2])
+                        dt = datetime.datetime.strptime(newDate, '%Y-%m-%d %H:%M')
 
-                    if id=='21' :
-                        drftA={}
-                        drftA["value"]=value
-                        drftA["dt"]=dt
-                        draftAFT[ "data" ].append(drftA)
-                    if id == '67':
-                        stw = {}
-                        stw[ "value" ] = value
-                        stw[ "dt" ] = dt
-                        STW[ "data" ].append(stw)
+                        value = row[3]
+                        siteId=row[2]
+                        if dt >  datetime.datetime.strptime('2018-05-25', '%Y-%m-%d'):
+                            print(dt)
+                        datt = {}
+                        datt[ "value" ] = 0
+                        datt[ "dt" ] = dt
+                        dateD[ "data" ].append(datt)
 
-                    if id=='22':
-                        drftF={}
-                        drftF["value"]=value
-                        drftF["dt"]=dt
-                        draftFORE[ "data" ].append(drftF)
+                        if id == '7':
+                            unknown = {}
+                            unknown["value"] = value
+                            unknown["dt"] = dt
+                            UNK["data"].append(unknown)
 
-                    if id=='61' :
-                        drft={}
-                        drft["value"]=value
-                        drft["dt"]=dt
-                        draft[ "data" ].append(drft)
-
-                    if id == '81':
-                        wa={}
-                        wa[ "value" ] = value
-                        wa[ "dt" ] = dt
-                        windAngle[ "data" ].append(wa)
-
-                    if id == '82' :
-                        ws={}
-                        ws[ "value" ] = value
-                        ws[ "dt" ] = dt
-                        windSpeed[ "data" ].append(ws)
-
-                    if id == '84' :
-                        so={}
-                        so[ "value" ] = value
-                        so[ "dt" ] = dt
-                        SpeedOvg[ "data" ].append(so)
-
-                    if id == '89' :
-                        rpms={}
-                        rpms[ "value" ] = value
-                        rpms[ "dt" ] = dt
-                        rpm[ "data" ].append(rpms)
-
-                    if id == '137' :
-                        fo={}
-                        fo[ "value" ] = value
-                        fo[ "dt" ] = dt
-                        foc[ "data" ].append(fo)
-
-                    if id == '136' :
-                        fot={}
-                        fot[ "value" ] = value
-                        fot[ "dt" ] = dt
-                        foct[ "data" ].append(fot)
+                        if id=='21' :
+                            drftA={}
+                            drftA["value"]=value
+                            drftA["dt"]=dt
+                            draftAFT[ "data" ].append(drftA)
 
 
-                    if id == '353' :
-                        pow={}
-                        pow[ "value" ] = value
-                        pow[ "dt" ] = dt
-                        power[ "data" ].append(pow)
+                        if id == '67':
+                            stw = {}
+                            stw[ "value" ] = value
+                            stw[ "dt" ] = dt
+                            STW[ "data" ].append(stw)
 
-                    line_count+=1
 
-                    if int(id) >353 : break
+                        if id=='22':
+                            drftF={}
+                            drftF["value"]=value
+                            drftF["dt"]=dt
+                            draftFORE[ "data" ].append(drftF)
 
-                    #print('Processed '+str(line_count)+ ' lines.')
-             except:
-                p=0
-                print('Processed ' + str(line_count) + ' lines.')
+                        if id=='61':
+                            drft={}
+                            drft["value"]=value
+
+                            drft["dt"]=dt
+                            draft[ "data" ].append(drft)
 
 
 
-        with open('./MT_DELTA_MARIA_data_1.csv', mode='w') as data:
+                        if id == '81':
+                            wa={}
+                            wa[ "value" ] = value
+                            wa[ "dt" ] = dt
+                            windAngle[ "data" ].append(wa)
+
+
+                        if id == '82' :
+                            ws={}
+                            ws[ "value" ] = value
+                            ws[ "dt" ] = dt
+                            windSpeed[ "data" ].append(ws)
+
+                        if id == '84' :
+                            so={}
+                            so[ "value" ] = value
+                            so[ "dt" ] = dt
+                            SpeedOvg[ "data" ].append(so)
+
+
+                        if id == '89' :
+                            rpms={}
+                            rpms[ "value" ] = value
+                            rpms[ "dt" ] = dt
+                            rpm[ "data" ].append(rpms)
+
+
+                        if id == '137' :
+                            fo={}
+                            fo[ "value" ] = value
+                            fo[ "dt" ] = dt
+                            foc[ "data" ].append(fo)
+
+
+                        if id == '136' :
+                            fot={}
+                            fot[ "value" ] = value
+                            fot[ "dt" ] = dt
+                            foct[ "data" ].append(fot)
+
+
+
+                        if id == '353' :
+                            pow={}
+                            pow[ "value" ] = value
+                            pow[ "dt" ] = dt
+                            power[ "data" ].append(pow)
+                           
+
+                        line_count+=1
+
+                        if int(id) >353 :
+                            break
+
+
+                        #print('Processed '+str(line_count)+ ' lines.')
+                 except Exception as e:
+                    p=0
+                    print(str(e))
+        try:
+            with open('./DateTime.csv', mode='w') as data:
+                dt_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+                dt_writer.writerow([ 'DateTimes' ])
+                for i in range(0, len(dateD[ "data" ])):
+                    dt_writer.writerow([ str(dateD[ "data" ][ i ][ 'dt' ]) ])
+            try:
+                with open('./DraftAFT.csv', mode='w') as data:
+                    draftA_writer = csv.writer(data, delimiter=',', quotechar='"',
+                                               quoting=csv.QUOTE_MINIMAL)
+                    draftA_writer.writerow([ 'Field', 'DateTime' ])
+
+                    k = 0
+                    for i in range(0, len(dateD[ "data" ])):
+                        if str(dateD[ "data" ][ i ][ 'dt' ]) == str(datetime.datetime.strptime('2018-10-09 13:01', '%Y-%m-%d %H:%M')):
+                            print(dt)
+
+                        if k>0:
+                            k =k+1 if str(draftAFT[ "data" ][ k ][ 'dt' ])==str(draftAFT[ "data" ][ k-1 ][ 'dt' ]) else k
+                        if str(draftAFT[ "data" ][ k ][ 'dt' ]) == str(dateD[ "data" ][ i ][ 'dt' ]):
+                            draftA_writer.writerow([ draftAFT[ "data" ][ k ][ 'value' ], dateD[ "data" ][ i ][ 'dt' ] ])
+                            k = k+1
+                        else:
+                            # k = k - 1 if k > 0 else 0
+                            if dateD[ "data" ][ i ][ 'dt' ] > draftAFT[ "data" ][ k ][ 'dt' ]:
+                                k=k+1
+                                draftA_writer.writerow([ draftAFT[ "data" ][ k ][ 'value' ], dateD[ "data" ][ i ][ 'dt' ] ])
+                                k=k+1
+                            else:
+
+                                draftA_writer.writerow([ "", dateD[ "data" ][ i ][ 'dt' ] ])
+            except:
+                ex=0
+                # for i in range(0, len(draftAFT[ "data" ])):
+                # draftA_writer.writerow([ draftAFT[ "data" ][ i ][ 'value' ], draftAFT[ "data" ][ i ][ 'dt' ] ])
+            try:
+                with open('./Draft.csv', mode='w') as data:
+                    draft_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+                    draft_writer.writerow([ 'Field', 'DateTime' ])
+
+                    k = 0
+                    for i in range(0, len(dateD[ "data" ])):
+                        if k > 0:
+                            k = k + 1 if str(draft[ "data" ][ k ][ 'dt' ]) == str(draft[ "data" ][ k - 1 ][ 'dt' ]) else k
+                        if draft[ "data" ][ k ][ 'dt' ] == dateD[ "data" ][ i ][ 'dt' ]:
+                            draft_writer.writerow([ draft[ "data" ][ k ][ 'value' ], dateD[ "data" ][ i ][ 'dt' ] ])
+                            k = k + 1
+                        else:
+                            #k = k - 1 if k > 0 else 0
+                            if dateD[ "data" ][ i ][ 'dt' ] > draft[ "data" ][ k ][ 'dt' ]:
+                                k=k+1
+                                draft_writer.writerow([ draft[ "data" ][ k ][ 'value' ], dateD[ "data" ][ i ][ 'dt' ] ])
+                                k=k+1
+                            else:
+                                draft_writer.writerow([ "", dateD[ "data" ][ i ][ 'dt' ] ])
+
+                #for i in range(0, len(draft[ "data" ])):
+                    #draft_writer.writerow([ draft[ "data" ][ i ][ 'value' ], draft[ "data" ][ i ][ 'dt' ] ])
+            except:
+                d=0
+            try:
+                with open('./DraftFORE.csv', mode='w') as data:
+                    draftF_writer = csv.writer(data, delimiter=',', quotechar='"',
+                                               quoting=csv.QUOTE_MINIMAL)
+                    draftF_writer.writerow([ 'Field', 'DateTime' ])
+
+                    k = 0
+                    for i in range(0, len(dateD[ "data" ])):
+                        if k > 0:
+                            k = k + 1 if str(draftFORE[ "data" ][ k ][ 'dt' ]) == str(draftFORE[ "data" ][ k - 1 ][ 'dt' ]) else k
+                        if draftFORE[ "data" ][ k ][ 'dt' ] == dateD[ "data" ][ i ][ 'dt' ]:
+                            draftF_writer.writerow([ draftFORE[ "data" ][ k ][ 'value' ], dateD[ "data" ][ i ][ 'dt' ] ])
+                            k = k + 1
+                        else:
+                            #k = k-1 if k > 0 else 0
+                            if dateD[ "data" ][ i ][ 'dt' ] > draftFORE[ "data" ][ k ][ 'dt' ]:
+                                k=k+1
+                                draftF_writer.writerow([ draftFORE[ "data" ][ k ][ 'value' ], dateD[ "data" ][ i ][ 'dt' ] ])
+                                k=k+1
+                            else:
+                                draftF_writer.writerow([ "", dateD[ "data" ][ i ][ 'dt' ] ])
+                            #k = +1
+
+                #for i in range(0, len(draftFORE[ "data" ])):
+                    #draftF_writer.writerow([ draftFORE[ "data" ][ i ][ 'value' ], draftFORE[ "data" ][ i ][ 'dt' ] ])
+            except:
+                d=0
+
+            try:
+                with open('./STW.csv', mode='w') as data:
+                    stw_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+                    stw_writer.writerow([ 'Field', 'DateTime' ])
+
+                    k = 0
+                    for i in range(0, len(dateD[ "data" ])):
+                        if k > 0:
+                            k = k + 1 if str(STW[ "data" ][ k ][ 'dt' ]) == str(
+                            STW[ "data" ][ k - 1 ][ 'dt' ]) else k
+                        if STW[ "data" ][ k ][ 'dt' ] == dateD[ "data" ][ i ][ 'dt' ]:
+                            stw_writer.writerow([ STW[ "data" ][ k ][ 'value' ], dateD[ "data" ][ i ][ 'dt' ] ])
+                            k = k + 1
+                        else:
+                            #k = k - 1 if k > 0 else 0
+                            if dateD[ "data" ][ i ][ 'dt' ] > STW[ "data" ][ k ][ 'dt' ]:
+                                k=k+1
+                                stw_writer.writerow([ STW[ "data" ][ k ][ 'value' ], dateD[ "data" ][ i ][ 'dt' ] ])
+                                k=k+1
+                            else:
+                                stw_writer.writerow([ "", dateD[ "data" ][ i ][ 'dt' ] ])
+
+                #for i in range(0, len(STW[ "data" ])):
+                    #stw_writer.writerow([ STW[ "data" ][ i ][ 'value' ], STW[ "data" ][ i ][ 'dt' ] ])
+            except:
+                d = 0
+
+            try:
+                with open('./RPM.csv', mode='w') as data:
+                    rpm_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+                    rpm_writer.writerow([ 'Field', 'DateTime' ])
+                    k = 0
+                    for i in range(0, len(dateD[ "data" ])):
+                        if k > 0:
+                            k = k + 1 if str(rpm[ "data" ][ k ][ 'dt' ]) == str(
+                            rpm[ "data" ][ k - 1 ][ 'dt' ]) else k
+                        if rpm[ "data" ][ k ][ 'dt' ] == dateD[ "data" ][ i ][ 'dt' ]:
+                            rpm_writer.writerow([ rpm[ "data" ][ k ][ 'value' ], dateD[ "data" ][ i ][ 'dt' ] ])
+                            k = k + 1
+                        else:
+                            #k = k - 1 if k > 0 else 0
+                            if dateD[ "data" ][ i ][ 'dt' ] > rpm[ "data" ][ k ][ 'dt' ]:
+                                k=k+1
+                                rpm_writer.writerow([ rpm[ "data" ][ k ][ 'value' ], dateD[ "data" ][ i ][ 'dt' ] ])
+                                k=k+1
+                            else:
+                                rpm_writer.writerow([ "", dateD[ "data" ][ i ][ 'dt' ] ])
+
+                #for i in range(0, len(rpm[ "data" ])):
+                    #rpm_writer.writerow([ rpm[ "data" ][ i ][ 'value' ], rpm[ "data" ][ i ][ 'dt' ] ])
+            except:
+                d = 0
+
+            try:
+                with open('./WA.csv', mode='w') as data:
+                    wa_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+                    wa_writer.writerow([ 'Field', 'DateTime' ])
+                    k = 0
+                    for i in range(0, len(dateD[ "data" ])):
+                        if k > 0:
+                            k = k + 1 if str(windAngle[ "data" ][ k ][ 'dt' ]) == str(
+                            windAngle[ "data" ][ k - 1 ][ 'dt' ]) else k
+                        if windAngle[ "data" ][ k ][ 'dt' ] == dateD[ "data" ][ i ][ 'dt' ]:
+                            wa_writer.writerow([ windAngle[ "data" ][ k ][ 'value' ], dateD[ "data" ][ i ][ 'dt' ] ])
+                            k = k + 1
+                        else:
+                            #k = k - 1 if k > 0 else 0
+                            if dateD[ "data" ][ i ][ 'dt' ] > windAngle[ "data" ][ k ][ 'dt' ]:
+                                k=k+1
+                                wa_writer.writerow([ windAngle[ "data" ][ k ][ 'value' ], dateD[ "data" ][ i ][ 'dt' ] ])
+                                k=k+1
+                            else:
+                                wa_writer.writerow([ "", dateD[ "data" ][ i ][ 'dt' ] ])
+
+                #for i in range(0, len(windAngle[ "data" ])):
+                    #wa_writer.writerow([ windAngle[ "data" ][ i ][ 'value' ], windAngle[ "data" ][ i ][ 'dt' ] ])
+            except:
+                d=0
+
+            try:
+                with open('./WS.csv', mode='w') as data:
+                    ws_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+                    ws_writer.writerow([ 'Field', 'DateTime' ])
+
+                    k = 0
+                    for i in range(0, len(dateD[ "data" ])):
+                        if k > 0:
+                            k = k + 1 if str(windSpeed[ "data" ][ k ][ 'dt' ]) == str(
+                            windSpeed[ "data" ][ k - 1 ][ 'dt' ]) else k
+                        if windSpeed[ "data" ][ k ][ 'dt' ] == dateD[ "data" ][ i ][ 'dt' ]:
+                            ws_writer.writerow([ windSpeed[ "data" ][ k ][ 'value' ], dateD[ "data" ][ i ][ 'dt' ] ])
+                            k = k + 1
+                        else:
+                            #k = k - 1 if k > 0 else 0
+                            if dateD[ "data" ][ i ][ 'dt' ] > windSpeed[ "data" ][ k ][ 'dt' ]:
+                                k=k+1
+                                wa_writer.writerow([ windSpeed[ "data" ][ k ][ 'value' ], dateD[ "data" ][ i ][ 'dt' ] ])
+                                k=k+1
+                            else:
+                                wa_writer.writerow([ "", dateD[ "data" ][ i ][ 'dt' ] ])
+
+                #for i in range(0, len(windSpeed[ "data" ])):
+                    #ws_writer.writerow([ windSpeed[ "data" ][ i ][ 'value' ], windSpeed[ "data" ][ i ][ 'dt' ] ])
+            except:
+                d=0
+
+            try:
+                with open('./FOC.csv', mode='w') as data:
+                    foc_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+                    foc_writer.writerow([ 'Field', 'DateTime' ])
+
+                    k = 0
+                    for i in range(0, len(dateD[ "data" ])):
+                        if k > 0:
+                            k = k + 1 if str(foc[ "data" ][ k ][ 'dt' ]) == str(
+                            foc[ "data" ][ k - 1 ][ 'dt' ]) else k
+                        if foc[ "data" ][ k ][ 'dt' ] == dateD[ "data" ][ i ][ 'dt' ]:
+                            foc_writer.writerow([ foc[ "data" ][ k ][ 'value' ], dateD[ "data" ][ i ][ 'dt' ] ])
+                            k = k + 1
+                        else:
+                            #k = k - 1 if k > 0 else 0
+                            if dateD[ "data" ][ i ][ 'dt' ] > foc[ "data" ][ k ][ 'dt' ]:
+                                k = k + 1
+                                foc_writer.writerow(
+                                    [ foc[ "data" ][ k ][ 'value' ], dateD[ "data" ][ i ][ 'dt' ] ])
+                                k = k + 1
+                            else:
+                                foc_writer.writerow([ "", dateD[ "data" ][ i ][ 'dt' ] ])
+
+                #for i in range(0, len(foc[ "data" ])):
+                    #foc_writer.writerow([ foc[ "data" ][ i ][ 'value' ], foc[ "data" ][ i ][ 'dt' ] ])
+            except:
+                d=0
+
+            try:
+                with open('./FOCt.csv', mode='w') as data:
+                    foct_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+                    foct_writer.writerow([ 'Field', 'DateTime' ])
+                    k=0
+                    for i in range(0, len(dateD[ "data" ])):
+                        if k > 0:
+                            k = k + 1 if str(foct[ "data" ][ k ][ 'dt' ]) == str(
+                            foct[ "data" ][ k - 1 ][ 'dt' ]) else k
+                        if foct[ "data" ][ k ][ 'dt' ] == dateD[ "data" ][ i ][ 'dt' ]:
+                            foct_writer.writerow([ foct[ "data" ][ k ][ 'value' ], dateD[ "data" ][ i ][ 'dt' ] ])
+                            k = k + 1
+                        else:
+                            #k = k - 1 if k > 0 else 0
+                            if dateD[ "data" ][ i ][ 'dt' ] > foct[ "data" ][ k ][ 'dt' ]:
+                                k = k + 1
+                                foct_writer.writerow(
+                                    [ foct[ "data" ][ k ][ 'value' ], dateD[ "data" ][ i ][ 'dt' ] ])
+                                k = k + 1
+                            else:
+                                foct_writer.writerow([ "", dateD[ "data" ][ i ][ 'dt' ] ])
+
+                #for i in range(0, len(foct[ "data" ])):
+                    #foct_writer.writerow([ foct[ "data" ][ i ][ 'value' ], foct[ "data" ][ i ][ 'dt' ] ])
+            except:
+                d=0
+
+            try:
+                with open('./SOVG.csv', mode='w') as data:
+                    sovg_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+                    sovg_writer.writerow([ 'Field', 'DateTime' ])
+                    k=0
+                    for i in range(0, len(dateD[ "data" ])):
+                        if k > 0:
+                            k = k + 1 if str(SpeedOvg[ "data" ][ k ][ 'dt' ]) == str(
+                            SpeedOvg[ "data" ][ k - 1 ][ 'dt' ]) else k
+                        if SpeedOvg[ "data" ][ k ][ 'dt' ] == dateD[ "data" ][ i ][ 'dt' ]:
+                            sovg_writer.writerow([ SpeedOvg[ "data" ][ k ][ 'value' ], dateD[ "data" ][ i ][ 'dt' ] ])
+                            k = k + 1
+                        else:
+                            #k = k - 1 if k > 0 else 0
+                            if dateD[ "data" ][ i ][ 'dt' ] > SpeedOvg[ "data" ][ k ][ 'dt' ]:
+                                k = k + 1
+                                sovg_writer.writerow(
+                                    [ SpeedOvg[ "data" ][ k ][ 'value' ], dateD[ "data" ][ i ][ 'dt' ] ])
+                                k = k + 1
+                            else:
+                                sovg_writer.writerow([ "", dateD[ "data" ][ i ][ 'dt' ] ])
+                    #sovg_writer.writerow([ SpeedOvg[ "data" ][ i ][ 'value' ], SpeedOvg[ "data" ][ i ][ 'dt' ] ])
+            except:
+                d=0
+
+            try:
+                with open('./POW.csv', mode='w') as data:
+                    pow_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+                    pow_writer.writerow([ 'Field', 'DateTime' ])
+                    k=0
+                    for i in range(0, len(dateD[ "data" ])):
+                            if k > 0:
+                                k = k + 1 if str(power[ "data" ][ k ][ 'dt' ]) == str(
+                                power[ "data" ][ k - 1 ][ 'dt' ]) else k
+                            if power[ "data" ][ k ][ 'dt' ]==dateD[ "data" ][ i ][ 'dt' ]:
+                                pow_writer.writerow([ power[ "data" ][k][ 'value' ], dateD[ "data" ][ i ][ 'dt' ] ])
+                                k = k + 1
+                            else:
+                                #k=k - 1 if k > 0 else 0
+                                if dateD[ "data" ][ i ][ 'dt' ] > power[ "data" ][ k ][ 'dt' ]:
+                                    k = k + 1
+                                    pow_writer.writerow(
+                                        [ power[ "data" ][ k ][ 'value' ], dateD[ "data" ][ i ][ 'dt' ] ])
+                                    k = k + 1
+                                else:
+                                    pow_writer.writerow([ "", dateD[ "data" ][ i ][ 'dt' ] ])
+            except:
+                d=0
+        except Exception as e:
+            print(str(e))
+
+    def ExtractLAROSDataset(self):
+        draft = {"data": [ ]}
+        draftAFT = {"data": [ ]}
+        draftFORE = {"data": [ ]}
+        windSpeed = {"data": [ ]}
+        windAngle = {"data": [ ]}
+        SpeedOvg = {"data": [ ]}
+        STW = {"data": [ ]}
+        rpm = {"data": [ ]}
+        power = {"data": [ ]}
+        foc = {"data": [ ]}
+        foct = {"data": [ ]}
+        dateD = {"data": [ ]}
+
+        drftFList=[]
+        drftAList=[]
+        drftList=[]
+        STWList=[]
+        POWList=[]
+        RPMList=[]
+        WAList=[]
+        WSList=[]
+        SOVGList=[]
+        FOCList=[]
+        FOCTList=[]
+
+        with open('./MT_DELTA_MARIA_data_NEW.csv', mode='w') as data:
             data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
             data_writer.writerow(['Draft','DrfAft', 'DrftFore','WindSpeed', 'WindAngle', 'SpeedOvg','STW','Rpm' ,'M/E FOC (kg/min)',
                                  'FOC Total', 'Power','DateTime' ])
             #data_writer.writerow(
                 #['Draft','DateTime' ])
+            drft = {}
+            with open('./data/LAROS/Draft.csv') as csv_file:
+                csv_reader = csv.reader(csv_file, delimiter=',')
+                for row in csv_reader:
+                    if row[ 0 ] != 'Field':
+                        drft[ row[ 1 ] ] = row[ 0 ]
+                        drftList.append(row[ 0 ])
+                        # drft[ "dt" ] = row[1]
+                        # draft[ "data" ].append(drft)
 
-            for i in range(0,len(UNK['data'])):
-                    dt = dateD['data'][i]['dt']
+            dateD=[]
+            with open('./data/LAROS/DateTime.csv') as csv_file:
+                csv_reader = csv.reader(csv_file, delimiter=',')
+                for row in csv_reader:
+                    if row[0]!='DateTimes':
+
+                        #datt[ "value" ] = row[0]
+                        dateD.append( row[0])
+                        #dateD[ "data" ].append(datt)
+
+            drftA = {}
+            with open('./data/LAROS/DraftAFT.csv') as csv_file:
+                csv_reader = csv.reader(csv_file, delimiter=',')
+                for row in csv_reader:
+                    if row[ 0 ] != 'Field':
+
+                        drftA[ row[1] ] = row[0]
+                        drftAList.append(row[ 0 ])
+                        #drftA[ "dt" ] =row[1]
+                        #draftAFT[ "data" ].append(drftA)
+
+            drftF = {}
+            with open('./data/LAROS/DraftFORE.csv') as csv_file:
+                csv_reader = csv.reader(csv_file, delimiter=',')
+                for row in csv_reader:
+                    if row[ 0 ] != 'Field':
+
+                        drftF[row[1] ] = row[0]
+                        drftFList.append(row[ 0 ])
+
+                        #drftF[ "dt" ] = row[1]
+                        #draftFORE[ "data" ].append(drftF)
+            stw = {}
+            with open('./data/LAROS/STW.csv') as csv_file:
+                csv_reader = csv.reader(csv_file, delimiter=',')
+                for row in csv_reader:
+                    if row[ 0 ] != 'Field':
+
+                        stw[ row[1]] = row[0]
+                        STWList.append(row[0])
+                        #stw[ "dt" ] = row[1]
+                        #STW[ "data" ].append(stw)
+            wa = {}
+            with open('./data/LAROS/WA.csv') as csv_file:
+                csv_reader = csv.reader(csv_file, delimiter=',')
+                for row in csv_reader:
+                    if row[ 0 ] != 'Field':
+
+                        wa[row[1] ] = row[0]
+                        WAList.append(row[0])
+                        #wa[ "dt" ] = row[1]
+                        #windAngle[ "data" ].append(wa)
+            ws = {}
+            with open('./data/LAROS/WS.csv') as csv_file:
+                csv_reader = csv.reader(csv_file, delimiter=',')
+                for row in csv_reader:
+                    if row[ 0 ] != 'Field':
+
+                        ws[ row[1] ] = row[0]
+                        WSList.append(row[0])
+                        #ws[ "dt" ] =
+                        #windSpeed[ "data" ].append(ws)
+            so = {}
+            with open('./data/LAROS/SOVG.csv') as csv_file:
+                csv_reader = csv.reader(csv_file, delimiter=',')
+                for row in csv_reader:
+                    if row[ 0 ] != 'Field':
+
+                        so[  row[1] ] = row[0]
+                        SOVGList.append(row[0])
+                        #so[ "dt" ] = row[1]
+                        #SpeedOvg[ "data" ].append(so)
+            rpms = {}
+            with open('./data/LAROS/RPM.csv') as csv_file:
+                csv_reader = csv.reader(csv_file, delimiter=',')
+                for row in csv_reader:
+                    if row[ 0 ] != 'Field':
+
+                        rpms[row[1] ] = row[0]
+                        RPMList.append(row[0])
+                        #rpms[ "dt" ] = row[1]
+                        #rpm[ "data" ].append(rpms)
+            fo = {}
+            with open('./data/LAROS/FOC.csv') as csv_file:
+                csv_reader = csv.reader(csv_file, delimiter=',')
+                for row in csv_reader:
+                    if row[ 0 ] != 'Field':
+
+                        fo[ row[1] ] = row[0]
+                        FOCList.append(row[0])
+                        #fo[ "dt" ] = row[1]
+                        #foc[ "data" ].append(fo)
+            fot = {}
+            with open('./data/LAROS/FOCt.csv') as csv_file:
+                csv_reader = csv.reader(csv_file, delimiter=',')
+                for row in csv_reader:
+                    if row[ 0 ] != 'Field':
+
+                        fot[ row[1] ] = row[0]
+                        FOCTList.append(row[0])
+                        #fot[ "dt" ] = row[1]
+                        #foct[ "data" ].append(fot)
+            pow = {}
+            with open('./data/LAROS/POW.csv') as csv_file:
+                csv_reader = csv.reader(csv_file, delimiter=',')
+                for row in csv_reader:
+                    if row[ 0 ] != 'Field':
+
+                        pow[ row[1] ] = row[0]
+                        POWList.append(row[0])
+                        #pow[ "dt" ] = row[1]
+                        #power[ "data" ].append(pow)
+
+
+            for i in range(0,len(dateD)):
+                    dt = dateD[i]
+                    print(str(dt))
                     value=""
 
                     value7 = ""
@@ -854,61 +1578,93 @@ class BaseSeriesReader:
                     value5=""
                     value4=""
                     value3=""
+                    try:
 
-                    try:
-                        value = draft['data'][i]['value']
-                    except:
-                        x=0
-                    try:
-                        value7 = draftAFT[ 'data' ][ i ][ 'value' ]
-                    except:
-                        x = 0
+                        #drftList=list(dict(filter(lambda elem: elem[ 0 ] == dt, drft.items())).values())
+                        #if drftList.__len__()>0:
+                        value = drftList[i]
+                        #if draft["data"][i]['dt']==dt:
+                            #value=draft['data'][ i ][ 'value' ]
+                        #value = [k for k in draft[ "data" ] if k['dt']==dt][0]['value']
+                        #drftAList = list(dict(filter(lambda elem: elem[ 0 ] == dt, drftA.items())).values())
+                        #if drftAList.__len__() > 0:
+                        value7 = drftAList[ i ]
+                        #if draftAFT["data"][i]['dt']==dt:
+                            #value7=draftAFT['data'][ i ][ 'value' ]
+                        #value7 = [k for k in draftAFT[ "data" ] if k['dt']==dt][0]['value']
 
-                    try:
-                        value8 = draftFORE[ 'data' ][ i ][ 'value' ]
-                    except:
-                        x = 0
+                        #drftFList = list(dict(filter(lambda elem: elem[ 0 ] == dt, drftF.items())).values())
+                        #if drftFList.__len__() > 0:
+                        value8 = drftFList[ i ]
 
-                    try:
-                        value = draft[ 'data' ][ i ][ 'value' ]
-                    except:
-                        x = 0
+                        #if draftFORE[ "data" ][ i ][ 'dt' ] == dt:
+                            #value8 = draftFORE[ 'data' ][ i ][ 'value' ]
+                        #value8 =[k for k in draftFORE[ "data" ] if k['dt']==dt][0]['value']
 
-                    try:
-                        value9 = STW[ 'data' ][ i ][ 'value' ]
-                    except:
-                        x = 0
+                        #STWList = list(dict(filter(lambda elem: elem[ 0 ] == dt, stw.items())).values())
+                        #if STWList.__len__() > 0:
+                        value9 = STWList[ i ]
 
-                    try:
-                        value10 = foct[ 'data' ][ i ][ 'value' ]
-                    except:
-                        x = 0
+                        #if STW[ "data" ][ i ][ 'dt' ] == dt:
+                            #value9 = STW[ 'data' ][ i ][ 'value' ]
+                        #value9 =[k for k in STW[ "data" ] if k['dt']==dt][0]['value']
+                        #FOCTList = list(dict(filter(lambda elem: elem[ 0 ] == dt, fot.items())).values())
+                        #if FOCTList.__len__() > 0:
+                        value10 = FOCTList[i ]
 
-                    try:
-                        value1 = windAngle['data'][i]['value']
-                    except:
-                        x=0
-                    try:
-                        value2 = windSpeed['data'][i]['value']
-                    except:
-                        x=0
-                    try:
-                        value3 = power['data'][i]['value']
-                    except:
-                        x=0
-                    try:
-                        value4 = foc['data'][i]['value']
-                    except:
-                        x=0
-                    try:
-                        value5 = rpm['data'][i]['value']
-                    except:
-                        x=0
-                    try:
-                        value6 = SpeedOvg['data'][i]['value']
-                    except:
-                        x=0
+                        #if foct[ "data" ][ i ][ 'dt' ] == dt:
+                            #value10 = foct[ 'data' ][ i ][ 'value' ]
+                        #value10 = [k for k in foct[ "data" ] if k['dt']==dt][0]['value']
+
+                        #WAList = list(dict(filter(lambda elem: elem[ 0 ] == dt, wa.items())).values())
+                        #if WAList.__len__() > 0:
+                        value1 = WAList[i ]
+                        #if windAngle[ "data" ][ i ][ 'dt' ] == dt:
+                            #value1 = windAngle[ 'data' ][ i ][ 'value' ]
+                        #value1 =[k for k in windAngle[ "data" ] if k['dt']==dt][0]['value']
+
+                        #WSList = list(dict(filter(lambda elem: elem[ 0 ] == dt, ws.items())).values())
+                        #if WSList.__len__() > 0:
+                        value2 = WSList[ i ]
+                        #if windSpeed[ "data" ][ i ][ 'dt' ] == dt:
+                            #value2 = windSpeed[ 'data' ][ i ][ 'value' ]
+                        #value2 = [k for k in windSpeed[ "data" ] if k['dt']==dt][0]['value']
+                        #POWList = list(dict(filter(lambda elem: elem[ 0 ] == dt, pow.items())).values())
+                        #if POWList.__len__() > 0:
+                        value3 = POWList[ i ]
+
+                        #if power[ "data" ][ i ][ 'dt' ] == dt:
+                            #value3 = power[ 'data' ][ i ][ 'value' ]
+                        #value3 = [k for k in power[ "data" ] if k['dt']==dt][0]['value']
+                        #POWList = list(dict(filter(lambda elem: elem[ 0 ] == dt, pow.items())).values())
+                        #if POWList.__len__() > 0:
+                        value3 = POWList[ i ]
+
+                        #FOCList = list(dict(filter(lambda elem: elem[ 0 ] == dt, foc.items())).values())
+                        #if FOCList.__len__() > 0:
+                        value4 = FOCList[ i ]
+                        #if foc[ "data" ][ i ][ 'dt' ] == dt:
+                            #value4 = foc[ 'data' ][ i ][ 'value' ]
+                        #value4 =[k for k in foc[ "data" ] if k['dt']==dt][0]['value']
+
+                        #RPMList = list(dict(filter(lambda elem: elem[ 0 ] == dt, rpm.items())).values())
+                        #if RPMList.__len__() > 0:
+                        value5 = RPMList[ i ]
+
+                        #if rpm[ "data" ][ i ][ 'dt' ] == dt:
+                            #value5 = rpm[ 'data' ][ i ][ 'value' ]
+                        #value5 = [k for k in rpm[ "data" ] if k['dt']==dt][0]['value']
+
+                        #SOVGList = list(dict(filter(lambda elem: elem[ 0 ] == dt, so.items())).values())
+                        #if SOVGList.__len__() > 0:
+                        value6 = SOVGList[ i ]
+                        #if SpeedOvg[ "data" ][ i ][ 'dt' ] == dt:
+                            #value6 = SpeedOvg[ 'data' ][ i ][ 'value' ]
+                        #value6 =[k for k in SpeedOvg[ "data" ] if k['dt']==dt][0]['value']
+
                     #####
+                    except Exception as e:
+                        print(str(e))
                     data_writer.writerow([value,value7,value8,value2,value1,value6,value9,value5,value4,value10,value3,str(dt)])
 
     def readLarosDataFromCsvNewExtractExcels(self, data):
