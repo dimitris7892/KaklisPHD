@@ -39,7 +39,7 @@ def main():
     subsetsB=[]
     reader = dRead.BaseSeriesReader()
 
-    #reader.readLarosDAta(datetime.datetime(2018,1,1),datetime.datetime(2019,1,1))
+    reader.readLarosDAta(datetime.datetime(2018,1,1),datetime.datetime(2019,1,1))
     #return
     #reader.ExtractLAROSDataset()
     ####
@@ -119,7 +119,7 @@ def main():
                if modeler.__class__.__name__=='TriInterpolantModeler' or modeler.__class__.__name__ == 'TensorFlow':
                  partK = [1]
                else:
-                 partK=[16]
+                 partK=K
            error = {"errors": [ ]}
            #random.seed(1)
 
