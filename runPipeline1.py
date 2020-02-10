@@ -1,4 +1,5 @@
 import dataReading as dRead
+import Danaos_ML_Project.dataReading as DANdRead
 import featureCalculation as fCalc
 import dataPartitioning as dPart
 import dataModeling as dModel
@@ -39,7 +40,8 @@ def main():
     subsetsB=[]
     reader = dRead.BaseSeriesReader()
 
-    reader.readLarosDAta(datetime.datetime(2018,1,1),datetime.datetime(2019,1,1))
+    #DANreader = DANdRead.BaseSeriesReader()
+    #DANreader.readLarosDAta(datetime.datetime(2018,1,1),datetime.datetime(2019,1,1))
     #return
     #reader.ExtractLAROSDataset()
     ####
@@ -86,7 +88,7 @@ def main():
         subsetsW.append(targetW)
         subsetsB.append(targetB)
         var.append(np.var(seriesX))
-        if len(subsetsX)>=5:
+        if len(subsetsX)>=3:
             break
     #subsetsX=[subsetsX[0]]
     #subsetsY=[subsetsY[0]]
@@ -98,7 +100,7 @@ def main():
     histTr=[]
     counter=0
 
-    K = range(1,21)
+    K = range(10,21)
     print("Number of Statistically ind. subsets for training: " + str(len(subsetsX)))
     subsetsX=[subsetsX[0:5]] if len(subsetsX) > 5 else subsetsX
     subsetsY = [ subsetsY[ 0:5 ] ] if len(subsetsY) > 5 else subsetsY
