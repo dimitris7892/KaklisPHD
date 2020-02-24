@@ -2,17 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="9e10e853-69bc-4a18-9c9f-e2f3d9527f23" name="Default" comment="">
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/dataReadingD.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Danaos_ML_Project/dataReading.py" afterPath="$PROJECT_DIR$/Danaos_ML_Project/dataReading.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Draft.csv" afterPath="$PROJECT_DIR$/Draft.csv" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/FOC.csv" afterPath="$PROJECT_DIR$/FOC.csv" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/RPM.csv" afterPath="$PROJECT_DIR$/RPM.csv" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/data/LAROS/Draft.csv" afterPath="$PROJECT_DIR$/data/LAROS/Draft.csv" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/data/LAROS/DraftAFT.csv" afterPath="$PROJECT_DIR$/data/LAROS/DraftAFT.csv" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/data/LAROS/FOC.csv" afterPath="$PROJECT_DIR$/data/LAROS/FOC.csv" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/data/LAROS/WS.csv" afterPath="$PROJECT_DIR$/data/LAROS/WS.csv" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dataReading.py" afterPath="$PROJECT_DIR$/dataReading.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/runPipeline1.py" afterPath="$PROJECT_DIR$/runPipeline1.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -23,11 +14,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="runPipeline1.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="runPipeline1.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/runPipeline1.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="228">
-              <caret line="50" column="0" lean-forward="false" selection-start-line="50" selection-start-column="0" selection-end-line="50" selection-end-column="0" />
+            <state relative-caret-position="313">
+              <caret line="55" column="43" lean-forward="true" selection-start-line="55" selection-start-column="43" selection-end-line="55" selection-end-column="43" />
               <folding>
                 <element signature="e#0#27#0" expanded="true" />
               </folding>
@@ -129,11 +120,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="dataReading.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="dataReading.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Danaos_ML_Project/dataReading.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="267">
-              <caret line="771" column="19" lean-forward="false" selection-start-line="771" selection-start-column="12" selection-end-line="771" selection-end-column="19" />
+            <state relative-caret-position="199">
+              <caret line="767" column="0" lean-forward="true" selection-start-line="767" selection-start-column="0" selection-end-line="767" selection-end-column="0" />
               <folding>
                 <element signature="e#0#18#0" expanded="true" />
                 <element signature="e#741#5043#0" expanded="false" />
@@ -449,6 +440,7 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="7" />
+    <editor active="true" />
     <layout>
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.17760417" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
@@ -1065,16 +1057,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/runPipeline1.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="228">
-          <caret line="50" column="0" lean-forward="false" selection-start-line="50" selection-start-column="0" selection-end-line="50" selection-end-column="0" />
-          <folding>
-            <element signature="e#0#27#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/dataReadingD.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="17">
@@ -1106,8 +1088,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Danaos_ML_Project/dataReading.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="267">
-          <caret line="771" column="19" lean-forward="false" selection-start-line="771" selection-start-column="12" selection-end-line="771" selection-end-column="19" />
+        <state relative-caret-position="199">
+          <caret line="767" column="0" lean-forward="true" selection-start-line="767" selection-start-column="0" selection-end-line="767" selection-end-column="0" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
             <element signature="e#741#5043#0" expanded="false" />
@@ -1128,6 +1110,16 @@
             <element signature="e#133992#153264#0" expanded="false" />
             <element signature="e#153385#175797#0" expanded="false" />
             <element signature="e#175850#178931#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/runPipeline1.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="313">
+          <caret line="55" column="43" lean-forward="true" selection-start-line="55" selection-start-column="43" selection-end-line="55" selection-end-column="43" />
+          <folding>
+            <element signature="e#0#27#0" expanded="true" />
           </folding>
         </state>
       </provider>
