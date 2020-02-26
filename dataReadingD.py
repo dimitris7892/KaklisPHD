@@ -5,7 +5,7 @@ import math
 import pyearth as sp
 import matplotlib
 import random
-import pyodbc
+#import pyodbc
 import csv
 import datetime
 from dateutil.rrule import rrule, DAILY, MINUTELY
