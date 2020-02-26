@@ -2,14 +2,14 @@ import numpy as np
 import pandas as pd
 from scipy.stats import ks_2samp,chisquare,chi2_contingency
 import math
-from pyproj import Proj, transform
+#from pyproj import Proj, transform
 import pyearth as sp
 import matplotlib
 from sklearn.cluster import KMeans
 from decimal import Decimal
 import random
-from coordinates.converter import CoordinateConverter, WGS84, L_Est97
-import pyodbc
+#from coordinates.converter import CoordinateConverter, WGS84, L_Est97
+#import pyodbc
 import csv
 import locale
 locale.setlocale(locale.LC_ALL, ""); print(locale.localeconv()["decimal_point"])
@@ -184,7 +184,7 @@ class BaseSeriesReader:
 
     def convertApparentToTrueWeather(self,weatherVectorApp,vesselVector):
 
-        weatherU,weatherV =self.calculateWindUVcompFromSpeedDir(weatherVectorApp[0] , weatherVectorApp[1])
+        weatherU,weatherV = self.calculateWindUVcompFromSpeedDir(weatherVectorApp[0] , weatherVectorApp[1])
 
         vesselU,vesselV = self.calculateSeaElUVcompFromSpeedDir(vesselVector[0] , vesselVector[1])
 
@@ -754,6 +754,7 @@ class BaseSeriesReader:
             # Extract centroid values
 
             centroids = dataModel.cluster_centers_
+
             partitionsX = []
             partitionsY = []
             partitionLabels = []
@@ -1325,6 +1326,7 @@ class BaseSeriesReader:
 
 
     def readLarosDAta(self, dtFrom, dtTo):
+
         UNK = {"data": [ ]}
         draft = {"data": [ ]}
         draftAFT = {"data": [ ]}

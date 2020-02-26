@@ -48,10 +48,10 @@ def main():
     #DANreader.readLarosDAta(datetime.datetime(2018,1,1),datetime.datetime(2019,1,1))
 
     #DANreader.GenericParserForDataExtraction('LAROS','MARMARAS','MT_DELTA_MARIA')
-    DANreader.readExtractNewDataset('MILLENIA','DOMINIA',';')
+    #DANreader.readExtractNewDataset('MILLENIA','FANTASIA',';')
     #return
     #DANreader.ExtractLAROSDataset("",'2017-06-01 00:00:00','2019-10-09 15:10:00')
-    return
+    #return
     ####
     num_lines = sum(1 for l in open(sFile))
     num_linesx = num_lines
@@ -131,7 +131,7 @@ def main():
                if modeler.__class__.__name__=='TriInterpolantModeler' or modeler.__class__.__name__ == 'TensorFlow':
                  partK = [1]
                else:
-                 partK=[15]
+                 partK=[5]
            error = {"errors": [ ]}
            #random.seed(1)
 
