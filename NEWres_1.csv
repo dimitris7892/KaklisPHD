@@ -1,2 +1,2 @@
 clusters,var,error,partitioners,models
-15,49.51682634011101,2458.97900390625,KMeansPartitioner,TensorFlowW
+5,49.51682634011101,8.428351402282715,KMeansPartitioner,TensorFlowW

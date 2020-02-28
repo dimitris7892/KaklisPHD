@@ -48,6 +48,7 @@ def main():
     #DANreader.readLarosDAta(datetime.datetime(2018,1,1),datetime.datetime(2019,1,1))
 
     #DANreader.GenericParserForDataExtraction('LAROS','MARMARAS','MT_DELTA_MARIA')
+    DANreader.GenericParserForDataExtraction('TELEGRAMS', 'MILLENIA', 'FANTASIA','ORACLE','10.2.5.80','millenia','millenia')
     #DANreader.readExtractNewDataset('MILLENIA','FANTASIA',';')
     #return
     #DANreader.ExtractLAROSDataset("",'2017-06-01 00:00:00','2019-10-09 15:10:00')
@@ -255,14 +256,14 @@ def main():
                 print("Evaluating on unseen data...")
                 if modeler.__class__.__name__ != 'TensorFlow' and modeler.__class__.__name__ != 'TensorFlowW' and modeler.__class__.__name__ != 'TriInterpolantModeler' and modeler.__class__.__name__ != 'TensorFlowWD':
                     Errors, meanError, sdError = eval.MeanAbsoluteErrorEvaluation.evaluate(eval.MeanAbsoluteErrorEvaluation(),
-                                                                                      unseenFeaturesX, unseenFeaturesY, modeler,None)
+                                                                                      unseenFeaturesX, unseenFeaturesY, modeler,genericModel)
 
 
                 elif modeler.__class__.__name__ == 'TensorFlow' or modeler.__class__.__name__ == 'TensorFlowW' or  modeler.__class__.__name__ == 'TensorFlowWD':
                     _, meanError, sdError = eval.MeanAbsoluteErrorEvaluation.evaluateKerasNN(
                         eval.MeanAbsoluteErrorEvaluation(),unseenFeaturesX,
                         unseenFeaturesY,
-                        modeler,output, None,None,partitionsX , scores)
+                        modeler,output, None,None,partitionsX , genericModel)
                 else:
                     if flagEvalTri == False:
                         Errors, meanError, sdError = eval.MeanAbsoluteErrorEvaluation.evaluateTriInterpolant(
