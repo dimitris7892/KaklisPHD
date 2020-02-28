@@ -1,7 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="BookmarkManager">
+    <bookmark url="mock:///fragment.py" line="0" mnemonic="9" />
+  </component>
   <component name="ChangeListManager">
-    <list default="true" id="9e10e853-69bc-4a18-9c9f-e2f3d9527f23" name="Default" comment="" />
+    <list default="true" id="9e10e853-69bc-4a18-9c9f-e2f3d9527f23" name="Default" comment="">
+      <change type="DELETED" beforePath="$PROJECT_DIR$/MT MERIDIAN SPIRIT - Vessel Consumption Profile.xlsx" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/data/MILLENIA/FANTASIA.csv" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/results.csv" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/utils.py" afterPath="" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/MT_DELTA_MARIA_draft.csv" afterPath="$PROJECT_DIR$/data/MARMARAS/MT_DELTA_MARIA_draft.csv" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/MT_DELTA_MARIA_draftB_9_analysis.csv" afterPath="$PROJECT_DIR$/data/MARMARAS/MT_DELTA_MARIA_draftB_9_analysis.csv" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/MT_DELTA_MARIA_draftS_9_analysis.csv" afterPath="$PROJECT_DIR$/data/MARMARAS/MT_DELTA_MARIA_draftS_9_analysis.csv" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/data/MILLENIA/DOMINIA.csv" afterPath="$PROJECT_DIR$/data/MILLENIA/TELEGRAMS/DOMINIA.csv" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/data/MILLENIA/MARIA_M.csv" afterPath="$PROJECT_DIR$/data/MILLENIA/TELEGRAMS/MARIA_M.csv" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/data/MILLENIA/MARIA_M_TLG.csv" afterPath="$PROJECT_DIR$/data/MILLENIA/TELEGRAMS/MARIA_M_TLG.csv" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/data/MILLENIA/MARIA_M_TLG.txt" afterPath="$PROJECT_DIR$/data/MILLENIA/TELEGRAMS/MARIA_M_TLG.txt" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Danaos_ML_Project/dataReading.py" afterPath="$PROJECT_DIR$/Danaos_ML_Project/dataReading.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/NEWres_1.csv" afterPath="$PROJECT_DIR$/NEWres_1.csv" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dataModeling.py" afterPath="$PROJECT_DIR$/dataModeling.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dataReading.py" afterPath="$PROJECT_DIR$/dataReading.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/evaluation.py" afterPath="$PROJECT_DIR$/evaluation.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/model_0_.csv" afterPath="$PROJECT_DIR$/model_0_.csv" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/model_1_.csv" afterPath="$PROJECT_DIR$/model_1_.csv" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/model_2_.csv" afterPath="$PROJECT_DIR$/model_2_.csv" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/model_3_.csv" afterPath="$PROJECT_DIR$/model_3_.csv" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/model_4_.csv" afterPath="$PROJECT_DIR$/model_4_.csv" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/model_Gen_.csv" afterPath="$PROJECT_DIR$/model_Gen_.csv" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/runPipeline1.py" afterPath="$PROJECT_DIR$/runPipeline1.py" />
+    </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -11,13 +39,72 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+      <file leaf-file-name="dataPartitioning.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/dataPartitioning.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="284">
+              <caret line="137" column="47" lean-forward="false" selection-start-line="137" selection-start-column="21" selection-end-line="137" selection-end-column="47" />
+              <folding>
+                <element signature="e#5784#10879#0" expanded="false" />
+                <element signature="e#10916#24857#0" expanded="false" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="dataReading.py" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/Danaos_ML_Project/dataReading.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="372">
+              <caret line="1180" column="68" lean-forward="true" selection-start-line="1180" selection-start-column="68" selection-end-line="1180" selection-end-column="68" />
+              <folding>
+                <element signature="e#0#18#0" expanded="true" />
+                <element signature="e#1295#5597#0" expanded="false" />
+                <element signature="e#5651#5723#0" expanded="false" />
+                <element signature="e#5794#6066#0" expanded="false" />
+                <element signature="e#6113#6143#0" expanded="false" />
+                <element signature="e#6194#7067#0" expanded="false" />
+                <element signature="e#7143#7461#0" expanded="false" />
+                <element signature="e#7546#7884#0" expanded="false" />
+                <element signature="e#7965#8158#0" expanded="false" />
+                <element signature="e#8223#8251#0" expanded="false" />
+                <element signature="e#8447#37671#0" expanded="false" />
+                <element signature="e#8525#11582#0" expanded="false" />
+                <element signature="e#12749#21997#0" expanded="false" />
+                <element signature="e#75401#97287#0" expanded="false" />
+                <element signature="e#97342#130805#0" expanded="false" />
+                <element signature="e#130876#146950#0" expanded="false" />
+                <element signature="e#210674#213755#0" expanded="false" />
+                <marker date="1582902499023" expanded="false" signature="168803:188088" ph="..." />
+                <marker date="1582902499023" expanded="false" signature="188200:210621" ph="..." />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
       <file leaf-file-name="runPipeline1.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/runPipeline1.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="313">
-              <caret line="55" column="43" lean-forward="true" selection-start-line="55" selection-start-column="43" selection-end-line="55" selection-end-column="43" />
+            <state relative-caret-position="330">
+              <caret line="50" column="4" lean-forward="false" selection-start-line="50" selection-start-column="4" selection-end-line="50" selection-end-column="4" />
               <folding>
                 <element signature="e#0#27#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="evaluation.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/evaluation.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="569">
+              <caret line="1265" column="0" lean-forward="false" selection-start-line="1265" selection-start-column="0" selection-end-line="1265" selection-end-column="0" />
+              <folding>
+                <element signature="e#0#18#0" expanded="true" />
+                <element signature="e#4277#37594#0" expanded="false" />
+                <element signature="e#37657#37858#0" expanded="false" />
+                <element signature="e#66283#67817#0" expanded="false" />
+                <marker date="1582892957100" expanded="true" signature="64097:64101" ph="..." />
               </folding>
             </state>
           </provider>
@@ -26,10 +113,21 @@
       <file leaf-file-name="dataModeling.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/dataModeling.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="33133">
-              <caret line="3242" column="26" lean-forward="false" selection-start-line="3242" selection-start-column="26" selection-end-line="3242" selection-end-column="26" />
+            <state relative-caret-position="321">
+              <caret line="3023" column="45" lean-forward="false" selection-start-line="3023" selection-start-column="45" selection-end-line="3023" selection-end-column="45" />
               <folding>
                 <element signature="e#0#33#0" expanded="true" />
+                <element signature="e#5055#31673#0" expanded="false" />
+                <element signature="e#6878#21962#0" expanded="false" />
+                <element signature="e#22007#23971#0" expanded="false" />
+                <element signature="e#31765#33101#0" expanded="false" />
+                <element signature="e#33152#33448#0" expanded="false" />
+                <element signature="e#33541#35395#0" expanded="false" />
+                <element signature="e#35472#37551#0" expanded="false" />
+                <element signature="e#37641#64328#0" expanded="false" />
+                <element signature="e#64405#64670#0" expanded="false" />
+                <element signature="e#64757#77425#0" expanded="false" />
+                <element signature="e#77494#77999#0" expanded="false" />
                 <element signature="e#78453#78560#0" expanded="false" />
                 <element signature="e#78625#81790#0" expanded="false" />
                 <element signature="e#79551#79937#0" expanded="false" />
@@ -52,96 +150,22 @@
                 <element signature="e#147596#147800#0" expanded="false" />
                 <element signature="e#147861#155306#0" expanded="false" />
                 <element signature="e#155356#156556#0" expanded="false" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="dataPartitioning.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/dataPartitioning.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="284">
-              <caret line="137" column="47" lean-forward="true" selection-start-line="137" selection-start-column="21" selection-end-line="137" selection-end-column="47" />
-              <folding>
-                <element signature="e#5784#10879#0" expanded="false" />
-                <element signature="e#10916#24857#0" expanded="false" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="evaluation.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/evaluation.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="14008">
-              <caret line="843" column="35" lean-forward="false" selection-start-line="843" selection-start-column="35" selection-end-line="843" selection-end-column="35" />
-              <folding>
-                <marker date="1580897721165" expanded="true" signature="40683:40687" ph="..." />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="dataReading.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/dataReading.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-13">
-              <caret line="58" column="46" lean-forward="true" selection-start-line="58" selection-start-column="46" selection-end-line="58" selection-end-column="46" />
-              <folding>
-                <element signature="e#27#45#0" expanded="true" />
-                <element signature="e#1071#1426#0" expanded="false" />
-                <element signature="e#3172#4807#0" expanded="false" />
-                <element signature="e#4891#5331#0" expanded="false" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="dataReadingD.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/dataReadingD.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="17">
-              <caret line="891" column="63" lean-forward="false" selection-start-line="891" selection-start-column="63" selection-end-line="891" selection-end-column="63" />
-              <folding>
-                <element signature="e#0#18#0" expanded="true" />
-                <element signature="e#319#4621#0" expanded="false" />
-                <element signature="e#4755#9685#0" expanded="false" />
-                <element signature="e#9742#36022#0" expanded="false" />
-                <element signature="e#9868#13761#0" expanded="false" />
-                <element signature="e#14136#36022#0" expanded="false" />
-                <element signature="e#87922#106458#0" expanded="false" />
-                <element signature="e#126642#149054#0" expanded="false" />
-                <element signature="e#149107#152188#0" expanded="false" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="dataReading.py" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/Danaos_ML_Project/dataReading.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="369">
-              <caret line="780" column="0" lean-forward="true" selection-start-line="780" selection-start-column="0" selection-end-line="780" selection-end-column="0" />
-              <folding>
-                <element signature="e#0#18#0" expanded="true" />
-                <element signature="e#741#5043#0" expanded="false" />
-                <element signature="e#5097#5169#0" expanded="false" />
-                <element signature="e#5240#5512#0" expanded="false" />
-                <element signature="e#5559#5589#0" expanded="false" />
-                <element signature="e#5640#6513#0" expanded="false" />
-                <element signature="e#6589#6907#0" expanded="false" />
-                <element signature="e#6992#7329#0" expanded="false" />
-                <element signature="e#7410#7603#0" expanded="false" />
-                <element signature="e#7668#7696#0" expanded="false" />
-                <element signature="e#7829#33130#0" expanded="false" />
-                <element signature="e#36837#39041#0" expanded="false" />
-                <element signature="e#39122#40203#0" expanded="false" />
-                <element signature="e#40578#62464#0" expanded="false" />
-                <element signature="e#62518#95981#0" expanded="false" />
-                <element signature="e#96052#112126#0" expanded="false" />
-                <element signature="e#133992#153264#0" expanded="false" />
-                <element signature="e#153385#175797#0" expanded="false" />
-                <element signature="e#175850#178931#0" expanded="false" />
+                <element signature="e#158130#159125#0" expanded="false" />
+                <element signature="e#159596#160648#0" expanded="false" />
+                <element signature="e#160703#160958#0" expanded="false" />
+                <element signature="e#161106#161272#0" expanded="false" />
+                <element signature="e#161368#161562#0" expanded="false" />
+                <element signature="e#161702#162859#0" expanded="false" />
+                <element signature="e#162943#188061#0" expanded="false" />
+                <element signature="e#190847#191445#0" expanded="false" />
+                <element signature="e#191559#192187#0" expanded="false" />
+                <element signature="e#204700#274185#0" expanded="false" />
+                <element signature="e#274240#275590#0" expanded="false" />
+                <element signature="e#275650#278929#0" expanded="false" />
+                <element signature="e#278992#279902#0" expanded="false" />
+                <element signature="e#279963#281675#0" expanded="false" />
+                <element signature="e#281733#284049#0" expanded="false" />
+                <element signature="e#284131#284878#0" expanded="false" />
               </folding>
             </state>
           </provider>
@@ -151,11 +175,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7]</find>
-      <find>dayssince</find>
-      <find>custom_activation23</find>
-      <find>newDataset</find>
-      <find>WWD</find>
       <find>dtV &gt; arrivalsDate[i]</find>
       <find>eager</find>
       <find>.txt</find>
@@ -180,7 +199,12 @@
       <find>%</find>
       <find>:</find>
       <find>strptime</find>
+      <find>weights</find>
+      <find>self.intercepts</find>
+      <find>connect</find>
       <find>datetime</find>
+      <find>vector</find>
+      <find>np.std</find>
     </findStrings>
     <replaceStrings>
       <replace>&gt; 9</replace>
@@ -206,7 +230,6 @@
         <option value="$PROJECT_DIR$/model_2_.csv" />
         <option value="$PROJECT_DIR$/model_4_.csv" />
         <option value="$PROJECT_DIR$/model_5_.csv" />
-        <option value="$PROJECT_DIR$/model_Gen_.csv" />
         <option value="$PROJECT_DIR$/featureCalculation.py" />
         <option value="$PROJECT_DIR$/model_0_.csv" />
         <option value="$PROJECT_DIR$/model_1_.csv" />
@@ -220,16 +243,29 @@
         <option value="$PROJECT_DIR$/dataPartitioning.py" />
         <option value="$PROJECT_DIR$/windDirMapped.csv" />
         <option value="$PROJECT_DIR$/newUtils.py" />
-        <option value="$PROJECT_DIR$/evaluation.py" />
-        <option value="$PROJECT_DIR$/dataModeling.py" />
         <option value="$PROJECT_DIR$/WSraw.csv" />
         <option value="$PROJECT_DIR$/data/LAROS/Draft.csv" />
         <option value="$PROJECT_DIR$/data/LAROS/DraftAFT.csv" />
-        <option value="$PROJECT_DIR$/dataReading.py" />
         <option value="$PROJECT_DIR$/data/LAROS/UNK.csv" />
         <option value="$PROJECT_DIR$/dataReadingD.py" />
         <option value="$PROJECT_DIR$/data/MARMARAS/noon_reports_MT_DELTA_MARIA.csv" />
+        <option value="$PROJECT_DIR$/dataReading.py" />
+        <option value="$PROJECT_DIR$/model_Gen_.csv" />
+        <option value="$USER_HOME$/AppData/Roaming/python/python36/site-packages/cx_Oracle/custom_exceptions.py" />
+        <option value="$USER_HOME$/AppData/Roaming/python/python36/site-packages/cx_Oracle/utils.py" />
+        <option value="$USER_HOME$/AppData/Roaming/python/python36/site-packages/cx_Oracle/connection.py" />
+        <option value="$USER_HOME$/AppData/Roaming/python/python36/site-packages/cx_Oracle/__init__.py" />
+        <option value="$USER_HOME$/AppData/Roaming/python/python36/site-packages/cx_Oracle/oci.py" />
+        <option value="$USER_HOME$/AppData/Roaming/python/python36/site-packages/cx_Oracle/buffer.py" />
+        <option value="$USER_HOME$/AppData/Roaming/python/python36/site-packages/cx_Oracle/environment.py" />
+        <option value="$USER_HOME$/AppData/Roaming/python/python36/site-packages/cx_Oracle/error.py" />
+        <option value="$USER_HOME$/AppData/Roaming/python/python36/site-packages/cx_Oracle/cursor.py" />
+        <option value="$USER_HOME$/AppData/Roaming/python/python36/site-packages/cx_Oracle/pythonic_oci.py" />
+        <option value="$PROJECT_DIR$/data/MILLENIA/TELEGRAMS/FANTASIA.csv" />
+        <option value="$PROJECT_DIR$/dataModeling.py" />
+        <option value="$PROJECT_DIR$/evaluation.py" />
         <option value="$PROJECT_DIR$/runPipeline1.py" />
+        <option value="/fragment.py" />
         <option value="$PROJECT_DIR$/Danaos_ML_Project/dataReading.py" />
       </list>
     </option>
@@ -273,18 +309,6 @@
               <item name="KaklisPHD" type="462c0819:PsiDirectoryNode" />
               <item name="data" type="462c0819:PsiDirectoryNode" />
             </path>
-            <path>
-              <item name="KaklisPHD" type="b2602c69:ProjectViewProjectNode" />
-              <item name="KaklisPHD" type="462c0819:PsiDirectoryNode" />
-              <item name="data" type="462c0819:PsiDirectoryNode" />
-              <item name="MARMARAS" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="KaklisPHD" type="b2602c69:ProjectViewProjectNode" />
-              <item name="KaklisPHD" type="462c0819:PsiDirectoryNode" />
-              <item name="data" type="462c0819:PsiDirectoryNode" />
-              <item name="MILLENIA" type="462c0819:PsiDirectoryNode" />
-            </path>
           </expand>
           <select />
         </subPane>
@@ -299,18 +323,18 @@
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\dkaklis\Desktop\KaklisPHD" />
       <recent name="C:\Users\dkaklis\Desktop\KaklisPHD\data\MILLENIA" />
       <recent name="C:\Users\dkaklis\Desktop\KaklisPHD\data\MARMARAS" />
       <recent name="C:\Users\dkaklis\Desktop\KaklisPHD\data\LAROS" />
-      <recent name="C:\Users\dkaklis\Desktop\KaklisPHD" />
       <recent name="C:\Users\dkaklis\Desktop\KaklisPHD\data" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\dkaklis\Desktop\KaklisPHD\data\MARMARAS" />
+      <recent name="C:\Users\dkaklis\Desktop\KaklisPHD\data\MILLENIA\TELEGRAMS" />
       <recent name="C:\Users\dkaklis\Desktop\KaklisPHD\Neurals_pvlos" />
       <recent name="C:\Users\dkaklis\Desktop\KaklisPHD\data\OCEAN_GOLD" />
       <recent name="C:\Users\dkaklis\Desktop\KaklisPHD\data\MILLENIA" />
-      <recent name="C:\Users\dkaklis\Desktop\KaklisPHD\Mapped_data" />
-      <recent name="C:\Users\dkaklis\Desktop\KaklisPHD\data\Penelope" />
     </key>
   </component>
   <component name="RunDashboard">
@@ -433,23 +457,23 @@
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="7" />
     <editor active="true" />
     <layout>
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.17760417" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.17916666" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.2777191" sideWeight="0.50208336" order="7" side_tool="true" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3273495" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.17317846" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.2745512" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.2777191" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Data View" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.41979167" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.22069694" sideWeight="0.49791667" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Data View" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.40989584" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3273495" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
     </layout>
     <layout-to-restore>
@@ -569,34 +593,19 @@
           <option name="timeStamp" value="736" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/dataModeling.py</url>
-          <line>3071</line>
-          <option name="timeStamp" value="904" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/dataModeling.py</url>
-          <line>3285</line>
-          <option name="timeStamp" value="906" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/Danaos_ML_Project/dataReading.py</url>
-          <line>2236</line>
+          <line>2935</line>
           <option name="timeStamp" value="1022" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/Danaos_ML_Project/dataReading.py</url>
-          <line>2090</line>
+          <line>2789</line>
           <option name="timeStamp" value="1028" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/Danaos_ML_Project/dataReading.py</url>
-          <line>2075</line>
+          <line>2774</line>
           <option name="timeStamp" value="1031" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/Danaos_ML_Project/dataReading.py</url>
-          <line>2026</line>
-          <option name="timeStamp" value="1034" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/dataReadingD.py</url>
@@ -605,28 +614,23 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/Danaos_ML_Project/dataReading.py</url>
-          <line>709</line>
-          <option name="timeStamp" value="1100" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/Danaos_ML_Project/dataReading.py</url>
-          <line>414</line>
+          <line>462</line>
           <option name="timeStamp" value="1147" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/Danaos_ML_Project/dataReading.py</url>
-          <line>393</line>
+          <line>450</line>
           <option name="timeStamp" value="1148" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/Danaos_ML_Project/dataReading.py</url>
-          <line>351</line>
+          <line>412</line>
           <option name="timeStamp" value="1150" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/Danaos_ML_Project/dataReading.py</url>
-          <line>784</line>
-          <option name="timeStamp" value="1167" />
+          <line>1482</line>
+          <option name="timeStamp" value="1202" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
@@ -636,217 +640,11 @@
           </properties>
         </breakpoint>
       </default-breakpoints>
-      <option name="time" value="1168" />
+      <option name="time" value="1231" />
     </breakpoint-manager>
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/data/MARIA_M_TLG.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Mapped_data/PENELOPE_mapped_1.csv">
-      <provider editor-type-id="csv-table-editor">
-        <state showInfoPanel="true" fixedHeaders="false" rowLines="3" />
-      </provider>
-      <provider selected="true" editor-type-id="csv-text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Neurals_pvlos/Danaos_Prediction_Module.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="837">
-          <caret line="244" column="45" lean-forward="false" selection-start-line="244" selection-start-column="45" selection-end-line="244" selection-end-column="45" />
-          <folding>
-            <element signature="e#29#48#0" expanded="true" />
-            <element signature="e#9059#9299#0" expanded="false" />
-            <element signature="e#9345#10006#0" expanded="false" />
-            <element signature="e#10846#11413#0" expanded="false" />
-            <element signature="e#11464#11641#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/NEWres.csv">
-      <provider editor-type-id="csv-table-editor">
-        <state showInfoPanel="true" fixedHeaders="false" rowLines="3" />
-      </provider>
-      <provider selected="true" editor-type-id="csv-text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/NEWres_1.csv">
-      <provider editor-type-id="csv-table-editor">
-        <state showInfoPanel="true" fixedHeaders="false" rowLines="3" />
-      </provider>
-      <provider selected="true" editor-type-id="csv-text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/draftsMapped.csv" />
-    <entry file="file://$PROJECT_DIR$/Link to ShipData.csv" />
-    <entry file="file://$PROJECT_DIR$/export telegram.csv" />
-    <entry file="file://$PROJECT_DIR$/metrics.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/results.csv" />
-    <entry file="file://$PROJECT_DIR$/plotResults.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/parameters.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/newUtils.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="605">
-          <caret line="55" column="0" lean-forward="false" selection-start-line="55" selection-start-column="0" selection-end-line="55" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/best_model.hdf5">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/blFlagsMapped.csv" />
-    <entry file="file://$PROJECT_DIR$/dataModeling.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="33133">
-          <caret line="3242" column="26" lean-forward="false" selection-start-line="3242" selection-start-column="26" selection-end-line="3242" selection-end-column="26" />
-          <folding>
-            <element signature="e#0#33#0" expanded="true" />
-            <element signature="e#78453#78560#0" expanded="false" />
-            <element signature="e#78625#81790#0" expanded="false" />
-            <element signature="e#79551#79937#0" expanded="false" />
-            <element signature="e#79997#80566#0" expanded="false" />
-            <element signature="e#80630#81369#0" expanded="false" />
-            <element signature="e#81852#89433#0" expanded="false" />
-            <element signature="e#82571#89087#0" expanded="false" />
-            <element signature="e#89650#91359#0" expanded="false" />
-            <element signature="e#90343#91011#0" expanded="false" />
-            <element signature="e#91065#91244#0" expanded="false" />
-            <element signature="e#91319#91359#0" expanded="false" />
-            <element signature="e#91409#92555#0" expanded="false" />
-            <element signature="e#92610#95433#0" expanded="false" />
-            <element signature="e#95489#109042#0" expanded="false" />
-            <element signature="e#109098#122844#0" expanded="false" />
-            <element signature="e#122978#138177#0" expanded="false" />
-            <element signature="e#138232#139580#0" expanded="false" />
-            <element signature="e#139634#146759#0" expanded="false" />
-            <element signature="e#146814#147538#0" expanded="false" />
-            <element signature="e#147596#147800#0" expanded="false" />
-            <element signature="e#147861#155306#0" expanded="false" />
-            <element signature="e#155356#156556#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/data/LAROS/POW.csv">
-      <provider selected="true" editor-type-id="LargeFileEditor">
-        <state relative-caret-position="-532741">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/data/LAROS/WA.csv">
-      <provider selected="true" editor-type-id="LargeFileEditor">
-        <state relative-caret-position="25">
-          <caret line="3" column="29" lean-forward="true" selection-start-line="3" selection-start-column="29" selection-end-line="3" selection-end-column="29" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/WSraw.csv">
-      <provider editor-type-id="csv-table-editor">
-        <state showInfoPanel="true" fixedHeaders="false" rowLines="3" />
-      </provider>
-      <provider selected="true" editor-type-id="csv-text-editor">
-        <state relative-caret-position="-1632">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/data/LAROS/WS.csv">
-      <provider editor-type-id="csv-table-editor">
-        <state showInfoPanel="true" fixedHeaders="false" rowLines="3" />
-      </provider>
-      <provider selected="true" editor-type-id="csv-text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/WS.csv">
-      <provider editor-type-id="csv-table-editor">
-        <state showInfoPanel="true" fixedHeaders="false" rowLines="3" />
-      </provider>
-      <provider selected="true" editor-type-id="csv-text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/WA.csv">
-      <provider editor-type-id="csv-table-editor">
-        <state showInfoPanel="true" fixedHeaders="false" rowLines="3" />
-      </provider>
-      <provider selected="true" editor-type-id="csv-text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/data/LAROS/STW.csv">
-      <provider selected="true" editor-type-id="LargeFileEditor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/data/MARMARAS/MT_DELTA_MARIA_data_.csv" />
-    <entry file="file://$USER_HOME$/AppData/Local/Programs/Python/Python36/Lib/codecs.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="229">
-          <caret line="308" column="0" lean-forward="false" selection-start-line="308" selection-start-column="0" selection-end-line="308" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/MT_DELTA_MARIA.txt">
-      <provider selected="true" editor-type-id="LargeFileEditor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/data/LAROS/DateTime.csv">
-      <provider selected="true" editor-type-id="LargeFileEditor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/data/LAROS/DraftAFT.csv">
       <provider editor-type-id="LargeFileEditor">
         <state relative-caret-position="0">
@@ -907,17 +705,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/daysSinceLastDryDock.csv">
-      <provider editor-type-id="csv-table-editor">
-        <state showInfoPanel="true" fixedHeaders="false" rowLines="3" />
-      </provider>
-      <provider selected="true" editor-type-id="csv-text-editor">
-        <state relative-caret-position="-1462739">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/MT_DELTA_MARIA_draftB_9_analysis.csv">
+    <entry file="file://$PROJECT_DIR$/data/MARMARAS/MT_DELTA_MARIA_draftB_9_analysis.csv">
       <provider editor-type-id="csv-table-editor">
         <state showInfoPanel="true" fixedHeaders="false" rowLines="3" />
       </provider>
@@ -937,23 +725,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/evaluation.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="14008">
-          <caret line="843" column="35" lean-forward="false" selection-start-line="843" selection-start-column="35" selection-end-line="843" selection-end-column="35" />
-          <folding>
-            <marker date="1580897721165" expanded="true" signature="40683:40687" ph="..." />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/data/MARMARAS/MT_DELTA_MARIA.csv">
-      <provider selected="true" editor-type-id="LargeFileEditor">
-        <state relative-caret-position="272">
-          <caret line="16" column="50" lean-forward="true" selection-start-line="16" selection-start-column="50" selection-end-line="16" selection-end-column="50" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/data/MARMARAS/noon_reports.csv">
       <provider editor-type-id="csv-table-editor">
         <state showInfoPanel="true" fixedHeaders="false" rowLines="3" />
@@ -965,37 +736,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/data/MARMARAS/noon_reports_MT_DELTA_MARIA.csv">
-      <provider editor-type-id="csv-table-editor">
-        <state showInfoPanel="true" fixedHeaders="false" rowLines="3" />
-      </provider>
-      <provider selected="true" editor-type-id="csv-text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$APPLICATION_HOME_DIR$/helpers/typeshed/stdlib/3/datetime.pyi">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/data/MILLENIA/MARIA_M_TLG.csv">
-      <provider editor-type-id="csv-table-editor">
-        <state showInfoPanel="true" fixedHeaders="false" rowLines="3" />
-      </provider>
-      <provider selected="true" editor-type-id="csv-text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/data/MILLENIA/MARIA_M_TLG.txt">
+    <entry file="file://$PROJECT_DIR$/data/MILLENIA/TELEGRAMS/MARIA_M_TLG.txt">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="194" />
@@ -1014,60 +755,37 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/data/MILLENIA/DOMINIA.csv">
-      <provider editor-type-id="csv-table-editor">
-        <state showInfoPanel="true" fixedHeaders="false" rowLines="3" />
-      </provider>
-      <provider selected="true" editor-type-id="csv-text-editor">
-        <state relative-caret-position="323">
-          <caret line="19" column="48" lean-forward="false" selection-start-line="19" selection-start-column="48" selection-end-line="19" selection-end-column="48" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/dataReading.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-13">
-          <caret line="58" column="46" lean-forward="true" selection-start-line="58" selection-start-column="46" selection-end-line="58" selection-end-column="46" />
+        <state relative-caret-position="-68">
+          <caret line="8" column="0" lean-forward="false" selection-start-line="8" selection-start-column="0" selection-end-line="8" selection-end-column="0" />
           <folding>
-            <element signature="e#27#45#0" expanded="true" />
-            <element signature="e#1071#1426#0" expanded="false" />
-            <element signature="e#3172#4807#0" expanded="false" />
-            <element signature="e#4891#5331#0" expanded="false" />
+            <marker date="1582704944966" expanded="false" signature="1061:1426" ph="..." />
+            <marker date="1582704944966" expanded="false" signature="3163:4807" ph="..." />
+            <marker date="1582704944966" expanded="false" signature="4880:5331" ph="..." />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/dataReadingD.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="17">
+        <state relative-caret-position="-2227">
           <caret line="891" column="63" lean-forward="false" selection-start-line="891" selection-start-column="63" selection-end-line="891" selection-end-column="63" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
-            <element signature="e#319#4621#0" expanded="false" />
-            <element signature="e#4755#9685#0" expanded="false" />
-            <element signature="e#9742#36022#0" expanded="false" />
-            <element signature="e#9868#13761#0" expanded="false" />
-            <element signature="e#14136#36022#0" expanded="false" />
-            <element signature="e#87922#106458#0" expanded="false" />
-            <element signature="e#126642#149054#0" expanded="false" />
-            <element signature="e#149107#152188#0" expanded="false" />
+            <element signature="e#149108#152189#0" expanded="false" />
+            <marker date="1582704801802" expanded="false" signature="311:4622" ph="..." />
+            <marker date="1582704801802" expanded="false" signature="4747:9686" ph="..." />
+            <marker date="1582704801802" expanded="false" signature="9734:36023" ph="..." />
+            <marker date="1582704801802" expanded="false" signature="9855:13762" ph="..." />
+            <marker date="1582704801802" expanded="false" signature="14124:36023" ph="..." />
+            <marker date="1582704801802" expanded="false" signature="87910:106459" ph="..." />
+            <marker date="1582704801802" expanded="false" signature="126634:149055" ph="..." />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/dataPartitioning.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="284">
-          <caret line="137" column="47" lean-forward="true" selection-start-line="137" selection-start-column="21" selection-end-line="137" selection-end-column="47" />
-          <folding>
-            <element signature="e#5784#10879#0" expanded="false" />
-            <element signature="e#10916#24857#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/data/MILLENIA/FANTASIA.csv">
+    <entry file="file://$PROJECT_DIR$/model_Gen_.csv">
       <provider editor-type-id="csv-table-editor">
         <state showInfoPanel="true" fixedHeaders="false" rowLines="3" />
       </provider>
@@ -1078,10 +796,377 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/dataPartitioning.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="284">
+          <caret line="137" column="47" lean-forward="false" selection-start-line="137" selection-start-column="21" selection-end-line="137" selection-end-column="47" />
+          <folding>
+            <element signature="e#5784#10879#0" expanded="false" />
+            <element signature="e#10916#24857#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$APPLICATION_HOME_DIR$/helpers/typeshed/stdlib/3/datetime.pyi">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/AppData/Local/Programs/Python/Python36/Lib/operator.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/AppData/Roaming/python/python36/site-packages/cx_Oracle/connection.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="187">
+          <caret line="11" column="16" lean-forward="false" selection-start-line="11" selection-start-column="16" selection-end-line="11" selection-end-column="16" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/AppData/Roaming/python/python36/site-packages/cx_Oracle/utils.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="446">
+          <caret line="35" column="1" lean-forward="false" selection-start-line="35" selection-start-column="1" selection-end-line="35" selection-end-column="1" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/AppData/Roaming/python/python36/site-packages/cx_Oracle/custom_exceptions.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="425">
+          <caret line="25" column="8" lean-forward="false" selection-start-line="25" selection-start-column="8" selection-end-line="25" selection-end-column="8" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/AppData/Roaming/python/python36/site-packages/cx_Oracle/oci.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="242">
+          <caret line="22" column="0" lean-forward="false" selection-start-line="22" selection-start-column="0" selection-end-line="22" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/AppData/Roaming/python/python36/site-packages/cx_Oracle/buffer.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="289">
+          <caret line="17" column="44" lean-forward="false" selection-start-line="17" selection-start-column="44" selection-end-line="17" selection-end-column="44" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/AppData/Roaming/python/python36/site-packages/cx_Oracle/environment.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="221">
+          <caret line="13" column="55" lean-forward="false" selection-start-line="13" selection-start-column="55" selection-end-line="13" selection-end-column="55" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/AppData/Roaming/python/python36/site-packages/cx_Oracle/error.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="340">
+          <caret line="20" column="30" lean-forward="false" selection-start-line="20" selection-start-column="30" selection-end-line="20" selection-end-column="30" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/AppData/Roaming/python/python36/site-packages/cx_Oracle/datetimevar.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/AppData/Roaming/python/python36/site-packages/cx_Oracle/pythonic_oci.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="51">
+          <caret line="3" column="18" lean-forward="false" selection-start-line="3" selection-start-column="18" selection-end-line="3" selection-end-column="18" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/AppData/Local/Programs/Python/Python36/Lib/locale.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/AppData/Local/Programs/Python/Python36/Lib/site-packages/sklearn/cluster/__init__.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/cx_Oracle/oci.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="85">
+          <caret line="5" column="0" lean-forward="true" selection-start-line="5" selection-start-column="0" selection-end-line="5" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/AppData/Roaming/python/python36/site-packages/cx_Oracle/__init__.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="123">
+          <caret line="14" column="34" lean-forward="false" selection-start-line="14" selection-start-column="34" selection-end-line="14" selection-end-column="34" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/cx_Oracle/cursor.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="119">
+          <caret line="7" column="18" lean-forward="false" selection-start-line="7" selection-start-column="18" selection-end-line="7" selection-end-column="18" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/AppData/Roaming/python/python36/site-packages/cx_Oracle/cursor.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="204">
+          <caret line="12" column="9" lean-forward="false" selection-start-line="12" selection-start-column="9" selection-end-line="12" selection-end-column="9" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/.PyCharmCE2017.2/system/python_stubs/-1519680916/cx_Oracle/__init__.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/data/MILLENIA/FANTASIA.csv">
+      <provider editor-type-id="csv-table-editor">
+        <state showInfoPanel="true" fixedHeaders="false" rowLines="3" />
+      </provider>
+      <provider selected="true" editor-type-id="csv-text-editor">
+        <state relative-caret-position="-1428">
+          <caret line="0" column="214" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="214" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/data/MILLENIA/TELEGRAMS/MARIA_M_TLG.csv">
+      <provider editor-type-id="csv-table-editor">
+        <state showInfoPanel="true" fixedHeaders="false" rowLines="3" />
+      </provider>
+      <provider selected="true" editor-type-id="csv-text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/data/MILLENIA/TELEGRAMS/MARIA_M.csv">
+      <provider editor-type-id="csv-table-editor">
+        <state showInfoPanel="true" fixedHeaders="false" rowLines="3" />
+      </provider>
+      <provider selected="true" editor-type-id="csv-text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/data/MILLENIA/FANTASIA">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/data/MILLENIA/TELEGRAMS/DOMINIA.csv">
+      <provider editor-type-id="csv-table-editor">
+        <state showInfoPanel="true" fixedHeaders="false" rowLines="3" />
+      </provider>
+      <provider selected="true" editor-type-id="csv-text-editor">
+        <state relative-caret-position="34">
+          <caret line="2" column="54" lean-forward="true" selection-start-line="2" selection-start-column="54" selection-end-line="2" selection-end-column="54" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/data/MILLENIA/TELEGRAMS/FANTASIA.csv">
+      <provider editor-type-id="csv-table-editor">
+        <state showInfoPanel="true" fixedHeaders="false" rowLines="3" />
+      </provider>
+      <provider selected="true" editor-type-id="csv-text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="204" lean-forward="true" selection-start-line="0" selection-start-column="204" selection-end-line="0" selection-end-column="204" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/data/MARMARAS/MT_DELTA_MARIA.csv">
+      <provider selected="true" editor-type-id="LargeFileEditor">
+        <state relative-caret-position="-14142">
+          <caret line="16" column="50" lean-forward="true" selection-start-line="16" selection-start-column="50" selection-end-line="16" selection-end-column="50" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/data/MARMARAS/noon_reports_MT_DELTA_MARIA.csv">
+      <provider editor-type-id="csv-table-editor">
+        <state showInfoPanel="true" fixedHeaders="false" rowLines="3" />
+      </provider>
+      <provider selected="true" editor-type-id="csv-text-editor">
+        <state relative-caret-position="-1683">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/daysSinceLastDryDock.csv">
+      <provider editor-type-id="csv-table-editor">
+        <state showInfoPanel="true" fixedHeaders="false" rowLines="3" />
+      </provider>
+      <provider selected="true" editor-type-id="csv-text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/results.csv">
+      <provider editor-type-id="csv-table-editor">
+        <state showInfoPanel="true" fixedHeaders="false" rowLines="3" />
+      </provider>
+      <provider selected="true" editor-type-id="csv-text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/WSraw.csv">
+      <provider selected="true" editor-type-id="LargeFileEditor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/dataY_.csv">
+      <provider editor-type-id="csv-table-editor">
+        <state showInfoPanel="true" fixedHeaders="false" rowLines="3" />
+      </provider>
+      <provider selected="true" editor-type-id="csv-text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/model_11_.csv">
+      <provider editor-type-id="csv-table-editor">
+        <state showInfoPanel="true" fixedHeaders="false" rowLines="3" />
+      </provider>
+      <provider selected="true" editor-type-id="csv-text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/data/MARMARAS/MT_DELTA_MARIA.txt">
+      <provider selected="true" editor-type-id="LargeFileEditor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/evaluation.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="569">
+          <caret line="1265" column="0" lean-forward="false" selection-start-line="1265" selection-start-column="0" selection-end-line="1265" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
+            <element signature="e#4277#37594#0" expanded="false" />
+            <element signature="e#37657#37858#0" expanded="false" />
+            <element signature="e#66283#67817#0" expanded="false" />
+            <marker date="1582892957100" expanded="true" signature="64097:64101" ph="..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/dataModeling.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="321">
+          <caret line="3023" column="45" lean-forward="false" selection-start-line="3023" selection-start-column="45" selection-end-line="3023" selection-end-column="45" />
+          <folding>
+            <element signature="e#0#33#0" expanded="true" />
+            <element signature="e#5055#31673#0" expanded="false" />
+            <element signature="e#6878#21962#0" expanded="false" />
+            <element signature="e#22007#23971#0" expanded="false" />
+            <element signature="e#31765#33101#0" expanded="false" />
+            <element signature="e#33152#33448#0" expanded="false" />
+            <element signature="e#33541#35395#0" expanded="false" />
+            <element signature="e#35472#37551#0" expanded="false" />
+            <element signature="e#37641#64328#0" expanded="false" />
+            <element signature="e#64405#64670#0" expanded="false" />
+            <element signature="e#64757#77425#0" expanded="false" />
+            <element signature="e#77494#77999#0" expanded="false" />
+            <element signature="e#78453#78560#0" expanded="false" />
+            <element signature="e#78625#81790#0" expanded="false" />
+            <element signature="e#79551#79937#0" expanded="false" />
+            <element signature="e#79997#80566#0" expanded="false" />
+            <element signature="e#80630#81369#0" expanded="false" />
+            <element signature="e#81852#89433#0" expanded="false" />
+            <element signature="e#82571#89087#0" expanded="false" />
+            <element signature="e#89650#91359#0" expanded="false" />
+            <element signature="e#90343#91011#0" expanded="false" />
+            <element signature="e#91065#91244#0" expanded="false" />
+            <element signature="e#91319#91359#0" expanded="false" />
+            <element signature="e#91409#92555#0" expanded="false" />
+            <element signature="e#92610#95433#0" expanded="false" />
+            <element signature="e#95489#109042#0" expanded="false" />
+            <element signature="e#109098#122844#0" expanded="false" />
+            <element signature="e#122978#138177#0" expanded="false" />
+            <element signature="e#138232#139580#0" expanded="false" />
+            <element signature="e#139634#146759#0" expanded="false" />
+            <element signature="e#146814#147538#0" expanded="false" />
+            <element signature="e#147596#147800#0" expanded="false" />
+            <element signature="e#147861#155306#0" expanded="false" />
+            <element signature="e#155356#156556#0" expanded="false" />
+            <element signature="e#158130#159125#0" expanded="false" />
+            <element signature="e#159596#160648#0" expanded="false" />
+            <element signature="e#160703#160958#0" expanded="false" />
+            <element signature="e#161106#161272#0" expanded="false" />
+            <element signature="e#161368#161562#0" expanded="false" />
+            <element signature="e#161702#162859#0" expanded="false" />
+            <element signature="e#162943#188061#0" expanded="false" />
+            <element signature="e#190847#191445#0" expanded="false" />
+            <element signature="e#191559#192187#0" expanded="false" />
+            <element signature="e#204700#274185#0" expanded="false" />
+            <element signature="e#274240#275590#0" expanded="false" />
+            <element signature="e#275650#278929#0" expanded="false" />
+            <element signature="e#278992#279902#0" expanded="false" />
+            <element signature="e#279963#281675#0" expanded="false" />
+            <element signature="e#281733#284049#0" expanded="false" />
+            <element signature="e#284131#284878#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/runPipeline1.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="313">
-          <caret line="55" column="43" lean-forward="true" selection-start-line="55" selection-start-column="43" selection-end-line="55" selection-end-column="43" />
+        <state relative-caret-position="330">
+          <caret line="50" column="4" lean-forward="false" selection-start-line="50" selection-start-column="4" selection-end-line="50" selection-end-column="4" />
           <folding>
             <element signature="e#0#27#0" expanded="true" />
           </folding>
@@ -1090,28 +1175,28 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Danaos_ML_Project/dataReading.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="369">
-          <caret line="780" column="0" lean-forward="true" selection-start-line="780" selection-start-column="0" selection-end-line="780" selection-end-column="0" />
+        <state relative-caret-position="372">
+          <caret line="1180" column="68" lean-forward="true" selection-start-line="1180" selection-start-column="68" selection-end-line="1180" selection-end-column="68" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
-            <element signature="e#741#5043#0" expanded="false" />
-            <element signature="e#5097#5169#0" expanded="false" />
-            <element signature="e#5240#5512#0" expanded="false" />
-            <element signature="e#5559#5589#0" expanded="false" />
-            <element signature="e#5640#6513#0" expanded="false" />
-            <element signature="e#6589#6907#0" expanded="false" />
-            <element signature="e#6992#7329#0" expanded="false" />
-            <element signature="e#7410#7603#0" expanded="false" />
-            <element signature="e#7668#7696#0" expanded="false" />
-            <element signature="e#7829#33130#0" expanded="false" />
-            <element signature="e#36837#39041#0" expanded="false" />
-            <element signature="e#39122#40203#0" expanded="false" />
-            <element signature="e#40578#62464#0" expanded="false" />
-            <element signature="e#62518#95981#0" expanded="false" />
-            <element signature="e#96052#112126#0" expanded="false" />
-            <element signature="e#133992#153264#0" expanded="false" />
-            <element signature="e#153385#175797#0" expanded="false" />
-            <element signature="e#175850#178931#0" expanded="false" />
+            <element signature="e#1295#5597#0" expanded="false" />
+            <element signature="e#5651#5723#0" expanded="false" />
+            <element signature="e#5794#6066#0" expanded="false" />
+            <element signature="e#6113#6143#0" expanded="false" />
+            <element signature="e#6194#7067#0" expanded="false" />
+            <element signature="e#7143#7461#0" expanded="false" />
+            <element signature="e#7546#7884#0" expanded="false" />
+            <element signature="e#7965#8158#0" expanded="false" />
+            <element signature="e#8223#8251#0" expanded="false" />
+            <element signature="e#8447#37671#0" expanded="false" />
+            <element signature="e#8525#11582#0" expanded="false" />
+            <element signature="e#12749#21997#0" expanded="false" />
+            <element signature="e#75401#97287#0" expanded="false" />
+            <element signature="e#97342#130805#0" expanded="false" />
+            <element signature="e#130876#146950#0" expanded="false" />
+            <element signature="e#210674#213755#0" expanded="false" />
+            <marker date="1582902499023" expanded="false" signature="168803:188088" ph="..." />
+            <marker date="1582902499023" expanded="false" signature="188200:210621" ph="..." />
           </folding>
         </state>
       </provider>

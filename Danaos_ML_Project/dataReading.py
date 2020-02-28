@@ -9,16 +9,21 @@ from sklearn.cluster import KMeans
 from decimal import Decimal
 import random
 #from coordinates.converter import CoordinateConverter, WGS84, L_Est97
-#import pyodbc
+import pyodbc
 import csv
 import locale
 locale.setlocale(locale.LC_ALL, ""); print(locale.localeconv()["decimal_point"])
 #locale.setlocale(locale.LC_NUMERIC, "en_DK.UTF-8")
 import datetime
+import cx_Oracle
 from dateutil.rrule import rrule, DAILY, MINUTELY
 from sympy.solvers import solve
 from sympy import Symbol
+from pathlib import Path
 from sympy import cos, sin , tan , exp , sqrt , E
+from openpyxl import load_workbook
+
+#DANAOS_TELEGRAMS_SQL =SELECT  TELEGRAM_DATE , TELEGRAM_TYPE,BALAST_FLAG,LATITUDE_DEGREES , LATITUDE_SECONDS ,LONGITUDE_DEGREES , LONGITUDE_SECONDS ,vessel_course,(DRAFT_AFT + DRAFT_FORE)/2 as DRAFT , ENGINE_RPM , WIND_DIRECTION , WIND_FORCE  ,AVERAGE_SPEED ,hours_slc,minutes_slc, (( NVL(ME_HSFO_CONS,0)+ NVL(ME_LSFO_CONS,0)+ NVL(ME_HSDO_CONS,0 ) + NVL(ME_LSDO_CONS,0)))   as ME_CONS_24h  FROM TELEGRAMS where vessel_code ='486' AND TELEGRAM_TYPE='D' or telegram_type='N';
 
 class BaseSeriesReader:
 
@@ -207,7 +212,62 @@ class BaseSeriesReader:
 
         return (360 + windDir) % 360
 
-    def GenericParserForDataExtraction(self,systemType, company, vessel , fileType=None, granularity=None, fileName=None):
+    def GenericParserForDataExtraction(self,systemType, company, vessel ,driver=None,server=None,usr=None,password=None,telegrams=None ,fileType=None, granularity=None, fileName=None):
+
+        if systemType=='TELEGRAMS':
+
+            if driver=='ORACLE':
+                #cx_Oracle.connect('millenia@/10.2.5.80:1521/OR11')
+                my_file = Path('./data/'+company+'/TELEGRAMS/'+vessel+'.csv')
+                if my_file.is_file()==False:
+
+                    dsn = cx_Oracle.makedsn(
+                            server,
+                            '1521',
+                            service_name='OR11'
+                        )
+                    connection = cx_Oracle.connect(
+                            user=usr,
+                            password=password,
+                            dsn=dsn
+                        )
+
+
+                    cursor_myserver = connection.cursor()
+
+                    cursor_myserver.execute('SELECT VESSEL_CODE FROM VESSEL_DATA WHERE VESSEL_NAME =  '"'" + vessel + "'"'  ')
+                    for row in cursor_myserver.fetchall():
+                        vessel_code = row[0]
+                    cursor_myserver.execute(
+                        'SELECT  TELEGRAM_DATE , TELEGRAM_TYPE,BALAST_FLAG,LATITUDE_DEGREES , LATITUDE_SECONDS ,LONGITUDE_DEGREES , LONGITUDE_SECONDS ,vessel_course,(DRAFT_AFT + DRAFT_FORE)/2 as DRAFT , ENGINE_RPM , WIND_DIRECTION , WIND_FORCE  ,AVERAGE_SPEED ,hours_slc,minutes_slc, (( NVL(ME_HSFO_CONS,0)+ NVL(ME_LSFO_CONS,0)+ NVL(ME_HSDO_CONS,0 ) + NVL(ME_LSDO_CONS,0)))   as ME_CONS_24h  FROM TELEGRAMS where vessel_code = '"'" + vessel_code + "'" 'AND TELEGRAM_TYPE='"'D'" 'or telegram_type='"'N'"' ')
+
+                    with open('./data/'+company+'/TELEGRAMS/'+vessel+'.csv', mode='w') as data:
+                        data_writer = csv.writer(data, delimiter=';', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+                        data_writer.writerow(['TELEGRAM_DATE','TELEGRAM_TYPE','BALAST_FLAG','LATITUDE_DEGREES','LATITUDE_SECONDS','LONGITUDE_DEGREES','LONGITUDE_SECONDS','VESSEL_COURSE','DRAFT','ENGINE_RPM','WIND_DIRECTION','WIND_FORCE','AVERAGE_SPEED','HOURS_SLC','MINUTES_SLC','ME_CONS_24H'])
+
+                        for row in cursor_myserver.fetchall():
+                            telegram_date = str(row[0])
+                            telegram_type = row[1]
+                            ballast_flag = row[2]
+                            lat_deg = row[3]
+                            lat_sec = row[4]
+                            lon_deg = row[5]
+                            lon_sec = row[6]
+                            vessel_course = row[7]
+                            draft = row[8]
+                            rpm = row[9]
+                            wd = row[10]
+                            wf = row[11]
+                            speed = row[12]
+                            h_slc = row[13]
+                            m_slc = row[14]
+                            foc = row[15]
+
+                            data_writer.writerow(
+                                [telegram_date, telegram_type, ballast_flag, lat_deg, lat_sec, lon_deg, lon_sec, vessel_course, draft,rpm, wd, wf, speed, h_slc,m_slc,foc])
+
+                    x=0
+                self.readExtractNewDataset(company,vessel,'C:/Users/dkaklis/Desktop/template.xlsx',';')
         if systemType == 'LAROS':
 
             #self.readLarosDAta(0,0)
@@ -218,10 +278,11 @@ class BaseSeriesReader:
             #data = data.drop(['DateTime'], axis=1)
             dtNew =np.nan_to_num(data.values)#.astype(float)
 
-            tlg_data = pd.read_csv('./data/' + company + '/' +'noon_reports_'+ vessel + '.csv', sep=';', decimal='.')
+            if telegrams==True:
+                tlg_data = pd.read_csv('./data/' + company + '/' +'noon_reports_'+ vessel + '.csv', sep=';', decimal='.')
 
-            # data = data.drop(['DateTime'], axis=1)
-            tlg_dtNew = np.nan_to_num(tlg_data.values)  # .astype(float)
+                # data = data.drop(['DateTime'], axis=1)
+                tlg_dtNew = np.nan_to_num(tlg_data.values)  # .astype(float)
 
             ###CREATE TABLE  OF CURRENT VESSEL FOR COMPANY
             connection = pyodbc.connect('Driver={SQL Server};'
@@ -232,185 +293,187 @@ class BaseSeriesReader:
 
             cursor_myserver = connection.cursor()
 
-            if cursor_myserver.tables(table=vessel+'_TLG', tableType='TABLE').fetchone():
-                print("TABLE " + vessel+'_TLG' + " ON DATABASE " + str.lower(company) + " EXISTS! ")
-            else:
-                cursor_myserver.execute(
-                    'CREATE TABLE [dbo].[' + vessel+'_TLG' + ']('
-                    + '[id] [int] IDENTITY(1,1) NOT NULL,'
-                    + '[vdate] [date] NOT NULL,'
-                    + '[time_utc] [char](10) NULL,'
-                    + '[type] [char](10) NULL,'
-                    + '[actl_spd] [decimal](5, 2) NULL,'
-                    + '[avg_spd] [decimal](5, 2) NULL,'
-                    + '[slip] [decimal](5, 2) NULL,'
-                    + '[act_rpm] [decimal](5, 2) NULL,'
-                    + '[sail_time] [decimal](5, 2) NULL,'
-                    + '[weather_force] [int] NULL,'
-                    + '[weather_wind_tv] [char](10) NULL,'
-                    + '[sea_condition] [char](10) NULL,'
-                    + '[swell_dir] [char](10) NULL,'
-                    + '[swell_lvl] [char](10) NULL,'
-                    + '[current_dir] [char](10) NULL,'
-                    + '[current_speed] [decimal](5, 2) NULL,'
-                    + '[draft] [decimal](5, 2) NULL '
-                    + 'CONSTRAINT [PK_' + vessel+'_TLG' +'] PRIMARY KEY CLUSTERED '
-                    + '('
-                    + '     [id] ASC'
-                    + ')'
-                    + ')'
-                    )
-
-                   # + ') WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]'
-                    #+ ' ) ON [PRIMARY]')
-
-                connection.commit()
-
-            if cursor_myserver.tables(table=vessel, tableType='TABLE').fetchone():
-                print("TABLE " + vessel + " ON DATABASE " + str.lower(company) + " EXISTS! ")
-            else:
-                cursor_myserver.execute(
-                    'CREATE TABLE [dbo].[' + vessel + ']('
-                    + '[id] [int] IDENTITY(1,1) NOT NULL,'
-                    + '[lat] [decimal](9, 6) NOT NULL,'
-                    + '[lon] [decimal](9, 6) NOT NULL,'
-                    + '[t_stamp] [datetime] NULL,'
-                    + '[course] [decimal](5, 2) NULL,'
-                    + '[stw] [decimal](5, 2) NULL,'
-                    + '[s_ovg] [decimal](5, 2) NULL,'
-                    + '[me_foc] [decimal](5, 2) NULL,'
-                    + '[rpm] [decimal](5, 2) NULL,'
-                    + '[power] [int] NULL,'
-                    + '[draft] [decimal](5, 2) NULL,'
-                    + '[trim] [decimal](5, 2) NULL,'
-                    + '[at_port] [int] NULL,'
-                    + '[daysFromLastPropClean] [int] NULL,'
-                    + '[daysFromLastDryDock] [int] NULL,'
-                    + '[sensor_wind_speed] [decimal](5, 2) NULL,'
-                    + '[sensor_wind_dir] [decimal](5, 2) NULL,'
-                    + '[wind_speed] [decimal](5, 2) NULL,'
-                    + '[wind_dir] [decimal](5, 2) NULL,'
-                    + '[curr_speed] [decimal](5, 2) NULL,'
-                    + '[curr_dir] [decimal](5, 2) NULL,'
-                    + '[comb_waves_height] [decimal](5, 2) NULL,'
-                    + '[comb_waves_dir] [decimal](5, 2) NULL,'
-                    + '[swell_height] [decimal](5, 2) NULL,'
-                    + '[swell_dir] [decimal](5, 2) NULL,'
-                    + '[wind_waves_height] [decimal](5, 2) NULL,'
-                    + '[wind_waves_dir] [decimal](5, 2) NULL '
-                    + 'CONSTRAINT [PK_' + vessel + '] PRIMARY KEY CLUSTERED '
-                    + '('
-                    + '     [id] ASC'
-                    + ')'
-                    + ')'
-                    )
-
-                   # + ') WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]'
-                    #+ ' ) ON [PRIMARY]')
-
-                connection.commit()
-
-            ### INSERT TLG DATA ON TLG TABLE
-            vdate = 0
-            time_utc = 0
-            actl_speed = 0
-            avg_speed = 0
-            slip = 0
-            act_rpm = 0
-            sail_time = 0
-            weather_force = 0
-            weather_wind_tv = 0
-            sea_condition = 0
-            swell_dir = 0
-            swell_lvl = 0
-            current_lvl = 0
-            current_speed = 0
-            ##############################################
-            for i in range(0, len(tlg_dtNew)):
-                values = np.nan_to_num(np.array(tlg_dtNew[i, :15]))
-                vdate = values[1]
-                time_utc =  values[2]
-                hours = str(time_utc).split(":")[0]
-                minutes = str(time_utc).split(":")[1]
-                actl_speed = values[3]
-                avg_speed = values[4]
-                slip = values[5]
-                act_rpm = values[6]
-                sail_time = values[7]
-                weather_force = values[8]
-                weather_wind_tv = values[9]
-                sea_condition = values[10]
-                swell_dir = values[11]
-                swell_lvl = values[12]
-                current_dir = values[13]
-                current_speed = values[14]
-
-                swell_lvl= 'n/a' if str(swell_lvl) == 'nan' else str(swell_lvl)
-                try:
-                    slip = str(slip).split(',')[0]+"."+str(slip).split(',')[1] if str(slip).split(',').__len__()>0 and str(slip) !='nan' else slip
-                except Exception as e:
-                    print(str(e))
-
-                datetime1 = vdate+" "+time_utc
-                datetime2=datetime.datetime.strptime(datetime1, '%d/%m/%y %H:%M') - datetime.timedelta(hours=float(sail_time), minutes=float(0))
-                datetime2 = str(datetime2)
-
-                date = vdate
-                month = date.split('/')[1]
-                day = date.split('/')[0]
-                year = '20'+date.split('/')[2]
-
-                vdate = month+'/'+day+'/'+year
-
-                hhMMss = time_utc
-                newDate = year + "-" + month + "-" + day + " " + ":".join(hhMMss.split(":")[0:2])
-                datetime1 = datetime.datetime.strptime(newDate, '%Y-%m-%d %H:%M')
-                datetime1=str(datetime1)
-                try:
+            if telegrams == True:
+                if cursor_myserver.tables(table=vessel+'_TLG', tableType='TABLE').fetchone():
+                    print("TABLE " + vessel+'_TLG' + " ON DATABASE " + str.lower(company) + " EXISTS! ")
+                else:
                     cursor_myserver.execute(
-                        "insert into [dbo].[" + vessel + '_TLG' + "](vdate, time_utc , type ,actl_spd  , avg_spd , slip , act_rpm , sail_time , weather_force , weather_wind_tv , sea_condition , swell_dir,"
-                        + "swell_lvl    , current_dir , current_speed , draft ) "
-                        + "values ("
-                        + "'" + str(vdate) + "', "
-                        + "'" + str(time_utc) + "', "
-                        + "'" + 'N' + "', "
-                        + str(np.nan_to_num(actl_speed)) + ", "
-                        + str(np.nan_to_num(avg_speed)) + ", "
-                        + str(np.nan_to_num(float(slip))) + ", "
-                        + str(np.nan_to_num(act_rpm)) + " , "
-                        + str(sail_time) + " , "
-                        + str(np.nan_to_num(weather_force)) + " , "
-                        + "'" + weather_wind_tv + "', "
-                        + "'" + sea_condition + "', "
-                        + "'" + swell_dir + "', "
-                        + "'" + str(swell_lvl) + "', "
-                        + "'" + str(current_dir) + "', "
-                        + str(np.nan_to_num(current_speed)) + ", "
-                        + str(0) + " )")
+                        'CREATE TABLE [dbo].[' + vessel+'_TLG' + ']('
+                        + '[id] [int] IDENTITY(1,1) NOT NULL,'
+                        + '[vdate] [date] NOT NULL,'
+                        + '[time_utc] [char](10) NULL,'
+                        + '[type] [char](10) NULL,'
+                        + '[actl_spd] [decimal](5, 2) NULL,'
+                        + '[avg_spd] [decimal](5, 2) NULL,'
+                        + '[slip] [decimal](5, 2) NULL,'
+                        + '[act_rpm] [decimal](5, 2) NULL,'
+                        + '[sail_time] [decimal](5, 2) NULL,'
+                        + '[weather_force] [int] NULL,'
+                        + '[weather_wind_tv] [char](10) NULL,'
+                        + '[sea_condition] [char](10) NULL,'
+                        + '[swell_dir] [char](10) NULL,'
+                        + '[swell_lvl] [char](10) NULL,'
+                        + '[current_dir] [char](10) NULL,'
+                        + '[current_speed] [decimal](5, 2) NULL,'
+                        + '[draft] [decimal](5, 2) NULL '
+                        + 'CONSTRAINT [PK_' + vessel+'_TLG' +'] PRIMARY KEY CLUSTERED '
+                        + '('
+                        + '     [id] ASC'
+                        + ')'
+                        + ')'
+                        )
+
+                       # + ') WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]'
+                        #+ ' ) ON [PRIMARY]')
 
                     connection.commit()
 
-                except Exception as e:
-                    print(str(e))
+                if cursor_myserver.tables(table=vessel, tableType='TABLE').fetchone():
+                    print("TABLE " + vessel + " ON DATABASE " + str.lower(company) + " EXISTS! ")
+                else:
+                    cursor_myserver.execute(
+                        'CREATE TABLE [dbo].[' + vessel + ']('
+                        + '[id] [int] IDENTITY(1,1) NOT NULL,'
+                        + '[lat] [decimal](9, 6) NOT NULL,'
+                        + '[lon] [decimal](9, 6) NOT NULL,'
+                        + '[t_stamp] [datetime] NULL,'
+                        + '[course] [decimal](5, 2) NULL,'
+                        + '[stw] [decimal](5, 2) NULL,'
+                        + '[s_ovg] [decimal](5, 2) NULL,'
+                        + '[me_foc] [decimal](5, 2) NULL,'
+                        + '[rpm] [decimal](5, 2) NULL,'
+                        + '[power] [int] NULL,'
+                        + '[draft] [decimal](5, 2) NULL,'
+                        + '[trim] [decimal](5, 2) NULL,'
+                        + '[at_port] [int] NULL,'
+                        + '[daysFromLastPropClean] [int] NULL,'
+                        + '[daysFromLastDryDock] [int] NULL,'
+                        + '[sensor_wind_speed] [decimal](5, 2) NULL,'
+                        + '[sensor_wind_dir] [decimal](5, 2) NULL,'
+                        + '[wind_speed] [decimal](5, 2) NULL,'
+                        + '[wind_dir] [decimal](5, 2) NULL,'
+                        + '[curr_speed] [decimal](5, 2) NULL,'
+                        + '[curr_dir] [decimal](5, 2) NULL,'
+                        + '[comb_waves_height] [decimal](5, 2) NULL,'
+                        + '[comb_waves_dir] [decimal](5, 2) NULL,'
+                        + '[swell_height] [decimal](5, 2) NULL,'
+                        + '[swell_dir] [decimal](5, 2) NULL,'
+                        + '[wind_waves_height] [decimal](5, 2) NULL,'
+                        + '[wind_waves_dir] [decimal](5, 2) NULL '
+                        + 'CONSTRAINT [PK_' + vessel + '] PRIMARY KEY CLUSTERED '
+                        + '('
+                        + '     [id] ASC'
+                        + ')'
+                        + ')'
+                        )
+
+                       # + ') WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]'
+                        #+ ' ) ON [PRIMARY]')
+
+                    connection.commit()
+
+                ### INSERT TLG DATA ON TLG TABLE
+                vdate = 0
+                time_utc = 0
+                actl_speed = 0
+                avg_speed = 0
+                slip = 0
+                act_rpm = 0
+                sail_time = 0
+                weather_force = 0
+                weather_wind_tv = 0
+                sea_condition = 0
+                swell_dir = 0
+                swell_lvl = 0
+                current_lvl = 0
+                current_speed = 0
+                ##############################################
+                for i in range(0, len(tlg_dtNew)):
+                    values = np.nan_to_num(np.array(tlg_dtNew[i, :15]))
+                    vdate = values[1]
+                    time_utc =  values[2]
+                    hours = str(time_utc).split(":")[0]
+                    minutes = str(time_utc).split(":")[1]
+                    actl_speed = values[3]
+                    avg_speed = values[4]
+                    slip = values[5]
+                    act_rpm = values[6]
+                    sail_time = values[7]
+                    weather_force = values[8]
+                    weather_wind_tv = values[9]
+                    sea_condition = values[10]
+                    swell_dir = values[11]
+                    swell_lvl = values[12]
+                    current_dir = values[13]
+                    current_speed = values[14]
+
+                    swell_lvl= 'n/a' if str(swell_lvl) == 'nan' else str(swell_lvl)
+                    try:
+                        slip = str(slip).split(',')[0]+"."+str(slip).split(',')[1] if str(slip).split(',').__len__()>0 and str(slip) !='nan' else slip
+                    except Exception as e:
+                        print(str(e))
+
+                    datetime1 = vdate+" "+time_utc
+                    datetime2=datetime.datetime.strptime(datetime1, '%d/%m/%y %H:%M') - datetime.timedelta(hours=float(sail_time), minutes=float(0))
+                    datetime2 = str(datetime2)
+
+                    date = vdate
+                    month = date.split('/')[1]
+                    day = date.split('/')[0]
+                    year = '20'+date.split('/')[2]
+
+                    vdate = month+'/'+day+'/'+year
+
+                    hhMMss = time_utc
+                    newDate = year + "-" + month + "-" + day + " " + ":".join(hhMMss.split(":")[0:2])
+                    datetime1 = datetime.datetime.strptime(newDate, '%Y-%m-%d %H:%M')
+                    datetime1=str(datetime1)
+                    try:
+                        cursor_myserver.execute(
+                            "insert into [dbo].[" + vessel + '_TLG' + "](vdate, time_utc , type ,actl_spd  , avg_spd , slip , act_rpm , sail_time , weather_force , weather_wind_tv , sea_condition , swell_dir,"
+                            + "swell_lvl    , current_dir , current_speed , draft ) "
+                            + "values ("
+                            + "'" + str(vdate) + "', "
+                            + "'" + str(time_utc) + "', "
+                            + "'" + 'N' + "', "
+                            + str(np.nan_to_num(actl_speed)) + ", "
+                            + str(np.nan_to_num(avg_speed)) + ", "
+                            + str(np.nan_to_num(float(slip))) + ", "
+                            + str(np.nan_to_num(act_rpm)) + " , "
+                            + str(sail_time) + " , "
+                            + str(np.nan_to_num(weather_force)) + " , "
+                            + "'" + weather_wind_tv + "', "
+                            + "'" + sea_condition + "', "
+                            + "'" + swell_dir + "', "
+                            + "'" + str(swell_lvl) + "', "
+                            + "'" + str(current_dir) + "', "
+                            + str(np.nan_to_num(current_speed)) + ", "
+                            + str(0) + " )")
+
+                        connection.commit()
+
+                    except Exception as e:
+                        print(str(e))
+
+                    cursor_myserver.execute(
+                        'SELECT id from ' + vessel + '_TLG' + ' WHERE vdate =' "'" + vdate + "'" + ' AND time_utc =' "'" + time_utc + "'")
+                    for row in cursor_myserver.fetchall():
+                        val_id = row.id
+                    cursor_myserver.execute(
+                        'UPDATE ' + vessel + ' SET tlg_id=' + str(val_id) + ' WHERE t_stamp > '"'" + datetime2 + "'" ' AND t_stamp < ' "'" + datetime1 + "'")
+
+                    connection.commit()
+                #####END OF INSERTION ON TLG TABLE
+
+                ####START OF INSERTION AT VESSEL TABLE ==> SENSOR DATA PLUS WEATHER HISTORIC DATA INSERTION
+                #813602
+                cursor_myserver.execute(
+                    'UPDATE ' + vessel + ' SET at_port=1 WHERE tlg_id IS NULL')
 
                 cursor_myserver.execute(
-                    'SELECT id from ' + vessel + '_TLG' + ' WHERE vdate =' "'" + vdate + "'" + ' AND time_utc =' "'" + time_utc + "'")
-                for row in cursor_myserver.fetchall():
-                    val_id = row.id
-                cursor_myserver.execute(
-                    'UPDATE ' + vessel + ' SET tlg_id=' + str(val_id) + ' WHERE t_stamp > '"'" + datetime2 + "'" ' AND t_stamp < ' "'" + datetime1 + "'")
-
+                    'UPDATE ' + vessel + ' SET at_port=0 WHERE tlg_id IS NOT NULL')
                 connection.commit()
-            #####END OF INSERTION ON TLG TABLE
-
-            ####START OF INSERTION AT VESSEL TABLE ==> SENSOR DATA PLUS WEATHER HISTORIC DATA INSERTION
-            #813602
-            cursor_myserver.execute(
-                'UPDATE ' + vessel + ' SET at_port=1 WHERE tlg_id IS NULL')
-
-            cursor_myserver.execute(
-                'UPDATE ' + vessel + ' SET at_port=0 WHERE tlg_id IS NOT NULL')
-            connection.commit()
+            ####END TELEGRAMS INSERTION IF AVAILABEL
 
             for i in range(0,len(dtNew)):
 
@@ -713,75 +776,709 @@ class BaseSeriesReader:
 
                         print("TABLE "'WeatherHistoryDB.dbo.d' + dbDate + " ON DATABASE WeatherHistoryDB DOES NOT EXISTS...INSERTING FIELDS FROM SENSORS.. ")
 
+    def fillExcelProfCons(self,vessel,pathToexcel,dataSet):
+        ##FEATURE SET EXACT POSITION OF COLUMNS NEEDED IN ORDER TO PRODUCE EXCEL
+        #2nd place BALLAST FLAG
+        #8th place DRAFT
+        #10th place WF
+        #11th place WD
+        #12th place SPEED
+        #15th place ME FOC 24H
+        ########################################################################
+        dtNew = dataSet
+        draft = (np.array((np.array([k for k in dtNew if float(k[8]) > 5 and float(k[8]) < 20])[:, 8])).astype(float))
+        velocities = (
+        np.array((np.array([k for k in dtNew if float(k[12]) > 5 and float(k[12]) < 18])[:, 12])).astype(float))
 
-    def readExtractNewDataset(self, company,vessel,separator=None):
+        dataModel = KMeans(n_clusters=4)
+        velocities = velocities.reshape(-1, 1)
+        dataModel.fit(velocities)
+        # Extract centroid values
+        centroids = dataModel.cluster_centers_
+        velocitiesSorted = np.sort(centroids, axis=0)
+        ################################################################################################
+        ballastDt = np.array([k for k in dtNew if k[2] == 'B'])[:, 7:].astype(float)
+        ladenDt = np.array([k for k in dtNew if k[2] == 'L'])[:, 7:].astype(float)
+
+        velocitiesB = np.array([k for k in ballastDt if k[5] > 6 and k[5] < 16])[:, 5]
+
+        dataModel = KMeans(n_clusters=4)
+        velocitiesB = velocitiesB.reshape(-1, 1)
+        dataModel.fit(velocitiesB)
+        labels = dataModel.predict(velocitiesB)
+        # Extract centroid values
+
+        centroidsB = dataModel.cluster_centers_
+        centroidsB = np.sort(centroidsB, axis=0)
+        ##LOAD EXCEL
+        workbook = load_workbook(filename=pathToexcel)
+
+        ####VESSEL BASIC INFO
+        workbook._sheets[2]['B6'] = round(centroidsB[0][0], 2)
+        workbook._sheets[2]['B16'] = round(centroidsB[1][0], 2)
+        workbook._sheets[2]['B26'] = round(centroidsB[2][0], 2)
+        workbook._sheets[2]['B36'] = round(centroidsB[3][0], 2)
+
+        workbook._sheets[0]['B2'] = vessel
+        workbook._sheets[0]['B5'] = round(velocitiesSorted[3][0], 1)
+        workbook._sheets[0]['B7'] = np.min(draft)
+        workbook._sheets[0]['B8'] = np.max(draft)
+        ##END OF VESSEL BASIC INFO
+
+        wind = [0, 22.5, 67.5, 112.5, 157.5, 180]
+
+        ###SEA STATE
+        ballastMaxSeaSate = []
+        for i in range(0, len(wind) - 1):
+            arrayWF = np.array(
+                [k for k in ballastDt if k[3] >= wind[i] and k[3] <= wind[i + 1] and k[4] <= 9 and k[8] > 0])
+            maxSS = np.max(arrayWF[:, 4]) if arrayWF.__len__() > 0 else 0
+            ballastMaxSeaSate.append(round(maxSS, 2))
+
+        for i in range(3, 8):
+            workbook._sheets[3]['B' + str(i)] = ballastMaxSeaSate[i - 3]
+        ####################################################
+        laddenMaxSeaSate = []
+        for i in range(0, len(wind) - 1):
+            arrayWF = np.array(
+                [k for k in ladenDt if k[3] >= wind[i] and k[3] <= wind[i + 1] and k[4] <= 9 and k[8] > 0])
+            maxSS = np.max(arrayWF[:, 4]) if arrayWF.__len__() > 0 else 0
+            laddenMaxSeaSate.append(round(maxSS, 2))
+
+        for i in range(12, 17):
+            workbook._sheets[3]['B' + str(i)] = laddenMaxSeaSate[i - 12]
+        ###############################
+        ##end of sea state
+        ###
+        meanDraftBallast = round(float(np.mean(np.array([k for k in ballastDt if k[1] >= 0])[:, 1])), 2)
+        workbook._sheets[2]['B2'] = meanDraftBallast
+        meanDraftLadden = round(float(np.mean(np.array([k for k in ladenDt if k[1] >= 0])[:, 1])), 2)
+        workbook._sheets[1]['B2'] = meanDraftLadden
+        #############################################################################
+        ##BALLAST
+        ###SPEED 10 WIND <1.5
+        ballastDt10_0 = []
+        for i in range(0, len(wind) - 1):
+            arrayFoc = np.array([k for k in ballastDt if
+                                 k[4] >= 0 and k[4] <= 1.5 and k[5] >= 9 and k[5] <= 10 and k[3] >= wind[i] and k[
+                                     3] <= wind[i + 1] and k[
+                                     8] > 0])
+            meanFoc = np.mean(arrayFoc[:, 8]) if arrayFoc.__len__() > 0 else 0
+            ballastDt10_0.append(round(meanFoc, 2))
+
+
+
+        for i in range(9, 14):
+            workbook._sheets[2]['B' + str(i)] = ballastDt10_0[i - 9]
+
+        ###SPEED 10  2 < WIND <3
+        ballastDt10_3 = []
+        for i in range(0, len(wind) - 1):
+            arrayFoc = np.array([k for k in ballastDt if
+                                 k[4] >= 2 and k[4] <= 3 and k[5] >= 9 and k[5] <= 10 and k[3] >= wind[i] and
+                                 k[
+                                     3] <= wind[i + 1] and k[
+                                     8] > 0])
+            meanFoc = np.mean(arrayFoc[:, 8]) if arrayFoc.__len__() > 0 else 0
+            ballastDt10_3.append(round(meanFoc, 2))
+
+        for i in range(9, 14):
+            workbook._sheets[2]['C' + str(i)] = ballastDt10_3[i - 9]
+
+        ###SPEED 10  4 < WIND <5
+        ballastDt10_5 = []
+        for i in range(0, len(wind) - 1):
+            arrayFoc = np.array([k for k in ballastDt if
+                                 k[4] >= 4 and k[4] <= 5 and k[5] >= 9 and k[5] <= 10 and k[3] >= wind[i] and
+                                 k[
+                                     3] <= wind[i + 1] and k[
+                                     8] > 0])
+            meanFoc = np.mean(arrayFoc[:, 8]) if arrayFoc.__len__() > 0 else 0
+            ballastDt10_5.append(round(meanFoc, 2))
+
+        for i in range(9, 14):
+            workbook._sheets[2]['D' + str(i)] = ballastDt10_5[i - 9]
+
+        ###SPEED 10  7 < WIND <8
+        ballastDt10_8 = []
+        for i in range(0, len(wind) - 1):
+            arrayFoc = np.array([k for k in ballastDt if
+                                 k[4] >= 7 and k[4] <= 8 and k[5] >= 9 and k[5] <= 10 and k[3] >= wind[i] and
+                                 k[
+                                     3] <= wind[i + 1] and k[
+                                     8] > 0])
+            meanFoc = np.mean(arrayFoc[:, 8]) if arrayFoc.__len__() > 0 else 0
+            ballastDt10_8.append(round(meanFoc, 2))
+
+        for i in range(9, 14):
+            workbook._sheets[2]['E' + str(i)] = ballastDt10_8[i - 9]
+
+        ##################################################################################################################
+        ##################################################################################################################
+
+        ###SPEED 11.5   WIND <1.5
+        ballastDt11_0 = []
+        for i in range(0, len(wind) - 1):
+            arrayFoc = np.array([k for k in ballastDt if
+                                 k[4] >= 0 and k[4] <= 1.5 and k[5] > 10 and k[5] <= 11.5 and k[3] >= wind[
+                                     i] and k[
+                                     3] <= wind[i + 1] and k[
+                                     8] > 0])
+            meanFoc = np.mean(arrayFoc[:, 8]) if arrayFoc.__len__() > 0 else 0
+            ballastDt11_0.append(round(meanFoc, 2))
+
+        for i in range(19, 24):
+            workbook._sheets[2]['B' + str(i)] = ballastDt11_0[i - 19]
+
+        ###SPEED 11.5  2 < WIND <3
+        ballastDt11_3 = []
+        for i in range(0, len(wind) - 1):
+            arrayFoc = np.array([k for k in ballastDt if
+                                 k[4] >= 2 and k[4] <= 3 and k[5] > 10 and k[5] <= 11.5 and k[3] >= wind[i] and k[
+                                     3] <= wind[i + 1] and k[
+                                     8] > 0])
+            meanFoc = np.mean(arrayFoc[:, 8]) if arrayFoc.__len__() > 0 else 0
+            ballastDt11_3.append(round(meanFoc, 2))
+
+        for i in range(19, 24):
+            workbook._sheets[2]['C' + str(i)] = ballastDt11_3[i - 19]
+
+        ###SPEED 11.5  4 < WIND <5
+        ballastDt11_5 = []
+        for i in range(0, len(wind) - 1):
+            arrayFoc = np.array([k for k in ballastDt if
+                                 k[4] >= 4 and k[4] <= 5 and k[5] > 10 and k[5] <= 11.5 and k[3] >= wind[i] and k[
+                                     3] <= wind[i + 1] and k[
+                                     8] > 0])
+            meanFoc = np.mean(arrayFoc[:, 8]) if arrayFoc.__len__() > 0 else 0
+            ballastDt11_5.append(round(meanFoc, 2))
+
+        for i in range(19, 24):
+            workbook._sheets[2]['D' + str(i)] = ballastDt11_5[i - 19]
+
+            ###SPEED 11.5  7 < WIND <8
+        ballastDt11_8 = []
+        for i in range(0, len(wind) - 1):
+            arrayFoc = np.array([k for k in ballastDt if
+                                 k[4] >= 7 and k[4] <= 8 and k[5] > 10 and k[5] <= 11.5 and k[3] >= wind[i] and k[
+                                     3] <= wind[i + 1] and k[
+                                     8] > 0])
+            meanFoc = np.mean(arrayFoc[:, 8]) if arrayFoc.__len__() > 0 else 0
+            ballastDt11_8.append(round(meanFoc, 2))
+
+        for i in range(19, 24):
+            workbook._sheets[2]['E' + str(i)] = ballastDt11_8[i - 19]
+
+        #################################
+
+        ###SPEED 12.5 WIND <1.5
+        ballastDt12_0 = []
+        for i in range(0, len(wind) - 1):
+            arrayFoc = np.array([k for k in ballastDt if
+                                 k[4] >= 0 and k[4] <= 1.5 and k[5] > 11.5 and k[5] <= 12.7 and k[3] >= wind[
+                                     i] and
+                                 k[
+                                     3] <= wind[i + 1] and k[
+                                     8] > 0])
+            meanFoc = np.mean(arrayFoc[:, 8]) if arrayFoc.__len__() > 0 else 0
+            ballastDt12_0.append(round(meanFoc, 2))
+
+        for i in range(29, 34):
+            workbook._sheets[2]['B' + str(i)] = ballastDt12_0[i - 29]
+
+            ###SPEED 11.5  2 < WIND <3
+        ballastDt12_3 = []
+        for i in range(0, len(wind) - 1):
+            arrayFoc = np.array([k for k in ballastDt if
+                                 k[4] >= 2 and k[4] <= 3 and k[5] > 11.5 and k[5] <= 12.7 and k[3] >= wind[
+                                     i] and k[
+                                     3] <= wind[i + 1] and k[
+                                     8] > 0])
+            meanFoc = np.mean(arrayFoc[:, 8]) if arrayFoc.__len__() > 0 else 0
+            ballastDt12_3.append(round(meanFoc, 2))
+
+        for i in range(29, 34):
+            workbook._sheets[2]['C' + str(i)] = ballastDt12_3[i - 29]
+
+        ###SPEED 11.5  4 < WIND <5
+        ballastDt12_5 = []
+        for i in range(0, len(wind) - 1):
+            arrayFoc = np.array([k for k in ballastDt if
+                                 k[4] >= 4 and k[4] <= 5 and k[5] > 11.5 and k[5] <= 12.7 and k[3] >= wind[
+                                     i] and k[
+                                     3] <= wind[i + 1] and k[
+                                     8] > 0])
+            meanFoc = np.mean(arrayFoc[:, 8]) if arrayFoc.__len__() > 0 else 0
+            ballastDt12_5.append(round(meanFoc, 2))
+
+        for i in range(29, 34):
+            workbook._sheets[2]['D' + str(i)] = ballastDt12_5[i - 29]
+
+        ###SPEED 11.5  7 < WIND <8
+        ballastDt12_8 = []
+        for i in range(0, len(wind) - 1):
+            arrayFoc = np.array([k for k in ballastDt if
+                                 k[4] >= 7 and k[4] <= 8 and k[5] > 11.5 and k[5] <= 12.7 and k[3] >= wind[
+                                     i] and k[
+                                     3] <= wind[i + 1] and k[
+                                     8] > 0])
+            meanFoc = np.mean(arrayFoc[:, 8]) if arrayFoc.__len__() > 0 else 0
+            ballastDt12_8.append(round(meanFoc, 2))
+
+        for i in range(29, 34):
+            workbook._sheets[2]['E' + str(i)] = ballastDt12_5[i - 29]
+
+        #################################
+
+        ###SPEED 13.5 WIND <1.5
+        ballastDt13_0 = []
+        for i in range(0, len(wind) - 1):
+            arrayFoc = np.array([k for k in ballastDt if
+                                 k[4] >= 0 and k[4] <= 1.5 and k[5] > 13 and k[5] <= 14 and k[3] >=
+                                 wind[
+                                     i] and
+                                 k[
+                                     3] <= wind[i + 1] and k[
+                                     8] > 0])
+            meanFoc = np.mean(arrayFoc[:, 8]) if arrayFoc.__len__() > 0 else 0
+            ballastDt13_0.append(round(meanFoc, 2))
+
+        for i in range(39, 44):
+            workbook._sheets[2]['B' + str(i)] = ballastDt13_0[i - 39]
+
+        ###SPEED 13.5  2 < WIND <3
+        ballastDt13_3 = []
+        for i in range(0, len(wind) - 1):
+            arrayFoc = np.array([k for k in ballastDt if
+                                 k[4] >= 2 and k[4] <= 3 and k[5] > 13 and k[5] <= 14 and k[3] >= wind[
+                                     i] and k[
+                                     3] <= wind[i + 1] and k[
+                                     8] > 0])
+            meanFoc = np.mean(arrayFoc[:, 8]) if arrayFoc.__len__() > 0 else 0
+            ballastDt13_3.append(round(meanFoc, 2))
+
+        for i in range(39, 44):
+            workbook._sheets[2]['C' + str(i)] = ballastDt13_3[i - 39]
+
+        ###SPEED 13.5  4 < WIND <5
+        ballastDt13_5 = []
+        for i in range(0, len(wind) - 1):
+            arrayFoc = np.array([k for k in ballastDt if
+                                 k[4] >= 4 and k[4] <= 5 and k[5] > 13 and k[5] <= 14 and k[3] >= wind[
+                                     i] and k[
+                                     3] <= wind[i + 1] and k[
+                                     8] > 0])
+            meanFoc = np.mean(arrayFoc[:, 8]) if arrayFoc.__len__() > 0 else 0
+            ballastDt13_5.append(round(meanFoc, 2))
+
+        for i in range(39, 44):
+            workbook._sheets[2]['D' + str(i)] = ballastDt13_5[i - 39]
+
+        ###SPEED 13.5  7 < WIND <8
+        ballastDt13_8 = []
+        for i in range(0, len(wind) - 1):
+            arrayFoc = np.array([k for k in ballastDt if
+                                 k[4] >= 7 and k[4] <= 8 and k[5] > 13 and k[5] <= 14 and k[3] >= wind[
+                                     i] and k[
+                                     3] <= wind[i + 1] and k[
+                                     8] > 0])
+            meanFoc = np.mean(arrayFoc[:, 8]) if arrayFoc.__len__() > 0 else 0
+            ballastDt13_8.append(round(meanFoc, 2))
+
+        for i in range(39, 44):
+            workbook._sheets[2]['E' + str(i)] = ballastDt13_8[i - 39]
+
+        ####END OF BALLAST #############################################################
+        ####END OF BALLAST #############################################################
+        ####END OF BALLAST #############################################################
+        ##TREAT outliers / missing values for ballast values
+        values = [k for k in ballastDt10_0 if k != 0]
+        for i in range(0, len(ballastDt10_0)):
+            if ballastDt10_0[i] < np.mean(values) - np.std(values) or ballastDt10_0[i] > np.mean(values) + np.std(
+                    values):
+                ballastDt10_0[i] = 0
+
+        values = [k for k in ballastDt10_3 if k != 0]
+        for i in range(0, len(ballastDt10_3)):
+            if ballastDt10_3[i]< np.mean(values) - np.std(values) or ballastDt10_3[i] > np.mean(values) + np.std(values):
+                ballastDt10_3[i]=0
+
+        values = [k for k in ballastDt10_5 if k != 0]
+        for i in range(0, len(ballastDt10_5)):
+            if ballastDt10_5[i]< np.mean(values) - np.std(values) or ballastDt10_5[i] > np.mean(values) + np.std(values):
+                ballastDt10_5[i]=0
+
+        values = [k for k in ballastDt10_8 if k != 0]
+        for i in range(0, len(ballastDt10_8)):
+            if ballastDt10_8[i] < np.mean(values) - np.std(values) or ballastDt10_8[i] > np.mean(values) + np.std(
+                    values):
+                ballastDt10_8[i] = 0
+
+        values = [k for k in ballastDt10_0 if k != 0]
+        length = values.__len__()
+        for i in range(0, len(ballastDt10_0)):
+            if ballastDt10_0[i] == 0:
+                ##find items !=0
+
+                ballastDt10_0[i] = np.sum(values) / length
+            if ballastDt10_0[i] > ballastDt11_0[i] and ballastDt11_0[i] > 0:
+                    while ballastDt10_0[i] > ballastDt11_0[i] :
+                        ballastDt10_0[i] = ballastDt10_0[i] - 0.1 * ballastDt10_0[i]
+            if ballastDt10_0[i] > ballastDt10_3[i] and ballastDt10_3[i] > 0:
+                    while ballastDt10_0[i] > ballastDt10_3[i] :
+                        ballastDt10_0[i] = ballastDt10_0[i] - 0.1 * ballastDt10_0[i]
+
+        for i in range(9, 14):
+                workbook._sheets[2]['B' + str(i)] = ballastDt10_0[i - 9]
+
+        ##TREAT outliers / missing values for ballast values
+        for i in range(0, len(ballastDt10_3)):
+            if ballastDt10_3[i] == 0:
+                ##find items !=0
+                values = [k for k in ballastDt10_3 if k != 0]
+                length = values.__len__()
+                ballastDt10_3[i] = np.sum(values) / length
+            if ballastDt10_3[i] > ballastDt11_3[i] and ballastDt11_3[i] > 0:
+                    while ballastDt10_3[i] > ballastDt11_3[i]:
+                        ballastDt10_3[i] = ballastDt10_3[i] - 0.1 * ballastDt10_3[i]
+            if ballastDt10_3[i] > ballastDt10_5[i] and ballastDt10_5[i] > 0:
+                    while ballastDt10_3[i] > ballastDt10_5[i]:
+                        ballastDt10_3[i] = ballastDt10_3[i] - 0.1 * ballastDt10_3[i]
+
+        for i in range(9, 14):
+            workbook._sheets[2]['C' + str(i)] = ballastDt10_3[i - 9]
+
+        ##TREAT outliers / missing values for ballast values
+        values = [k for k in ballastDt10_5 if k != 0]
+        length = values.__len__()
+        for i in range(0, len(ballastDt10_5)):
+                if ballastDt10_5[i] == 0:
+                    ##find items !=0
+                    ballastDt10_5[i] = np.sum(values) / length
+                if ballastDt10_5[i] > ballastDt11_5[i] and ballastDt11_5[i] > 0:
+                    while ballastDt10_5[i] > ballastDt11_5[i]:
+                        ballastDt10_5[i] = ballastDt10_5[i] - 0.1 * ballastDt10_5[i]
+                if ballastDt10_5[i] > ballastDt10_8[i] and ballastDt10_8[i] > 0:
+                    while ballastDt10_5[i] > ballastDt10_8[i]:
+                        ballastDt10_5[i] = ballastDt10_5[i] - 0.1 * ballastDt10_5[i]
+
+        for i in range(9, 14):
+                workbook._sheets[2]['D' + str(i)] = ballastDt10_5[i - 9]
+
+
+        ##TREAT outliers / missing values for ballast values
+        values = [k for k in ballastDt10_8 if k != 0]
+        length = values.__len__()
+        for i in range(0, len(ballastDt10_8)):
+            if ballastDt10_8[i] == 0:
+                ##find items !=0
+                ballastDt10_8[i] = np.sum(values) / length
+            if ballastDt10_8[i] > ballastDt11_8[i] and ballastDt11_8[i] > 0:
+                while ballastDt10_8[i] > ballastDt11_8[i]:
+                    ballastDt10_8[i] = ballastDt10_8[i] - 0.1 * ballastDt10_8[i]
+
+        for i in range(9, 14):
+            workbook._sheets[2]['E' + str(i)] = ballastDt10_8[i - 9]
+
+
+        ###START OF LADDEN
+
+        ####################################################################################################
+        ####################################################################################################
+        ####################################################################################################
+        ####################################################################################################
+        velocities = np.array([k for k in ladenDt if k[5] > 6 and k[5] < 16])[:, 5]
+        dataModel = KMeans(n_clusters=4)
+        velocities = velocities.reshape(-1, 1)
+        dataModel.fit(velocities)
+        labels = dataModel.predict(velocities)
+        # Extract centroid values
+
+        centroidsL = dataModel.cluster_centers_
+        centroidsL = np.sort(centroidsL, axis=0)
+
+        workbook._sheets[1]['B6'] = round(centroidsL[0][0], 2)
+        workbook._sheets[1]['B16'] = round(centroidsL[1][0], 2)
+        workbook._sheets[1]['B26'] = round(centroidsL[2][0], 2)
+        workbook._sheets[1]['B36'] = round(centroidsL[3][0], 2)
+
+        ###SPEED 10 WIND <1.5
+        ladenDt10_0 = []
+        for i in range(0, len(wind) - 1):
+            arrayFoc = np.array([k for k in ladenDt if
+                                 k[4] >= 0 and k[4] <= 1.5 and k[5] >= 9 and k[5] <= 10 and k[3] >= wind[i] and k[
+                                     3] <= wind[i + 1] and k[
+                                     8] > 0])
+            meanFoc = np.mean(arrayFoc[:, 8]) if arrayFoc.__len__() > 0 else 0
+            ladenDt10_0.append(round(meanFoc, 2))
+
+        for i in range(9, 14):
+            workbook._sheets[1]['B' + str(i)] = ladenDt10_0[i - 9]
+
+        ###SPEED 11.5  2 < WIND <3
+        ladenDt10_3 = []
+        for i in range(0, len(wind) - 1):
+            arrayFoc = np.array([k for k in ladenDt if
+                                 k[4] >= 2 and k[4] <= 3 and k[5] >= 9 and k[5] <= 10 and k[3] >= wind[i] and
+                                 k[
+                                     3] <= wind[i + 1] and k[
+                                     8] > 0])
+            meanFoc = np.mean(arrayFoc[:, 8]) if arrayFoc.__len__() > 0 else 0
+            ladenDt10_3.append(round(meanFoc, 2))
+
+        for i in range(9, 14):
+            workbook._sheets[1]['C' + str(i)] = ladenDt10_3[i - 9]
+
+        ###SPEED 10.5  4 < WIND <5
+        ladenDt10_5 = []
+        for i in range(0, len(wind) - 1):
+            arrayFoc = np.array([k for k in ladenDt if
+                                 k[4] >= 4 and k[4] <= 5 and k[5] >= 9 and k[5] <= 10 and k[3] >= wind[i] and
+                                 k[
+                                     3] <= wind[i + 1] and k[
+                                     8] > 0])
+            meanFoc = np.mean(arrayFoc[:, 8]) if arrayFoc.__len__() > 0 else 0
+            ladenDt10_5.append(round(meanFoc, 2))
+
+        for i in range(9, 14):
+            workbook._sheets[1]['D' + str(i)] = ladenDt10_5[i - 9]
+
+        ###SPEED 10.5  7 < WIND <8
+        ladenDt10_8 = []
+        for i in range(0, len(wind) - 1):
+            arrayFoc = np.array([k for k in ladenDt if
+                                 k[4] >= 7 and k[4] <= 8 and k[5] >= 9 and k[5] <= 10 and k[3] >= wind[i] and
+                                 k[
+                                     3] <= wind[i + 1] and k[
+                                     8] > 0])
+            meanFoc = np.mean(arrayFoc[:, 8]) if arrayFoc.__len__() > 0 else 0
+            ladenDt10_8.append(round(meanFoc, 2))
+
+        for i in range(9, 14):
+            workbook._sheets[1]['E' + str(i)] = ladenDt10_8[i - 9]
+
+        ##################################################################################################################
+        ##################################################################################################################
+
+        ###SPEED 11.5   WIND <1.5
+        ladenDt11_0 = []
+        for i in range(0, len(wind) - 1):
+            arrayFoc = np.array([k for k in ladenDt if
+                                 k[4] >= 0 and k[4] <= 1.5 and k[5] > 10.5 and k[5] <= centroidsL[1][0] and k[3] >=
+                                 wind[
+                                     i] and k[
+                                     3] <= wind[i + 1] and k[
+                                     8] > 0])
+            meanFoc = np.mean(arrayFoc[:, 8]) if arrayFoc.__len__() > 0 else 0
+            ladenDt11_0.append(round(meanFoc, 2))
+
+        for i in range(19, 24):
+            workbook._sheets[1]['B' + str(i)] = ladenDt11_0[i - 19]
+
+        ###SPEED 11.5  2 < WIND <3
+        ladenDt11_3 = []
+        for i in range(0, len(wind) - 1):
+            arrayFoc = np.array([k for k in ladenDt if
+                                 k[4] >= 2 and k[4] <= 3 and k[5] > 10.5 and k[5] <= centroidsL[1][0] and k[3] >= wind[
+                                     i] and k[
+                                     3] <= wind[i + 1] and k[
+                                     8] > 0])
+            meanFoc = np.mean(arrayFoc[:, 8]) if arrayFoc.__len__() > 0 else 0
+            ladenDt11_3.append(round(meanFoc, 2))
+
+        for i in range(19, 24):
+            workbook._sheets[1]['C' + str(i)] = ladenDt11_3[i - 19]
+
+        ###SPEED 11.5  4 < WIND <5
+        ladenDt11_5 = []
+        for i in range(0, len(wind) - 1):
+            arrayFoc = np.array([k for k in ladenDt if
+                                 k[4] >= 4 and k[4] <= 5 and k[5] > 10.5 and k[5] <= centroidsL[1][0] and k[3] >= wind[
+                                     i] and k[
+                                     3] <= wind[i + 1] and k[
+                                     8] > 0])
+            meanFoc = np.mean(arrayFoc[:, 8]) if arrayFoc.__len__() > 0 else 0
+            ladenDt11_5.append(round(meanFoc, 2))
+
+        for i in range(19, 24):
+            workbook._sheets[1]['D' + str(i)] = ladenDt11_5[i - 19]
+
+            ###SPEED 11.5  7 < WIND <8
+        ladenDt11_8 = []
+        for i in range(0, len(wind) - 1):
+            arrayFoc = np.array([k for k in ladenDt if
+                                 k[4] >= 7 and k[4] <= 8 and k[5] > 10.5 and k[5] <= centroidsL[1][0] and k[3] >= wind[
+                                     i] and k[
+                                     3] <= wind[i + 1] and k[
+                                     8] > 0])
+            meanFoc = np.mean(arrayFoc[:, 8]) if arrayFoc.__len__() > 0 else 0
+            ladenDt11_8.append(round(meanFoc, 2))
+
+        for i in range(19, 24):
+            workbook._sheets[1]['E' + str(i)] = ladenDt11_8[i - 19]
+
+        #################################
+
+        ###SPEED 12.5 WIND <1.5
+        ladenDt12_0 = []
+        for i in range(0, len(wind) - 1):
+            arrayFoc = np.array([k for k in ladenDt if
+                                 k[4] >= 0 and k[4] <= 1.5 and k[5] > centroidsL[1][0] and k[5] <= centroidsL[2][0] and
+                                 k[3] >= wind[
+                                     i] and
+                                 k[
+                                     3] <= wind[i + 1] and k[
+                                     8] > 0])
+            meanFoc = np.mean(arrayFoc[:, 8]) if arrayFoc.__len__() > 0 else 0
+            ladenDt12_0.append(round(meanFoc, 2))
+
+        for i in range(29, 34):
+            workbook._sheets[1]['B' + str(i)] = ladenDt12_0[i - 29]
+
+        ###SPEED 11.5  2 < WIND <3
+        ladenDt12_3 = []
+        for i in range(0, len(wind) - 1):
+            arrayFoc = np.array([k for k in ladenDt if
+                                 k[4] >= 2 and k[4] <= 3 and k[5] > centroidsL[1][0] and k[5] <= centroidsL[2][0] and k[
+                                     3] >= wind[
+                                     i] and k[
+                                     3] <= wind[i + 1] and k[
+                                     8] > 0])
+            meanFoc = np.mean(arrayFoc[:, 8]) if arrayFoc.__len__() > 0 else 0
+            ladenDt12_3.append(round(meanFoc, 2))
+
+        for i in range(29, 34):
+            workbook._sheets[1]['C' + str(i)] = ladenDt12_3[i - 29]
+
+        ###SPEED 11.5  4 < WIND <5
+        ladenDt12_5 = []
+        for i in range(0, len(wind) - 1):
+            arrayFoc = np.array([k for k in ladenDt if
+                                 k[4] >= 4 and k[4] <= 5 and k[5] > centroidsL[1][0] and k[5] <= centroidsL[2][0] and k[
+                                     3] >= wind[
+                                     i] and k[
+                                     3] <= wind[i + 1] and k[
+                                     8] > 0])
+            meanFoc = np.mean(arrayFoc[:, 8]) if arrayFoc.__len__() > 0 else 0
+            ladenDt12_5.append(round(meanFoc, 2))
+
+        for i in range(29, 34):
+            workbook._sheets[1]['D' + str(i)] = ladenDt12_5[i - 29]
+
+        ###SPEED 11.5  7 < WIND <8
+        ladenDt12_8 = []
+        for i in range(0, len(wind) - 1):
+            arrayFoc = np.array([k for k in ladenDt if
+                                 k[4] >= 7 and k[4] <= 8 and k[5] > centroidsL[1][0] and k[5] <= centroidsL[2][0] and k[
+                                     3] >= wind[
+                                     i] and k[
+                                     3] <= wind[i + 1] and k[
+                                     8] > 0])
+            meanFoc = np.mean(arrayFoc[:, 8]) if arrayFoc.__len__() > 0 else 0
+            ladenDt12_8.append(round(meanFoc, 2))
+
+        for i in range(29, 34):
+            workbook._sheets[1]['E' + str(i)] = ladenDt12_8[i - 29]
+
+        #################################
+
+        ###SPEED 13.5 WIND <1.5
+        ladenDt13_0 = []
+        for i in range(0, len(wind) - 1):
+            arrayFoc = np.array([k for k in ladenDt if
+                                 k[4] >= 0 and k[4] <= 1.5 and k[5] > centroidsL[2][0] and k[5] <= centroidsL[3][0] and
+                                 k[3] >=
+                                 wind[
+                                     i] and
+                                 k[
+                                     3] <= wind[i + 1] and k[
+                                     8] > 0])
+            meanFoc = np.mean(arrayFoc[:, 8]) if arrayFoc.__len__() > 0 else 0
+            ladenDt13_0.append(round(meanFoc, 2))
+
+        for i in range(39, 44):
+            workbook._sheets[1]['B' + str(i)] = ladenDt13_0[i - 39]
+
+        ###SPEED 13.5  2 < WIND <3
+        ladenDt13_3 = []
+        for i in range(0, len(wind) - 1):
+            arrayFoc = np.array([k for k in ladenDt if
+                                 k[4] >= 2 and k[4] <= 3 and k[5] > centroidsL[2][0] and k[5] <= centroidsL[3][0] and k[
+                                     3] >= wind[
+                                     i] and k[
+                                     3] <= wind[i + 1] and k[
+                                     8] > 0])
+            meanFoc = np.mean(arrayFoc[:, 8]) if arrayFoc.__len__() > 0 else 0
+            ladenDt13_3.append(round(meanFoc, 2))
+
+        for i in range(39, 44):
+            workbook._sheets[1]['C' + str(i)] = ladenDt13_3[i - 39]
+
+        ###SPEED 13.5  4 < WIND <5
+        ladenDt13_5 = []
+        for i in range(0, len(wind) - 1):
+            arrayFoc = np.array([k for k in ladenDt if
+                                 k[4] >= 4 and k[4] <= 5 and k[5] > centroidsL[2][0] and k[5] <= centroidsL[3][0] and k[
+                                     3] >= wind[
+                                     i] and k[
+                                     3] <= wind[i + 1] and k[
+                                     8] > 0])
+            meanFoc = np.mean(arrayFoc[:, 8]) if arrayFoc.__len__() > 0 else 0
+            ladenDt13_5.append(round(meanFoc, 2))
+
+        for i in range(39, 44):
+            workbook._sheets[1]['D' + str(i)] = ladenDt13_5[i - 39]
+
+        ###SPEED 13.5  7 < WIND <8
+        ladenDt13_8 = []
+        for i in range(0, len(wind) - 1):
+            arrayFoc = np.array([k for k in ladenDt if
+                                 k[4] >= 7 and k[4] <= 8 and k[5] > centroidsL[2][0] and k[5] <= centroidsL[3][0] and k[
+                                     3] >= wind[
+                                     i] and k[
+                                     3] <= wind[i + 1] and k[
+                                     8] > 0])
+            meanFoc = np.mean(arrayFoc[:, 8]) if arrayFoc.__len__() > 0 else 0
+            ladenDt13_8.append(round(meanFoc, 2))
+
+        for i in range(39, 44):
+            workbook._sheets[1]['E' + str(i)] = ladenDt13_8[i - 39]
+
+        workbook.save(filename=pathToexcel.split('.')[0] + '_1.' + pathToexcel.split('.')[1])
+
+    def readExtractNewDataset(self, company,vessel,pathToexcel,separator=None):
         ####################
         ####################
         ####################
         if company == 'MILLENIA':
-
-
             ####DOMINIA
-            data = pd.read_csv('./data/' + company + '/' + vessel + '.csv', sep=separator, decimal=',')
+            data = pd.read_csv('./data/' + company + '/TELEGRAMS/' + vessel + '.csv', sep=separator, decimal=',')
 
             # data = data.drop(['DateTime'], axis=1)
             dtNew = np.nan_to_num(data.values)  # .astype(float)
+            ballastDt = np.array([k for k in dtNew if k[2] == 'B'])[:, 7:].astype(float)
+            ladenDt = np.array([k for k in dtNew if k[2] == 'L'])[:, 7:].astype(float)
+
+            meanDraftBallast = round(float(np.mean(np.array([k for k in ballastDt if k[1] >= 0])[:, 1])), 2)
+            meanDraftLadden = round(float(np.mean(np.array([k for k in ladenDt if k[1] >= 0])[:, 1])), 2)
+
             #draft = (np.array([k for k in dtNew  ])[:,5] + np.array([k for k in dtNew ])[:,6])/2
             #dtNew = np.array(np.append(dtNew.reshape(-1,dtNew.shape[1]) ,  np.asmatrix([draft]).T,axis=1))
             foc24h=[]
             for i in range(0,len(dtNew)):
+                dtNew[i,10] = self.getRelativeDirectionWeatherVessel(float(dtNew[i,7]),float(dtNew[i,10]))
                 if str(dtNew[i,2])=='nan':
-                    if dtNew[i,8]>8.7:
+                    if float(dtNew[i,8])>math.floor(meanDraftLadden):
                         dtNew[i,2]='L'
                     else:
                         dtNew[i,2]='B'
 
-                if dtNew[i,15]>0:
-                    if dtNew[i,13] + dtNew[i,14] > 0:
-                        dtNew[i, 15]=( (dtNew[i,15]  / (dtNew[i,13] + dtNew[i,14] /60 )) *24)
-                #else:
-                    #foc24h.append(dtNew[i,15])
-            #foc24h = np.array(foc24h)
-            #dtNew = np.array(np.append(dtNew.reshape(-1, dtNew.shape[1]), np.asmatrix([foc24h]).T, axis=1))
-            #foc24h = dtNew[:,15]  / (dtNew[:,16] + dtNew[:,17] /60 ) *24
-            ballastDt = np.array([k for k in dtNew if k[2] == 'B'])[:, 7:].astype(float)
+                if float(dtNew[i,15])>0:
+                    if float(dtNew[i,13]) + float(dtNew[i,14]) > 0:
+                        dtNew[i, 15]=( (float(dtNew[i,15])  / (float(dtNew[i,13]) + float(dtNew[i,14]) /60 )) *24)
 
-            velocities = np.array([k for k in ballastDt if k[5]>6 and k[5]<16])[:,5]
-            dataModel = KMeans(n_clusters=4)
-            velocities=velocities.reshape(-1, 1)
-            dataModel.fit(velocities)
-            labels = dataModel.predict(velocities)
-            # Extract centroid values
-
-            centroids = dataModel.cluster_centers_
-
-            partitionsX = []
-            partitionsY = []
-            partitionLabels = []
-            # For each label
-            for curLbl in np.unique(labels):
-                # Create a partition for X using records with corresponding label equal to the current
-                partitionsX.append(np.asarray(velocities[labels == curLbl]))
-                # Create a partition for Y using records with corresponding label equal to the current
-                # Keep partition label to ascertain same order of results
-                partitionLabels.append(curLbl)
-            #ballastDtNew = ballastDt[:,3:].astype(float)
-
-            #ballastDt10_0 =  np.array([k for k in ballastDt if
-                      #k[4] >=0 and k[4]<=2 and k[5] >= 9 and k[5] <= 10 and k[3] >= 0 and k[3] <= 22.5 and k[8] > 0])[:, 8]
-
-            ladenDt =  np.array([k for k in dtNew if k[2] == 'L'])[:, 7:].astype(float)
-            #########################
-            #########################
-            velocities = np.array([k for k in ladenDt if k[5] > 6 and k[5] < 16])[:, 5]
-            dataModel = KMeans(n_clusters=4)
-            velocities = velocities.reshape(-1, 1)
-            dataModel.fit(velocities)
-            labels = dataModel.predict(velocities)
-            # Extract centroid values
-
-            centroids = dataModel.cluster_centers_
-
+            self.fillExcelProfCons(vessel,pathToexcel,dtNew)
+            return
 
             draft = {"data": [ ]}
             course = {"data": [ ]}

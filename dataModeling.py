@@ -3010,10 +3010,10 @@ class TensorFlowW(BasePartitionModeler):
             #model.add(keras.layers.Dense(len(partition_labels)*3, input_shape=(2,)))
             #model.add(keras.layers.Dense(len(partition_labels) * 2, input_shape=(2,)))
 
-            model.add(keras.layers.Dense(len(partition_labels), input_shape=(2,)))
+            model.add(keras.layers.Dense(genModelKnots-1, input_shape=(2+genModelKnots-1,)))
             model.add(keras.layers.Dense(10, input_shape=(2,)))
             model.add(keras.layers.Dense(5, input_shape=(2,)))
-            model.add(keras.layers.Dense(2, input_shape=(2,)))
+            #model.add(keras.layers.Dense(2, input_shape=(2,)))
 
 
 
@@ -3152,8 +3152,10 @@ class TensorFlowW(BasePartitionModeler):
                 ClModels[ "data" ].append(model)
             modelCount+=1
 
+        self.count=0
         def extractFunctionsFromSplines(x0, x1):
             piecewiseFunc = [ ]
+            self.count = self.count + 1
             for csvM in csvModels:
                 if csvM!='./model_Gen_.csv':
                     continue
@@ -3167,12 +3169,16 @@ class TensorFlowW(BasePartitionModeler):
                         if [ w for w in row if w == "Basis" ].__len__() > 0:
                             continue
                         if [ w for w in row if w == "(Intercept)" ].__len__() > 0:
-                            self.intercepts.append(float(row[ 1 ]))
+
                             self.interceptsGen = float(row[ 1 ])
                             continue
+
                         if row.__len__() == 0:
                             continue
                         d = row[ 0 ]
+                        if self.count==1:
+                            self.intercepts.append(float(row[1]))
+
                         if d.split("*").__len__() == 1:
                             split = ""
                             try:
@@ -3187,9 +3193,9 @@ class TensorFlowW(BasePartitionModeler):
                                         # tf.math.multiply(tf.cast(tf.math.less(x, num), tf.float32),
                                         # (num - inputs)))
                                         if split.__contains__("x0"):
-                                            piecewiseFunc.append((num - x0) * float(row[ 1 ]))
+                                            piecewiseFunc.append((num - x0))# * float(row[ 1 ]))
                                         if split.__contains__("x1"):
-                                            piecewiseFunc.append((num - x1) * float(row[ 1 ]))
+                                            piecewiseFunc.append((num - x1)) #* float(row[ 1 ]))
                                     # if id ==  self.modelId:
                                     # inputs = tf.where(x >= num, float(row[ 1 ]) * (inputs - num), inputs)
                                     except:
@@ -3202,9 +3208,9 @@ class TensorFlowW(BasePartitionModeler):
                                     # if float(row[ 1 ]) < 10000:
                                     try:
                                         if split.__contains__("x0"):
-                                            piecewiseFunc.append((x0 - num) * float(row[ 1 ]))
+                                            piecewiseFunc.append((x0 - num))# * float(row[ 1 ]))
                                         if split.__contains__("x1"):
-                                            piecewiseFunc.append((x1 - num) * float(row[ 1 ]))
+                                            piecewiseFunc.append((x1 - num))# * float(row[ 1 ]))
 
                                         # piecewiseFunc.append(
                                         # tf.math.multiply(tf.cast(tf.math.greater(x, num), tf.float32),
@@ -3535,18 +3541,32 @@ class TensorFlowW(BasePartitionModeler):
 
             return piecewiseFunc
 
-        extractFunctionsFromSplines(1, 1)
+        #extractFunctionsFromSplines(1, 1)
 
         self.flagGen=False
 
         estimator = baseline_model()
         XSplineVector=[]
+        velocities = []
+        vectorWeights=[]
+
         for i in range(0,len(X)):
             vector = extractFunctionsFromSplines(X[i][0],X[i][1])
             XSplineVector.append(np.append(X[i],vector))
+            velocities.append(X[i])
+            vectorWeights.append(vector)
+            #XSplineVector.append( vector)
 
         #X =  np.append(X, np.asmatrix([dataY]).T, axis=1)
-        estimator.fit(X, Y, epochs=100, validation_split=0.33)
+        XSplineVector = np.array(XSplineVector)
+        weights0 =  np.mean(XSplineVector, axis=0)
+        #weights1 = self.intercepts
+        weights1 = estimator.layers[0].get_weights()[0][1]
+        weights = np.array(np.append(weights0.reshape(-1,1),np.asmatrix(weights0).reshape(-1,1),axis=1).reshape(2,-1))
+
+        #estimator.layers[0].set_weights([weights, np.array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])])
+        #estimator.layers[4].inputs
+        estimator.fit(XSplineVector, Y, epochs=100, validation_split=0.33)
         self.flagGen = True
 
         #estimatorD = baseline_modelDeepCl()
@@ -3639,17 +3659,17 @@ class TensorFlowW(BasePartitionModeler):
         scores=[]
         #tf.keras.backend.clear_session()
         #tf.keras.backend.clear_session()
-        estimatorGen = baseline_model1()
+        #estimatorGen = baseline_model1()
 
-        estimatorGen.fit(X, Y, epochs=100, validation_split=0.33,verbose=1)
+        #estimatorGen.fit(X, Y, epochs=100, validation_split=0.33,verbose=1)
 
-        for idx, pCurLbl in enumerate(partition_labels):
+        #for idx, pCurLbl in enumerate(partition_labels):
                 #partitionsX[ idx ]=partitionsX[idx].reshape(-1,2)
 
                 #estimator = baseline_model()
                 #try:
-                self.modelId =idx
-                self.countTimes+=1
+                #self.modelId =idx
+                #self.countTimes+=1
 
                     #modelId=idx
 
@@ -3659,21 +3679,21 @@ class TensorFlowW(BasePartitionModeler):
                     #if idx==0:
                         #estimator.add(keras.layers.Activation(custom_activation2))
                     #else:
-                numOfNeurons = [x for x in ClModels['data'] if x['id']==idx][0]['funcs']
+                #numOfNeurons = [x for x in ClModels['data'] if x['id']==idx][0]['funcs']
                     #estimatorCl=replace_intermediate_layer_in_keras(estimator, -1 ,MyLayer(5))
                     #len(DeepClpartitionLabels)+
                     #estimatorCl = insert_intermediate_layer_in_keras(estimator, 1, keras.layers.Dense(numOfNeurons))
                     #lr = 0.001 if np.std(np.array(partitionsX[idx])) < 30  else 0.2
-                try:
+                #try:
 
-                    estimatorCl = replace_intermediate_layer_in_keras(estimatorGen, 1, -1 , keras.layers.Dense(numOfNeurons,input_shape=(2,)),keras.layers.Activation(custom_activation2) )
+                    #estimatorCl = replace_intermediate_layer_in_keras(estimatorGen, 1, -1 , keras.layers.Dense(numOfNeurons,input_shape=(2,)),keras.layers.Activation(custom_activation2) )
 
-                except:
-                    self.modelId = 'Gen'
-                    estimatorCl = replace_intermediate_layer_in_keras(estimatorGen, 1, 0,
-                                                                      keras.layers.Dense(numOfNeurons,
-                                                                                         input_shape=(2,)),
-                                                                      keras.layers.Activation(custom_activation2))
+                #except:
+                    #self.modelId = 'Gen'
+                    #estimatorCl = replace_intermediate_layer_in_keras(estimatorGen, 1, 0,
+                                                                      #keras.layers.Dense(numOfNeurons,
+                                                                                         #input_shape=(2,)),
+                                                                      #keras.layers.Activation(custom_activation2))
                     #estimatorCl = insert_intermediate_layer_in_keras(estimatorGen, 1,keras.layers.Activation(custom_activation2))
                     #estimatorCl = insert_intermediate_layer_in_keras(estimator,0,keras.layers.Activation(custom_activation2))
 
@@ -3682,12 +3702,12 @@ class TensorFlowW(BasePartitionModeler):
                     #estimator.layers[3] = custom_activation2(inputs=estimator.layers[2].output, modelId=idx) if idx ==0 else estimator.layers[3]
                     #estimator.layers[3] = custom_activation2 if idx ==3 else estimator.layers[3]
 
-                estimatorCl.fit(np.array(partitionsX[idx]),np.array(partitionsY[idx]),epochs=100,validation_split=0.33)#validation_split=0.33
+                #estimatorCl.fit(np.array(partitionsX[idx]),np.array(partitionsY[idx]),epochs=100,validation_split=0.33)#validation_split=0.33
 
-                score = estimatorCl.evaluate(np.array(partitionsX[idx]),np.array(partitionsY[idx]),verbose=1)
-                print("%s: %.2f%%" % ("acc: ", score))
-                scores.append(score)
-                NNmodels.append(estimatorCl)
+                #score = estimatorCl.evaluate(np.array(partitionsX[idx]),np.array(partitionsY[idx]),verbose=1)
+                #print("%s: %.2f%%" % ("acc: ", score))
+                #scores.append(score)
+                #NNmodels.append(estimatorCl)
                 #except Exception as e:
                     #print(str(e))
                     #return
@@ -3701,7 +3721,7 @@ class TensorFlowW(BasePartitionModeler):
         self._models = NNmodels
 
         # Return list of models
-        return estimator, None ,scores, numpy.empty,None #, estimator , DeepCLpartitionsX
+        return estimator, None ,scores, numpy.empty,vectorWeights #, estimator , DeepCLpartitionsX
 
     def createModelsForConv(self,partitionsX, partitionsY, partition_labels):
         ##Conv1D NN

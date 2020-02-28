@@ -16,6 +16,7 @@ from scipy import spatial
 import pyearth as sp
 from scipy.spatial import Delaunay, ConvexHull
 import matplotlib.pyplot as plt
+import csv
 import pyearth as sp
 import sklearn.svm as svr
 
@@ -793,8 +794,391 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
         UnseenSeriesX = dtNew
         return UnseenSeriesX
 
+    def extractFunctionsFromSplines(self,x0, x1):
+        piecewiseFunc = []
+        #self.count = self.count + 1
+        csvModels=['./model_Gen_.csv']
+        for csvM in csvModels:
+            if csvM != './model_Gen_.csv':
+                continue
+            # id = csvM.split("_")[ 1 ]
+            # piecewiseFunc = [ ]
+
+            with open(csvM) as csv_file:
+                data = csv.reader(csv_file, delimiter=',')
+                for row in data:
+                    # for d in row:
+                    if [w for w in row if w == "Basis"].__len__() > 0:
+                        continue
+                    if [w for w in row if w == "(Intercept)"].__len__() > 0:
+                        #self.interceptsGen = float(row[1])
+                        continue
+
+                    if row.__len__() == 0:
+                        continue
+                    d = row[0]
+                    #if self.count == 1:
+                        #self.intercepts.append(float(row[1]))
+
+                    if d.split("*").__len__() == 1:
+                        split = ""
+                        try:
+                            split = d.split('-')[0][2:4]
+                            if split != "x0" and split != "x1":
+                                split = d.split('-')[1]
+                                num = float(d.split('-')[0].split('h(')[1])
+                                # if id == id:
+                                # if float(row[ 1 ]) < 10000:
+                                try:
+                                    # piecewiseFunc.append(
+                                    # tf.math.multiply(tf.cast(tf.math.less(x, num), tf.float32),
+                                    # (num - inputs)))
+                                    if split.__contains__("x0"):
+                                        piecewiseFunc.append((num - x0))  # * float(row[ 1 ]))
+                                    if split.__contains__("x1"):
+                                        piecewiseFunc.append((num - x1))  # * float(row[ 1 ]))
+                                # if id ==  self.modelId:
+                                # inputs = tf.where(x >= num, float(row[ 1 ]) * (inputs - num), inputs)
+                                except:
+                                    dc = 0
+                            else:
+                                ##x0 or x1
+                                split = d.split('-')[0]
+                                num = float(d.split('-')[1].split(')')[0])
+                                # if id == id:
+                                # if float(row[ 1 ]) < 10000:
+                                try:
+                                    if split.__contains__("x0"):
+                                        piecewiseFunc.append((x0 - num))  # * float(row[ 1 ]))
+                                    if split.__contains__("x1"):
+                                        piecewiseFunc.append((x1 - num))  # * float(row[ 1 ]))
+
+                                        # piecewiseFunc.append(
+                                        # tf.math.multiply(tf.cast(tf.math.greater(x, num), tf.float32),
+                                        # (inputs - num)))
+                                # if id == self.modelId:
+                                # inputs = tf.where(x <= num, float(row[ 1 ]) * (num - inputs), inputs)
+                                except:
+                                    dc = 0
+                        except:
+                            # if id == id:
+                            # if float(row[ 1 ]) < 10000:
+                            try:
+                                piecewiseFunc.append(x0)
+
+                                # piecewiseFunc.append(tf.math.multiply(tf.cast(x, tf.float32),
+                                # (inputs)))
+
+                                # inputs = tf.where(x >= 0, float(row[ 1 ]) * inputs, inputs)
+                            # continue
+                            except:
+                                dc = 0
+
+                    else:
+                        funcs = d.split("*")
+                        nums = []
+                        flgFirstx = False
+                        flgs = []
+                        for r in funcs:
+                            try:
+                                if r.split('-')[0][2] != "x":
+                                    flgFirstx = True
+                                    nums.append(float(r.split('-')[0].split('h(')[1]))
+
+                                else:
+                                    nums.append(float(r.split('-')[1].split(')')[0]))
+
+                                flgs.append(flgFirstx)
+                            except:
+                                flgFirstx = False
+                                flgs = []
+                                split = d.split('-')[0][2]
+                                try:
+                                    if d.split('-')[0][2] == "x":
+                                        # if id == id:
+                                        # if float(row[ 1 ]) < 10000:
+                                        try:
+
+                                            if d.split("-")[0].__contains__("x1") and d.split("-")[1].__contains__(
+                                                    "x1"):
+                                                split = "x1"
+                                            if d.split("-")[0].__contains__("x0") and d.split("-")[1].__contains__(
+                                                    "x0"):
+                                                split = "x0"
+                                            if d.split("-")[0].__contains__("x0") and d.split("-")[1].__contains__(
+                                                    "x1"):
+                                                split = "x01"
+                                            if d.split("-")[0].__contains__("x1") and d.split("-")[1].__contains__(
+                                                    "x0"):
+                                                split = "x10"
+
+                                            if split == "x0":
+                                                piecewiseFunc.append(x0 * (x0 - nums[0]) * float(row[1]))
+                                            elif split == "x1":
+                                                piecewiseFunc.append(x1 * (x1 - nums[0]) * float(row[1]))
+                                            elif split == "x01":
+                                                piecewiseFunc.append(x0 * (x1 - nums[0]) * float(row[1]))
+                                            elif split == "x10":
+                                                piecewiseFunc.append(x1 * (x0 - nums[0]) * float(row[1]))
+                                                # piecewiseFunc.append(tf.math.multiply(tf.cast(x, tf.float32),
+                                                # (inputs) * (
+                                                # inputs - nums[ 0 ])))
+
+                                                # inputs = tf.where(x >= 0,
+                                                # float(row[ 1 ]) * (inputs) * (inputs - nums[ 0 ]), inputs)
+                                        except:
+                                            dc = 0
+
+                                    else:
+                                        flgFirstx = True
+                                        # if id == id:
+                                        # if float(row[ 1 ]) < 10000:
+                                        try:
+
+                                            if d.split("-")[0].__contains__("x1") and d.split("-")[
+                                                1].__contains__("x1"):
+                                                split = "x1"
+                                            if d.split("-")[0].__contains__("x0") and d.split("-")[
+                                                1].__contains__("x0"):
+                                                split = "x0"
+                                            if d.split("-")[0].__contains__("x0") and d.split("-")[
+                                                1].__contains__("x1"):
+                                                split = "x01"
+                                            if d.split("-")[0].__contains__("x1") and d.split("-")[
+                                                1].__contains__("x0"):
+                                                split = "x10"
+
+                                            if split == "x0":
+                                                piecewiseFunc.append(x0 * (nums[0] - x0) * float(row[1]))
+                                            elif split == "x1":
+                                                piecewiseFunc.append(x1 * (nums[0] - x1) * float(row[1]))
+                                            elif split == "x01":
+                                                piecewiseFunc.append(x0 * (nums[0] - x1) * float(row[1]))
+                                            elif split == "x10":
+                                                piecewiseFunc.append(x1 * (nums[0] - x0) * float(row[1]))
+
+                                            # piecewiseFunc.append(tf.math.multiply(tf.cast(x, tf.float32),
+                                            # (inputs) * (
+                                            # nums[ 0 ] - inputs)))
+
+                                            # inputs = tf.where(x > 0 ,
+                                            # float(row[ 1 ]) * (inputs) * (nums[ 0 ] - inputs),inputs)
+                                            flgs.append(flgFirstx)
+                                        except:
+                                            dc = 0
+
+                                except:
+                                    # if id == id:
+                                    # if float(row[ 1 ]) < 10000:
+                                    try:
+                                        piecewiseFunc.append(x0)
+
+                                        # piecewiseFunc.append(tf.math.multiply(tf.cast(x, tf.float32),
+                                        # (inputs)))
+
+                                        # inputs = tf.where(x >= 0, float(row[ 1 ]) * (inputs), inputs)
+                                    except:
+                                        dc = 0
+                        try:
+                            # if id == id:
+                            if flgs.count(True) == 2:
+                                # if float(row[ 1 ])<10000:
+                                try:
+
+                                    if d.split("-")[0].__contains__("x1") and d.split("-")[1].__contains__(
+                                            "x1"):
+                                        split = "x1"
+                                    if d.split("-")[0].__contains__("x0") and d.split("-")[1].__contains__(
+                                            "x0"):
+                                        split = "x0"
+                                    if d.split("-")[0].__contains__("x0") and d.split("-")[1].__contains__(
+                                            "x1"):
+                                        split = "x01"
+                                    if d.split("-")[0].__contains__("x1") and d.split("-")[1].__contains__(
+                                            "x0"):
+                                        split = "x10"
+
+                                    if split == "x0":
+                                        piecewiseFunc.append((nums[0] - x0) * (nums[1] - x0) * float(row[1]))
+                                    elif split == "x1":
+                                        piecewiseFunc.append((nums[0] - x1) * (nums[1] - x1) * float(row[1]))
+                                    elif split == "x01":
+                                        piecewiseFunc.append((nums[0] - x0) * (nums[1] - x1) * float(row[1]))
+                                    elif split == "x10":
+                                        piecewiseFunc.append((nums[0] - x1) * (nums[1] - x0) * float(row[1]))
+
+
+                                except:
+                                    dc = 0
+
+                            elif flgs.count(False) == 2:
+                                # if float(row[ 1 ]) < 10000:
+                                try:
+                                    if d.split("-")[0].__contains__("x1") and d.split("-")[1].__contains__(
+                                            "x1"):
+                                        split = "x1"
+                                    if d.split("-")[0].__contains__("x0") and d.split("-")[1].__contains__(
+                                            "x0"):
+                                        split = "x0"
+                                    if d.split("-")[0].__contains__("x0") and d.split("-")[1].__contains__(
+                                            "x1"):
+                                        split = "x01"
+                                    if d.split("-")[0].__contains__("x1") and d.split("-")[1].__contains__(
+                                            "x0"):
+                                        split = "x10"
+
+                                    if split == "x0":
+                                        piecewiseFunc.append((x0 - nums[0]) * (x0 - nums[1]) * float(row[1]))
+                                    elif split == "x1":
+                                        piecewiseFunc.append((x1 - nums[0]) * (x1 - nums[1]) * float(row[1]))
+                                    elif split == "x01":
+                                        piecewiseFunc.append((x0 - nums[0]) * (x1 - nums[1]) * float(row[1]))
+                                    elif split == "x10":
+                                        piecewiseFunc.append((x1 - nums[0]) * (x0 - nums[1]) * float(row[1]))
+                                        # inputs = tf.where(x > nums[ 0 ] and x > nums[ 1 ],
+                                        # float(row[ 1 ]) * (inputs - nums[ 0 ]) * (
+                                        # inputs - nums[ 1 ]), inputs)
+                                except:
+                                    dc = 0
+                            else:
+                                try:
+                                    if flgs[0] == False:
+                                        if nums.__len__() > 1:
+                                            # if float(row[ 1 ]) < 10000:
+                                            try:
+                                                if d.split("-")[0].__contains__("x1") and d.split("-")[
+                                                    2].__contains__("x1"):
+                                                    split = "x1"
+                                                if d.split("-")[0].__contains__("x0") and d.split("-")[
+                                                    2].__contains__("x0"):
+                                                    split = "x0"
+                                                if d.split("-")[0].__contains__("x0") and d.split("-")[
+                                                    2].__contains__("x1"):
+                                                    split = "x01"
+                                                if d.split("-")[0].__contains__("x1") and d.split("-")[
+                                                    2].__contains__("x0"):
+                                                    split = "x10"
+
+                                                if split == "x0":
+                                                    piecewiseFunc.append(
+                                                        (x0 - nums[0]) * (nums[1] - x0) * float(row[1]))
+                                                elif split == "x1":
+                                                    piecewiseFunc.append(
+                                                        (x1 - nums[0]) * (nums[1] - x1) * float(row[1]))
+                                                elif split == "x01":
+                                                    piecewiseFunc.append(
+                                                        (x0 - nums[0]) * (nums[1] - x1) * float(row[1]))
+                                                elif split == "x10":
+                                                    piecewiseFunc.append(
+                                                        (x1 - nums[0]) * (nums[1] - x0) * float(row[1]))
+
+
+
+
+                                            # inputs = tf.where(x > nums[ 0 ] and x < nums[ 1 ],
+                                            # float(row[ 1 ]) * (inputs - nums[ 0 ]) * (
+                                            # nums[ 1 ] - inputs), inputs)
+                                            except:
+                                                dc = 0
+                                        else:
+                                            # if float(row[ 1 ]) < 10000:
+                                            try:
+                                                if d.split("-")[0].__contains__("x1") and d.split("-")[
+                                                    1].__contains__("x1"):
+                                                    split = "x1"
+                                                if d.split("-")[0].__contains__("x0") and d.split("-")[
+                                                    1].__contains__("x0"):
+                                                    split = "x0"
+                                                if d.split("-")[0].__contains__("x0") and d.split("-")[
+                                                    1].__contains__("x1"):
+                                                    split = "x01"
+                                                if d.split("-")[0].__contains__("x1") and d.split("-")[
+                                                    1].__contains__("x0"):
+                                                    split = "x10"
+
+                                                piecewiseFunc.append((x0 - nums[0]) * float(row[1]))
+
+
+
+                                                # inputs = tf.where(x > nums[0],
+                                                # float(row[ 1 ]) * (inputs - nums[ 0 ]), inputs)
+                                            except:
+                                                dc = 0
+                                    else:
+                                        if nums.__len__() > 1:
+                                            # if float(row[ 1 ]) < 10000:
+                                            try:
+                                                if d.split("-")[0].__contains__("x1") and d.split("-")[
+                                                    1].__contains__("x1"):
+                                                    split = "x1"
+                                                if d.split("-")[0].__contains__("x0") and d.split("-")[
+                                                    1].__contains__("x0"):
+                                                    split = "x0"
+                                                if d.split("-")[0].__contains__("x0") and d.split("-")[
+                                                    1].__contains__("x1"):
+                                                    split = "x01"
+                                                if d.split("-")[0].__contains__("x1") and d.split("-")[
+                                                    1].__contains__("x0"):
+                                                    split = "x10"
+
+                                                if split == "x0":
+                                                    piecewiseFunc.append(
+                                                        (nums[0] - x0) * (x0 - nums[1]) * float(row[1]))
+                                                elif split == "x1":
+                                                    piecewiseFunc.append(
+                                                        (nums[0] - x1) * (x1 - nums[1]) * float(row[1]))
+                                                elif split == "x01":
+                                                    piecewiseFunc.append(
+                                                        (nums[0] - x0) * (x1 - nums[1]) * float(row[1]))
+                                                elif split == "x10":
+                                                    piecewiseFunc.append(
+                                                        (nums[0] - x1) * (x0 - nums[1]) * float(row[1]))
+                                                    # inputs = tf.where(x < nums[ 0 ] and x > nums[1],
+                                                    # float(row[ 1 ]) * (nums[ 0 ] - inputs) * (
+                                                    # inputs - nums[ 1 ]), inputs)
+                                            except:
+                                                dc = 0
+                                        else:
+                                            # if float(row[ 1 ]) < 10000:
+                                            try:
+
+                                                if d.split("-")[0].__contains__("x1") and d.split("-")[
+                                                    1].__contains__("x1"):
+                                                    split = "x1"
+                                                if d.split("-")[0].__contains__("x0") and d.split("-")[
+                                                    1].__contains__("x0"):
+                                                    split = "x0"
+                                                if d.split("-")[0].__contains__("x0") and d.split("-")[
+                                                    1].__contains__("x1"):
+                                                    split = "x01"
+                                                if d.split("-")[0].__contains__("x1") and d.split("-")[
+                                                    1].__contains__("x0"):
+                                                    split = "x10"
+
+                                                if split == "x0":
+                                                    piecewiseFunc.append((x0 - nums[0]) * float(row[1]))
+                                                elif split == "x1":
+                                                    piecewiseFunc.append((x1 - nums[0]) * float(row[1]))
+                                                    # piecewiseFunc.append(tf.math.multiply(tf.cast(
+                                                    # tf.math.less(x, nums[ 0 ]), tf.float32),
+                                                    # (
+                                                    # inputs - nums[ 0 ])))
+
+                                                    # inputs = tf.where(x < nums[ 0 ],
+                                                    # float(row[ 1 ]) * (
+                                                    # inputs - nums[ 0 ]), inputs)
+                                            except:
+                                                dc = 0
+                                except:
+                                    dc = 0
+                        except:
+                            dc = 0
+
+        return piecewiseFunc
+
     def evaluateKerasNN(self, unseenX, unseenY, modeler,output,xs,genericModel,partitionsX , scores):
         lErrors = []
+        vectorWeights = scores
         #unseenX = unseenX.reshape((unseenX.shape[ 0 ], 1, unseenX.shape[ 1 ]))
         #from sklearn.decomposition import PCA
         #pca = PCA()
@@ -852,7 +1236,8 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
             #weight= model2.layers[1].get_weights()[0][0,:][cl]
             #prediction = np.sum(model2.predict(pPoint, verbose=0)) / 5
 
-            ind , fit = modeler.getBestPartitionForPoint(pPoint,partitionsX)
+            #ind , fit = modeler.getBestPartitionForPoint(pPoint,partitionsX)
+            ind, fit = modeler.getBestPartitionForPoint(pPoint, vectorWeights)
             #fits = modeler.getFitsOfPoint(partitionsX,pPoint)
             #fit  = modeler.getFitofPointIncluster(pPoint,centroids[ind])
             #scaledPoint = scalerX.fit_transform(pPoint)
@@ -876,8 +1261,10 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
             #for i in range(0,len(fits)):
                 #pred+=fits[i]*modeler._models[i].predict(pPoint)
 
-            #prediction = abs(modeler._models[ ind ].predict(pPoint))
-            prediction = abs(modeler._models[ind].predict(pPoint)) if fit > 0.5 else  modeler._models[len(modeler._models)-1].predict(pPoint)
+            vector = self.extractFunctionsFromSplines(pPoint[0][0],pPoint[0][1])
+            XSplineVector=np.append(pPoint, vector)
+            prediction = abs(modeler._models[ 0 ].predict(XSplineVector.reshape(-1,15)))
+            #prediction = abs(modeler._models[ind].predict(pPoint)) if fit > 0.5 else  modeler._models[len(modeler._models)-1].predict(pPoint)
 
             #prediction = (scalerY.inverse_transform(prediction))  # + scalerY.inverse_transform(currModeler1.predict(scaled))) / 2
             #states_value = modeler._models[0].model.predict([unseenX[:,0].reshape(1,unseenX.shape[200],1) , unseenX[ :, 1 ].reshape(1, unseenX.shape[ 200 ], 1)])
