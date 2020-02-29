@@ -794,13 +794,13 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
         UnseenSeriesX = dtNew
         return UnseenSeriesX
 
-    def extractFunctionsFromSplines(self,x0, x1):
+    def extractFunctionsFromSplines(self,x0, x1,modelId):
         piecewiseFunc = []
         #self.count = self.count + 1
-        csvModels=['./model_Gen_.csv']
+        csvModels=['./model_'+str(modelId)+'_.csv']
         for csvM in csvModels:
-            if csvM != './model_Gen_.csv':
-                continue
+            #if csvM != './model_Gen_.csv':
+                #continue
             # id = csvM.split("_")[ 1 ]
             # piecewiseFunc = [ ]
 
@@ -1237,7 +1237,7 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
             #prediction = np.sum(model2.predict(pPoint, verbose=0)) / 5
 
             #ind , fit = modeler.getBestPartitionForPoint(pPoint,partitionsX)
-            ind, fit = modeler.getBestPartitionForPoint(pPoint, vectorWeights)
+            ind, fit = modeler.getBestPartitionForPoint(pPoint, partitionsX)
             #fits = modeler.getFitsOfPoint(partitionsX,pPoint)
             #fit  = modeler.getFitofPointIncluster(pPoint,centroids[ind])
             #scaledPoint = scalerX.fit_transform(pPoint)
@@ -1261,10 +1261,11 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
             #for i in range(0,len(fits)):
                 #pred+=fits[i]*modeler._models[i].predict(pPoint)
 
-            vector = self.extractFunctionsFromSplines(pPoint[0][0],pPoint[0][1])
+            vector = self.extractFunctionsFromSplines(pPoint[0][0],pPoint[0][1],ind)
             XSplineVector=np.append(pPoint, vector)
-            prediction = abs(modeler._models[ 0 ].predict(XSplineVector.reshape(-1,15)))
-            #prediction = abs(modeler._models[ind].predict(pPoint)) if fit > 0.5 else  modeler._models[len(modeler._models)-1].predict(pPoint)
+            XSplineVector = XSplineVector.reshape(-1, XSplineVector.shape[ 0 ])
+            #prediction = abs(modeler._models[ 0 ].predict(XSplineVector))
+            prediction = abs(modeler._models[ind].predict(pPoint)) if fit > 0.5 else  modeler._models[len(modeler._models)-1].predict(pPoint)
 
             #prediction = (scalerY.inverse_transform(prediction))  # + scalerY.inverse_transform(currModeler1.predict(scaled))) / 2
             #states_value = modeler._models[0].model.predict([unseenX[:,0].reshape(1,unseenX.shape[200],1) , unseenX[ :, 1 ].reshape(1, unseenX.shape[ 200 ], 1)])
