@@ -1264,8 +1264,12 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
             vector = self.extractFunctionsFromSplines(pPoint[0][0],pPoint[0][1],ind)
             XSplineVector=np.append(pPoint, vector)
             XSplineVector = XSplineVector.reshape(-1, XSplineVector.shape[ 0 ])
+
+            vector = self.extractFunctionsFromSplines(pPoint[ 0 ][ 0 ], pPoint[ 0 ][ 1 ], 'Gen')
+            XSplineGenVector = np.append(pPoint, vector)
+            XSplineGenVector = XSplineGenVector.reshape(-1, XSplineGenVector.shape[ 0 ])
             #prediction = abs(modeler._models[ 0 ].predict(XSplineVector))
-            prediction = abs(modeler._models[ind].predict(XSplineVector)) if fit > 0.5 else  modeler._models[len(modeler._models)-1].predict(XSplineVector)
+            prediction = abs(modeler._models[ind].predict(XSplineVector)) if fit > 0.5 else  modeler._models[len(modeler._models)-1].predict(XSplineGenVector)
 
             #prediction = (scalerY.inverse_transform(prediction))  # + scalerY.inverse_transform(currModeler1.predict(scaled))) / 2
             #states_value = modeler._models[0].model.predict([unseenX[:,0].reshape(1,unseenX.shape[200],1) , unseenX[ :, 1 ].reshape(1, unseenX.shape[ 200 ], 1)])
