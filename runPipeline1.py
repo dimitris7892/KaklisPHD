@@ -98,7 +98,7 @@ def main():
         subsetsB.append(targetB)
         var.append(np.var(seriesX))
 
-        if len(subsetsX)>=1:
+        if len(subsetsX)>=5:
 
             break
     #subsetsX=[subsetsX[0]]
@@ -111,7 +111,7 @@ def main():
     histTr=[]
     counter=0
 
-    K = range(1,11)
+    K = range(1,12)
     print("Number of Statistically ind. subsets for training: " + str(len(subsetsX)))
     subsetsX=[subsetsX[0:5]] if len(subsetsX) > 5 else subsetsX
     subsetsY = [ subsetsY[ 0:5 ] ] if len(subsetsY) > 5 else subsetsY
@@ -303,6 +303,8 @@ def main():
                 err["error"] = meanError
                 err["k"]=k
                 error["errors"].append(err)
+                if modeler.__class__.__name__ == 'TriInterpolantModeler' and numOfclusters==1:
+                    break
 
 
     eval.MeanAbsoluteErrorEvaluation.ANOVAtest(eval.MeanAbsoluteErrorEvaluation(), clusters, varTr, errors,models,part)
