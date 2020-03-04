@@ -3011,8 +3011,9 @@ class TensorFlowW(BasePartitionModeler):
             #model.add(keras.layers.Dense(len(partition_labels) * 2, input_shape=(2,)))
 
             model.add(keras.layers.Dense(genModelKnots-1, input_shape=(2+genModelKnots-1,)))
+                                         #
             #model.add(keras.layers.Dense(10, input_shape=(2,)))
-            #model.add(keras.layers.Dense(5, input_shape=(2,)))
+            model.add(keras.layers.Dense(4, ))
             #model.add(keras.layers.Dense(2, input_shape=(2,)))
 
 
@@ -3553,20 +3554,34 @@ class TensorFlowW(BasePartitionModeler):
         for i in range(0,len(X)):
             vector = extractFunctionsFromSplines(X[i][0],X[i][1])
             XSplineVector.append(np.append(X[i],vector))
-            velocities.append(X[i])
-            vectorWeights.append(vector)
+            #XSplineVector.append(vector)
+            #velocities.append(X[i])
+            #vectorWeights.append(vector)
             #XSplineVector.append( vector)
 
         #X =  np.append(X, np.asmatrix([dataY]).T, axis=1)
         XSplineVector = np.array(XSplineVector)
-        #weights0 =  np.mean(XSplineVector, axis=0)
+        weights0 =  np.mean(XSplineVector, axis=0)
         #weights1 = self.intercepts
-        #weights1 = estimator.layers[0].get_weights()[0][1]
-        #weights = np.array(np.append(weights0.reshape(-1,1),np.asmatrix(weights0).reshape(-1,1),axis=1).reshape(2,-1))
+        weights1 = estimator.layers[0].get_weights()[0][1]
+        weights = np.array(np.append(weights0.reshape(-1,1),np.asmatrix(weights0).reshape(-1,1),axis=1).reshape(2,-1))
 
-        #estimator.layers[0].set_weights([weights, np.array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])])
+        #estimator.layers[0].set_weights([weights, np.array([0] * (genModelKnots-1))])
         #estimator.layers[4].inputs
+
+        #input_shape = estimator.layers[ 0 ].get_input_shape_at(0)  # get the input shape of desired layer
+        #layer_input = keras.Input(shape=(2,))  # a new input tensor to be able to feed the desired layer
+
+        # create the new nodes for each layer in the path
+        #x = layer_input
+        #for layer in estimator.layers[ 0: ]:
+            #x = layer(x)
+
+        # create the model
+        #new_model = keras.Model(layer_input, x)
+        #new_model.compile(loss=keras.losses.mean_squared_error, optimizer=keras.optimizers.Adam(),)#experimental_run_tf_function=False )
         estimator.fit(XSplineVector, Y, epochs=100, validation_split=0.33)
+
         self.flagGen = True
 
         #estimatorD = baseline_modelDeepCl()
@@ -3672,6 +3687,7 @@ class TensorFlowW(BasePartitionModeler):
                 for i in range(0, len(partitionsX[idx])):
                     vector = extractFunctionsFromSplines(partitionsX[idx][ i ][ 0 ], partitionsX[idx][ i ][ 1 ])
                     XSplineClusterVector.append(np.append(partitionsX[idx][i], vector))
+                    #XSplineClusterVector.append(vector)
                     #velocities.append(X[ i ])
                     #vectorWeights.append(vector)
                     # XSplineVector.append( vector)
@@ -3684,12 +3700,22 @@ class TensorFlowW(BasePartitionModeler):
 
                 estimatorCl = keras.models.Sequential()
 
-                estimatorCl.add(keras.layers.Dense(numOfNeurons , input_shape=(2+numOfNeurons-1,)))
+                estimatorCl.add(keras.layers.Dense(numOfNeurons -1 ,input_shape=(2+numOfNeurons-1,)))
+                estimatorCl.add(keras.layers.Dense(4, ))
+                                                   #input_shape=(2+numOfNeurons-1,)))
 
                 estimatorCl.add(keras.layers.Dense(1, ))
                 estimatorCl.compile(loss=keras.losses.mean_squared_error, optimizer=keras.optimizers.Adam(), )                #try:
 
+                weights0 = np.mean(XSplineClusterVector, axis=0)
+                # weights1 = self.intercepts
+                weights1 = estimatorCl.layers[ 0 ].get_weights()[ 0 ][ 1 ]
+                weights = np.array(
+                    np.append(weights0.reshape(-1, 1), np.asmatrix(weights0).reshape(-1, 1), axis=1).reshape(2, -1))
 
+
+
+                #estimatorCl.layers[ 0 ].set_weights([ weights, np.array([0]*(numOfNeurons-1))])
                     #modelId=idx
 
                 #estimatorCl = baseline_model()
@@ -3723,7 +3749,7 @@ class TensorFlowW(BasePartitionModeler):
                     #estimator.layers[3] = custom_activation2 if idx ==3 else estimator.layers[3]
 
                 estimatorCl.fit(np.array(XSplineClusterVector),np.array(partitionsY[idx]),epochs=100,validation_split=0.33)#validation_split=0.33
-
+                #np.array(XSplineClusterVector)
                 score = estimatorCl.evaluate(np.array(XSplineClusterVector),np.array(partitionsY[idx]),verbose=1)
                 #print("%s: %.2f%%" % ("acc: ", score))
                 scores.append(score)
