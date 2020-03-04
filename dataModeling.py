@@ -3013,7 +3013,7 @@ class TensorFlowW(BasePartitionModeler):
             model.add(keras.layers.Dense(genModelKnots-1, input_shape=(2+genModelKnots-1,)))
                                          #
             #model.add(keras.layers.Dense(10, input_shape=(2,)))
-            model.add(keras.layers.Dense(4, ))
+            #model.add(keras.layers.Dense(4, ))
             #model.add(keras.layers.Dense(2, input_shape=(2,)))
 
 
@@ -3701,7 +3701,7 @@ class TensorFlowW(BasePartitionModeler):
                 estimatorCl = keras.models.Sequential()
 
                 estimatorCl.add(keras.layers.Dense(numOfNeurons -1 ,input_shape=(2+numOfNeurons-1,)))
-                estimatorCl.add(keras.layers.Dense(4, ))
+                #estimatorCl.add(keras.layers.Dense(4, ))
                                                    #input_shape=(2+numOfNeurons-1,)))
 
                 estimatorCl.add(keras.layers.Dense(1, ))
