@@ -48,7 +48,7 @@ def main():
     #DANreader.readLarosDAta(datetime.datetime(2018,1,1),datetime.datetime(2019,1,1))
 
     #DANreader.GenericParserForDataExtraction('LAROS','MARMARAS','MT_DELTA_MARIA')
-    DANreader.GenericParserForDataExtraction('TELEGRAMS', 'MILLENIA', 'FANTASIA','ORACLE','10.2.5.80','millenia','millenia')
+    #DANreader.GenericParserForDataExtraction('TELEGRAMS', 'MILLENIA', 'FANTASIA','ORACLE','10.2.5.80','millenia','millenia')
     #DANreader.readExtractNewDataset('MILLENIA','FANTASIA',';')
     #return
     #DANreader.ExtractLAROSDataset("",'2017-06-01 00:00:00','2019-10-09 15:10:00')
@@ -111,7 +111,7 @@ def main():
     histTr=[]
     counter=0
 
-    K = range(1,4)
+    K = range(1,12)
     print("Number of Statistically ind. subsets for training: " + str(len(subsetsX)))
     subsetsX=[subsetsX[0:5]] if len(subsetsX) > 5 else subsetsX
     subsetsY = [ subsetsY[ 0:5 ] ] if len(subsetsY) > 5 else subsetsY
@@ -130,7 +130,7 @@ def main():
                      #[0.6]
            if partitioner.__class__.__name__=='KMeansPartitioner':
                if modeler.__class__.__name__=='TriInterpolantModeler' or modeler.__class__.__name__ == 'TensorFlow':
-                 partK = [1]
+                 partK =K
                else:
                  partK=[5]
            error = {"errors": [ ]}
@@ -303,6 +303,8 @@ def main():
                 err["error"] = meanError
                 err["k"]=k
                 error["errors"].append(err)
+                if modeler.__class__.__name__ == 'TriInterpolantModeler' and numOfclusters==1:
+                    break
 
 
     eval.MeanAbsoluteErrorEvaluation.ANOVAtest(eval.MeanAbsoluteErrorEvaluation(), clusters, varTr, errors,models,part)
