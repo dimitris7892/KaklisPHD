@@ -9,7 +9,7 @@ from sklearn.cluster import KMeans
 from decimal import Decimal
 import random
 #from coordinates.converter import CoordinateConverter, WGS84, L_Est97
-import pyodbc
+#import pyodbc
 import csv
 import locale
 locale.setlocale(locale.LC_ALL, ""); print(locale.localeconv()["decimal_point"])
@@ -21,7 +21,7 @@ from sympy.solvers import solve
 from sympy import Symbol
 from pathlib import Path
 from sympy import cos, sin , tan , exp , sqrt , E
-from openpyxl import load_workbook
+#from openpyxl import load_workbook
 
 #DANAOS_TELEGRAMS_SQL =SELECT  TELEGRAM_DATE , TELEGRAM_TYPE,BALAST_FLAG,LATITUDE_DEGREES , LATITUDE_SECONDS ,LONGITUDE_DEGREES , LONGITUDE_SECONDS ,vessel_course,(DRAFT_AFT + DRAFT_FORE)/2 as DRAFT , ENGINE_RPM , WIND_DIRECTION , WIND_FORCE  ,AVERAGE_SPEED ,hours_slc,minutes_slc, (( NVL(ME_HSFO_CONS,0)+ NVL(ME_LSFO_CONS,0)+ NVL(ME_HSDO_CONS,0 ) + NVL(ME_LSDO_CONS,0)))   as ME_CONS_24h  FROM TELEGRAMS where vessel_code ='486' AND TELEGRAM_TYPE='D' or telegram_type='N';
 
