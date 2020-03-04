@@ -98,7 +98,7 @@ def main():
         subsetsB.append(targetB)
         var.append(np.var(seriesX))
 
-        if len(subsetsX)>=5:
+        if len(subsetsX)>=1:
 
             break
     #subsetsX=[subsetsX[0]]
