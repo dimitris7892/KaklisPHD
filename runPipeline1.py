@@ -48,7 +48,7 @@ def main():
     #DANreader.readLarosDAta(datetime.datetime(2018,1,1),datetime.datetime(2019,1,1))
 
     #DANreader.GenericParserForDataExtraction('LAROS','MARMARAS','MT_DELTA_MARIA')
-    DANreader.GenericParserForDataExtraction('LEMAG', 'GOLDENPORT', 'TRAMMO LAOURA',driver='ORACLE',server='10.2.5.80',sid='OR12',usr='goldenport',password='goldenport',pathOfRawData='C:/Users/dkaklis/Desktop/danaos')
+    #DANreader.GenericParserForDataExtraction('LEMAG', 'GOLDENPORT', 'TRAMMO LAOURA',driver='ORACLE',server='10.2.5.80',sid='OR12',usr='goldenport',password='goldenport',pathOfRawData='C:/Users/dkaklis/Desktop/danaos')
     #DANreader.readExtractNewDataset('MILLENIA','FANTASIA',';')
     #return
     #DANreader.ExtractLAROSDataset("",'2017-06-01 00:00:00','2019-10-09 15:10:00')
@@ -98,7 +98,7 @@ def main():
         subsetsB.append(targetB)
         var.append(np.var(seriesX))
 
-        if len(subsetsX)>=1:
+        if len(subsetsX)>=5:
 
             break
     #subsetsX=[subsetsX[0]]
@@ -132,7 +132,7 @@ def main():
                if modeler.__class__.__name__=='TriInterpolantModeler' or modeler.__class__.__name__ == 'TensorFlow':
                  partK =K
                else:
-                 partK=[5]
+                 partK=K
            error = {"errors": [ ]}
            #random.seed(1)
 
