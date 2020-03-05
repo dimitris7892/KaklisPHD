@@ -3748,14 +3748,14 @@ class TensorFlowW(BasePartitionModeler):
                     #estimator.compile()
                     #estimator.layers[3] = custom_activation2(inputs=estimator.layers[2].output, modelId=idx) if idx ==0 else estimator.layers[3]
                     #estimator.layers[3] = custom_activation2 if idx ==3 else estimator.layers[3]
-                try:
-                    estimatorCl.fit(np.array(XSplineClusterVector),np.array(partitionsY[idx]),epochs=100)#validation_split=0.33
-                    Clscore = estimatorCl.evaluate(np.array(XSplineClusterVector), np.array(partitionsY[idx]), verbose=1)
-                    scores.append(Clscore)
-                    NNmodels.append(estimatorCl)
-                except:
-                    scores.append(score)
-                    NNmodels.append(estimator)
+                #try:
+                estimatorCl.fit(np.array(XSplineClusterVector),np.array(partitionsY[idx]),epochs=100)#validation_split=0.33
+                Clscore = estimatorCl.evaluate(np.array(XSplineClusterVector), np.array(partitionsY[idx]), verbose=1)
+                scores.append(Clscore)
+                NNmodels.append(estimatorCl)
+                #except:
+                    #scores.append(score)
+                    #NNmodels.append(estimator)
 
                 #np.array(XSplineClusterVector)
 
