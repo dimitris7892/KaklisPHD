@@ -3581,6 +3581,7 @@ class TensorFlowW(BasePartitionModeler):
         #new_model = keras.Model(layer_input, x)
         #new_model.compile(loss=keras.losses.mean_squared_error, optimizer=keras.optimizers.Adam(),)#experimental_run_tf_function=False )
         estimator.fit(XSplineVector, Y, epochs=100, validation_split=0.33)
+        score = estimator.evaluate(np.array(XSplineVector),Y, verbose=1)
 
         self.flagGen = True
 
@@ -3749,14 +3750,17 @@ class TensorFlowW(BasePartitionModeler):
                     #estimator.layers[3] = custom_activation2 if idx ==3 else estimator.layers[3]
                 try:
                     estimatorCl.fit(np.array(XSplineClusterVector),np.array(partitionsY[idx]),epochs=100)#validation_split=0.33
-                    score = estimatorCl.evaluate(np.array(XSplineClusterVector), np.array(partitionsY[idx]), verbose=1)
+                    Clscore = estimatorCl.evaluate(np.array(XSplineClusterVector), np.array(partitionsY[idx]), verbose=1)
+                    scores.append(Clscore)
+                    NNmodels.append(estimatorCl)
                 except:
+                    scores.append(score)
                     NNmodels.append(estimator)
+
                 #np.array(XSplineClusterVector)
 
                 #print("%s: %.2f%%" % ("acc: ", score))
-                scores.append(score)
-                NNmodels.append(estimatorCl)
+
                 #except Exception as e:
                     #print(str(e))
                     #return
