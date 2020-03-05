@@ -289,7 +289,7 @@ class BaseSeriesReader:
                 np.append(firstColumn, np.asmatrix([vCourses,blFlags,otherColumns,windDirs,windSpeeds,otherColumns,otherColumns,drafts,otherColumns,windSpeeds,windDirs,stw,
                                                     otherColumns,otherColumns,np.round((foc/1000)*24,2)]).T, axis=1))
 
-            with open('./data/' + company + '/' + vessel + '/mappedData', mode='w') as data:
+            with open('./data/' + company + '/' + vessel + '/mappedData.csv', mode='w') as data:
                 data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
             for i in range(0, len(newDataSet)):
 
