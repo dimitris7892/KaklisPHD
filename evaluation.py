@@ -1269,7 +1269,7 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
             XSplineGenVector = np.append(pPoint, vector)
             XSplineGenVector = XSplineGenVector.reshape(-1, XSplineGenVector.shape[ 0 ])
             #prediction = abs(modeler._models[ 0 ].predict(XSplineVector))
-            prediction = (abs(modeler._models[ind].predict(XSplineGenVector)) + modeler._models[len(modeler._models)-1].predict(XSplineVector))/2
+            prediction = (abs(modeler._models[ind].predict(XSplineVector)) + modeler._models[len(modeler._models)-1].predict(XSplineGenVector))/2
                 #abs(modeler._models[ind].predict(XSplineVector))
                 #(abs(modeler._models[ind].predict(XSplineVector)) + modeler._models[len(modeler._models)-1].predict(XSplineGenVector))/2
                 #abs(modeler._models[ind].predict(XSplineVector)) if fit > 0.5 else  modeler._models[len(modeler._models)-1].predict(XSplineGenVector)
