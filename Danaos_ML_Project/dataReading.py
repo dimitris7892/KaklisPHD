@@ -9,7 +9,7 @@ from sklearn.cluster import KMeans
 from decimal import Decimal
 import random
 #from coordinates.converter import CoordinateConverter, WGS84, L_Est97
-#import pyodbc
+import pyodbc
 import csv
 import locale
 locale.setlocale(locale.LC_ALL, ""); print(locale.localeconv()["decimal_point"])
@@ -21,7 +21,7 @@ from sympy.solvers import solve
 from sympy import Symbol
 from pathlib import Path
 from sympy import cos, sin , tan , exp , sqrt , E
-#from openpyxl import load_workbook
+from openpyxl import load_workbook
 import glob, os
 from pathlib import Path
 import shutil
@@ -244,6 +244,8 @@ class BaseSeriesReader:
             blFlags=[]
             vCourses = []
             ##map weather data from telegrams
+
+            ####
             for i in range(0,len(newDataSet)):
                 datetimeV = str(newDataSet[i,0])
                 lat = str(newDataSet[i, 4])
@@ -267,6 +269,9 @@ class BaseSeriesReader:
                 drafts.append(0 if telegramRow.__len__() == 0 else telegramRow[:, 8][0])
                 vCourses.append(vCourse)
                 blFlags.append('nan' if telegramRow.__len__() == 0 else telegramRow[:, 2][0])
+
+
+
                 #filteredDTWs = [d for d in dateTimesW if month == str(d).split('/')[1] and day ==
                                 #str(d).split('/')[0] and year[2:] == str(d).split('/')[2]]
 
@@ -283,6 +288,14 @@ class BaseSeriesReader:
             newDataSet = np.array(
                 np.append(firstColumn, np.asmatrix([vCourses,blFlags,otherColumns,windDirs,windSpeeds,otherColumns,otherColumns,drafts,otherColumns,windSpeeds,windDirs,stw,
                                                     otherColumns,otherColumns,np.round((foc/1000)*24,2)]).T, axis=1))
+
+            with open('./data/' + company + '/' + vessel + '/mappedData', mode='w') as data:
+                data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+            for i in range(0, len(newDataSet)):
+
+                    data_writer.writerow([0, vCourses[i], blFlags[i], 0, windDirs[i], windSpeeds[i], 0, 0, drafts[i], 0, windSpeeds[i],
+                                              windDirs[i], stw[i], 0, 0, np.round((foc[i] / 1000) * 24, 2)])
+
 
 
             self.fillExcelProfCons(vessel,'C:/Users/dkaklis/Desktop/template.xlsx',newDataSet)
@@ -1016,6 +1029,18 @@ class BaseSeriesReader:
         workbook._sheets[1]['B2'] = meanDraftLadden
         #############################################################################
         ##BALLAST
+        ##delete ballast outliers
+        np.delete(ladenDt, [i for (i, v) in enumerate(ladenDt[:, 8]) if v < (
+            np.mean(ladenDt[:, 8]) - np.std(ladenDt[:, 8])) or v > np.mean(
+            ladenDt[:, 8]) + np.std(
+            ladenDt[:, 8])], 0)
+
+        ##delete ladden outliers
+        np.delete(ladenDt, [i for (i, v) in enumerate(ladenDt[:, 8]) if v < (
+            np.mean(ladenDt[:, 8]) - np.std(ladenDt[:, 8])) or v > np.mean(
+            ladenDt[:, 8]) + np.std(
+            ladenDt[:, 8])], 0)
+
         ###SPEED 10 WIND <1.5
         ballastDt10_0 = []
         for i in range(0, len(wind) - 1):
@@ -1146,7 +1171,7 @@ class BaseSeriesReader:
         for i in range(29, 34):
             workbook._sheets[2]['B' + str(i)] = ballastDt12_0[i - 29]
 
-            ###SPEED 11.5  2 < WIND <3
+        ###SPEED 11.5  2 < WIND <3
         ballastDt12_3 = []
         for i in range(0, len(wind) - 1):
             arrayFoc = np.array([k for k in ballastDt if

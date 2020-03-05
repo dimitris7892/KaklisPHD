@@ -3707,11 +3707,11 @@ class TensorFlowW(BasePartitionModeler):
                 estimatorCl.add(keras.layers.Dense(1, ))
                 estimatorCl.compile(loss=keras.losses.mean_squared_error, optimizer=keras.optimizers.Adam(), )                #try:
 
-                weights0 = np.mean(XSplineClusterVector, axis=0)
+                #weights0 = np.mean(XSplineClusterVector, axis=0)
                 # weights1 = self.intercepts
-                weights1 = estimatorCl.layers[ 0 ].get_weights()[ 0 ][ 1 ]
-                weights = np.array(
-                    np.append(weights0.reshape(-1, 1), np.asmatrix(weights0).reshape(-1, 1), axis=1).reshape(2, -1))
+                #weights1 = estimatorCl.layers[ 0 ].get_weights()[ 0 ][ 1 ]
+                #weights = np.array(
+                    #np.append(weights0.reshape(-1, 1), np.asmatrix(weights0).reshape(-1, 1), axis=1).reshape(2, -1))
 
 
 
@@ -3747,10 +3747,13 @@ class TensorFlowW(BasePartitionModeler):
                     #estimator.compile()
                     #estimator.layers[3] = custom_activation2(inputs=estimator.layers[2].output, modelId=idx) if idx ==0 else estimator.layers[3]
                     #estimator.layers[3] = custom_activation2 if idx ==3 else estimator.layers[3]
-
-                estimatorCl.fit(np.array(XSplineClusterVector),np.array(partitionsY[idx]),epochs=100,validation_split=0.33)#validation_split=0.33
+                try:
+                    estimatorCl.fit(np.array(XSplineClusterVector),np.array(partitionsY[idx]),epochs=100)#validation_split=0.33
+                    score = estimatorCl.evaluate(np.array(XSplineClusterVector), np.array(partitionsY[idx]), verbose=1)
+                except:
+                    NNmodels.append(estimator)
                 #np.array(XSplineClusterVector)
-                score = estimatorCl.evaluate(np.array(XSplineClusterVector),np.array(partitionsY[idx]),verbose=1)
+
                 #print("%s: %.2f%%" % ("acc: ", score))
                 scores.append(score)
                 NNmodels.append(estimatorCl)
