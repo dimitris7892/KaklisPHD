@@ -224,7 +224,7 @@ class BaseSeriesReader:
                 shutil.copytree(pathOfRawData, path)
             dataSet = []
             for infile in  sorted(glob.glob(path+'*.csv')):
-                data = pd.read_csv(infile, sep=';', decimal='.',skiprows=2)
+                data = pd.read_csv(infile, sep=';', decimal='.',skiprows=1)
                 dataSet.append(data)
                 print(str(infile))
 
@@ -249,7 +249,9 @@ class BaseSeriesReader:
             for i in range(0,len(newDataSet)):
                 datetimeV = str(newDataSet[i,0])
                 lat = str(newDataSet[i, 4])
+                latDir = str(newDataSet[i, 5])
                 lon = str(newDataSet[i, 6])
+                lonDir = str(newDataSet[i, 7])
                 vCourse = newDataSet[i, 1]
                 dateV = datetimeV.split(" ")[0]
                 hhMMss=datetimeV.split(" ")[1]
@@ -263,7 +265,7 @@ class BaseSeriesReader:
 
                 telegramRow = np.array( [row for row in telegrams if str(row[0]).split(" ")[0]==newDate])
 
-                windDir , windSpeed = self.mapWeatherData(vCourse,newDate1,lat,lon)
+                windDir , windSpeed = self.mapWeatherData(vCourse,newDate1,lat,lon , latDir,lonDir)
                 windDirs.append(windDir)
                 windSpeeds.append(windSpeed)
                 drafts.append(0 if telegramRow.__len__() == 0 else telegramRow[:, 8][0])
@@ -289,6 +291,10 @@ class BaseSeriesReader:
                 np.append(firstColumn, np.asmatrix([vCourses,blFlags,otherColumns,windDirs,windSpeeds,otherColumns,otherColumns,drafts,otherColumns,windSpeeds,windDirs,stw,
                                                     otherColumns,otherColumns,np.round((foc/1000)*24,2)]).T, axis=1))
 
+
+
+            self.fillExcelProfCons(vessel,'C:/Users/dkaklis/Desktop/template.xlsx',newDataSet)
+
             with open('./data/' + company + '/' + vessel + '/mappedData.csv', mode='w') as data:
                 data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
             for i in range(0, len(newDataSet)):
@@ -296,9 +302,6 @@ class BaseSeriesReader:
                     data_writer.writerow([0, vCourses[i], blFlags[i], 0, windDirs[i], windSpeeds[i], 0, 0, drafts[i], 0, windSpeeds[i],
                                               windDirs[i], stw[i], 0, 0, np.round((foc[i] / 1000) * 24, 2)])
 
-
-
-            self.fillExcelProfCons(vessel,'C:/Users/dkaklis/Desktop/template.xlsx',newDataSet)
             #while endYear <= endYear and startDay<=endDay and startMonth<=endMonth:
                 #data = pd.read_csv('./data/' + company + '/' + vessel +'SEEAmag '+startYear+'.'+startMonth+'.'+startDay+'.csv', sep=';', decimal='.')
                 #startDay=+1
@@ -867,7 +870,7 @@ class BaseSeriesReader:
 
                         print("TABLE "'WeatherHistoryDB.dbo.d' + dbDate + " ON DATABASE WeatherHistoryDB DOES NOT EXISTS...INSERTING FIELDS FROM SENSORS.. ")
 
-    def mapWeatherData(self,Vcourse,dt ,lat, lon ):
+    def mapWeatherData(self,Vcourse,dt ,lat, lon ,latDir , lonDir ):
 
         LAT = lat[0:9]
         LON = lon[0:9]
@@ -895,6 +898,8 @@ class BaseSeriesReader:
 
         LAT = np.round(LAT)
         LON = np.round(LON)
+        LAT = -LAT if latDir =='W' or latDir=='S' else LAT
+        LON = -LON if lonDir == 'W' or lonDir=='S' else LON
         ### end lat , lon
 
         ##FORM WEATHER HISTORY DB NAME TO SEARCH
@@ -1753,7 +1758,7 @@ class BaseSeriesReader:
                         dtNew[i, 15]=( (float(dtNew[i,15])  / (float(dtNew[i,13]) + float(dtNew[i,14]) /60 )) *24)
 
             self.fillExcelProfCons(vessel,pathToexcel,dtNew)
-            return
+            #return
 
             draft = {"data": [ ]}
             course = {"data": [ ]}
