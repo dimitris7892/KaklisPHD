@@ -5,6 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="9e10e853-69bc-4a18-9c9f-e2f3d9527f23" name="Default" comment="">
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Danaos_ML_Project/dataReading.py" afterPath="$PROJECT_DIR$/Danaos_ML_Project/dataReading.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/runPipeline1.py" afterPath="$PROJECT_DIR$/runPipeline1.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -32,37 +33,39 @@
       <file leaf-file-name="dataReading.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Danaos_ML_Project/dataReading.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="424">
-              <caret line="1604" column="0" lean-forward="false" selection-start-line="1604" selection-start-column="0" selection-end-line="1604" selection-end-column="0" />
+            <state relative-caret-position="-2211">
+              <caret line="286" column="0" lean-forward="true" selection-start-line="286" selection-start-column="0" selection-end-line="286" selection-end-column="0" />
               <folding>
                 <element signature="e#0#18#0" expanded="true" />
                 <element signature="e#1349#5651#0" expanded="false" />
-                <element signature="e#15641#41682#0" expanded="false" />
-                <element signature="e#105974#139437#0" expanded="false" />
-                <element signature="e#139508#155582#0" expanded="false" />
-                <element signature="e#155651#196785#0" expanded="false" />
-                <element signature="e#196841#219253#0" expanded="false" />
-                <element signature="e#219306#222387#0" expanded="false" />
-                <marker date="1583339106434" expanded="false" signature="5695:5777" ph="..." />
-                <marker date="1583339106434" expanded="false" signature="5838:6120" ph="..." />
-                <marker date="1583339106434" expanded="false" signature="6158:6197" ph="..." />
-                <marker date="1583339106434" expanded="false" signature="6239:7121" ph="..." />
-                <marker date="1583339106434" expanded="false" signature="7187:7515" ph="..." />
-                <marker date="1583339106434" expanded="false" signature="7590:7938" ph="..." />
-                <marker date="1583339106434" expanded="false" signature="8010:8212" ph="..." />
-                <marker date="1583339106434" expanded="false" signature="8267:8305" ph="..." />
-                <marker date="1583339106434" expanded="false" signature="16743:26008" ph="..." />
-                <marker date="1583339106434" expanded="false" signature="177435:196720" ph="..." />
+                <element signature="e#12582#15980#0" expanded="false" />
+                <element signature="e#16028#42069#0" expanded="false" />
+                <element signature="e#42132#44981#0" expanded="false" />
+                <element signature="e#109288#142751#0" expanded="false" />
+                <element signature="e#142822#158896#0" expanded="false" />
+                <element signature="e#158965#200099#0" expanded="false" />
+                <element signature="e#200155#222567#0" expanded="false" />
+                <element signature="e#222620#225701#0" expanded="false" />
+                <marker date="1583404914511" expanded="false" signature="5695:5777" ph="..." />
+                <marker date="1583404914511" expanded="false" signature="5838:6120" ph="..." />
+                <marker date="1583404914511" expanded="false" signature="6158:6197" ph="..." />
+                <marker date="1583404914511" expanded="false" signature="6239:7121" ph="..." />
+                <marker date="1583404914511" expanded="false" signature="7187:7515" ph="..." />
+                <marker date="1583404914511" expanded="false" signature="7590:7938" ph="..." />
+                <marker date="1583404914511" expanded="false" signature="8010:8212" ph="..." />
+                <marker date="1583404914511" expanded="false" signature="8267:8305" ph="..." />
+                <marker date="1583404914511" expanded="false" signature="17130:26395" ph="..." />
+                <marker date="1583404914511" expanded="false" signature="180749:200034" ph="..." />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="runPipeline1.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="runPipeline1.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/runPipeline1.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="398">
-              <caret line="126" column="57" lean-forward="true" selection-start-line="126" selection-start-column="57" selection-end-line="126" selection-end-column="57" />
+            <state relative-caret-position="542">
+              <caret line="128" column="39" lean-forward="true" selection-start-line="128" selection-start-column="39" selection-end-line="128" selection-end-column="39" />
               <folding>
                 <element signature="e#0#27#0" expanded="true" />
               </folding>
@@ -73,23 +76,22 @@
       <file leaf-file-name="evaluation.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/evaluation.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="926">
-              <caret line="1271" column="141" lean-forward="false" selection-start-line="1271" selection-start-column="141" selection-end-line="1271" selection-end-column="141" />
+            <state relative-caret-position="2761">
+              <caret line="1300" column="56" lean-forward="true" selection-start-line="1300" selection-start-column="56" selection-end-line="1300" selection-end-column="56" />
               <folding>
                 <element signature="e#0#18#0" expanded="true" />
                 <element signature="e#4277#37594#0" expanded="false" />
                 <element signature="e#37657#37858#0" expanded="false" />
-                <element signature="e#66976#68510#0" expanded="false" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="dataModeling.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="dataModeling.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/dataModeling.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1359">
-              <caret line="3705" column="0" lean-forward="false" selection-start-line="3705" selection-start-column="0" selection-end-line="3705" selection-end-column="0" />
+            <state relative-caret-position="1342">
+              <caret line="3752" column="113" lean-forward="true" selection-start-line="3752" selection-start-column="113" selection-end-line="3752" selection-end-column="113" />
               <folding>
                 <element signature="e#0#33#0" expanded="true" />
                 <element signature="e#5055#31673#0" expanded="false" />
@@ -155,7 +157,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>UNK</find>
       <find>pyodbc</find>
       <find>[]</find>
       <find>28/3/2019  8:35:00</find>
@@ -185,6 +186,7 @@
       <find>np.append(</find>
       <find>vector</find>
       <find>fillExcelProfCons</find>
+      <find>join</find>
     </findStrings>
     <replaceStrings>
       <replace>&gt; 9</replace>
@@ -245,12 +247,12 @@
         <option value="/fragment.py" />
         <option value="$PROJECT_DIR$/dataModeling.py" />
         <option value="$PROJECT_DIR$/evaluation.py" />
-        <option value="$PROJECT_DIR$/Danaos_ML_Project/dataReading.py" />
         <option value="$PROJECT_DIR$/runPipeline1.py" />
+        <option value="$PROJECT_DIR$/Danaos_ML_Project/dataReading.py" />
       </list>
     </option>
   </component>
-  <component name="ProjectFrameBounds" extendedState="6">
+  <component name="ProjectFrameBounds" extendedState="7">
     <option name="x" value="185" />
     <option name="y" value="127" />
     <option name="width" value="1040" />
@@ -440,7 +442,7 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
+    <frame x="-8" y="-8" width="1936" height="1056" extended-state="7" />
     <editor active="true" />
     <layout>
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.17916666" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
@@ -449,11 +451,11 @@
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3273495" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.17317846" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.2745512" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.2745512" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.22069694" sideWeight="0.49791667" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.22069694" sideWeight="0.49791667" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Data View" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.40989584" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -580,17 +582,17 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/Danaos_ML_Project/dataReading.py</url>
-          <line>3093</line>
+          <line>3185</line>
           <option name="timeStamp" value="1022" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/Danaos_ML_Project/dataReading.py</url>
-          <line>2947</line>
+          <line>3039</line>
           <option name="timeStamp" value="1028" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/Danaos_ML_Project/dataReading.py</url>
-          <line>2932</line>
+          <line>3024</line>
           <option name="timeStamp" value="1031" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
@@ -600,33 +602,23 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/Danaos_ML_Project/dataReading.py</url>
-          <line>531</line>
+          <line>540</line>
           <option name="timeStamp" value="1147" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/Danaos_ML_Project/dataReading.py</url>
-          <line>519</line>
+          <line>528</line>
           <option name="timeStamp" value="1148" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/Danaos_ML_Project/dataReading.py</url>
-          <line>481</line>
+          <line>490</line>
           <option name="timeStamp" value="1150" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/Danaos_ML_Project/dataReading.py</url>
-          <line>282</line>
-          <option name="timeStamp" value="1244" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/Danaos_ML_Project/dataReading.py</url>
-          <line>338</line>
-          <option name="timeStamp" value="1245" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/Danaos_ML_Project/dataReading.py</url>
-          <line>278</line>
-          <option name="timeStamp" value="1252" />
+          <line>268</line>
+          <option name="timeStamp" value="1258" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
@@ -636,7 +628,7 @@
           </properties>
         </breakpoint>
       </default-breakpoints>
-      <option name="time" value="1254" />
+      <option name="time" value="1259" />
     </breakpoint-manager>
     <watches-manager />
   </component>
@@ -1063,19 +1055,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/evaluation.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="926">
-          <caret line="1271" column="141" lean-forward="false" selection-start-line="1271" selection-start-column="141" selection-end-line="1271" selection-end-column="141" />
-          <folding>
-            <element signature="e#0#18#0" expanded="true" />
-            <element signature="e#4277#37594#0" expanded="false" />
-            <element signature="e#37657#37858#0" expanded="false" />
-            <element signature="e#66976#68510#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/data/GOLDENPORT/TELEGRAMS/TRAMMO LAOURA.csv">
       <provider editor-type-id="csv-table-editor">
         <state showInfoPanel="true" fixedHeaders="false" rowLines="3" />
@@ -1098,10 +1077,61 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/evaluation.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2761">
+          <caret line="1300" column="56" lean-forward="true" selection-start-line="1300" selection-start-column="56" selection-end-line="1300" selection-end-column="56" />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
+            <element signature="e#4277#37594#0" expanded="false" />
+            <element signature="e#37657#37858#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/runPipeline1.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="542">
+          <caret line="128" column="39" lean-forward="true" selection-start-line="128" selection-start-column="39" selection-end-line="128" selection-end-column="39" />
+          <folding>
+            <element signature="e#0#27#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Danaos_ML_Project/dataReading.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-2211">
+          <caret line="286" column="0" lean-forward="true" selection-start-line="286" selection-start-column="0" selection-end-line="286" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
+            <element signature="e#1349#5651#0" expanded="false" />
+            <element signature="e#12582#15980#0" expanded="false" />
+            <element signature="e#16028#42069#0" expanded="false" />
+            <element signature="e#42132#44981#0" expanded="false" />
+            <element signature="e#109288#142751#0" expanded="false" />
+            <element signature="e#142822#158896#0" expanded="false" />
+            <element signature="e#158965#200099#0" expanded="false" />
+            <element signature="e#200155#222567#0" expanded="false" />
+            <element signature="e#222620#225701#0" expanded="false" />
+            <marker date="1583404914511" expanded="false" signature="5695:5777" ph="..." />
+            <marker date="1583404914511" expanded="false" signature="5838:6120" ph="..." />
+            <marker date="1583404914511" expanded="false" signature="6158:6197" ph="..." />
+            <marker date="1583404914511" expanded="false" signature="6239:7121" ph="..." />
+            <marker date="1583404914511" expanded="false" signature="7187:7515" ph="..." />
+            <marker date="1583404914511" expanded="false" signature="7590:7938" ph="..." />
+            <marker date="1583404914511" expanded="false" signature="8010:8212" ph="..." />
+            <marker date="1583404914511" expanded="false" signature="8267:8305" ph="..." />
+            <marker date="1583404914511" expanded="false" signature="17130:26395" ph="..." />
+            <marker date="1583404914511" expanded="false" signature="180749:200034" ph="..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/dataModeling.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1359">
-          <caret line="3705" column="0" lean-forward="false" selection-start-line="3705" selection-start-column="0" selection-end-line="3705" selection-end-column="0" />
+        <state relative-caret-position="1342">
+          <caret line="3752" column="113" lean-forward="true" selection-start-line="3752" selection-start-column="113" selection-end-line="3752" selection-end-column="113" />
           <folding>
             <element signature="e#0#33#0" expanded="true" />
             <element signature="e#5055#31673#0" expanded="false" />
@@ -1145,43 +1175,6 @@
             <marker date="1583316704754" expanded="false" signature="278042:281326" ph="..." />
             <marker date="1583316704754" expanded="false" signature="281382:282299" ph="..." />
             <marker date="1583316704754" expanded="false" signature="282355:284072" ph="..." />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Danaos_ML_Project/dataReading.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="424">
-          <caret line="1604" column="0" lean-forward="false" selection-start-line="1604" selection-start-column="0" selection-end-line="1604" selection-end-column="0" />
-          <folding>
-            <element signature="e#0#18#0" expanded="true" />
-            <element signature="e#1349#5651#0" expanded="false" />
-            <element signature="e#15641#41682#0" expanded="false" />
-            <element signature="e#105974#139437#0" expanded="false" />
-            <element signature="e#139508#155582#0" expanded="false" />
-            <element signature="e#155651#196785#0" expanded="false" />
-            <element signature="e#196841#219253#0" expanded="false" />
-            <element signature="e#219306#222387#0" expanded="false" />
-            <marker date="1583339106434" expanded="false" signature="5695:5777" ph="..." />
-            <marker date="1583339106434" expanded="false" signature="5838:6120" ph="..." />
-            <marker date="1583339106434" expanded="false" signature="6158:6197" ph="..." />
-            <marker date="1583339106434" expanded="false" signature="6239:7121" ph="..." />
-            <marker date="1583339106434" expanded="false" signature="7187:7515" ph="..." />
-            <marker date="1583339106434" expanded="false" signature="7590:7938" ph="..." />
-            <marker date="1583339106434" expanded="false" signature="8010:8212" ph="..." />
-            <marker date="1583339106434" expanded="false" signature="8267:8305" ph="..." />
-            <marker date="1583339106434" expanded="false" signature="16743:26008" ph="..." />
-            <marker date="1583339106434" expanded="false" signature="177435:196720" ph="..." />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/runPipeline1.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="398">
-          <caret line="126" column="57" lean-forward="true" selection-start-line="126" selection-start-column="57" selection-end-line="126" selection-end-column="57" />
-          <folding>
-            <element signature="e#0#27#0" expanded="true" />
           </folding>
         </state>
       </provider>
