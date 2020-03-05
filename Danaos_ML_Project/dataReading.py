@@ -9,7 +9,7 @@ from sklearn.cluster import KMeans
 from decimal import Decimal
 import random
 #from coordinates.converter import CoordinateConverter, WGS84, L_Est97
-#import pyodbc
+import pyodbc
 import csv
 import locale
 locale.setlocale(locale.LC_ALL, ""); print(locale.localeconv()["decimal_point"])
@@ -21,7 +21,7 @@ from sympy.solvers import solve
 from sympy import Symbol
 from pathlib import Path
 from sympy import cos, sin , tan , exp , sqrt , E
-#from openpyxl import load_workbook
+from openpyxl import load_workbook
 import glob, os
 from pathlib import Path
 import shutil
@@ -242,38 +242,60 @@ class BaseSeriesReader:
             windSpeeds = []
             drafts =[]
             blFlags=[]
+            vCourses = []
             ##map weather data from telegrams
+
+            ####
             for i in range(0,len(newDataSet)):
                 datetimeV = str(newDataSet[i,0])
+                lat = str(newDataSet[i, 4])
+                lon = str(newDataSet[i, 6])
+                vCourse = newDataSet[i, 1]
                 dateV = datetimeV.split(" ")[0]
+                hhMMss=datetimeV.split(" ")[1]
                 month = dateV.split("/")[0]
                 day = dateV.split("/")[1]
                 year = dateV.split("/")[2]
                 month = '0'+month if month.__len__()==1 else month
                 day = '0' + day if day.__len__() == 1 else day
                 newDate = year +'-'+month +'-'+day
+                newDate1 =year +'-'+month +'-'+day  +" " + ":".join(hhMMss.split(":")[ 0:2 ])
 
-                telegramRow =np.array( [row for row in telegrams if str(row[0]).split(" ")[0]==newDate])
+                telegramRow = np.array( [row for row in telegrams if str(row[0]).split(" ")[0]==newDate])
 
-                windDirs.append(0 if telegramRow.__len__()==0 else telegramRow[:,10][0])
-                windSpeeds.append(0 if telegramRow.__len__()==0 else telegramRow[:,11][0])
+                windDir , windSpeed = self.mapWeatherData(vCourse,newDate1,lat,lon)
+                windDirs.append(windDir)
+                windSpeeds.append(windSpeed)
                 drafts.append(0 if telegramRow.__len__() == 0 else telegramRow[:, 8][0])
-                blFlags.append('N' if telegramRow.__len__() == 0 else telegramRow[:, 2][0])
+                vCourses.append(vCourse)
+                blFlags.append('nan' if telegramRow.__len__() == 0 else telegramRow[:, 2][0])
+
+
+
                 #filteredDTWs = [d for d in dateTimesW if month == str(d).split('/')[1] and day ==
                                 #str(d).split('/')[0] and year[2:] == str(d).split('/')[2]]
 
             stw = np.array([k for k in newDataSet])[:,3].astype(float).reshape(-1)
             drafts = np.nan_to_num(drafts).reshape(-1)
-            foc = np.array([k for k in newDataSet])[:,9].astype(float).reshape(-1)
+            foc = np.array([k for k in newDataSet])[:,8].astype(float).reshape(-1)
             windSpeeds = np.nan_to_num(windSpeeds).reshape(-1)
             windDirs = np.nan_to_num(windDirs).reshape(-1)
             blFlags =np.array( blFlags).reshape(-1)
             drafts = np.array(drafts).reshape(-1)
+            vCourses = np.array(vCourses).reshape(-1)
             firstColumn = np.array([0] * len(stw)).reshape(-1,1)
             otherColumns = np.array([0] * len(stw)).reshape(-1)
             newDataSet = np.array(
-                np.append(firstColumn, np.asmatrix([otherColumns,blFlags,otherColumns,windDirs,windSpeeds,otherColumns,otherColumns,drafts,otherColumns,windSpeeds,windDirs,stw,
-                                                    otherColumns,otherColumns,np.round(foc/1000,2)]).T, axis=1))
+                np.append(firstColumn, np.asmatrix([vCourses,blFlags,otherColumns,windDirs,windSpeeds,otherColumns,otherColumns,drafts,otherColumns,windSpeeds,windDirs,stw,
+                                                    otherColumns,otherColumns,np.round((foc/1000)*24,2)]).T, axis=1))
+
+            with open('./data/' + company + '/' + vessel + '/mappedData', mode='w') as data:
+                data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+            for i in range(0, len(newDataSet)):
+
+                    data_writer.writerow([0, vCourses[i], blFlags[i], 0, windDirs[i], windSpeeds[i], 0, 0, drafts[i], 0, windSpeeds[i],
+                                              windDirs[i], stw[i], 0, 0, np.round((foc[i] / 1000) * 24, 2)])
+
 
 
             self.fillExcelProfCons(vessel,'C:/Users/dkaklis/Desktop/template.xlsx',newDataSet)
@@ -845,6 +867,88 @@ class BaseSeriesReader:
 
                         print("TABLE "'WeatherHistoryDB.dbo.d' + dbDate + " ON DATABASE WeatherHistoryDB DOES NOT EXISTS...INSERTING FIELDS FROM SENSORS.. ")
 
+    def mapWeatherData(self,Vcourse,dt ,lat, lon ):
+
+        LAT = lat[0:9]
+        LON = lon[0:9]
+        ###CONVERT DECIMAL DEGREE MINUTE LAT , LON INTO DD
+        strLATbeforeComma = str(LAT).split('.')[0]
+        strLATafterComma = str(LAT).split('.')[1]
+
+        pos = 3 if strLATbeforeComma.__len__() == 5  else 2
+        LATDegrees = float(strLATbeforeComma[0:pos])
+        LATmin = float(str(strLATbeforeComma[pos:] + '.' + strLATafterComma))
+
+        strLONbeforeComma = str(LON).split('.')[0]
+        strLONafterComma = str(LON).split('.')[1]
+
+        pos = 3 if strLONbeforeComma.__len__() == 5  else 2
+        LONDegrees = float(strLONbeforeComma[0:pos])
+        LONmin = float(str(strLONbeforeComma[pos:] + '.' + strLONafterComma))
+
+        LAT = LATDegrees + float(LATmin) / 60  # + float(LATsec) / 3600
+        LON = LONDegrees + float(LONmin) / 60  # + float(LONsec) / 3600
+        OrigLAT = LAT
+        OrigLON = LON
+        # OrigLAT=float('{0:.5f}'.format(OrigLAT))
+        # OrigLON=float('{0:.5f}'.format(OrigLON))
+
+        LAT = np.round(LAT)
+        LON = np.round(LON)
+        ### end lat , lon
+
+        ##FORM WEATHER HISTORY DB NAME TO SEARCH
+        date = str(dt).split(" ")[0]
+        day = int(date.split("-")[2])
+        month = date.split("-")[1]
+        year = date.split("-")[0]
+        hhMM = str(dt).split(" ")[1]
+        h = int(hhMM.split(":")[0])
+        M = int(hhMM.split(":")[1])
+        if int(M) > 30:
+            h += 1
+        if h % 3 == 2:
+            h += 1
+        else:
+            h = h - h % 3
+
+        day = day + 1 if h == 24 else day
+        day = '0' + str(day) if str(day).__len__() == 1 else str(day)
+        h = 0 if h == 24 else h
+
+        h = '0' + str(h) if str(h).__len__() == 1 else str(h)
+        dbDate = year + month + day + h
+        #####END WEATHER HISTORY DB NAME
+
+        connWEATHERHISTORY = pyodbc.connect('DRIVER={SQL Server};SERVER=WEATHERSERVER_DEV;'
+                                            'DATABASE=WeatherHistoryDB;'
+                                            'UID=sa;'
+                                            'PWD=sa1!')
+
+        cursor = connWEATHERHISTORY.cursor()
+
+        ##INITIALIZE WEATHER HISTORY DB FIELDS
+        # relWindSpeed = 0
+        windSpeed = 0
+        windDir = 0
+        relWindDir = 0
+
+        #####################
+        if cursor.tables(table='d' + dbDate, tableType='TABLE').fetchone():
+
+            # IF WEATHER HISTORY TABLE EXISTS => SELECT FIELDS FROM WEATHER HISTORY DB
+            cursor.execute(
+                'SELECT * FROM d' + dbDate + ' WHERE lat=' + str(LAT) + 'and lon=' + str(
+                    LON))
+
+            for row in cursor.fetchall():
+                windSpeed = float(row.windSpeed)
+                windDir = float(row.windDir)
+                relWindDir = self.getRelativeDirectionWeatherVessel(windDir, Vcourse)
+
+
+        return windSpeed ,np.round(relWindDir,2)
+
     def fillExcelProfCons(self,vessel,pathToexcel,dataSet):
         ##FEATURE SET EXACT POSITION OF COLUMNS NEEDED IN ORDER TO PRODUCE EXCEL
         #2nd place BALLAST FLAG
@@ -925,6 +1029,18 @@ class BaseSeriesReader:
         workbook._sheets[1]['B2'] = meanDraftLadden
         #############################################################################
         ##BALLAST
+        ##delete ballast outliers
+        np.delete(ladenDt, [i for (i, v) in enumerate(ladenDt[:, 8]) if v < (
+            np.mean(ladenDt[:, 8]) - np.std(ladenDt[:, 8])) or v > np.mean(
+            ladenDt[:, 8]) + np.std(
+            ladenDt[:, 8])], 0)
+
+        ##delete ladden outliers
+        np.delete(ladenDt, [i for (i, v) in enumerate(ladenDt[:, 8]) if v < (
+            np.mean(ladenDt[:, 8]) - np.std(ladenDt[:, 8])) or v > np.mean(
+            ladenDt[:, 8]) + np.std(
+            ladenDt[:, 8])], 0)
+
         ###SPEED 10 WIND <1.5
         ballastDt10_0 = []
         for i in range(0, len(wind) - 1):
@@ -1055,7 +1171,7 @@ class BaseSeriesReader:
         for i in range(29, 34):
             workbook._sheets[2]['B' + str(i)] = ballastDt12_0[i - 29]
 
-            ###SPEED 11.5  2 < WIND <3
+        ###SPEED 11.5  2 < WIND <3
         ballastDt12_3 = []
         for i in range(0, len(wind) - 1):
             arrayFoc = np.array([k for k in ballastDt if
@@ -1603,6 +1719,7 @@ class BaseSeriesReader:
             workbook._sheets[1]['E' + str(i)] = ladenDt13_8[i - 39]
 
         workbook.save(filename=pathToexcel.split('.')[0] + '_1.' + pathToexcel.split('.')[1])
+        return
 
     def readExtractNewDataset(self, company,vessel,pathToexcel,separator=None):
         ####################
