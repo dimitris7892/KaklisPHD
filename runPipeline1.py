@@ -1,6 +1,6 @@
 import dataReading as dRead
-#from Danaos_ML_Project import dataReading as DANdRead
-#import  Danaos_ML_Project.dataReading as DANdRead
+#from Danaos_ML_Project import dataReading as DANdRead ##   NEWWWW
+import  Danaos_ML_Project.dataReading as DANdRead
 import featureCalculation as fCalc
 import dataReadingD as DANRead
 import dataPartitioning as dPart
@@ -42,7 +42,7 @@ def main():
     subsetsB=[]
     reader = dRead.BaseSeriesReader()
 
-    #DANreader = DANdRead.BaseSeriesReader()
+    DANreader = DANdRead.BaseSeriesReader()
     #DANreader.GenericParserForDataExtraction('LAROS', 'MARMARAS', 'MT_DELTA_MARIA')
     #DANreader = DANRead.BaseSeriesReader()
     #DANreader.readLarosDAta(datetime.datetime(2018,1,1),datetime.datetime(2019,1,1))
