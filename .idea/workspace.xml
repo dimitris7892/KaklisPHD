@@ -5,7 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="9e10e853-69bc-4a18-9c9f-e2f3d9527f23" name="Default" comment="">
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Danaos_ML_Project/dataReading.py" afterPath="$PROJECT_DIR$/Danaos_ML_Project/dataReading.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/NEWres_1.csv" afterPath="$PROJECT_DIR$/NEWres_1.csv" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/evaluation.py" afterPath="$PROJECT_DIR$/evaluation.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/model_0_.csv" afterPath="$PROJECT_DIR$/model_0_.csv" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/runPipeline1.py" afterPath="$PROJECT_DIR$/runPipeline1.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -33,30 +37,30 @@
       <file leaf-file-name="dataReading.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Danaos_ML_Project/dataReading.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="356">
-              <caret line="254" column="0" lean-forward="false" selection-start-line="254" selection-start-column="0" selection-end-line="254" selection-end-column="0" />
+            <state relative-caret-position="527">
+              <caret line="1388" column="0" lean-forward="false" selection-start-line="1388" selection-start-column="0" selection-end-line="1388" selection-end-column="0" />
               <folding>
                 <element signature="e#0#18#0" expanded="true" />
                 <element signature="e#8353#9163#0" expanded="false" />
-                <element signature="e#14389#17787#0" expanded="false" />
-                <element signature="e#43956#46924#0" expanded="false" />
-                <element signature="e#89339#117195#0" expanded="false" />
-                <element signature="e#166927#208061#0" expanded="false" />
-                <element signature="e#230582#233663#0" expanded="false" />
-                <marker date="1583488623541" expanded="false" signature="1340:5651" ph="..." />
-                <marker date="1583488623541" expanded="false" signature="5695:5777" ph="..." />
-                <marker date="1583488623541" expanded="false" signature="5838:6120" ph="..." />
-                <marker date="1583488623541" expanded="false" signature="6158:6197" ph="..." />
-                <marker date="1583488623541" expanded="false" signature="6239:7121" ph="..." />
-                <marker date="1583488623541" expanded="false" signature="7187:7515" ph="..." />
-                <marker date="1583488623541" expanded="false" signature="7590:7938" ph="..." />
-                <marker date="1583488623541" expanded="false" signature="8010:8212" ph="..." />
-                <marker date="1583488623541" expanded="false" signature="8267:8305" ph="..." />
-                <marker date="1583488623541" expanded="false" signature="17821:43876" ph="..." />
-                <marker date="1583488623541" expanded="false" signature="18937:28202" ph="..." />
-                <marker date="1583488623541" expanded="false" signature="117240:150713" ph="..." />
-                <marker date="1583488623541" expanded="false" signature="150774:166858" ph="..." />
-                <marker date="1583488623541" expanded="false" signature="188711:207996" ph="..." />
+                <element signature="e#14386#17784#0" expanded="false" />
+                <element signature="e#43953#46921#0" expanded="false" />
+                <element signature="e#93829#121685#0" expanded="false" />
+                <element signature="e#171417#212551#0" expanded="false" />
+                <element signature="e#235072#238153#0" expanded="false" />
+                <marker date="1583496290349" expanded="false" signature="1340:5651" ph="..." />
+                <marker date="1583496290349" expanded="false" signature="5695:5777" ph="..." />
+                <marker date="1583496290349" expanded="false" signature="5838:6120" ph="..." />
+                <marker date="1583496290349" expanded="false" signature="6158:6197" ph="..." />
+                <marker date="1583496290349" expanded="false" signature="6239:7121" ph="..." />
+                <marker date="1583496290349" expanded="false" signature="7187:7515" ph="..." />
+                <marker date="1583496290349" expanded="false" signature="7590:7938" ph="..." />
+                <marker date="1583496290349" expanded="false" signature="8010:8212" ph="..." />
+                <marker date="1583496290349" expanded="false" signature="8267:8305" ph="..." />
+                <marker date="1583496290349" expanded="false" signature="17818:43873" ph="..." />
+                <marker date="1583496290349" expanded="false" signature="18934:28199" ph="..." />
+                <marker date="1583496290349" expanded="false" signature="121730:155203" ph="..." />
+                <marker date="1583496290349" expanded="false" signature="155264:171348" ph="..." />
+                <marker date="1583496290349" expanded="false" signature="193201:212486" ph="..." />
               </folding>
             </state>
           </provider>
@@ -65,8 +69,8 @@
       <file leaf-file-name="runPipeline1.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/runPipeline1.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="510">
-              <caret line="132" column="20" lean-forward="true" selection-start-line="132" selection-start-column="20" selection-end-line="132" selection-end-column="20" />
+            <state relative-caret-position="-799">
+              <caret line="100" column="28" lean-forward="true" selection-start-line="100" selection-start-column="28" selection-end-line="100" selection-end-column="28" />
               <folding>
                 <element signature="e#0#27#0" expanded="true" />
               </folding>
@@ -77,8 +81,8 @@
       <file leaf-file-name="evaluation.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/evaluation.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="500">
-              <caret line="1272" column="31" lean-forward="true" selection-start-line="1272" selection-start-column="31" selection-end-line="1272" selection-end-column="31" />
+            <state relative-caret-position="432">
+              <caret line="1275" column="99" lean-forward="false" selection-start-line="1275" selection-start-column="99" selection-end-line="1275" selection-end-column="99" />
               <folding>
                 <element signature="e#0#18#0" expanded="true" />
                 <element signature="e#4277#37594#0" expanded="false" />
@@ -247,9 +251,9 @@
         <option value="$USER_HOME$/AppData/Roaming/python/python36/site-packages/cx_Oracle/pythonic_oci.py" />
         <option value="$PROJECT_DIR$/data/MILLENIA/TELEGRAMS/FANTASIA.csv" />
         <option value="/fragment.py" />
-        <option value="$PROJECT_DIR$/evaluation.py" />
         <option value="$PROJECT_DIR$/dataModeling.py" />
         <option value="$PROJECT_DIR$/Danaos_ML_Project/dataReading.py" />
+        <option value="$PROJECT_DIR$/evaluation.py" />
         <option value="$PROJECT_DIR$/runPipeline1.py" />
       </list>
     </option>
@@ -453,11 +457,11 @@
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3273495" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.17317846" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.2745512" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.2745512" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.22069694" sideWeight="0.49791667" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.22069694" sideWeight="0.49791667" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Data View" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.40989584" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -584,17 +588,17 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/Danaos_ML_Project/dataReading.py</url>
-          <line>3355</line>
+          <line>3444</line>
           <option name="timeStamp" value="1022" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/Danaos_ML_Project/dataReading.py</url>
-          <line>3209</line>
+          <line>3298</line>
           <option name="timeStamp" value="1028" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/Danaos_ML_Project/dataReading.py</url>
-          <line>3194</line>
+          <line>3283</line>
           <option name="timeStamp" value="1031" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
@@ -619,18 +623,18 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/Danaos_ML_Project/dataReading.py</url>
-          <line>1002</line>
-          <option name="timeStamp" value="1269" />
+          <line>1955</line>
+          <option name="timeStamp" value="1278" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/Danaos_ML_Project/dataReading.py</url>
-          <line>1034</line>
-          <option name="timeStamp" value="1275" />
+          <line>1392</line>
+          <option name="timeStamp" value="1280" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/Danaos_ML_Project/dataReading.py</url>
-          <line>1104</line>
-          <option name="timeStamp" value="1276" />
+          <line>1375</line>
+          <option name="timeStamp" value="1281" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
@@ -640,18 +644,11 @@
           </properties>
         </breakpoint>
       </default-breakpoints>
-      <option name="time" value="1277" />
+      <option name="time" value="1282" />
     </breakpoint-manager>
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/data/LAROS/LAT.csv">
-      <provider selected="true" editor-type-id="LargeFileEditor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/data/LAROS/Course.csv">
       <provider editor-type-id="csv-table-editor">
         <state showInfoPanel="true" fixedHeaders="false" rowLines="3" />
@@ -1077,18 +1074,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/evaluation.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="500">
-          <caret line="1272" column="31" lean-forward="true" selection-start-line="1272" selection-start-column="31" selection-end-line="1272" selection-end-column="31" />
-          <folding>
-            <element signature="e#0#18#0" expanded="true" />
-            <element signature="e#4277#37594#0" expanded="false" />
-            <element signature="e#37657#37858#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/dataModeling.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="536">
@@ -1152,40 +1137,60 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/data/GOLDENPORT/mappedData.csv">
+      <provider selected="true" editor-type-id="csv-text-editor">
+        <state relative-caret-position="-2720">
+          <caret line="5" column="0" lean-forward="false" selection-start-line="5" selection-start-column="0" selection-end-line="5" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/Danaos_ML_Project/dataReading.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="356">
-          <caret line="254" column="0" lean-forward="false" selection-start-line="254" selection-start-column="0" selection-end-line="254" selection-end-column="0" />
+        <state relative-caret-position="527">
+          <caret line="1388" column="0" lean-forward="false" selection-start-line="1388" selection-start-column="0" selection-end-line="1388" selection-end-column="0" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
             <element signature="e#8353#9163#0" expanded="false" />
-            <element signature="e#14389#17787#0" expanded="false" />
-            <element signature="e#43956#46924#0" expanded="false" />
-            <element signature="e#89339#117195#0" expanded="false" />
-            <element signature="e#166927#208061#0" expanded="false" />
-            <element signature="e#230582#233663#0" expanded="false" />
-            <marker date="1583488623541" expanded="false" signature="1340:5651" ph="..." />
-            <marker date="1583488623541" expanded="false" signature="5695:5777" ph="..." />
-            <marker date="1583488623541" expanded="false" signature="5838:6120" ph="..." />
-            <marker date="1583488623541" expanded="false" signature="6158:6197" ph="..." />
-            <marker date="1583488623541" expanded="false" signature="6239:7121" ph="..." />
-            <marker date="1583488623541" expanded="false" signature="7187:7515" ph="..." />
-            <marker date="1583488623541" expanded="false" signature="7590:7938" ph="..." />
-            <marker date="1583488623541" expanded="false" signature="8010:8212" ph="..." />
-            <marker date="1583488623541" expanded="false" signature="8267:8305" ph="..." />
-            <marker date="1583488623541" expanded="false" signature="17821:43876" ph="..." />
-            <marker date="1583488623541" expanded="false" signature="18937:28202" ph="..." />
-            <marker date="1583488623541" expanded="false" signature="117240:150713" ph="..." />
-            <marker date="1583488623541" expanded="false" signature="150774:166858" ph="..." />
-            <marker date="1583488623541" expanded="false" signature="188711:207996" ph="..." />
+            <element signature="e#14386#17784#0" expanded="false" />
+            <element signature="e#43953#46921#0" expanded="false" />
+            <element signature="e#93829#121685#0" expanded="false" />
+            <element signature="e#171417#212551#0" expanded="false" />
+            <element signature="e#235072#238153#0" expanded="false" />
+            <marker date="1583496290349" expanded="false" signature="1340:5651" ph="..." />
+            <marker date="1583496290349" expanded="false" signature="5695:5777" ph="..." />
+            <marker date="1583496290349" expanded="false" signature="5838:6120" ph="..." />
+            <marker date="1583496290349" expanded="false" signature="6158:6197" ph="..." />
+            <marker date="1583496290349" expanded="false" signature="6239:7121" ph="..." />
+            <marker date="1583496290349" expanded="false" signature="7187:7515" ph="..." />
+            <marker date="1583496290349" expanded="false" signature="7590:7938" ph="..." />
+            <marker date="1583496290349" expanded="false" signature="8010:8212" ph="..." />
+            <marker date="1583496290349" expanded="false" signature="8267:8305" ph="..." />
+            <marker date="1583496290349" expanded="false" signature="17818:43873" ph="..." />
+            <marker date="1583496290349" expanded="false" signature="18934:28199" ph="..." />
+            <marker date="1583496290349" expanded="false" signature="121730:155203" ph="..." />
+            <marker date="1583496290349" expanded="false" signature="155264:171348" ph="..." />
+            <marker date="1583496290349" expanded="false" signature="193201:212486" ph="..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/evaluation.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="432">
+          <caret line="1275" column="99" lean-forward="false" selection-start-line="1275" selection-start-column="99" selection-end-line="1275" selection-end-column="99" />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
+            <element signature="e#4277#37594#0" expanded="false" />
+            <element signature="e#37657#37858#0" expanded="false" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/runPipeline1.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="510">
-          <caret line="132" column="20" lean-forward="true" selection-start-line="132" selection-start-column="20" selection-end-line="132" selection-end-column="20" />
+        <state relative-caret-position="-799">
+          <caret line="100" column="28" lean-forward="true" selection-start-line="100" selection-start-column="28" selection-end-line="100" selection-end-column="28" />
           <folding>
             <element signature="e#0#27#0" expanded="true" />
           </folding>
