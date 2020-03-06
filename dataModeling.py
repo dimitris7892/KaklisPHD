@@ -3770,7 +3770,7 @@ class TensorFlowW(BasePartitionModeler):
         #models=[]
 
 
-        NNmodels.append(estimator)
+        NNmodels.append([estimator,'GEN'])
         self._models = NNmodels
 
         # Return list of models
