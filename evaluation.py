@@ -1270,7 +1270,10 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
             XSplineGenVector = XSplineGenVector.reshape(-1, XSplineGenVector.shape[ 0 ])
             #prediction = abs(modeler._models[ 0 ].predict(XSplineVector))
             XSplineVector = XSplineGenVector if modeler._models[ind][1]=='GEN' else XSplineVector
-            prediction = (abs(modeler._models[ind][0].predict(XSplineVector)) + modeler._models[len(modeler._models)-1][0].predict(XSplineGenVector))/2
+            try:
+                prediction = (abs(modeler._models[ind][0].predict(XSplineVector)) + modeler._models[len(modeler._models)-1][0].predict(XSplineGenVector))/2
+            except:
+                prediction = modeler._models[len(modeler._models) - 1][0].predict(XSplineGenVector)
                 #abs(modeler._models[ind].predict(XSplineVector))
                 #(abs(modeler._models[ind].predict(XSplineVector)) + modeler._models[len(modeler._models)-1].predict(XSplineGenVector))/2
                 #abs(modeler._models[ind].predict(XSplineVector)) if fit > 0.5 else  modeler._models[len(modeler._models)-1].predict(XSplineGenVector)
