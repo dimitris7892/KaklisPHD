@@ -250,6 +250,10 @@ class BaseSeriesReader:
                                        pathOfRawData=None):
         if systemType=='LEMAG':
 
+            #data = pd.read_csv('./data/' + company + '/mappedData.csv')
+            #newDataSet = data.values
+            #self.fillExcelProfCons(vessel, 'C:/Users/dkaklis/Desktop/template.xlsx', newDataSet)
+
             path = './data/' + company + '/' + vessel+'/'
             #Path('./data/' + company + '/'+vessel).mkdir(parents=True, exist_ok=True)
             if os.path.isdir('./data/' + company + '/'+vessel)==False:
@@ -322,19 +326,17 @@ class BaseSeriesReader:
             firstColumn = np.array([0] * len(stw)).reshape(-1,1)
             otherColumns = np.array([0] * len(stw)).reshape(-1)
             newDataSet = np.array(
-                np.append(firstColumn, np.asmatrix([vCourses,blFlags,otherColumns,windDirs,windSpeeds,otherColumns,otherColumns,drafts,otherColumns,windSpeeds,windDirs,stw,
+                np.append(firstColumn, np.asmatrix([vCourses,blFlags,otherColumns,otherColumns,otherColumns,otherColumns,otherColumns,drafts,otherColumns,windDirs,windSpeeds,stw,
                                                     otherColumns,otherColumns,np.round((foc/1000)*24,2)]).T, axis=1))
 
-
-
-            self.fillExcelProfCons(vessel,'C:/Users/dkaklis/Desktop/template.xlsx',newDataSet)
+            self.fillExcelProfCons(vessel, 'C:/Users/dkaklis/Desktop/template.xlsx', newDataSet)
 
             with open('./data/' + company + '/' + vessel + '/mappedData.csv', mode='w') as data:
                 data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
                 for i in range(0, len(newDataSet)):
                     data_writer.writerow(
-                        [0, vCourses[i], blFlags[i], 0, windDirs[i], windSpeeds[i], 0, 0, drafts[i], 0, windSpeeds[i],
-                         windDirs[i], stw[i], 0, 0, np.round((foc[i] / 1000) * 24, 2)])
+                        [0, vCourses[i], blFlags[i], 0,0,0, 0, 0, drafts[i], 0, windDirs[i],
+                         windSpeeds[i], stw[i], 0, 0, np.round((foc[i] / 1000) * 24, 2)])
 
             #while endYear <= endYear and startDay<=endDay and startMonth<=endMonth:
                 #data = pd.read_csv('./data/' + company + '/' + vessel +'SEEAmag '+startYear+'.'+startMonth+'.'+startDay+'.csv', sep=';', decimal='.')
@@ -1102,9 +1104,7 @@ class BaseSeriesReader:
         ballastDt10_0 = []
         for i in range(0, len(wind) - 1):
             arrayFoc = np.array([k for k in ballastDt if
-                                 k[4] >= 0 and k[4] <= 1.5 and k[5] >= 9 and k[5] <= 10 and k[3] >= wind[i] and k[
-                                     3] <= wind[i + 1] and k[
-                                     8] > 0])
+                                 k[4] >= 0 and k[4] <= 1.5 and k[5] >= 9 and k[5] <= 10 and k[3] >= wind[i] and k[3] <= wind[i + 1] and k[8] > 0])
             meanFoc = np.mean(arrayFoc[:, 8]) if arrayFoc.__len__() > 0 else 0
             ballastDt10_0.append(round(meanFoc, 2))
 
