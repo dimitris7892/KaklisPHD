@@ -214,6 +214,38 @@ class BaseSeriesReader:
 
         return (360 + windDir) % 360
 
+    def ConvertToBeaufort(self , ws):
+        wsB = 0
+        if ws <= 0.5:
+            wsB = 0
+        elif ws >= 0.5 and ws <1.5:
+            wsB = 1
+        elif ws >= 1.6 and ws < 3.3:
+            wsB = 2
+        elif ws >= 3.4 and ws < 5.5:
+            wsB = 3
+        elif ws >= 3.4 and ws < 5.5:
+            wsB = 3
+        elif ws >= 5.7 and ws < 7.9:
+            wsB = 4
+        elif ws >= 8 and ws < 10.7:
+            wsB = 5
+        elif ws >= 10.8 and ws < 13.8:
+            wsB = 6
+        elif ws >= 13.9 and ws < 17.1:
+            wsB = 7
+        elif ws >= 17.2 and ws < 20.7:
+            wsB = 8
+        elif ws >= 20.8 and ws < 24.4:
+            wsB = 9
+        elif ws >= 24.5 and ws < 28.4:
+            wsB = 10
+        elif ws >= 28.5 and ws < 32.6:
+            wsB = 11
+        elif ws >= 32.7:
+            wsB = 12
+        return wsB
+
     def GenericParserForDataExtraction(self,systemType, company, vessel ,driver=None,server=None,sid=None,usr=None,password=None,telegrams=None ,fileType=None, granularity=None, fileName=None,
                                        pathOfRawData=None):
         if systemType=='LEMAG':
@@ -247,7 +279,7 @@ class BaseSeriesReader:
 
             ####
             for i in range(0,len(newDataSet)):
-                #if i >= 10000:
+                #if i >= 1000:
                     #break
                 datetimeV = str(newDataSet[i,0])
                 lat = str(newDataSet[i, 4])
@@ -263,11 +295,12 @@ class BaseSeriesReader:
                 month = '0'+month if month.__len__()==1 else month
                 day = '0' + day if day.__len__() == 1 else day
                 newDate = year +'-'+month +'-'+day
-                newDate1 =year +'-'+month +'-'+day  +" " + ":".join(hhMMss.split(":")[ 0:2 ])
+                newDate1 = year +'-'+month +'-'+day  +" " + ":".join(hhMMss.split(":")[ 0:2 ])
 
                 telegramRow = np.array( [row for row in telegrams if str(row[0]).split(" ")[0]==newDate])
 
                 windSpeed , windDir  = self.mapWeatherData(vCourse,newDate1,lat,lon , latDir,lonDir)
+                windSpeed = self.ConvertToBeaufort(windSpeed)
                 windDirs.append(windDir)
                 windSpeeds.append(windSpeed)
                 drafts.append(0 if telegramRow.__len__() == 0 else telegramRow[:, 8][0])
@@ -298,10 +331,10 @@ class BaseSeriesReader:
 
             with open('./data/' + company + '/' + vessel + '/mappedData.csv', mode='w') as data:
                 data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-            for i in range(0, len(newDataSet)):
-
-                    data_writer.writerow([0, vCourses[i], blFlags[i], 0, windDirs[i], windSpeeds[i], 0, 0, drafts[i], 0, windSpeeds[i],
-                                              windDirs[i], stw[i], 0, 0, np.round((foc[i] / 1000) * 24, 2)])
+                for i in range(0, len(newDataSet)):
+                    data_writer.writerow(
+                        [0, vCourses[i], blFlags[i], 0, windDirs[i], windSpeeds[i], 0, 0, drafts[i], 0, windSpeeds[i],
+                         windDirs[i], stw[i], 0, 0, np.round((foc[i] / 1000) * 24, 2)])
 
             #while endYear <= endYear and startDay<=endDay and startMonth<=endMonth:
                 #data = pd.read_csv('./data/' + company + '/' + vessel +'SEEAmag '+startYear+'.'+startMonth+'.'+startDay+'.csv', sep=';', decimal='.')
@@ -1518,7 +1551,7 @@ class BaseSeriesReader:
                         ballastDt12_0[i] = ballastDt12_0[i] - 0.1 * ballastDt12_0[i]
 
         for i in range(29, 34):
-                workbook._sheets[2]['B' + str(i)] = round(ballastDt12_0[i - 19], 2)
+                workbook._sheets[2]['B' + str(i)] = round(ballastDt12_0[i - 29], 2)
 
         ##TREAT outliers / missing values for ballast values
         for i in range(0, len(ballastDt12_3)):
@@ -1552,7 +1585,7 @@ class BaseSeriesReader:
                         ballastDt12_5[i] = ballastDt12_5[i] - 0.1 * ballastDt12_5[i]
 
         for i in range(29, 34):
-                workbook._sheets[2]['D' + str(i)] = round(ballastDt11_5[i - 19], 2)
+                workbook._sheets[2]['D' + str(i)] = round(ballastDt11_5[i - 29], 2)
 
         ##TREAT outliers / missing values for ballast values
         values = [k for k in ballastDt11_8 if k != 0]
@@ -1566,7 +1599,7 @@ class BaseSeriesReader:
                         ballastDt11_8[i] = ballastDt11_8[i] - 0.1 * ballastDt11_8[i]
 
         for i in range(29, 34):
-                workbook._sheets[2]['E' + str(i)] = round(ballastDt11_8[i - 19], 2)
+                workbook._sheets[2]['E' + str(i)] = round(ballastDt11_8[i - 29], 2)
 
         ###START OF LADDEN##################################################################################
         ####################################################################################################
