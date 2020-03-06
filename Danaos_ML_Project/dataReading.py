@@ -250,9 +250,9 @@ class BaseSeriesReader:
                                        pathOfRawData=None):
         if systemType=='LEMAG':
 
-            #data = pd.read_csv('./data/' + company + '/mappedData.csv')
-            #newDataSet = data.values
-            #self.fillExcelProfCons(vessel, 'C:/Users/dkaklis/Desktop/template.xlsx', newDataSet)
+            data = pd.read_csv('./data/' + company + '/mappedData.csv')
+            newDataSet = data.values
+            self.fillExcelProfCons(vessel, 'C:/Users/dkaklis/Desktop/template.xlsx', newDataSet)
 
             path = './data/' + company + '/' + vessel+'/'
             #Path('./data/' + company + '/'+vessel).mkdir(parents=True, exist_ok=True)
@@ -1082,9 +1082,9 @@ class BaseSeriesReader:
         ###############################
         ##end of sea state
         ###
-        meanDraftBallast = round(float(np.mean(np.array([k for k in ballastDt if k[1] >= 0])[:, 1])), 2)
+        meanDraftBallast = round(float(np.mean(np.array([k for k in ballastDt if k[1] > 0])[:, 1])), 2)
         workbook._sheets[2]['B2'] = meanDraftBallast
-        meanDraftLadden = round(float(np.mean(np.array([k for k in ladenDt if k[1] >= 0])[:, 1])), 2)
+        meanDraftLadden = round(float(np.mean(np.array([k for k in ladenDt if k[1] > 0])[:, 1])), 2)
         workbook._sheets[1]['B2'] = meanDraftLadden
         #############################################################################
         ##BALLAST
@@ -1361,7 +1361,6 @@ class BaseSeriesReader:
         for i in range(0, len(ballastDt10_0)):
             if ballastDt10_0[i] == 0:
                 ##find items !=0
-
                 ballastDt10_0[i] = np.sum(values) / length
             if ballastDt10_0[i] > ballastDt11_0[i] and ballastDt11_0[i] > 0:
                     while ballastDt10_0[i] > ballastDt11_0[i] :
@@ -1585,21 +1584,111 @@ class BaseSeriesReader:
                         ballastDt12_5[i] = ballastDt12_5[i] - 0.1 * ballastDt12_5[i]
 
         for i in range(29, 34):
-                workbook._sheets[2]['D' + str(i)] = round(ballastDt11_5[i - 29], 2)
+                workbook._sheets[2]['D' + str(i)] = round(ballastDt12_5[i - 29], 2)
 
         ##TREAT outliers / missing values for ballast values
-        values = [k for k in ballastDt11_8 if k != 0]
+        values = [k for k in ballastDt12_8 if k != 0]
         length = values.__len__()
-        for i in range(0, len(ballastDt11_8)):
-                if ballastDt11_8[i] == 0:
+        for i in range(0, len(ballastDt12_8)):
+                if ballastDt12_8[i] == 0:
                     ##find items !=0
-                    ballastDt11_8[i] = np.sum(values) / length
-                if ballastDt11_8[i] > ballastDt12_8[i] and ballastDt12_8[i] > 0:
-                    while ballastDt11_8[i] > ballastDt12_8[i]:
-                        ballastDt11_8[i] = ballastDt11_8[i] - 0.1 * ballastDt11_8[i]
+                    ballastDt12_8[i] = np.sum(values) / length
+                if ballastDt12_8[i] > ballastDt13_8[i] and ballastDt13_8[i] > 0:
+                    while ballastDt12_8[i] > ballastDt12_8[i]:
+                        ballastDt12_8[i] = ballastDt12_8[i] - 0.1 * ballastDt12_8[i]
 
         for i in range(29, 34):
-                workbook._sheets[2]['E' + str(i)] = round(ballastDt11_8[i - 29], 2)
+                workbook._sheets[2]['E' + str(i)] = round(ballastDt12_8[i - 29], 2)
+
+
+                ####################################################################################################
+        values = [k for k in ballastDt13_0 if k != 0]
+        for i in range(0, len(ballastDt13_0)):
+            if ballastDt13_0[i] < np.mean(values) - np.std(values) or ballastDt13_0[i] > np.mean(values) + np.std(
+                    values):
+                ballastDt13_0[i] = 0
+
+        values = [k for k in ballastDt13_3 if k != 0]
+        for i in range(0, len(ballastDt13_3)):
+            if ballastDt13_3[i] < np.mean(values) - np.std(values) or ballastDt13_3[i] > np.mean(values) + np.std(
+                    values):
+                ballastDt13_3[i] = 0
+
+        values = [k for k in ballastDt13_5 if k != 0]
+        for i in range(0, len(ballastDt13_5)):
+            if ballastDt13_5[i] < np.mean(values) - np.std(values) or ballastDt13_5[i] > np.mean(values) + np.std(
+                    values):
+                ballastDt13_5[i] = 0
+
+        values = [k for k in ballastDt13_8 if k != 0]
+        for i in range(0, len(ballastDt13_8)):
+            if ballastDt13_8[i] < np.mean(values) - np.std(values) or ballastDt13_8[i] > np.mean(values) + np.std(
+                    values):
+                ballastDt13_8[i] = 0
+
+        values = [k for k in ballastDt13_0 if k != 0]
+        length = values.__len__()
+        for i in range(0, len(ballastDt13_0)):
+            if ballastDt13_0[i] == 0:
+                ##find items !=0
+                ballastDt13_0[i] = np.sum(values) / length
+            #if ballastDt13_0[i] > ballastDt13_0[i] and ballastDt13_0[i] > 0:
+                #while ballastDt12_0[i] > ballastDt13_0[i]:
+                    #ballastDt12_0[i] = ballastDt12_0[i] - 0.1 * ballastDt12_0[i]
+            if ballastDt13_0[i] > ballastDt13_3[i] and ballastDt13_3[i] > 0:
+                while ballastDt13_0[i] > ballastDt13_3[i]:
+                    ballastDt13_0[i] = ballastDt13_0[i] - 0.1 * ballastDt13_0[i]
+
+        for i in range(39, 44):
+            workbook._sheets[2]['B' + str(i)] = round(ballastDt12_0[i - 39], 2)
+
+        ##TREAT outliers / missing values for ballast values
+        for i in range(0, len(ballastDt13_3)):
+            if ballastDt13_3[i] == 0:
+                ##find items !=0
+                values = [k for k in ballastDt13_3 if k != 0]
+                length = values.__len__()
+                ballastDt13_3[i] = np.sum(values) / length
+            #if ballastDt13_3[i] > ballastDt13_3[i] and ballastDt13_3[i] > 0:
+                #while ballastDt12_3[i] > ballastDt13_3[i]:
+                    #ballastDt12_3[i] = ballastDt12_3[i] - 0.1 * ballastDt12_3[i]
+            if ballastDt13_3[i] > ballastDt13_5[i] and ballastDt13_5[i] > 0:
+                while ballastDt13_3[i] > ballastDt13_5[i]:
+                    ballastDt13_3[i] = ballastDt13_3[i] - 0.1 * ballastDt13_3[i]
+
+        for i in range(39, 44):
+            workbook._sheets[2]['C' + str(i)] = round(ballastDt12_3[i - 39], 2)
+
+        ##TREAT outliers / missing values for ballast values
+        values = [k for k in ballastDt13_5 if k != 0]
+        length = values.__len__()
+        for i in range(0, len(ballastDt13_5)):
+            if ballastDt13_5[i] == 0:
+                ##find items !=0
+                ballastDt13_5[i] = np.sum(values) / length
+            #if ballastDt13_5[i] > ballastDt12_5[i] and ballastDt12_5[i] > 0:
+                #while ballastDt12_5[i] > ballastDt11_5[i]:
+                    #ballastDt12_5[i] = ballastDt12_5[i] - 0.1 * ballastDt12_5[i]
+            if ballastDt13_5[i] > ballastDt13_8[i] and ballastDt13_8[i] > 0:
+                while ballastDt13_5[i] > ballastDt13_8[i]:
+                    ballastDt13_5[i] = ballastDt13_5[i] - 0.1 * ballastDt13_5[i]
+
+        for i in range(39, 44):
+            workbook._sheets[2]['D' + str(i)] = round(ballastDt12_5[i - 39], 2)
+
+        ##TREAT outliers / missing values for ballast values
+        values = [k for k in ballastDt12_8 if k != 0]
+        length = values.__len__()
+        for i in range(0, len(ballastDt12_8)):
+            if ballastDt13_8[i] == 0:
+                ##find items !=0
+                ballastDt13_8[i] = np.sum(values) / length
+            #if ballastDt12_8[i] > ballastDt13_8[i] and ballastDt13_8[i] > 0:
+                #while ballastDt13_8[i] > ballastDt13_8[i]:
+                    #ballastDt13_8[i] = ballastDt13_8[i] - 0.1 * ballastDt13_8[i]
+
+        for i in range(39, 44):
+            workbook._sheets[2]['E' + str(i)] = round(ballastDt13_8[i - 39], 2)
 
         ###START OF LADDEN##################################################################################
         ####################################################################################################
