@@ -1204,7 +1204,7 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
         #scalerY =preprocessing.StandardScaler()
         ##scalerX = scalerX.fit(np.concatenate(partitionsX))
         #scalerY = scalerY.fit(np.concatenate(partitionsY).reshape(-1, 1))
-
+        count = 0
         for iCnt in range(np.shape(unseenX)[0]):
             pPoint =unseenX[iCnt]
             pPoint= pPoint.reshape(-1,unseenX.shape[1])
@@ -1272,8 +1272,10 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
             XSplineVector = XSplineGenVector if modeler._models[ind][1]=='GEN' else XSplineVector
             try:
                 prediction = (abs(modeler._models[ind][0].predict(XSplineVector)) + modeler._models[len(modeler._models)-1][0].predict(XSplineGenVector))/2
+                lErrors.append(abs(prediction - trueVal))
             except:
-                prediction = modeler._models[len(modeler._models) - 1][0].predict(XSplineGenVector)
+                #prediction = modeler._models[len(modeler._models) - 1][0].predict(XSplineGenVector)
+                count=count+1
                 #abs(modeler._models[ind].predict(XSplineVector))
                 #(abs(modeler._models[ind].predict(XSplineVector)) + modeler._models[len(modeler._models)-1].predict(XSplineGenVector))/2
                 #abs(modeler._models[ind].predict(XSplineVector)) if fit > 0.5 else  modeler._models[len(modeler._models)-1].predict(XSplineGenVector)
@@ -1282,12 +1284,13 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
             #states_value = modeler._models[0].model.predict([unseenX[:,0].reshape(1,unseenX.shape[200],1) , unseenX[ :, 1 ].reshape(1, unseenX.shape[ 200 ], 1)])
 
             ##########
-            lErrors.append(abs(prediction - trueVal))
+
             if abs(prediction - trueVal)>10:
                 w=0
         #x=unseenX[:,0].reshape(-1,unseenX.shape[0])
         #prediction =modeler._models[ 0 ].predict(unseenX.reshape(2,2860))
         #print np.mean(abs(prediction - unseenY))
+        print("EXCEPTIONS :  "+str(count))
         errors = np.asarray(lErrors)
 
         return errors, np.mean(errors), np.std(lErrors)
@@ -1305,11 +1308,7 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
                             #'meanBearing':trFeatures[1]
                             })
         groups=[error,clusters,var]
-        #moore = statsmodels.api.datasets.get_rdataset("Moore", "carData", cache=True)  # load
-        #data = moore.data
-        #data = data.rename(columns={"partner.status":"partner_status"})  # make name pythonic
-        #moore_lm = ols('error ~ C(fcategory, Sum)*C(partner_status, Sum)',data = data).fit()
-        #table = statsmodels.api.stats.anova_lm(moore_lm, typ=2)  # Type 2 Anova DataFrame
+
 
         #data=[error,np.var(unseenX),clusters]
         print(stats.kruskal(error,clusters,var,models,partitioners))
