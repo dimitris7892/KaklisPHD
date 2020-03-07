@@ -291,6 +291,11 @@ class BaseSeriesReader:
                 lon = str(newDataSet[i, 6])
                 lonDir = str(newDataSet[i, 7])
                 vCourse = newDataSet[i, 1]
+
+                rpm = newDataSet[i,20]
+                power = newDataSet[i, 22]
+
+                ###########################################
                 dateV = datetimeV.split(" ")[0]
                 hhMMss=datetimeV.split(" ")[1]
                 month = dateV.split("/")[0]
@@ -302,6 +307,9 @@ class BaseSeriesReader:
                 newDate1 = year +'-'+month +'-'+day  +" " + ":".join(hhMMss.split(":")[ 0:2 ])
 
                 telegramRow = np.array( [row for row in telegrams if str(row[0]).split(" ")[0]==newDate])
+
+                if rpm >= 0 and rpm < 1 or telegramRow.__len__==0:
+                    continue
 
                 windSpeed , windDir  = self.mapWeatherData(vCourse,newDate1,lat,lon , latDir,lonDir)
                 windSpeed = self.ConvertToBeaufort(windSpeed)
@@ -998,7 +1006,7 @@ class BaseSeriesReader:
         #11th place WF
         #12th place SPEED
         #15th place ME FOC 24H
-        dtNew = dataSet
+        dtNew = np.array([k for k in dataSet if float(k[12])>5 and float(k[15])>10])
 
         ballastDt = np.array([k for k in dtNew if k[2] == 'B'])[:, 7:].astype(float)
         ladenDt = np.array([k for k in dtNew if k[2] == 'L'])[:, 7:].astype(float)
@@ -1008,12 +1016,13 @@ class BaseSeriesReader:
 
 
         for i in range(0, len(dtNew)):
-            dtNew[i, 10] = self.getRelativeDirectionWeatherVessel(float(dtNew[i, 7]), float(dtNew[i, 10]))
+            #tNew[i, 10] = self.getRelativeDirectionWeatherVessel(float(dtNew[i, 7]), float(dtNew[i, 10]))
             if str(dtNew[i, 2]) == 'nan':
-                if float(dtNew[i, 8]) > math.floor(meanDraftLadden):
+                if float(dtNew[i, 8]) > math.floor(meanDraftLadden)+1:
                     dtNew[i, 2] = 'L'
                 else:
-                    dtNew[i, 2] = 'B'
+                    #if float(dtNew[i, 8]) > 3:
+                        dtNew[i, 2] = 'B'
         ########################################################################
         ########################################################################
         ########################################################################
@@ -1356,21 +1365,103 @@ class BaseSeriesReader:
                     values):
                 ballastDt10_8[i] = 0
 
+        values = [k for k in ballastDt11_0 if k != 0]
+        for i in range(0, len(ballastDt11_0)):
+                if ballastDt11_0[i] < np.mean(values) - np.std(values) or ballastDt11_0[i] > np.mean(values) + np.std(
+                        values):
+                    ballastDt11_0[i] = 0
+
+        values = [k for k in ballastDt11_3 if k != 0]
+        for i in range(0, len(ballastDt11_3)):
+                if ballastDt11_3[i] < np.mean(values) - np.std(values) or ballastDt11_3[i] > np.mean(values) + np.std(
+                        values):
+                    ballastDt11_3[i] = 0
+
+        values = [k for k in ballastDt11_5 if k != 0]
+        for i in range(0, len(ballastDt11_5)):
+                if ballastDt11_5[i] < np.mean(values) - np.std(values) or ballastDt11_5[i] > np.mean(values) + np.std(
+                        values):
+                    ballastDt11_5[i] = 0
+
+        values = [k for k in ballastDt11_8 if k != 0]
+        for i in range(0, len(ballastDt11_8)):
+                if ballastDt11_8[i] < np.mean(values) - np.std(values) or ballastDt11_8[i] > np.mean(values) + np.std(
+                        values):
+                    ballastDt11_8[i] = 0
+
+        values = [k for k in ballastDt12_0 if k != 0]
+        for i in range(0, len(ballastDt12_0)):
+                    if ballastDt12_0[i] < np.mean(values) - np.std(values) or ballastDt12_0[i] > np.mean(
+                            values) + np.std(
+                            values):
+                        ballastDt12_0[i] = 0
+
+        values = [k for k in ballastDt12_3 if k != 0]
+        for i in range(0, len(ballastDt12_3)):
+                    if ballastDt12_3[i] < np.mean(values) - np.std(values) or ballastDt12_3[i] > np.mean(
+                            values) + np.std(
+                            values):
+                        ballastDt12_3[i] = 0
+
+        values = [k for k in ballastDt12_5 if k != 0]
+        for i in range(0, len(ballastDt12_5)):
+                    if ballastDt12_5[i] < np.mean(values) - np.std(values) or ballastDt12_5[i] > np.mean(
+                            values) + np.std(
+                            values):
+                        ballastDt12_5[i] = 0
+
+        values = [k for k in ballastDt12_8 if k != 0]
+        for i in range(0, len(ballastDt12_8)):
+                    if ballastDt12_8[i] < np.mean(values) - np.std(values) or ballastDt12_8[i] > np.mean(
+                            values) + np.std(
+                            values):
+                        ballastDt12_8[i] = 0
+
+        #####################################################################################################################
+        ##REPLACE NULL ZERO VALUES
+        #####################################################################################################################
         values = [k for k in ballastDt10_0 if k != 0]
         length = values.__len__()
         for i in range(0, len(ballastDt10_0)):
             if ballastDt10_0[i] == 0:
                 ##find items !=0
                 ballastDt10_0[i] = np.sum(values) / length
-            if ballastDt10_0[i] > ballastDt11_0[i] and ballastDt11_0[i] > 0:
-                    while ballastDt10_0[i] > ballastDt11_0[i] :
+
+        values = [k for k in ballastDt11_0 if k != 0]
+        length = values.__len__()
+        for i in range(0, len(ballastDt11_0)):
+            if ballastDt11_0[i] == 0:
+                ##find items !=0
+                ballastDt11_0[i] = np.sum(values) / length
+
+        values = [k for k in ballastDt12_0 if k != 0]
+        length = values.__len__()
+        for i in range(0, len(ballastDt12_0)):
+            if ballastDt12_0[i] == 0:
+                ##find items !=0
+                ballastDt12_0[i] = np.sum(values) / length
+
+        values = [k for k in ballastDt13_0 if k != 0]
+        length = values.__len__()
+        for i in range(0, len(ballastDt13_0)):
+            if ballastDt13_0[i] == 0:
+                ##find items !=0
+                ballastDt13_0[i] = np.sum(values) / length
+        #####################################################################################################################
+        #####################################################################################################################
+        for i in range(0, len(ballastDt10_0)):
+            if ballastDt10_0[i] == 0:
+                ##find items !=0
+                ballastDt10_0[i] = np.sum(values) / length
+            if (ballastDt10_0[i] > ballastDt11_0[i] or ballastDt10_0[i] > ballastDt12_0[i] or ballastDt10_0[i] > ballastDt13_0[i] ) and ballastDt11_0[i] > 0:
+                    while  (ballastDt10_0[i] > ballastDt11_0[i] or ballastDt10_0[i] > ballastDt12_0[i] or ballastDt10_0[i] > ballastDt13_0[i] ) :
                         ballastDt10_0[i] = ballastDt10_0[i] - 0.1 * ballastDt10_0[i]
-            if ballastDt10_0[i] > ballastDt10_3[i] and ballastDt10_3[i] > 0:
-                    while ballastDt10_0[i] > ballastDt10_3[i] :
-                        ballastDt10_0[i] = ballastDt10_0[i] - 0.1 * ballastDt10_0[i]
+
 
         for i in range(9, 14):
                 workbook._sheets[2]['B' + str(i)] = round(ballastDt10_0[i - 9],2)
+
+
 
         ##TREAT outliers / missing values for ballast values
         for i in range(0, len(ballastDt10_3)):
@@ -1379,12 +1470,10 @@ class BaseSeriesReader:
                 values = [k for k in ballastDt10_3 if k != 0]
                 length = values.__len__()
                 ballastDt10_3[i] = np.sum(values) / length
-            if ballastDt10_3[i] > ballastDt11_3[i] and ballastDt11_3[i] > 0:
+            if ballastDt10_3[i] > ballastDt11_3[i]  and ballastDt11_3[i] > 0:
                     while ballastDt10_3[i] > ballastDt11_3[i]:
                         ballastDt10_3[i] = ballastDt10_3[i] - 0.1 * ballastDt10_3[i]
-            if ballastDt10_3[i] > ballastDt10_5[i] and ballastDt10_5[i] > 0:
-                    while ballastDt10_3[i] > ballastDt10_5[i]:
-                        ballastDt10_3[i] = ballastDt10_3[i] - 0.1 * ballastDt10_3[i]
+
 
         for i in range(9, 14):
             workbook._sheets[2]['C' + str(i)] = round( ballastDt10_3[i - 9],2)
@@ -1398,9 +1487,6 @@ class BaseSeriesReader:
                     ballastDt10_5[i] = np.sum(values) / length
                 if ballastDt10_5[i] > ballastDt11_5[i] and ballastDt11_5[i] > 0:
                     while ballastDt10_5[i] > ballastDt11_5[i]:
-                        ballastDt10_5[i] = ballastDt10_5[i] - 0.1 * ballastDt10_5[i]
-                if ballastDt10_5[i] > ballastDt10_8[i] and ballastDt10_8[i] > 0:
-                    while ballastDt10_5[i] > ballastDt10_8[i]:
                         ballastDt10_5[i] = ballastDt10_5[i] - 0.1 * ballastDt10_5[i]
 
         for i in range(9, 14):
@@ -1422,29 +1508,7 @@ class BaseSeriesReader:
             workbook._sheets[2]['E' + str(i)] = round( ballastDt10_8[i - 9],2)
 
         ####################################################################################################
-        values = [k for k in ballastDt11_0 if k != 0]
-        for i in range(0, len(ballastDt11_0)):
-            if ballastDt11_0[i] < np.mean(values) - np.std(values) or ballastDt11_0[i] > np.mean(values) + np.std(
-                    values):
-                ballastDt11_0[i] = 0
 
-        values = [k for k in ballastDt11_3 if k != 0]
-        for i in range(0, len(ballastDt11_3)):
-            if ballastDt11_3[i] < np.mean(values) - np.std(values) or ballastDt11_3[i] > np.mean(values) + np.std(
-                    values):
-                ballastDt11_3[i] = 0
-
-        values = [k for k in ballastDt11_5 if k != 0]
-        for i in range(0, len(ballastDt11_5)):
-            if ballastDt11_5[i] < np.mean(values) - np.std(values) or ballastDt11_5[i] > np.mean(values) + np.std(
-                    values):
-                ballastDt11_5[i] = 0
-
-        values = [k for k in ballastDt11_8 if k != 0]
-        for i in range(0, len(ballastDt11_8)):
-            if ballastDt11_8[i] < np.mean(values) - np.std(values) or ballastDt11_8[i] > np.mean(values) + np.std(
-                    values):
-                ballastDt11_8[i] = 0
 
         values = [k for k in ballastDt11_0 if k != 0]
         length = values.__len__()
@@ -1455,9 +1519,6 @@ class BaseSeriesReader:
                 ballastDt11_0[i] = np.sum(values) / length
             if ballastDt11_0[i] > ballastDt12_0[i] and ballastDt12_0[i] > 0:
                 while ballastDt11_0[i] > ballastDt12_0[i]:
-                    ballastDt11_0[i] = ballastDt11_0[i] - 0.1 * ballastDt11_0[i]
-            if ballastDt11_0[i] > ballastDt11_3[i] and ballastDt11_3[i] > 0:
-                while ballastDt11_0[i] > ballastDt11_3[i]:
                     ballastDt11_0[i] = ballastDt11_0[i] - 0.1 * ballastDt11_0[i]
 
         for i in range(19, 24):
@@ -1473,9 +1534,7 @@ class BaseSeriesReader:
             if ballastDt11_3[i] > ballastDt12_3[i] and ballastDt12_3[i] > 0:
                 while ballastDt11_3[i] > ballastDt12_3[i]:
                     ballastDt11_3[i] = ballastDt11_3[i] - 0.1 * ballastDt11_3[i]
-            if ballastDt11_3[i] > ballastDt11_5[i] and ballastDt11_5[i] > 0:
-                while ballastDt11_3[i] > ballastDt11_5[i]:
-                    ballastDt11_3[i] = ballastDt11_3[i] - 0.1 * ballastDt11_3[i]
+
 
         for i in range(19, 24):
             workbook._sheets[2]['C' + str(i)] = round(ballastDt11_3[i - 19], 2)
@@ -1490,9 +1549,7 @@ class BaseSeriesReader:
             if ballastDt11_5[i] > ballastDt12_5[i] and ballastDt12_5[i] > 0:
                 while ballastDt11_5[i] > ballastDt11_5[i]:
                     ballastDt11_5[i] = ballastDt11_5[i] - 0.1 * ballastDt11_5[i]
-            if ballastDt11_5[i] > ballastDt11_8[i] and ballastDt11_8[i] > 0:
-                while ballastDt11_5[i] > ballastDt11_8[i]:
-                    ballastDt11_5[i] = ballastDt11_5[i] - 0.1 * ballastDt11_5[i]
+
 
         for i in range(19, 24):
             workbook._sheets[2]['D' + str(i)] = round(ballastDt11_5[i - 19], 2)
@@ -1512,29 +1569,6 @@ class BaseSeriesReader:
             workbook._sheets[2]['E' + str(i)] = round(ballastDt11_8[i - 19], 2)
 
         ####################################################################################################
-        values = [k for k in ballastDt12_0 if k != 0]
-        for i in range(0, len(ballastDt12_0)):
-                if ballastDt12_0[i] < np.mean(values) - np.std(values) or ballastDt12_0[i] > np.mean(values) + np.std(
-                        values):
-                    ballastDt12_0[i] = 0
-
-        values = [k for k in ballastDt12_3 if k != 0]
-        for i in range(0, len(ballastDt12_3)):
-                if ballastDt12_3[i] < np.mean(values) - np.std(values) or ballastDt12_3[i] > np.mean(values) + np.std(
-                        values):
-                    ballastDt12_3[i] = 0
-
-        values = [k for k in ballastDt12_5 if k != 0]
-        for i in range(0, len(ballastDt12_5)):
-                if ballastDt12_5[i] < np.mean(values) - np.std(values) or ballastDt12_5[i] > np.mean(values) + np.std(
-                        values):
-                    ballastDt12_5[i] = 0
-
-        values = [k for k in ballastDt12_8 if k != 0]
-        for i in range(0, len(ballastDt12_8)):
-                if ballastDt12_8[i] < np.mean(values) - np.std(values) or ballastDt12_8[i] > np.mean(values) + np.std(
-                        values):
-                    ballastDt12_8[i] = 0
 
         values = [k for k in ballastDt12_0 if k != 0]
         length = values.__len__()
@@ -1545,9 +1579,7 @@ class BaseSeriesReader:
                 if ballastDt12_0[i] > ballastDt13_0[i] and ballastDt13_0[i] > 0:
                     while ballastDt12_0[i] > ballastDt13_0[i]:
                         ballastDt12_0[i] = ballastDt12_0[i] - 0.1 * ballastDt12_0[i]
-                if ballastDt12_0[i] > ballastDt12_3[i] and ballastDt12_3[i] > 0:
-                    while ballastDt12_0[i] > ballastDt12_3[i]:
-                        ballastDt12_0[i] = ballastDt12_0[i] - 0.1 * ballastDt12_0[i]
+
 
         for i in range(29, 34):
                 workbook._sheets[2]['B' + str(i)] = round(ballastDt12_0[i - 29], 2)
@@ -1562,9 +1594,7 @@ class BaseSeriesReader:
                 if ballastDt12_3[i] > ballastDt13_3[i] and ballastDt13_3[i] > 0:
                     while ballastDt12_3[i] > ballastDt13_3[i]:
                         ballastDt12_3[i] = ballastDt12_3[i] - 0.1 * ballastDt12_3[i]
-                if ballastDt12_3[i] > ballastDt12_5[i] and ballastDt12_5[i] > 0:
-                    while ballastDt12_3[i] > ballastDt12_5[i]:
-                        ballastDt12_3[i] = ballastDt12_3[i] - 0.1 * ballastDt12_3[i]
+
 
         for i in range(29, 34):
                 workbook._sheets[2]['C' + str(i)] = round(ballastDt12_3[i - 29], 2)
@@ -1579,9 +1609,7 @@ class BaseSeriesReader:
                 if ballastDt12_5[i] > ballastDt12_5[i] and ballastDt12_5[i] > 0:
                     while ballastDt12_5[i] > ballastDt11_5[i]:
                         ballastDt12_5[i] = ballastDt12_5[i] - 0.1 * ballastDt12_5[i]
-                if ballastDt12_5[i] > ballastDt13_8[i] and ballastDt13_8[i] > 0:
-                    while ballastDt12_5[i] > ballastDt12_8[i]:
-                        ballastDt12_5[i] = ballastDt12_5[i] - 0.1 * ballastDt12_5[i]
+
 
         for i in range(29, 34):
                 workbook._sheets[2]['D' + str(i)] = round(ballastDt12_5[i - 29], 2)
@@ -1679,7 +1707,7 @@ class BaseSeriesReader:
         ##TREAT outliers / missing values for ballast values
         values = [k for k in ballastDt12_8 if k != 0]
         length = values.__len__()
-        for i in range(0, len(ballastDt12_8)):
+        for i in range(0, len(ballastDt13_8)):
             if ballastDt13_8[i] == 0:
                 ##find items !=0
                 ballastDt13_8[i] = np.sum(values) / length
@@ -1689,6 +1717,12 @@ class BaseSeriesReader:
 
         for i in range(39, 44):
             workbook._sheets[2]['E' + str(i)] = round(ballastDt13_8[i - 39], 2)
+
+        ######START STANDARIZATION OF BALLAST WEATHER VALUES  ######START STANDARIZATION OF BALLAST WEATHER VALUES
+        ######START STANDARIZATION OF BALLAST WEATHER VALUES
+        ######START STANDARIZATION OF BALLAST WEATHER VALUES
+        ######START STANDARIZATION OF BALLAST WEATHER VALUES
+        ######START STANDARIZATION OF BALLAST WEATHER VALUES
 
         ###START OF LADDEN##################################################################################
         ####################################################################################################
