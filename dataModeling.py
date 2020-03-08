@@ -3580,8 +3580,12 @@ class TensorFlowW(BasePartitionModeler):
         # create the model
         #new_model = keras.Model(layer_input, x)
         #new_model.compile(loss=keras.losses.mean_squared_error, optimizer=keras.optimizers.Adam(),)#experimental_run_tf_function=False )
-        estimator.fit(XSplineVector, Y, epochs=100, validation_split=0.33)
-        score = estimator.evaluate(np.array(XSplineVector),Y, verbose=1)
+        try:
+            estimator.fit(XSplineVector, Y, epochs=100, validation_split=0.33)
+            score = estimator.evaluate(np.array(XSplineVector),Y, verbose=1)
+        except:
+            estimator.fit(X, Y, epochs=100, validation_split=0.33)
+
 
         self.flagGen = True
 
