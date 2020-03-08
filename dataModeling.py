@@ -3561,10 +3561,10 @@ class TensorFlowW(BasePartitionModeler):
 
         #X =  np.append(X, np.asmatrix([dataY]).T, axis=1)
         XSplineVector = np.array(XSplineVector)
-        weights0 =  np.mean(XSplineVector, axis=0)
+        #weights0 =  np.mean(XSplineVector, axis=0)
         #weights1 = self.intercepts
-        weights1 = estimator.layers[0].get_weights()[0][1]
-        weights = np.array(np.append(weights0.reshape(-1,1),np.asmatrix(weights0).reshape(-1,1),axis=1).reshape(2,-1))
+        #weights1 = estimator.layers[0].get_weights()[0][1]
+        #weights = np.array(np.append(weights0.reshape(-1,1),np.asmatrix(weights0).reshape(-1,1),axis=1).reshape(2,-1))
 
         #estimator.layers[0].set_weights([weights, np.array([0] * (genModelKnots-1))])
         #estimator.layers[4].inputs
