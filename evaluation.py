@@ -1285,8 +1285,8 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
 
             ##########
 
-            if abs(prediction - trueVal)>10:
-                w=0
+            ##if abs(prediction - trueVal)>10:
+                #w=0
         #x=unseenX[:,0].reshape(-1,unseenX.shape[0])
         #prediction =modeler._models[ 0 ].predict(unseenX.reshape(2,2860))
         #print np.mean(abs(prediction - unseenY))
