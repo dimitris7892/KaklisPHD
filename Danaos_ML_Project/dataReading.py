@@ -246,6 +246,37 @@ class BaseSeriesReader:
             wsB = 12
         return wsB
 
+    def CalculateVesselDirection(self,vlon1,  vlat1,  vlon2,  vlat2):
+
+        angle = 0
+        if (vlon1 == vlon2):
+            if vlat1 <= vlat2:
+                angle = 0
+            else:
+                angle = 180
+        else:
+            absDif = abs(vlon1 - vlon2)
+            # Checks if it is closer to change directions.
+            if (absDif > 360 - absDif):
+
+                vlon1 = (360 + vlon1) % 360
+                vlon2 = (360 + vlon2) % 360
+            if (vlat1 == vlat2):
+
+                if (vlon1 <= vlon2):
+                    angle = 90
+                else:
+                    angle = 270
+            else:
+                division = ((vlat2 - vlat1) / (vlon2 - vlon1))
+                if (vlon1 < vlon2):
+                    angle = 90 - np.rad2deg(math.atan(division))
+                else:# if ((vlon1 > vlon2) & & (vlat1 < vlat2))
+                    angle = 270 - np.rad2deg(math.atan(division))
+
+
+        return angle
+
     def GenericParserForDataExtraction(self,systemType, company, vessel ,driver=None,server=None,sid=None,usr=None,password=None,telegrams=None ,fileType=None, granularity=None, fileName=None,
                                        pathOfRawData=None):
         if systemType=='LEMAG':
@@ -279,72 +310,99 @@ class BaseSeriesReader:
             drafts =[]
             blFlags=[]
             vCourses = []
+            stws=[]
+            focs = []
+            lats = []
+            lons = []
+            bearings = []
             ##map weather data from telegrams
 
             ####
             for i in range(0,len(newDataSet)):
                 #if i >= 1000:
                     #break
-                datetimeV = str(newDataSet[i,0])
+                datetimeV = str(newDataSet[i, 0])
+                dateV = datetimeV.split(" ")[0]
+                hhMMss = datetimeV.split(" ")[1]
+                month = dateV.split("/")[0]
+                day = dateV.split("/")[1]
+                year = dateV.split("/")[2]
+                month = '0' + month if month.__len__() == 1 else month
+                day = '0' + day if day.__len__() == 1 else day
+                newDate = year + '-' + month + '-' + day
+                newDate1 = year + '-' + month + '-' + day + " " + ":".join(hhMMss.split(":")[0:2])
+
+                telegramRow = np.array( [row for row in telegrams if str(row[0]).split(" ")[0]==newDate])
+
+                #if rpm >= 0 and rpm < 1 or telegramRow.__len__==0:
+                    #continue
+
+
                 lat = str(newDataSet[i, 4])
                 latDir = str(newDataSet[i, 5])
                 lon = str(newDataSet[i, 6])
                 lonDir = str(newDataSet[i, 7])
                 vCourse = newDataSet[i, 1]
-
+                stw = newDataSet[i,3]
+                foc = newDataSet[i, 8]
                 rpm = newDataSet[i,20]
                 power = newDataSet[i, 22]
-
+                #####FIND BEARING
+                LAT , LON = self.convertLATLONfromDegMinSec(lat,lon , latDir,lonDir)
+                lats.append(LAT)
+                lons.append(LON)
                 ###########################################
-                dateV = datetimeV.split(" ")[0]
-                hhMMss=datetimeV.split(" ")[1]
-                month = dateV.split("/")[0]
-                day = dateV.split("/")[1]
-                year = dateV.split("/")[2]
-                month = '0'+month if month.__len__()==1 else month
-                day = '0' + day if day.__len__() == 1 else day
-                newDate = year +'-'+month +'-'+day
-                newDate1 = year +'-'+month +'-'+day  +" " + ":".join(hhMMss.split(":")[ 0:2 ])
+                #x = math.sin(lons[i] - lons[i - 1]) * math.cos(lats[i])
+                #y = math.cos(lats[i]) * math.sin(lats[i - 1]) - math.sin(lats[i - 1]) * math.sin(lats[i]) * math.cos(lons[i] - lons[i - 1])
+                #bearing = math.atan2(x, y)
+                bearing = self.CalculateVesselDirection(float(lons[i]),float(lats[i]),float(lons[i-1]),float(lats[i-1]))
+                bearings.append(bearing)
 
-                telegramRow = np.array( [row for row in telegrams if str(row[0]).split(" ")[0]==newDate])
-
-                if rpm >= 0 and rpm < 1 or telegramRow.__len__==0:
-                    continue
-
-                windSpeed , windDir  = self.mapWeatherData(vCourse,newDate1,lat,lon , latDir,lonDir)
+                windSpeed , windDir  = self.mapWeatherData(bearing,newDate1,LAT ,LON)
                 windSpeed = self.ConvertToBeaufort(windSpeed)
                 windDirs.append(windDir)
                 windSpeeds.append(windSpeed)
                 drafts.append(0 if telegramRow.__len__() == 0 else telegramRow[:, 8][0])
                 vCourses.append(vCourse)
                 blFlags.append('nan' if telegramRow.__len__() == 0 else telegramRow[:, 2][0])
-
+                stws.append(stw)
+                if foc < 500:
+                    x=0
+                focs.append(np.round((foc/1000)*24,2))
 
                 #filteredDTWs = [d for d in dateTimesW if month == str(d).split('/')[1] and day ==
                                 #str(d).split('/')[0] and year[2:] == str(d).split('/')[2]]
 
-            stw = np.array([k for k in newDataSet])[:,3].astype(float).reshape(-1)
+            #stw = np.array([k for k in newDataSet])[:,3].astype(float).reshape(-1)
+
+
+
+
+
+            #bearings[0].insert(0, 0)
+            bearings = np.asarray(bearings)[0].reshape(-1)
+
             drafts = np.nan_to_num(drafts).reshape(-1)
-            foc = np.array([k for k in newDataSet])[:,8].astype(float).reshape(-1)
+            #foc = np.array([k for k in newDataSet])[:,8].astype(float).reshape(-1)
             windSpeeds = np.nan_to_num(windSpeeds).reshape(-1)
             windDirs = np.nan_to_num(windDirs).reshape(-1)
             blFlags =np.array( blFlags).reshape(-1)
             drafts = np.array(drafts).reshape(-1)
             vCourses = np.array(vCourses).reshape(-1)
-            firstColumn = np.array([0] * len(stw)).reshape(-1,1)
-            otherColumns = np.array([0] * len(stw)).reshape(-1)
+            firstColumn = np.array([0] * len(stws)).reshape(-1,1)
+            otherColumns = np.array([0] * len(stws)).reshape(-1)
             newDataSet = np.array(
-                np.append(firstColumn, np.asmatrix([vCourses,blFlags,otherColumns,otherColumns,otherColumns,otherColumns,otherColumns,drafts,otherColumns,windDirs,windSpeeds,stw,
-                                                    otherColumns,otherColumns,np.round((foc/1000)*24,2)]).T, axis=1))
+                np.append(firstColumn, np.asmatrix([vCourses,blFlags,otherColumns,otherColumns,otherColumns,otherColumns,otherColumns,drafts,otherColumns,windDirs,windSpeeds,stws,
+                                                    otherColumns,otherColumns,focs]).T, axis=1))
 
 
 
-            with open('./data/' + company + '/' + vessel + '/mappedData.csv', mode='w') as data:
+            with open('./data/' + company + '/mappedData.csv', mode='w') as data:
                 data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
                 for i in range(0, len(newDataSet)):
                     data_writer.writerow(
                         [0, vCourses[i], blFlags[i], 0,0,0, 0, 0, drafts[i], 0, windDirs[i],
-                         windSpeeds[i], stw[i], 0, 0, np.round((foc[i] / 1000) * 24, 2)])
+                         windSpeeds[i], stws[i], 0, 0, focs[i]])
 
             self.fillExcelProfCons(vessel, 'C:/Users/dkaklis/Desktop/template.xlsx', newDataSet)
             #while endYear <= endYear and startDay<=endDay and startMonth<=endMonth:
@@ -621,6 +679,8 @@ class BaseSeriesReader:
                 LAT = float(values[11])
                 LON = float(values[12])
 
+
+
                 ###################################################################
                 Vcourse = float(values[3])
                 Vstw = float(values[7])
@@ -639,11 +699,11 @@ class BaseSeriesReader:
                 power = values[10]
                 atPort = 1 if power == 0 else 0
                 ###################################################################
+                if stw < 1 and Sovg < 1 and power == 0 and rpm == 0:
+                    continue
+                if LAT == 0 or LON == 0:
+                    continue
 
-                if stw<1 and Sovg<1 and power==0 and rpm==0:
-                    continue
-                if LAT==0 or LON==0:
-                    continue
 
                 ###CONVERT DECIMAL DEGREE MINUTE LAT , LON INTO DD
                 strLATbeforeComma = str(LAT).split('.')[0]
@@ -915,7 +975,7 @@ class BaseSeriesReader:
 
                         print("TABLE "'WeatherHistoryDB.dbo.d' + dbDate + " ON DATABASE WeatherHistoryDB DOES NOT EXISTS...INSERTING FIELDS FROM SENSORS.. ")
 
-    def mapWeatherData(self,Vcourse,dt ,lat, lon ,latDir , lonDir ):
+    def convertLATLONfromDegMinSec(self,lat, lon ,latDir , lonDir ):
 
         LAT = lat[0:9]
         LON = lon[0:9]
@@ -943,9 +1003,14 @@ class BaseSeriesReader:
 
         LAT = np.round(LAT)
         LON = np.round(LON)
-        LAT = -LAT if latDir =='W' or latDir=='S' else LAT
-        LON = -LON if lonDir == 'W' or lonDir=='S' else LON
+        LAT = -LAT if latDir == 'W' or latDir == 'S' else LAT
+        LON = -LON if lonDir == 'W' or lonDir == 'S' else LON
         ### end lat , lon
+        return LAT , LON
+
+    def mapWeatherData(self,Vcourse,dt ,LAT , LON  ):
+
+        #LAT , LON  = self.convertLATLONfromDegMinSec(lat, lon ,latDir , lonDir)
 
         ##FORM WEATHER HISTORY DB NAME TO SEARCH
         date = str(dt).split(" ")[0]
@@ -1007,7 +1072,7 @@ class BaseSeriesReader:
         #11th place WF
         #12th place SPEED
         #15th place ME FOC 24H
-        dtNew = np.array([k for k in dataSet if float(k[12])>5 and float(k[15])>10])
+        dtNew = np.array([k for k in dataSet if float(k[12])>4 and float(k[15])>5])
 
         ballastDt = np.array([k for k in dtNew if k[2] == 'B'])[:, 7:].astype(float)
         ladenDt = np.array([k for k in dtNew if k[2] == 'L'])[:, 7:].astype(float)
@@ -1115,7 +1180,7 @@ class BaseSeriesReader:
         for i in range(0, len(wind) - 1):
             arrayFoc = np.array([k for k in ballastDt if
                                  k[4] >= 0 and k[4] <= 1.5 and k[5] >= 9 and k[5] <= 10 and k[3] >= wind[i] and k[3] <= wind[i + 1] and k[8] > 0])
-            meanFoc = np.mean(arrayFoc[:, 8]) if arrayFoc.__len__() > 0 else 0
+            meanFoc = np.mean(arrayFoc[:, 8]) if arrayFoc.__len__() > 5 else 0
             ballastDt10_0.append(round(meanFoc, 2))
 
 
@@ -1131,7 +1196,7 @@ class BaseSeriesReader:
                                  k[
                                      3] <= wind[i + 1] and k[
                                      8] > 0])
-            meanFoc = np.mean(arrayFoc[:, 8]) if arrayFoc.__len__() > 0 else 0
+            meanFoc = np.mean(arrayFoc[:, 8]) if arrayFoc.__len__() > 5 else 0
             ballastDt10_3.append(round(meanFoc, 2))
 
         for i in range(9, 14):
@@ -1145,7 +1210,7 @@ class BaseSeriesReader:
                                  k[
                                      3] <= wind[i + 1] and k[
                                      8] > 0])
-            meanFoc = np.mean(arrayFoc[:, 8]) if arrayFoc.__len__() > 0 else 0
+            meanFoc = np.mean(arrayFoc[:, 8]) if arrayFoc.__len__() > 5 else 0
             ballastDt10_5.append(round(meanFoc, 2))
 
         for i in range(9, 14):
@@ -1159,7 +1224,7 @@ class BaseSeriesReader:
                                  k[
                                      3] <= wind[i + 1] and k[
                                      8] > 0])
-            meanFoc = np.mean(arrayFoc[:, 8]) if arrayFoc.__len__() > 0 else 0
+            meanFoc = np.mean(arrayFoc[:, 8]) if arrayFoc.__len__() > 5 else 0
             ballastDt10_8.append(round(meanFoc, 2))
 
         for i in range(9, 14):
@@ -1176,7 +1241,7 @@ class BaseSeriesReader:
                                      i] and k[
                                      3] <= wind[i + 1] and k[
                                      8] > 0])
-            meanFoc = np.mean(arrayFoc[:, 8]) if arrayFoc.__len__() > 0 else 0
+            meanFoc = np.mean(arrayFoc[:, 8]) if arrayFoc.__len__() > 5 else 0
             ballastDt11_0.append(round(meanFoc, 2))
 
         for i in range(19, 24):
@@ -1189,7 +1254,7 @@ class BaseSeriesReader:
                                  k[4] >= 2 and k[4] <= 3 and k[5] > 10 and k[5] <= 11.5 and k[3] >= wind[i] and k[
                                      3] <= wind[i + 1] and k[
                                      8] > 0])
-            meanFoc = np.mean(arrayFoc[:, 8]) if arrayFoc.__len__() > 0 else 0
+            meanFoc = np.mean(arrayFoc[:, 8]) if arrayFoc.__len__() > 5 else 0
             ballastDt11_3.append(round(meanFoc, 2))
 
         for i in range(19, 24):
@@ -1202,7 +1267,7 @@ class BaseSeriesReader:
                                  k[4] >= 4 and k[4] <= 5 and k[5] > 10 and k[5] <= 11.5 and k[3] >= wind[i] and k[
                                      3] <= wind[i + 1] and k[
                                      8] > 0])
-            meanFoc = np.mean(arrayFoc[:, 8]) if arrayFoc.__len__() > 0 else 0
+            meanFoc = np.mean(arrayFoc[:, 8]) if arrayFoc.__len__() > 5 else 0
             ballastDt11_5.append(round(meanFoc, 2))
 
         for i in range(19, 24):
@@ -1215,7 +1280,7 @@ class BaseSeriesReader:
                                  k[4] >= 7 and k[4] <= 8 and k[5] > 10 and k[5] <= 11.5 and k[3] >= wind[i] and k[
                                      3] <= wind[i + 1] and k[
                                      8] > 0])
-            meanFoc = np.mean(arrayFoc[:, 8]) if arrayFoc.__len__() > 0 else 0
+            meanFoc = np.mean(arrayFoc[:, 8]) if arrayFoc.__len__() > 5 else 0
             ballastDt11_8.append(round(meanFoc, 2))
 
         for i in range(19, 24):
@@ -1232,7 +1297,7 @@ class BaseSeriesReader:
                                  k[
                                      3] <= wind[i + 1] and k[
                                      8] > 0])
-            meanFoc = np.mean(arrayFoc[:, 8]) if arrayFoc.__len__() > 0 else 0
+            meanFoc = np.mean(arrayFoc[:, 8]) if arrayFoc.__len__() > 5 else 0
             ballastDt12_0.append(round(meanFoc, 2))
 
         for i in range(29, 34):
@@ -1246,7 +1311,7 @@ class BaseSeriesReader:
                                      i] and k[
                                      3] <= wind[i + 1] and k[
                                      8] > 0])
-            meanFoc = np.mean(arrayFoc[:, 8]) if arrayFoc.__len__() > 0 else 0
+            meanFoc = np.mean(arrayFoc[:, 8]) if arrayFoc.__len__() > 5 else 0
             ballastDt12_3.append(round(meanFoc, 2))
 
         for i in range(29, 34):
@@ -1260,7 +1325,7 @@ class BaseSeriesReader:
                                      i] and k[
                                      3] <= wind[i + 1] and k[
                                      8] > 0])
-            meanFoc = np.mean(arrayFoc[:, 8]) if arrayFoc.__len__() > 0 else 0
+            meanFoc = np.mean(arrayFoc[:, 8]) if arrayFoc.__len__() > 5 else 0
             ballastDt12_5.append(round(meanFoc, 2))
 
         for i in range(29, 34):
@@ -1274,7 +1339,7 @@ class BaseSeriesReader:
                                      i] and k[
                                      3] <= wind[i + 1] and k[
                                      8] > 0])
-            meanFoc = np.mean(arrayFoc[:, 8]) if arrayFoc.__len__() > 0 else 0
+            meanFoc = np.mean(arrayFoc[:, 8]) if arrayFoc.__len__() > 5 else 0
             ballastDt12_8.append(round(meanFoc, 2))
 
         for i in range(29, 34):
@@ -1292,7 +1357,7 @@ class BaseSeriesReader:
                                  k[
                                      3] <= wind[i + 1] and k[
                                      8] > 0])
-            meanFoc = np.mean(arrayFoc[:, 8]) if arrayFoc.__len__() > 0 else 0
+            meanFoc = np.mean(arrayFoc[:, 8]) if arrayFoc.__len__() > 5 else 0
             ballastDt13_0.append(round(meanFoc, 2))
 
         for i in range(39, 44):
@@ -1306,7 +1371,7 @@ class BaseSeriesReader:
                                      i] and k[
                                      3] <= wind[i + 1] and k[
                                      8] > 0])
-            meanFoc = np.mean(arrayFoc[:, 8]) if arrayFoc.__len__() > 0 else 0
+            meanFoc = np.mean(arrayFoc[:, 8]) if arrayFoc.__len__() > 5 else 0
             ballastDt13_3.append(round(meanFoc, 2))
 
         for i in range(39, 44):
@@ -1320,7 +1385,7 @@ class BaseSeriesReader:
                                      i] and k[
                                      3] <= wind[i + 1] and k[
                                      8] > 0])
-            meanFoc = np.mean(arrayFoc[:, 8]) if arrayFoc.__len__() > 0 else 0
+            meanFoc = np.mean(arrayFoc[:, 8]) if arrayFoc.__len__() > 5 else 0
             ballastDt13_5.append(round(meanFoc, 2))
 
         for i in range(39, 44):
@@ -1334,7 +1399,7 @@ class BaseSeriesReader:
                                      i] and k[
                                      3] <= wind[i + 1] and k[
                                      8] > 0])
-            meanFoc = np.mean(arrayFoc[:, 8]) if arrayFoc.__len__() > 0 else 0
+            meanFoc = np.mean(arrayFoc[:, 8]) if arrayFoc.__len__() > 5 else 0
             ballastDt13_8.append(round(meanFoc, 2))
 
         for i in range(39, 44):
@@ -1344,80 +1409,9 @@ class BaseSeriesReader:
         ####END OF BALLAST #############################################################
         ####END OF BALLAST #############################################################
         ##TREAT outliers / missing values for ballast values
-        values = [k for k in ballastDt10_0 if k != 0]
-        for i in range(0, len(ballastDt10_0)):
-            if ballastDt10_0[i] < np.mean(values) - np.std(values) or ballastDt10_0[i] > np.mean(values) + np.std(
-                    values):
-                ballastDt10_0[i] = 0
 
-        values = [k for k in ballastDt10_3 if k != 0]
-        for i in range(0, len(ballastDt10_3)):
-            if ballastDt10_3[i]< np.mean(values) - np.std(values) or ballastDt10_3[i] > np.mean(values) + np.std(values):
-                ballastDt10_3[i]=0
-
-        values = [k for k in ballastDt10_5 if k != 0]
-        for i in range(0, len(ballastDt10_5)):
-            if ballastDt10_5[i]< np.mean(values) - np.std(values) or ballastDt10_5[i] > np.mean(values) + np.std(values):
-                ballastDt10_5[i]=0
-
-        values = [k for k in ballastDt10_8 if k != 0]
-        for i in range(0, len(ballastDt10_8)):
-            if ballastDt10_8[i] < np.mean(values) - np.std(values) or ballastDt10_8[i] > np.mean(values) + np.std(
-                    values):
-                ballastDt10_8[i] = 0
-
-        values = [k for k in ballastDt11_0 if k != 0]
-        for i in range(0, len(ballastDt11_0)):
-                if ballastDt11_0[i] < np.mean(values) - np.std(values) or ballastDt11_0[i] > np.mean(values) + np.std(
-                        values):
-                    ballastDt11_0[i] = 0
-
-        values = [k for k in ballastDt11_3 if k != 0]
-        for i in range(0, len(ballastDt11_3)):
-                if ballastDt11_3[i] < np.mean(values) - np.std(values) or ballastDt11_3[i] > np.mean(values) + np.std(
-                        values):
-                    ballastDt11_3[i] = 0
-
-        values = [k for k in ballastDt11_5 if k != 0]
-        for i in range(0, len(ballastDt11_5)):
-                if ballastDt11_5[i] < np.mean(values) - np.std(values) or ballastDt11_5[i] > np.mean(values) + np.std(
-                        values):
-                    ballastDt11_5[i] = 0
-
-        values = [k for k in ballastDt11_8 if k != 0]
-        for i in range(0, len(ballastDt11_8)):
-                if ballastDt11_8[i] < np.mean(values) - np.std(values) or ballastDt11_8[i] > np.mean(values) + np.std(
-                        values):
-                    ballastDt11_8[i] = 0
-
-        values = [k for k in ballastDt12_0 if k != 0]
-        for i in range(0, len(ballastDt12_0)):
-                    if ballastDt12_0[i] < np.mean(values) - np.std(values) or ballastDt12_0[i] > np.mean(
-                            values) + np.std(
-                            values):
-                        ballastDt12_0[i] = 0
-
-        values = [k for k in ballastDt12_3 if k != 0]
-        for i in range(0, len(ballastDt12_3)):
-                    if ballastDt12_3[i] < np.mean(values) - np.std(values) or ballastDt12_3[i] > np.mean(
-                            values) + np.std(
-                            values):
-                        ballastDt12_3[i] = 0
-
-        values = [k for k in ballastDt12_5 if k != 0]
-        for i in range(0, len(ballastDt12_5)):
-                    if ballastDt12_5[i] < np.mean(values) - np.std(values) or ballastDt12_5[i] > np.mean(
-                            values) + np.std(
-                            values):
-                        ballastDt12_5[i] = 0
-
-        values = [k for k in ballastDt12_8 if k != 0]
-        for i in range(0, len(ballastDt12_8)):
-                    if ballastDt12_8[i] < np.mean(values) - np.std(values) or ballastDt12_8[i] > np.mean(
-                            values) + np.std(
-                            values):
-                        ballastDt12_8[i] = 0
-
+        #workbook.save(filename=pathToexcel.split('.')[0] + '_1.' + pathToexcel.split('.')[1])
+        #return
         #####################################################################################################################
         ##REPLACE NULL ZERO VALUES
         #####################################################################################################################
@@ -1532,6 +1526,8 @@ class BaseSeriesReader:
                     if ballastDt13_8[i] == 0:
                         ##find items !=0
                         ballastDt13_8[i] = np.sum(values) / length
+
+
         #####################################################################################################################
         #####################################################################################################################
         for i in range(0, len(ballastDt10_0)):
@@ -1569,7 +1565,7 @@ class BaseSeriesReader:
                 #if ballastDt10_5[i] == 0:
                     ##find items !=0
                     #ballastDt10_5[i] = np.sum(values) / length
-                if (ballastDt10_5[i] > ballastDt11_5[i] or ballastDt11_5[i] > ballastDt12_5[i] or ballastDt10_5[i] > ballastDt13_5[i] ) and ballastDt11_5[i] > 0:
+                if (ballastDt10_5[i] > ballastDt11_5[i] or ballastDt10_5[i] > ballastDt12_5[i] or ballastDt10_5[i] > ballastDt13_5[i] ) and ballastDt11_5[i] > 0:
                     while (ballastDt10_5[i] > ballastDt11_5[i] or ballastDt10_5[i] > ballastDt12_5[i] or ballastDt10_5[i] > ballastDt13_5[i] ):
                         ballastDt10_5[i] = ballastDt10_5[i] - 0.1 * ballastDt10_5[i]
 
@@ -1609,13 +1605,13 @@ class BaseSeriesReader:
 
         ##TREAT outliers / missing values for ballast values
         for i in range(0, len(ballastDt11_3)):
-            if ballastDt11_3[i] == 0:
+            #if ballastDt11_3[i] == 0:
                 ##find items !=0
-                values = [k for k in ballastDt11_3 if k != 0]
-                length = values.__len__()
-                ballastDt11_3[i] = np.sum(values) / length
-            if ballastDt11_3[i] > ballastDt12_3[i] and ballastDt12_3[i] > 0:
-                while ballastDt11_3[i] > ballastDt12_3[i]:
+                #values = [k for k in ballastDt11_3 if k != 0]
+                #length = values.__len__()
+                #ballastDt11_3[i] = np.sum(values) / length
+            if (ballastDt11_3[i] > ballastDt12_3[i] or ballastDt11_3[i] > ballastDt13_3[i]) and ballastDt12_3[i] > 0:
+                while (ballastDt11_3[i] > ballastDt12_3[i] or ballastDt11_3[i] > ballastDt13_3[i]):
                     ballastDt11_3[i] = ballastDt11_3[i] - 0.1 * ballastDt11_3[i]
 
 
@@ -1626,11 +1622,11 @@ class BaseSeriesReader:
         values = [k for k in ballastDt11_5 if k != 0]
         length = values.__len__()
         for i in range(0, len(ballastDt11_5)):
-            if ballastDt11_5[i] == 0:
+            #if ballastDt11_5[i] == 0:
                 ##find items !=0
-                ballastDt11_5[i] = np.sum(values) / length
-            if ballastDt11_5[i] > ballastDt12_5[i] and ballastDt12_5[i] > 0:
-                while ballastDt11_5[i] > ballastDt11_5[i]:
+               # ballastDt11_5[i] = np.sum(values) / length
+            if (ballastDt11_5[i] > ballastDt12_5[i] or ballastDt11_5[i] > ballastDt13_5[i]) and ballastDt12_5[i] > 0:
+                while (ballastDt11_5[i] > ballastDt12_5[i] or ballastDt11_5[i] > ballastDt13_5[i]):
                     ballastDt11_5[i] = ballastDt11_5[i] - 0.1 * ballastDt11_5[i]
 
 
@@ -1644,8 +1640,8 @@ class BaseSeriesReader:
             if ballastDt11_8[i] == 0:
                 ##find items !=0
                 ballastDt11_8[i] = np.sum(values) / length
-            if ballastDt11_8[i] > ballastDt12_8[i] and ballastDt12_8[i] > 0:
-                while ballastDt11_8[i] > ballastDt12_8[i]:
+            if (ballastDt11_8[i] > ballastDt12_8[i] or ballastDt11_8[i] > ballastDt13_8[i]) and ballastDt12_8[i] > 0:
+                while (ballastDt11_8[i] > ballastDt12_8[i] or ballastDt11_8[i] > ballastDt13_8[i]):
                     ballastDt11_8[i] = ballastDt11_8[i] - 0.1 * ballastDt11_8[i]
 
         for i in range(19, 24):
@@ -1689,8 +1685,8 @@ class BaseSeriesReader:
                 if ballastDt12_5[i] == 0:
                     ##find items !=0
                     ballastDt12_5[i] = np.sum(values) / length
-                if ballastDt12_5[i] > ballastDt12_5[i] and ballastDt12_5[i] > 0:
-                    while ballastDt12_5[i] > ballastDt11_5[i]:
+                if ballastDt12_5[i] > ballastDt13_5[i] and ballastDt12_5[i] > 0:
+                    while ballastDt12_5[i] > ballastDt13_5[i]:
                         ballastDt12_5[i] = ballastDt12_5[i] - 0.1 * ballastDt12_5[i]
 
 
@@ -1705,101 +1701,17 @@ class BaseSeriesReader:
                     ##find items !=0
                     ballastDt12_8[i] = np.sum(values) / length
                 if ballastDt12_8[i] > ballastDt13_8[i] and ballastDt13_8[i] > 0:
-                    while ballastDt12_8[i] > ballastDt12_8[i]:
+                    while ballastDt12_8[i] > ballastDt13_8[i]:
                         ballastDt12_8[i] = ballastDt12_8[i] - 0.1 * ballastDt12_8[i]
 
         for i in range(29, 34):
                 workbook._sheets[2]['E' + str(i)] = round(ballastDt12_8[i - 29], 2)
 
 
+
+
         ################################################################################################################
-        values = [k for k in ballastDt13_0 if k != 0]
-        for i in range(0, len(ballastDt13_0)):
-            if ballastDt13_0[i] < np.mean(values) - np.std(values) or ballastDt13_0[i] > np.mean(values) + np.std(
-                    values):
-                ballastDt13_0[i] = 0
 
-        values = [k for k in ballastDt13_3 if k != 0]
-        for i in range(0, len(ballastDt13_3)):
-            if ballastDt13_3[i] < np.mean(values) - np.std(values) or ballastDt13_3[i] > np.mean(values) + np.std(
-                    values):
-                ballastDt13_3[i] = 0
-
-        values = [k for k in ballastDt13_5 if k != 0]
-        for i in range(0, len(ballastDt13_5)):
-            if ballastDt13_5[i] < np.mean(values) - np.std(values) or ballastDt13_5[i] > np.mean(values) + np.std(
-                    values):
-                ballastDt13_5[i] = 0
-
-        values = [k for k in ballastDt13_8 if k != 0]
-        for i in range(0, len(ballastDt13_8)):
-            if ballastDt13_8[i] < np.mean(values) - np.std(values) or ballastDt13_8[i] > np.mean(values) + np.std(
-                    values):
-                ballastDt13_8[i] = 0
-
-        values = [k for k in ballastDt13_0 if k != 0]
-        length = values.__len__()
-        for i in range(0, len(ballastDt13_0)):
-            if ballastDt13_0[i] == 0:
-                ##find items !=0
-                ballastDt13_0[i] = np.sum(values) / length
-            #if ballastDt13_0[i] > ballastDt13_0[i] and ballastDt13_0[i] > 0:
-                #while ballastDt12_0[i] > ballastDt13_0[i]:
-                    #ballastDt12_0[i] = ballastDt12_0[i] - 0.1 * ballastDt12_0[i]
-            if ballastDt13_0[i] > ballastDt13_3[i] and ballastDt13_3[i] > 0:
-                while ballastDt13_0[i] > ballastDt13_3[i]:
-                    ballastDt13_0[i] = ballastDt13_0[i] - 0.1 * ballastDt13_0[i]
-
-        for i in range(39, 44):
-            workbook._sheets[2]['B' + str(i)] = round(ballastDt12_0[i - 39], 2)
-
-        ##TREAT outliers / missing values for ballast values
-        for i in range(0, len(ballastDt13_3)):
-            if ballastDt13_3[i] == 0:
-                ##find items !=0
-                values = [k for k in ballastDt13_3 if k != 0]
-                length = values.__len__()
-                ballastDt13_3[i] = np.sum(values) / length
-            #if ballastDt13_3[i] > ballastDt13_3[i] and ballastDt13_3[i] > 0:
-                #while ballastDt12_3[i] > ballastDt13_3[i]:
-                    #ballastDt12_3[i] = ballastDt12_3[i] - 0.1 * ballastDt12_3[i]
-            if ballastDt13_3[i] > ballastDt13_5[i] and ballastDt13_5[i] > 0:
-                while ballastDt13_3[i] > ballastDt13_5[i]:
-                    ballastDt13_3[i] = ballastDt13_3[i] - 0.1 * ballastDt13_3[i]
-
-        for i in range(39, 44):
-            workbook._sheets[2]['C' + str(i)] = round(ballastDt12_3[i - 39], 2)
-
-        ##TREAT outliers / missing values for ballast values
-        values = [k for k in ballastDt13_5 if k != 0]
-        length = values.__len__()
-        for i in range(0, len(ballastDt13_5)):
-            if ballastDt13_5[i] == 0:
-                ##find items !=0
-                ballastDt13_5[i] = np.sum(values) / length
-            #if ballastDt13_5[i] > ballastDt12_5[i] and ballastDt12_5[i] > 0:
-                #while ballastDt12_5[i] > ballastDt11_5[i]:
-                    #ballastDt12_5[i] = ballastDt12_5[i] - 0.1 * ballastDt12_5[i]
-            if ballastDt13_5[i] > ballastDt13_8[i] and ballastDt13_8[i] > 0:
-                while ballastDt13_5[i] > ballastDt13_8[i]:
-                    ballastDt13_5[i] = ballastDt13_5[i] - 0.1 * ballastDt13_5[i]
-
-        for i in range(39, 44):
-            workbook._sheets[2]['D' + str(i)] = round(ballastDt12_5[i - 39], 2)
-
-        ##TREAT outliers / missing values for ballast values
-        values = [k for k in ballastDt12_8 if k != 0]
-        length = values.__len__()
-        for i in range(0, len(ballastDt13_8)):
-            if ballastDt13_8[i] == 0:
-                ##find items !=0
-                ballastDt13_8[i] = np.sum(values) / length
-            #if ballastDt12_8[i] > ballastDt13_8[i] and ballastDt13_8[i] > 0:
-                #while ballastDt13_8[i] > ballastDt13_8[i]:
-                    #ballastDt13_8[i] = ballastDt13_8[i] - 0.1 * ballastDt13_8[i]
-
-        for i in range(39, 44):
-            workbook._sheets[2]['E' + str(i)] = round(ballastDt13_8[i - 39], 2)
 
         ######START STANDARIZATION OF BALLAST WEATHER VALUES  ######START STANDARIZATION OF BALLAST WEATHER VALUES
         ######START STANDARIZATION OF BALLAST WEATHER VALUES
