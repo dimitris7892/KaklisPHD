@@ -3584,6 +3584,14 @@ class TensorFlowW(BasePartitionModeler):
             estimator.fit(XSplineVector, Y, epochs=100, validation_split=0.33)
             score = estimator.evaluate(np.array(XSplineVector),Y, verbose=1)
         except:
+
+            estimator = keras.models.Sequential()
+
+            estimator.add(keras.layers.Dense(genModelKnots, input_shape=(2,)))
+
+            estimator.add(keras.layers.Dense(1, ))
+            estimator.compile(loss=keras.losses.mean_squared_error, optimizer=keras.optimizers.Adam(), )
+
             estimator.fit(X, Y, epochs=100, validation_split=0.33)
 
 
