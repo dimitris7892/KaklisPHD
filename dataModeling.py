@@ -2997,6 +2997,19 @@ class TensorFlowW(BasePartitionModeler):
             model.compile(loss='mse' , optimizer=keras.optimizers.Adam())
             return model
 
+        def baseline_model3():
+            # create model
+            model = keras.models.Sequential()
+
+            model.add(keras.layers.Dense(genModelKnots - 1, input_shape=(2,)))
+
+            model.add(keras.layers.Dense(1, ))
+
+            model.compile(loss=keras.losses.mean_squared_error,
+                          optimizer=keras.optimizers.Adam() )  # experimental_run_tf_function=False )
+
+            return model
+
         def baseline_model():
             #create model
             model = keras.models.Sequential()
@@ -3585,13 +3598,7 @@ class TensorFlowW(BasePartitionModeler):
             score = estimator.evaluate(np.array(XSplineVector),Y, verbose=1)
         except:
 
-            estimator = keras.models.Sequential()
-
-            estimator.add(keras.layers.Dense(genModelKnots, input_shape=(2,)))
-
-            estimator.add(keras.layers.Dense(1, ))
-            estimator.compile(loss=keras.losses.mean_squared_error, optimizer=keras.optimizers.Adam(), )
-
+            estimator = baseline_model3()
             estimator.fit(X, Y, epochs=100, validation_split=0.33)
 
 
