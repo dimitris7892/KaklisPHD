@@ -5539,7 +5539,8 @@ class SplineRegressionModeler(BasePartitionModeler):
 
 
         # Init model to partition map
-        self._partitionsPerModel = {}
+        #self._partitionsPerModel = {}
+        self._partitionsPerModel = []
         # For each label/partition
         for idx, pCurLbl in enumerate(partition_labels):
             # Create a linear model
@@ -5576,13 +5577,32 @@ class SplineRegressionModeler(BasePartitionModeler):
                 #print str(Exception)
             # Add to returned list
             models.append(curModel)
-            self._partitionsPerModel[ curModel ] = partitionsX[ idx ]
+            #self._partitionsPerModel[ curModel ] = partitionsX[ idx ]
+            self._partitionsPerModel.append(partitionsX[idx])
 
         # Update private models
         self._models = models
 
         # Return list of models
         return models,numpy.empty ,numpy.empty,None,None
+
+    def getBestModelForPoint(self, point):
+        # mBest = None
+        mBest = None
+        dBestFit = 0
+        # For each model
+        for i in range(0,len(self._models)):
+            # If it is a better for the point
+            dCurFit = self.getFitnessOfModelForPoint(i, point)
+            if dCurFit > dBestFit:
+                # Update the selected best model and corresponding fit
+                dBestFit = dCurFit
+                mBest = self._models[i]
+
+        if mBest == None:
+            return self._models[0]
+        else:
+            return mBest
 
     def getFitnessOfModelForPoint(self, model, point):
         return 1.0 / (1.0 + numpy.linalg.norm(np.mean(self._partitionsPerModel[ model ]) - point))
