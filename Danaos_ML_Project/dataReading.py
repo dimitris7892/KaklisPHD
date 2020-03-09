@@ -337,7 +337,7 @@ class BaseSeriesReader:
                 np.append(firstColumn, np.asmatrix([vCourses,blFlags,otherColumns,otherColumns,otherColumns,otherColumns,otherColumns,drafts,otherColumns,windDirs,windSpeeds,stw,
                                                     otherColumns,otherColumns,np.round((foc/1000)*24,2)]).T, axis=1))
 
-            self.fillExcelProfCons(vessel, 'C:/Users/dkaklis/Desktop/template.xlsx', newDataSet)
+
 
             with open('./data/' + company + '/' + vessel + '/mappedData.csv', mode='w') as data:
                 data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
@@ -346,6 +346,7 @@ class BaseSeriesReader:
                         [0, vCourses[i], blFlags[i], 0,0,0, 0, 0, drafts[i], 0, windDirs[i],
                          windSpeeds[i], stw[i], 0, 0, np.round((foc[i] / 1000) * 24, 2)])
 
+            self.fillExcelProfCons(vessel, 'C:/Users/dkaklis/Desktop/template.xlsx', newDataSet)
             #while endYear <= endYear and startDay<=endDay and startMonth<=endMonth:
                 #data = pd.read_csv('./data/' + company + '/' + vessel +'SEEAmag '+startYear+'.'+startMonth+'.'+startDay+'.csv', sep=';', decimal='.')
                 #startDay=+1
@@ -1447,12 +1448,96 @@ class BaseSeriesReader:
             if ballastDt13_0[i] == 0:
                 ##find items !=0
                 ballastDt13_0[i] = np.sum(values) / length
+
+        values = [k for k in ballastDt10_3 if k != 0]
+        length = values.__len__()
+        for i in range(0, len(ballastDt10_3)):
+            if ballastDt10_3[i] == 0:
+                ##find items !=0
+                ballastDt10_3[i] = np.sum(values) / length
+
+        values = [k for k in ballastDt11_3 if k != 0]
+        length = values.__len__()
+        for i in range(0, len(ballastDt11_3)):
+            if ballastDt11_3[i] == 0:
+                ##find items !=0
+                ballastDt11_3[i] = np.sum(values) / length
+
+        values = [k for k in ballastDt12_3 if k != 0]
+        length = values.__len__()
+        for i in range(0, len(ballastDt12_3)):
+            if ballastDt12_3[i] == 0:
+                ##find items !=0
+                ballastDt12_3[i] = np.sum(values) / length
+
+        values = [k for k in ballastDt13_3 if k != 0]
+        length = values.__len__()
+        for i in range(0, len(ballastDt13_3)):
+            if ballastDt13_3[i] == 0:
+                ##find items !=0
+                ballastDt13_3[i] = np.sum(values) / length
+
+        values = [k for k in ballastDt10_5 if k != 0]
+        length = values.__len__()
+        for i in range(0, len(ballastDt10_5)):
+                if ballastDt10_5[i] == 0:
+                    ##find items !=0
+                    ballastDt10_5[i] = np.sum(values) / length
+
+        values = [k for k in ballastDt11_5 if k != 0]
+        length = values.__len__()
+        for i in range(0, len(ballastDt11_5)):
+                if ballastDt11_5[i] == 0:
+                    ##find items !=0
+                    ballastDt11_5[i] = np.sum(values) / length
+
+        values = [k for k in ballastDt12_5 if k != 0]
+        length = values.__len__()
+        for i in range(0, len(ballastDt12_5)):
+                if ballastDt12_5[i] == 0:
+                    ##find items !=0
+                    ballastDt12_5[i] = np.sum(values) / length
+
+        values = [k for k in ballastDt13_5 if k != 0]
+        length = values.__len__()
+        for i in range(0, len(ballastDt13_5)):
+                if ballastDt13_5[i] == 0:
+                    ##find items !=0
+                    ballastDt13_5[i] = np.sum(values) / length
+
+        values = [k for k in ballastDt10_8 if k != 0]
+        length = values.__len__()
+        for i in range(0, len(ballastDt10_8)):
+                    if ballastDt10_8[i] == 0:
+                        ##find items !=0
+                        ballastDt10_8[i] = np.sum(values) / length
+
+        values = [k for k in ballastDt11_8 if k != 0]
+        length = values.__len__()
+        for i in range(0, len(ballastDt11_8)):
+                    if ballastDt11_8[i] == 0:
+                        ##find items !=0
+                        ballastDt11_8[i] = np.sum(values) / length
+
+        values = [k for k in ballastDt12_8 if k != 0]
+        length = values.__len__()
+        for i in range(0, len(ballastDt12_8)):
+                    if ballastDt12_8[i] == 0:
+                        ##find items !=0
+                        ballastDt12_8[i] = np.sum(values) / length
+
+        values = [k for k in ballastDt13_8 if k != 0]
+        length = values.__len__()
+        for i in range(0, len(ballastDt13_8)):
+                    if ballastDt13_8[i] == 0:
+                        ##find items !=0
+                        ballastDt13_8[i] = np.sum(values) / length
         #####################################################################################################################
         #####################################################################################################################
         for i in range(0, len(ballastDt10_0)):
-            if ballastDt10_0[i] == 0:
+            #if ballastDt10_0[i] == 0:
                 ##find items !=0
-                ballastDt10_0[i] = np.sum(values) / length
+                #ballastDt10_0[i] = np.sum(values) / length
             if (ballastDt10_0[i] > ballastDt11_0[i] or ballastDt10_0[i] > ballastDt12_0[i] or ballastDt10_0[i] > ballastDt13_0[i] ) and ballastDt11_0[i] > 0:
                     while  (ballastDt10_0[i] > ballastDt11_0[i] or ballastDt10_0[i] > ballastDt12_0[i] or ballastDt10_0[i] > ballastDt13_0[i] ) :
                         ballastDt10_0[i] = ballastDt10_0[i] - 0.1 * ballastDt10_0[i]
@@ -1465,13 +1550,13 @@ class BaseSeriesReader:
 
         ##TREAT outliers / missing values for ballast values
         for i in range(0, len(ballastDt10_3)):
-            if ballastDt10_3[i] == 0:
+            #if ballastDt10_3[i] == 0:
                 ##find items !=0
-                values = [k for k in ballastDt10_3 if k != 0]
-                length = values.__len__()
-                ballastDt10_3[i] = np.sum(values) / length
-            if ballastDt10_3[i] > ballastDt11_3[i]  and ballastDt11_3[i] > 0:
-                    while ballastDt10_3[i] > ballastDt11_3[i]:
+                #values = [k for k in ballastDt10_3 if k != 0]
+                #length = values.__len__()
+                #ballastDt10_3[i] = np.sum(values) / length
+            if (ballastDt10_3[i] > ballastDt11_3[i] or ballastDt10_3[i] > ballastDt12_3[i] or ballastDt10_3[i] > ballastDt13_3[i] )  and ballastDt11_3[i] > 0:
+                    while(ballastDt10_3[i] > ballastDt11_3[i] or ballastDt10_3[i] > ballastDt12_3[i] or ballastDt10_3[i] > ballastDt13_3[i] ):
                         ballastDt10_3[i] = ballastDt10_3[i] - 0.1 * ballastDt10_3[i]
 
 
@@ -1479,14 +1564,13 @@ class BaseSeriesReader:
             workbook._sheets[2]['C' + str(i)] = round( ballastDt10_3[i - 9],2)
 
         ##TREAT outliers / missing values for ballast values
-        values = [k for k in ballastDt10_5 if k != 0]
-        length = values.__len__()
+
         for i in range(0, len(ballastDt10_5)):
-                if ballastDt10_5[i] == 0:
+                #if ballastDt10_5[i] == 0:
                     ##find items !=0
-                    ballastDt10_5[i] = np.sum(values) / length
-                if ballastDt10_5[i] > ballastDt11_5[i] and ballastDt11_5[i] > 0:
-                    while ballastDt10_5[i] > ballastDt11_5[i]:
+                    #ballastDt10_5[i] = np.sum(values) / length
+                if (ballastDt10_5[i] > ballastDt11_5[i] or ballastDt11_5[i] > ballastDt12_5[i] or ballastDt10_5[i] > ballastDt13_5[i] ) and ballastDt11_5[i] > 0:
+                    while (ballastDt10_5[i] > ballastDt11_5[i] or ballastDt10_5[i] > ballastDt12_5[i] or ballastDt10_5[i] > ballastDt13_5[i] ):
                         ballastDt10_5[i] = ballastDt10_5[i] - 0.1 * ballastDt10_5[i]
 
         for i in range(9, 14):
@@ -1494,14 +1578,13 @@ class BaseSeriesReader:
 
 
         ##TREAT outliers / missing values for ballast values
-        values = [k for k in ballastDt10_8 if k != 0]
-        length = values.__len__()
+
         for i in range(0, len(ballastDt10_8)):
-            if ballastDt10_8[i] == 0:
+            #if ballastDt10_8[i] == 0:
                 ##find items !=0
-                ballastDt10_8[i] = np.sum(values) / length
-            if ballastDt10_8[i] > ballastDt11_8[i] and ballastDt11_8[i] > 0:
-                while ballastDt10_8[i] > ballastDt11_8[i]:
+                #ballastDt10_8[i] = np.sum(values) / length
+            if (ballastDt10_8[i] > ballastDt11_8[i] or ballastDt10_8[i] > ballastDt12_8[i] or ballastDt10_8[i] > ballastDt13_8[i] ) and ballastDt11_8[i] > 0:
+                while (ballastDt10_8[i] > ballastDt11_8[i] or ballastDt10_8[i] > ballastDt12_8[i] or ballastDt10_8[i] > ballastDt13_8[i] ):
                     ballastDt10_8[i] = ballastDt10_8[i] - 0.1 * ballastDt10_8[i]
 
         for i in range(9, 14):
@@ -1510,13 +1593,13 @@ class BaseSeriesReader:
         ####################################################################################################
 
 
-        values = [k for k in ballastDt11_0 if k != 0]
-        length = values.__len__()
+        #values = [k for k in ballastDt11_0 if k != 0]
+        #length = values.__len__()
         for i in range(0, len(ballastDt11_0)):
-            if ballastDt11_0[i] == 0:
+            #if ballastDt11_0[i] == 0:
                 ##find items !=0
 
-                ballastDt11_0[i] = np.sum(values) / length
+                #ballastDt11_0[i] = np.sum(values) / length
             if ballastDt11_0[i] > ballastDt12_0[i] and ballastDt12_0[i] > 0:
                 while ballastDt11_0[i] > ballastDt12_0[i]:
                     ballastDt11_0[i] = ballastDt11_0[i] - 0.1 * ballastDt11_0[i]
@@ -1629,7 +1712,7 @@ class BaseSeriesReader:
                 workbook._sheets[2]['E' + str(i)] = round(ballastDt12_8[i - 29], 2)
 
 
-                ####################################################################################################
+        ################################################################################################################
         values = [k for k in ballastDt13_0 if k != 0]
         for i in range(0, len(ballastDt13_0)):
             if ballastDt13_0[i] < np.mean(values) - np.std(values) or ballastDt13_0[i] > np.mean(values) + np.std(
