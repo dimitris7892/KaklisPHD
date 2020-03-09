@@ -2,7 +2,7 @@ import numpy as np
 import dataModeling as dt
 import tensorflow as tf
 import sklearn.ensemble as skl
-#import statsmodels.api
+import statsmodels.api
 from statsmodels.formula.api import ols
 import pandas as pd
 #import scikit_posthocs as sp
@@ -34,8 +34,7 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
     def evaluate(self, unseenX, unseenY, modeler,genericModel):
         lErrors = []
         for iCnt in range(np.shape(unseenX)[0]):
-            pPoint = unseenX[iCnt].reshape(1, -1)#[0] # Convert to matrix
-            trueVal = unseenY[iCnt]
+            pPoint = unseenX[iCnt].reshape(1, -1)#[0] # Convert to matrix            trueVal = unseenY[iCnt]
             prediction = modeler.getBestModelForPoint(pPoint).predict(pPoint)
 
             lErrors.append(abs(prediction - trueVal))
@@ -1271,10 +1270,7 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
             #prediction = abs(modeler._models[ 0 ].predict(XSplineVector))
             XSplineVector = XSplineGenVector if modeler._models[ind][1]=='GEN' else XSplineVector
             try:
-                if modeler._models[ ind ][ 1 ] == 'GEN':
-                    prediction = modeler._models[ len(modeler._models) - 1 ][ 0 ].predict(XSplineGenVector)
-                else:
-                    prediction = (abs(modeler._models[ind][0].predict(XSplineVector)) + modeler._models[len(modeler._models)-1][0].predict(XSplineGenVector))/2
+                prediction = (abs(modeler._models[ind][0].predict(XSplineVector)) + modeler._models[len(modeler._models)-1][0].predict(XSplineGenVector))/2
                 lErrors.append(abs(prediction - trueVal))
             except:
                 #prediction = modeler._models[len(modeler._models) - 1][0].predict(XSplineGenVector)
@@ -1288,8 +1284,8 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
 
             ##########
 
-            #if abs(prediction - trueVal)>10:
-                #w=0
+            if abs(prediction - trueVal)>10:
+                w=0
         #x=unseenX[:,0].reshape(-1,unseenX.shape[0])
         #prediction =modeler._models[ 0 ].predict(unseenX.reshape(2,2860))
         #print np.mean(abs(prediction - unseenY))
