@@ -1,13 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="BookmarkManager">
-    <bookmark url="mock:///fragment.py" line="0" mnemonic="9" />
-  </component>
   <component name="ChangeListManager">
     <list default="true" id="9e10e853-69bc-4a18-9c9f-e2f3d9527f23" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Danaos_ML_Project/dataReading.py" afterPath="$PROJECT_DIR$/Danaos_ML_Project/dataReading.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/dataModeling.py" afterPath="$PROJECT_DIR$/dataModeling.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/runPipeline1.py" afterPath="$PROJECT_DIR$/runPipeline1.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -21,8 +16,8 @@
       <file leaf-file-name="dataPartitioning.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/dataPartitioning.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="17">
-              <caret line="72" column="29" lean-forward="false" selection-start-line="72" selection-start-column="29" selection-end-line="72" selection-end-column="29" />
+            <state relative-caret-position="527">
+              <caret line="112" column="42" lean-forward="true" selection-start-line="102" selection-start-column="7" selection-end-line="112" selection-end-column="42" />
               <folding>
                 <element signature="e#5784#10879#0" expanded="false" />
                 <element signature="e#10916#24857#0" expanded="false" />
@@ -34,30 +29,31 @@
       <file leaf-file-name="dataReading.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Danaos_ML_Project/dataReading.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="289">
-              <caret line="283" column="12" lean-forward="true" selection-start-line="283" selection-start-column="12" selection-end-line="283" selection-end-column="12" />
+            <state relative-caret-position="637">
+              <caret line="2310" column="0" lean-forward="false" selection-start-line="2310" selection-start-column="0" selection-end-line="2310" selection-end-column="0" />
               <folding>
                 <element signature="e#0#18#0" expanded="true" />
-                <element signature="e#8353#9163#0" expanded="false" />
-                <element signature="e#9244#10118#0" expanded="false" />
-                <element signature="e#16568#19966#0" expanded="false" />
-                <element signature="e#46149#47355#0" expanded="false" />
-                <element signature="e#47420#49284#0" expanded="false" />
-                <element signature="e#92599#120455#0" expanded="false" />
-                <element signature="e#170187#211321#0" expanded="false" />
-                <element signature="e#233842#236923#0" expanded="false" />
-                <marker date="1583767236021" expanded="false" signature="1340:5651" ph="..." />
-                <marker date="1583767236021" expanded="false" signature="5695:5777" ph="..." />
-                <marker date="1583767236021" expanded="false" signature="5838:6120" ph="..." />
-                <marker date="1583767236021" expanded="false" signature="6158:6197" ph="..." />
-                <marker date="1583767236021" expanded="false" signature="6239:7121" ph="..." />
-                <marker date="1583767236021" expanded="false" signature="7187:7515" ph="..." />
-                <marker date="1583767236021" expanded="false" signature="7590:7938" ph="..." />
-                <marker date="1583767236021" expanded="false" signature="8010:8212" ph="..." />
-                <marker date="1583767236021" expanded="false" signature="8267:8305" ph="..." />
-                <marker date="1583767236021" expanded="false" signature="21116:30381" ph="..." />
-                <marker date="1583767236021" expanded="false" signature="120500:153973" ph="..." />
-                <marker date="1583767236021" expanded="false" signature="191971:211256" ph="..." />
+                <element signature="e#1349#5651#0" expanded="false" />
+                <element signature="e#5705#5777#0" expanded="false" />
+                <element signature="e#5848#6120#0" expanded="false" />
+                <element signature="e#6167#6197#0" expanded="false" />
+                <element signature="e#6248#7121#0" expanded="false" />
+                <element signature="e#7197#7515#0" expanded="false" />
+                <element signature="e#7600#7938#0" expanded="false" />
+                <element signature="e#8019#8212#0" expanded="false" />
+                <element signature="e#8277#8305#0" expanded="false" />
+                <element signature="e#8353#9065#0" expanded="false" />
+                <element signature="e#9146#10020#0" expanded="false" />
+                <element signature="e#17544#20942#0" expanded="false" />
+                <element signature="e#22109#31357#0" expanded="false" />
+                <element signature="e#31471#47045#0" expanded="false" />
+                <element signature="e#44680#47045#0" expanded="false" />
+                <element signature="e#47125#48333#0" expanded="false" />
+                <marker date="1584115230563" expanded="false" signature="108994:136859" ph="..." />
+                <marker date="1584115230563" expanded="false" signature="136904:170377" ph="..." />
+                <marker date="1584115230563" expanded="false" signature="186582:227725" ph="..." />
+                <marker date="1584115230563" expanded="false" signature="208375:227660" ph="..." />
+                <marker date="1584115230563" expanded="false" signature="250237:253327" ph="..." />
               </folding>
             </state>
           </provider>
@@ -66,8 +62,8 @@
       <file leaf-file-name="runPipeline1.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/runPipeline1.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2312">
-              <caret line="175" column="64" lean-forward="false" selection-start-line="175" selection-start-column="64" selection-end-line="175" selection-end-column="64" />
+            <state relative-caret-position="653">
+              <caret line="50" column="0" lean-forward="false" selection-start-line="50" selection-start-column="0" selection-end-line="50" selection-end-column="0" />
               <folding>
                 <element signature="e#0#27#0" expanded="true" />
               </folding>
@@ -78,8 +74,8 @@
       <file leaf-file-name="evaluation.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/evaluation.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="262">
-              <caret line="37" column="35" lean-forward="true" selection-start-line="37" selection-start-column="35" selection-end-line="37" selection-end-column="35" />
+            <state relative-caret-position="289">
+              <caret line="37" column="35" lean-forward="false" selection-start-line="37" selection-start-column="35" selection-end-line="37" selection-end-column="35" />
               <folding>
                 <element signature="e#0#18#0" expanded="true" />
                 <element signature="e#1483#2229#0" expanded="false" />
@@ -120,7 +116,7 @@
       <file leaf-file-name="dataModeling.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/dataModeling.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="472">
+            <state relative-caret-position="18615">
               <caret line="5599" column="39" lean-forward="false" selection-start-line="5599" selection-start-column="39" selection-end-line="5599" selection-end-column="39" />
               <folding>
                 <element signature="e#0#33#0" expanded="true" />
@@ -167,16 +163,15 @@
                 <element signature="e#155356#156556#0" expanded="false" />
                 <element signature="e#156601#156982#0" expanded="false" />
                 <element signature="e#158585#159580#0" expanded="false" />
+                <element signature="e#192158#192756#0" expanded="false" />
+                <element signature="e#192870#193498#0" expanded="false" />
+                <element signature="e#207911#277396#0" expanded="false" />
+                <element signature="e#277451#278801#0" expanded="false" />
                 <element signature="e#278948#281384#0" expanded="false" />
                 <element signature="e#282217#282812#0" expanded="false" />
-                <marker date="1583766386415" expanded="false" signature="192143:192756" ph="..." />
-                <marker date="1583766386415" expanded="false" signature="192855:193498" ph="..." />
-                <marker date="1583766386415" expanded="false" signature="207904:277396" ph="..." />
-                <marker date="1583766386415" expanded="false" signature="277446:278801" ph="..." />
-                <marker date="1583766386415" expanded="false" signature="282868:283785" ph="..." />
-                <marker date="1583766386415" expanded="false" signature="283841:285558" ph="..." />
-                <marker date="1583766386415" expanded="false" signature="285611:287932" ph="..." />
-                <marker date="1583766386415" expanded="false" signature="288009:288761" ph="..." />
+                <element signature="e#282875#283785#0" expanded="false" />
+                <element signature="e#283846#285558#0" expanded="false" />
+                <element signature="e#285616#287932#0" expanded="false" />
               </folding>
             </state>
           </provider>
@@ -199,12 +194,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>Draft.csv</find>
-      <find>daysSin</find>
-      <find>daysSinceLa</find>
-      <find>daysSincelastPropClean.csv</find>
-      <find>days</find>
-      <find>DaysSinceLastPropCleaning</find>
       <find>trim</find>
       <find>strp</find>
       <find>mileni</find>
@@ -229,11 +218,21 @@
       <find>earth</find>
       <find>bearing</find>
       <find>sp</find>
+      <find>getActualWindDirFromWindSensor</find>
+      <find>getRelativeDirectionWeatherVessel</find>
+      <find>tlgarrayFoc.__len__() &gt; 5</find>
+      <find>tlgarrayFoc.__len__() &gt; 40</find>
+      <find>and k[8] &gt; 0</find>
+      <find>tlgarrayFoc.__len__() &gt; 1400</find>
     </findStrings>
     <replaceStrings>
       <replace>&gt; 9</replace>
       <replace>data[0], data[1], data[2], data[3], data[4], data[5],data[6],data[7],data[8]</replace>
       <replace>0</replace>
+      <replace>tlgarrayFoc.__len__() &gt; 40</replace>
+      <replace>tlgarrayFoc.__len__() &gt; 1400</replace>
+      <replace>and k[8] &gt; 2</replace>
+      <replace>tlgarrayFoc.__len__() &gt; 5</replace>
     </replaceStrings>
   </component>
   <component name="Git.Settings">
@@ -290,6 +289,7 @@
         <option value="$PROJECT_DIR$/runPipeline1.py" />
         <option value="$PROJECT_DIR$/evaluation.py" />
         <option value="$PROJECT_DIR$/dataModeling.py" />
+        <option value="$PROJECT_DIR$/data/GOLDENPORT/TELEGRAMS/TRAMMO LAOURA.csv" />
         <option value="$PROJECT_DIR$/Danaos_ML_Project/dataReading.py" />
       </list>
     </option>
@@ -315,7 +315,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -343,6 +342,7 @@
           <select />
         </subPane>
       </pane>
+      <pane id="Scope" />
       <pane id="Scratches" />
     </panes>
   </component>
@@ -485,25 +485,24 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="7" />
-    <editor active="true" />
     <layout>
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.17916666" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.14791666" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.2777191" sideWeight="0.50208336" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3273495" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.17317846" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.2745512" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.22069694" sideWeight="0.49791667" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Data View" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.40989584" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.22069694" sideWeight="0.49791667" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Data View" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.56927085" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3273495" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
     </layout>
     <layout-to-restore>
@@ -511,20 +510,20 @@
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.2777191" sideWeight="0.50208336" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.2745512" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.17317846" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.2745512" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.24010417" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.17916666" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3273495" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.37697995" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
-      <window_info id="Data View" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.57916665" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.22069694" sideWeight="0.49791667" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Data View" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.56927085" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
     </layout-to-restore>
   </component>
   <component name="VcsContentAnnotationSettings">
@@ -624,17 +623,17 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/Danaos_ML_Project/dataReading.py</url>
-          <line>3473</line>
+          <line>3799</line>
           <option name="timeStamp" value="1022" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/Danaos_ML_Project/dataReading.py</url>
-          <line>3327</line>
+          <line>3653</line>
           <option name="timeStamp" value="1028" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/Danaos_ML_Project/dataReading.py</url>
-          <line>3312</line>
+          <line>3638</line>
           <option name="timeStamp" value="1031" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
@@ -644,28 +643,28 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/Danaos_ML_Project/dataReading.py</url>
-          <line>659</line>
+          <line>684</line>
           <option name="timeStamp" value="1147" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/Danaos_ML_Project/dataReading.py</url>
-          <line>647</line>
+          <line>672</line>
           <option name="timeStamp" value="1148" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/Danaos_ML_Project/dataReading.py</url>
-          <line>609</line>
+          <line>634</line>
           <option name="timeStamp" value="1150" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/Danaos_ML_Project/dataReading.py</url>
-          <line>1984</line>
+          <line>2310</line>
           <option name="timeStamp" value="1278" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/Danaos_ML_Project/dataReading.py</url>
-          <line>1413</line>
-          <option name="timeStamp" value="1308" />
+          <line>1028</line>
+          <option name="timeStamp" value="1334" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
@@ -675,51 +674,20 @@
           </properties>
         </breakpoint>
       </default-breakpoints>
-      <option name="time" value="1321" />
+      <option name="time" value="1400" />
     </breakpoint-manager>
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/data/LAROS/FOC.csv">
-      <provider editor-type-id="csv-table-editor">
-        <state showInfoPanel="true" fixedHeaders="false" rowLines="3" />
-      </provider>
-      <provider selected="true" editor-type-id="csv-text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/data/MARMARAS/noon_reports.csv">
-      <provider editor-type-id="csv-table-editor">
-        <state showInfoPanel="true" fixedHeaders="false" rowLines="3" />
-      </provider>
-      <provider selected="true" editor-type-id="csv-text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/data/MARMARAS/noon_reports.csv" />
     <entry file="file://$PROJECT_DIR$/data/MILLENIA/TELEGRAMS/MARIA_M_TLG.txt">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="194" />
-          <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/data/MILLENIA/DOMINIA .csv">
-      <provider editor-type-id="csv-table-editor">
-        <state showInfoPanel="true" fixedHeaders="false" rowLines="3" />
-      </provider>
-      <provider selected="true" editor-type-id="csv-text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/data/MILLENIA/DOMINIA .csv" />
     <entry file="file://$PROJECT_DIR$/dataReadingD.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-2227">
@@ -750,87 +718,22 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$USER_HOME$/AppData/Roaming/python/python36/site-packages/cx_Oracle/connection.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="187">
-          <caret line="11" column="16" lean-forward="false" selection-start-line="11" selection-start-column="16" selection-end-line="11" selection-end-column="16" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/AppData/Roaming/python/python36/site-packages/cx_Oracle/utils.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="446">
-          <caret line="35" column="1" lean-forward="false" selection-start-line="35" selection-start-column="1" selection-end-line="35" selection-end-column="1" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/AppData/Roaming/python/python36/site-packages/cx_Oracle/custom_exceptions.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="425">
-          <caret line="25" column="8" lean-forward="false" selection-start-line="25" selection-start-column="8" selection-end-line="25" selection-end-column="8" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/AppData/Roaming/python/python36/site-packages/cx_Oracle/oci.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="242">
-          <caret line="22" column="0" lean-forward="false" selection-start-line="22" selection-start-column="0" selection-end-line="22" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/AppData/Roaming/python/python36/site-packages/cx_Oracle/buffer.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="289">
-          <caret line="17" column="44" lean-forward="false" selection-start-line="17" selection-start-column="44" selection-end-line="17" selection-end-column="44" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/AppData/Roaming/python/python36/site-packages/cx_Oracle/environment.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="221">
-          <caret line="13" column="55" lean-forward="false" selection-start-line="13" selection-start-column="55" selection-end-line="13" selection-end-column="55" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/AppData/Roaming/python/python36/site-packages/cx_Oracle/error.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="340">
-          <caret line="20" column="30" lean-forward="false" selection-start-line="20" selection-start-column="30" selection-end-line="20" selection-end-column="30" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/AppData/Roaming/python/python36/site-packages/cx_Oracle/datetimevar.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/AppData/Roaming/python/python36/site-packages/cx_Oracle/pythonic_oci.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="51">
-          <caret line="3" column="18" lean-forward="false" selection-start-line="3" selection-start-column="18" selection-end-line="3" selection-end-column="18" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$USER_HOME$/AppData/Roaming/python/python36/site-packages/cx_Oracle/connection.py" />
+    <entry file="file://$USER_HOME$/AppData/Roaming/python/python36/site-packages/cx_Oracle/utils.py" />
+    <entry file="file://$USER_HOME$/AppData/Roaming/python/python36/site-packages/cx_Oracle/custom_exceptions.py" />
+    <entry file="file://$USER_HOME$/AppData/Roaming/python/python36/site-packages/cx_Oracle/oci.py" />
+    <entry file="file://$USER_HOME$/AppData/Roaming/python/python36/site-packages/cx_Oracle/buffer.py" />
+    <entry file="file://$USER_HOME$/AppData/Roaming/python/python36/site-packages/cx_Oracle/environment.py" />
+    <entry file="file://$USER_HOME$/AppData/Roaming/python/python36/site-packages/cx_Oracle/error.py" />
+    <entry file="file://$USER_HOME$/AppData/Roaming/python/python36/site-packages/cx_Oracle/datetimevar.py" />
+    <entry file="file://$USER_HOME$/AppData/Roaming/python/python36/site-packages/cx_Oracle/pythonic_oci.py" />
     <entry file="file://$USER_HOME$/AppData/Local/Programs/Python/Python36/Lib/locale.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -838,61 +741,21 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/cx_Oracle/oci.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="85">
-          <caret line="5" column="0" lean-forward="true" selection-start-line="5" selection-start-column="0" selection-end-line="5" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/AppData/Roaming/python/python36/site-packages/cx_Oracle/__init__.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="123">
-          <caret line="14" column="34" lean-forward="false" selection-start-line="14" selection-start-column="34" selection-end-line="14" selection-end-column="34" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/cx_Oracle/cursor.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="119">
-          <caret line="7" column="18" lean-forward="false" selection-start-line="7" selection-start-column="18" selection-end-line="7" selection-end-column="18" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/AppData/Roaming/python/python36/site-packages/cx_Oracle/cursor.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="204">
-          <caret line="12" column="9" lean-forward="false" selection-start-line="12" selection-start-column="9" selection-end-line="12" selection-end-column="9" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/cx_Oracle/oci.py" />
+    <entry file="file://$USER_HOME$/AppData/Roaming/python/python36/site-packages/cx_Oracle/__init__.py" />
+    <entry file="file://$PROJECT_DIR$/cx_Oracle/cursor.py" />
+    <entry file="file://$USER_HOME$/AppData/Roaming/python/python36/site-packages/cx_Oracle/cursor.py" />
     <entry file="file://$USER_HOME$/.PyCharmCE2017.2/system/python_stubs/-1519680916/cx_Oracle/__init__.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/data/MILLENIA/FANTASIA.csv">
-      <provider editor-type-id="csv-table-editor">
-        <state showInfoPanel="true" fixedHeaders="false" rowLines="3" />
-      </provider>
-      <provider selected="true" editor-type-id="csv-text-editor">
-        <state relative-caret-position="-1428">
-          <caret line="0" column="214" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="214" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/data/MILLENIA/FANTASIA.csv" />
     <entry file="file://$PROJECT_DIR$/data/MILLENIA/TELEGRAMS/MARIA_M_TLG.csv">
       <provider editor-type-id="csv-table-editor">
         <state showInfoPanel="true" fixedHeaders="false" rowLines="3" />
@@ -900,7 +763,6 @@
       <provider selected="true" editor-type-id="csv-text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -911,18 +773,10 @@
       <provider selected="true" editor-type-id="csv-text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/data/MILLENIA/FANTASIA">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/data/MILLENIA/FANTASIA" />
     <entry file="file://$PROJECT_DIR$/data/MILLENIA/TELEGRAMS/FANTASIA.csv">
       <provider editor-type-id="csv-table-editor">
         <state showInfoPanel="true" fixedHeaders="false" rowLines="3" />
@@ -930,7 +784,6 @@
       <provider selected="true" editor-type-id="csv-text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="204" lean-forward="true" selection-start-line="0" selection-start-column="204" selection-end-line="0" selection-end-column="204" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -948,7 +801,6 @@
       <provider selected="true" editor-type-id="csv-text-editor">
         <state relative-caret-position="-1683">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -959,21 +811,10 @@
       <provider selected="true" editor-type-id="csv-text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/results.csv">
-      <provider editor-type-id="csv-table-editor">
-        <state showInfoPanel="true" fixedHeaders="false" rowLines="3" />
-      </provider>
-      <provider selected="true" editor-type-id="csv-text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/results.csv" />
     <entry file="file://$PROJECT_DIR$/WSraw.csv">
       <provider selected="true" editor-type-id="LargeFileEditor">
         <state relative-caret-position="0">
@@ -988,7 +829,6 @@
       <provider selected="true" editor-type-id="csv-text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -999,17 +839,10 @@
       <provider selected="true" editor-type-id="csv-text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/data/MARMARAS/MT_DELTA_MARIA.txt">
-      <provider selected="true" editor-type-id="LargeFileEditor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/data/MARMARAS/MT_DELTA_MARIA.txt" />
     <entry file="file://$PROJECT_DIR$/data/MILLENIA/TELEGRAMS/DOMINIA.csv">
       <provider editor-type-id="csv-table-editor">
         <state showInfoPanel="true" fixedHeaders="false" rowLines="3" />
@@ -1017,18 +850,6 @@
       <provider selected="true" editor-type-id="csv-text-editor">
         <state relative-caret-position="-1275">
           <caret line="27" column="21" lean-forward="false" selection-start-line="27" selection-start-column="21" selection-end-line="27" selection-end-column="21" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/data/GOLDENPORT/TELEGRAMS/TRAMMO LAOURA.csv">
-      <provider editor-type-id="csv-table-editor">
-        <state showInfoPanel="true" fixedHeaders="false" rowLines="3" />
-      </provider>
-      <provider selected="true" editor-type-id="csv-text-editor">
-        <state relative-caret-position="218">
-          <caret line="29820" column="10" lean-forward="false" selection-start-line="29820" selection-start-column="0" selection-end-line="29820" selection-end-column="10" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1058,7 +879,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1066,7 +886,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="219">
           <caret line="296" column="8" lean-forward="false" selection-start-line="296" selection-start-column="8" selection-end-line="296" selection-end-column="8" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1077,18 +896,6 @@
       <provider selected="true" editor-type-id="csv-text-editor">
         <state relative-caret-position="340">
           <caret line="38" column="53" lean-forward="true" selection-start-line="38" selection-start-column="53" selection-end-line="38" selection-end-column="53" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/dataPartitioning.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="17">
-          <caret line="72" column="29" lean-forward="false" selection-start-line="72" selection-start-column="29" selection-end-line="72" selection-end-column="29" />
-          <folding>
-            <element signature="e#5784#10879#0" expanded="false" />
-            <element signature="e#10916#24857#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1099,35 +906,12 @@
       <provider selected="true" editor-type-id="csv-text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/dataReading.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="432">
-          <caret line="51" column="51" lean-forward="false" selection-start-line="51" selection-start-column="51" selection-end-line="51" selection-end-column="51" />
-          <folding>
-            <element signature="e#27#45#0" expanded="true" />
-            <element signature="e#1072#1427#0" expanded="false" />
-            <element signature="e#1492#3106#0" expanded="false" />
-            <element signature="e#3173#4808#0" expanded="false" />
-            <element signature="e#4892#5332#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/data/GOLDENPORT/mappedData.csv">
-      <provider selected="true" editor-type-id="csv-text-editor">
-        <state relative-caret-position="68">
-          <caret line="25" column="0" lean-forward="false" selection-start-line="25" selection-start-column="0" selection-end-line="25" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/dataModeling.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="472">
+        <state relative-caret-position="18615">
           <caret line="5599" column="39" lean-forward="false" selection-start-line="5599" selection-start-column="39" selection-end-line="5599" selection-end-column="39" />
           <folding>
             <element signature="e#0#33#0" expanded="true" />
@@ -1174,24 +958,23 @@
             <element signature="e#155356#156556#0" expanded="false" />
             <element signature="e#156601#156982#0" expanded="false" />
             <element signature="e#158585#159580#0" expanded="false" />
+            <element signature="e#192158#192756#0" expanded="false" />
+            <element signature="e#192870#193498#0" expanded="false" />
+            <element signature="e#207911#277396#0" expanded="false" />
+            <element signature="e#277451#278801#0" expanded="false" />
             <element signature="e#278948#281384#0" expanded="false" />
             <element signature="e#282217#282812#0" expanded="false" />
-            <marker date="1583766386415" expanded="false" signature="192143:192756" ph="..." />
-            <marker date="1583766386415" expanded="false" signature="192855:193498" ph="..." />
-            <marker date="1583766386415" expanded="false" signature="207904:277396" ph="..." />
-            <marker date="1583766386415" expanded="false" signature="277446:278801" ph="..." />
-            <marker date="1583766386415" expanded="false" signature="282868:283785" ph="..." />
-            <marker date="1583766386415" expanded="false" signature="283841:285558" ph="..." />
-            <marker date="1583766386415" expanded="false" signature="285611:287932" ph="..." />
-            <marker date="1583766386415" expanded="false" signature="288009:288761" ph="..." />
+            <element signature="e#282875#283785#0" expanded="false" />
+            <element signature="e#283846#285558#0" expanded="false" />
+            <element signature="e#285616#287932#0" expanded="false" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/evaluation.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="262">
-          <caret line="37" column="35" lean-forward="true" selection-start-line="37" selection-start-column="35" selection-end-line="37" selection-end-column="35" />
+        <state relative-caret-position="289">
+          <caret line="37" column="35" lean-forward="false" selection-start-line="37" selection-start-column="35" selection-end-line="37" selection-end-column="35" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
             <element signature="e#1483#2229#0" expanded="false" />
@@ -1212,10 +995,62 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/data/GOLDENPORT/mappedData.csv">
+      <provider selected="true" editor-type-id="csv-text-editor">
+        <state relative-caret-position="68">
+          <caret line="25" column="0" lean-forward="false" selection-start-line="25" selection-start-column="0" selection-end-line="25" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/AppData/Local/Programs/Python/Python36/Lib/site-packages/numpy/core/fromnumeric.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="236">
+          <caret line="3075" column="0" lean-forward="false" selection-start-line="3075" selection-start-column="0" selection-end-line="3075" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/dataReading.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="432">
+          <caret line="51" column="51" lean-forward="false" selection-start-line="51" selection-start-column="51" selection-end-line="51" selection-end-column="51" />
+          <folding>
+            <element signature="e#27#45#0" expanded="true" />
+            <element signature="e#1072#1427#0" expanded="false" />
+            <element signature="e#1492#3106#0" expanded="false" />
+            <element signature="e#3173#4808#0" expanded="false" />
+            <element signature="e#4892#5332#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/data/GOLDENPORT/TELEGRAMS/TRAMMO LAOURA.csv">
+      <provider editor-type-id="csv-table-editor">
+        <state showInfoPanel="true" fixedHeaders="false" rowLines="3" />
+      </provider>
+      <provider selected="true" editor-type-id="csv-text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="206" lean-forward="false" selection-start-line="0" selection-start-column="206" selection-end-line="0" selection-end-column="206" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/dataPartitioning.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="527">
+          <caret line="112" column="42" lean-forward="true" selection-start-line="102" selection-start-column="7" selection-end-line="112" selection-end-column="42" />
+          <folding>
+            <element signature="e#5784#10879#0" expanded="false" />
+            <element signature="e#10916#24857#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/runPipeline1.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2312">
-          <caret line="175" column="64" lean-forward="false" selection-start-line="175" selection-start-column="64" selection-end-line="175" selection-end-column="64" />
+        <state relative-caret-position="653">
+          <caret line="50" column="0" lean-forward="false" selection-start-line="50" selection-start-column="0" selection-end-line="50" selection-end-column="0" />
           <folding>
             <element signature="e#0#27#0" expanded="true" />
           </folding>
@@ -1224,30 +1059,31 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Danaos_ML_Project/dataReading.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="289">
-          <caret line="283" column="12" lean-forward="true" selection-start-line="283" selection-start-column="12" selection-end-line="283" selection-end-column="12" />
+        <state relative-caret-position="637">
+          <caret line="2310" column="0" lean-forward="false" selection-start-line="2310" selection-start-column="0" selection-end-line="2310" selection-end-column="0" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
-            <element signature="e#8353#9163#0" expanded="false" />
-            <element signature="e#9244#10118#0" expanded="false" />
-            <element signature="e#16568#19966#0" expanded="false" />
-            <element signature="e#46149#47355#0" expanded="false" />
-            <element signature="e#47420#49284#0" expanded="false" />
-            <element signature="e#92599#120455#0" expanded="false" />
-            <element signature="e#170187#211321#0" expanded="false" />
-            <element signature="e#233842#236923#0" expanded="false" />
-            <marker date="1583767236021" expanded="false" signature="1340:5651" ph="..." />
-            <marker date="1583767236021" expanded="false" signature="5695:5777" ph="..." />
-            <marker date="1583767236021" expanded="false" signature="5838:6120" ph="..." />
-            <marker date="1583767236021" expanded="false" signature="6158:6197" ph="..." />
-            <marker date="1583767236021" expanded="false" signature="6239:7121" ph="..." />
-            <marker date="1583767236021" expanded="false" signature="7187:7515" ph="..." />
-            <marker date="1583767236021" expanded="false" signature="7590:7938" ph="..." />
-            <marker date="1583767236021" expanded="false" signature="8010:8212" ph="..." />
-            <marker date="1583767236021" expanded="false" signature="8267:8305" ph="..." />
-            <marker date="1583767236021" expanded="false" signature="21116:30381" ph="..." />
-            <marker date="1583767236021" expanded="false" signature="120500:153973" ph="..." />
-            <marker date="1583767236021" expanded="false" signature="191971:211256" ph="..." />
+            <element signature="e#1349#5651#0" expanded="false" />
+            <element signature="e#5705#5777#0" expanded="false" />
+            <element signature="e#5848#6120#0" expanded="false" />
+            <element signature="e#6167#6197#0" expanded="false" />
+            <element signature="e#6248#7121#0" expanded="false" />
+            <element signature="e#7197#7515#0" expanded="false" />
+            <element signature="e#7600#7938#0" expanded="false" />
+            <element signature="e#8019#8212#0" expanded="false" />
+            <element signature="e#8277#8305#0" expanded="false" />
+            <element signature="e#8353#9065#0" expanded="false" />
+            <element signature="e#9146#10020#0" expanded="false" />
+            <element signature="e#17544#20942#0" expanded="false" />
+            <element signature="e#22109#31357#0" expanded="false" />
+            <element signature="e#31471#47045#0" expanded="false" />
+            <element signature="e#44680#47045#0" expanded="false" />
+            <element signature="e#47125#48333#0" expanded="false" />
+            <marker date="1584115230563" expanded="false" signature="108994:136859" ph="..." />
+            <marker date="1584115230563" expanded="false" signature="136904:170377" ph="..." />
+            <marker date="1584115230563" expanded="false" signature="186582:227725" ph="..." />
+            <marker date="1584115230563" expanded="false" signature="208375:227660" ph="..." />
+            <marker date="1584115230563" expanded="false" signature="250237:253327" ph="..." />
           </folding>
         </state>
       </provider>
