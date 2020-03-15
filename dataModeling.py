@@ -3002,26 +3002,11 @@ class TensorFlowW(BasePartitionModeler):
             #create model
             model = keras.models.Sequential()
 
-            #model.add(keras.layers.Dense(len(partition_labels)*2, input_shape=(2,)))
-            #model.add(keras.layers.Dense(len(partition_labels), input_shape=(2,) ))
-            #model.add(keras.layers.Activation(custom_activation2))
 
-            #len(DeepClpartitionLabels)
-            #model.add(keras.layers.Dense(len(DeepClpartitionLabels), input_shape=(2,)))
-            #model.add(keras.layers.Dense(len(partition_labels)*3, input_shape=(2,)))
-            #model.add(keras.layers.Dense(len(partition_labels) * 2, input_shape=(2,)))
 
             model.add(keras.layers.Dense(genModelKnots-1, input_shape=(2+genModelKnots-1,)))
                                          #
-            #model.add(keras.layers.Dense(10, input_shape=(2,)))
-            #model.add(keras.layers.Dense(4, ))
-            #model.add(keras.layers.Dense(2, input_shape=(2,)))
 
-
-
-            #model.add(keras.layers.Dense(1, input_shape=(2,)))  # activation=custom_activation
-            #model.add(keras.layers.Activation(custom_activation2))
-            #model.add(keras.layers.Dense(2, input_shape=(2,)))
 
             model.add(keras.layers.Dense(1,))
 
@@ -3037,18 +3022,11 @@ class TensorFlowW(BasePartitionModeler):
             # create model
             model = keras.models.Sequential()
 
-            #model.add(keras.layers.Dense(1, input_shape=(2,)))
-            #model.add(keras.layers.Activation(custom_activation2))
-            model.add(keras.layers.Dense(genModelKnots-1, input_shape=(2,)))
-            #model.add(keras.layers.Dense(, input_shape=(2,)))
-            #model.add(keras.layers.Dense(5, input_shape=(2,)))
-            #model.add(keras.layers.Dense(genModelKnots-1, input_shape=(2,)))
-            model.add(keras.layers.Dense(2))
-            #model.add(keras.layers.Activation(custom_activation2))
 
-            #model.add(keras.layers.Activation(custom_activation2))
-            #model.add(keras.layers.Activation(keras.activations.softmax))
-            #model.add(keras.layers.Activation(custom_activation2))
+            model.add(keras.layers.Dense(genModelKnots-1, input_shape=(2,)))
+
+            model.add(keras.layers.Dense(2))
+
             model.add(keras.layers.Dense(1))
 
 
@@ -3702,8 +3680,8 @@ class TensorFlowW(BasePartitionModeler):
                 XSplineClusterVector=[]
                 for i in range(0, len(partitionsX[idx])):
                     vector = extractFunctionsFromSplines(partitionsX[idx][ i ][ 0 ], partitionsX[idx][ i ][ 1 ])
-                    XSplineClusterVector.append(np.append(partitionsX[idx][i], vector))
-                    #XSplineClusterVector.append(vector)
+                    #XSplineClusterVector.append(np.append(partitionsX[idx][i], vector))
+                    XSplineClusterVector.append(vector)
                     #velocities.append(X[ i ])
                     #vectorWeights.append(vector)
                     # XSplineVector.append( vector)
@@ -3716,22 +3694,21 @@ class TensorFlowW(BasePartitionModeler):
 
                 estimatorCl = keras.models.Sequential()
 
-                estimatorCl.add(keras.layers.Dense(numOfNeurons -1 ,input_shape=(2+numOfNeurons-1,)))
-                #estimatorCl.add(keras.layers.Dense(4, ))
-                                                   #input_shape=(2+numOfNeurons-1,)))
-
+                #estimatorCl.add(keras.layers.Dense(numOfNeurons -1 ,input_shape=(2+numOfNeurons-1,)))
+                estimatorCl.add(keras.layers.Dense(numOfNeurons - 1, input_shape=(2 ,)))
+                estimatorCl.add(keras.layers.Dense(2))
                 estimatorCl.add(keras.layers.Dense(1, ))
                 estimatorCl.compile(loss=keras.losses.mean_squared_error, optimizer=keras.optimizers.Adam(), )                #try:
 
-                #weights0 = np.mean(XSplineClusterVector, axis=0)
+                weights0 = np.mean(XSplineClusterVector, axis=0)
                 # weights1 = self.intercepts
                 #weights1 = estimatorCl.layers[ 0 ].get_weights()[ 0 ][ 1 ]
-                #weights = np.array(
-                    #np.append(weights0.reshape(-1, 1), np.asmatrix(weights0).reshape(-1, 1), axis=1).reshape(2, -1))
+                weights = np.array(
+                    np.append(weights0.reshape(-1, 1), np.asmatrix(weights0).reshape(-1, 1), axis=1).reshape(2, -1))
 
 
 
-                #estimatorCl.layers[ 0 ].set_weights([ weights, np.array([0]*(numOfNeurons-1))])
+                estimatorCl.layers[ 0 ].set_weights([ weights, np.array([0]*(numOfNeurons-1))])
                     #modelId=idx
 
                 #estimatorCl = baseline_model()
@@ -3764,11 +3741,23 @@ class TensorFlowW(BasePartitionModeler):
                     #estimator.layers[3] = custom_activation2(inputs=estimator.layers[2].output, modelId=idx) if idx ==0 else estimator.layers[3]
                     #estimator.layers[3] = custom_activation2 if idx ==3 else estimator.layers[3]
                 #try:
-                estimatorCl.fit(np.array(XSplineClusterVector),np.array(partitionsY[idx]),epochs=100)#validation_split=0.33
-                Clscore = estimatorCl.evaluate(np.array(XSplineClusterVector), np.array(partitionsY[idx]), verbose=1)
-                scores.append(Clscore)
+                #estimatorCl.fit(np.array(XSplineClusterVector),np.array(partitionsY[idx]),epochs=100)#validation_split=0.33
+                estimatorCl.fit(partitionsX[idx], np.array(partitionsY[idx]),epochs=100)  # validation_split=0.33
+
+                x = input_img
+
+                x = estimatorCl.layers[2](x)
+
+                modelCl = keras.models.Model(inputs=input_img, outputs=x)
+                # model2 = keras.models.Model(inputs=estimator.layers[2].input, outputs=estimator.layers[-1].output)
+
+                modelCl.compile(optimizer=keras.optimizers.Adam(), loss='mse')
+                modelCl.fit(X, Y, epochs=100)
+
+                #Clscore = estimatorCl.evaluate(np.array(XSplineClusterVector), np.array(partitionsY[idx]), verbose=1)
+                #scores.append(Clscore)
                 #NNmodels.append([estimatorCl,'CL'])
-                NNmodels.append(estimatorCl)
+                NNmodels.append(modelCl)
                 #except:
                     #scores.append(score)
                     #NNmodels.append([estimator,'GEN'])
@@ -3786,7 +3775,7 @@ class TensorFlowW(BasePartitionModeler):
         #models=[]
 
 
-        NNmodels.append(estimator)
+        NNmodels.append(model2)
         self._models = NNmodels
 
         # Return list of models
