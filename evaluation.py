@@ -1269,16 +1269,17 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
             XSplineGenVector = np.append(pPoint, vector)
             XSplineGenVector = XSplineGenVector.reshape(-1, XSplineGenVector.shape[ 0 ])
             #prediction = abs(modeler._models[ 0 ].predict(XSplineVector))
-            XSplineVector = XSplineGenVector if modeler._models[ind][1]=='GEN' else XSplineVector
-            try:
-                if modeler._models[ ind ][ 1 ] == 'GEN':
-                    prediction = modeler._models[ len(modeler._models) - 1 ][ 0 ].predict(XSplineGenVector)
-                else:
-                    prediction = (abs(modeler._models[ind][0].predict(XSplineVector)) + modeler._models[len(modeler._models)-1][0].predict(XSplineGenVector))/2
-                lErrors.append(abs(prediction - trueVal))
-            except:
+            #XSplineVector = XSplineGenVector if modeler._models[ind][1]=='GEN' else XSplineVector
+            prediction = (abs(modeler._models[ind].predict(XSplineVector)) + modeler._models[len(modeler._models)-1].predict(XSplineGenVector))/2
+            #try:
+                #if modeler._models[ ind ][ 1 ] == 'GEN':
+            #prediction = modeler._models[ len(modeler._models) - 1 ][ 0 ].predict(XSplineGenVector)
+                #else:
+                    #prediction = (abs(modeler._models[ind][0].predict(XSplineVector)) + modeler._models[len(modeler._models)-1][0].predict(XSplineGenVector))/2
+                #lErrors.append(abs(prediction - trueVal))
+            #except:
                 #prediction = modeler._models[len(modeler._models) - 1][0].predict(XSplineGenVector)
-                count=count+1
+                #count=count+1
                 #abs(modeler._models[ind].predict(XSplineVector))
                 #(abs(modeler._models[ind].predict(XSplineVector)) + modeler._models[len(modeler._models)-1].predict(XSplineGenVector))/2
                 #abs(modeler._models[ind].predict(XSplineVector)) if fit > 0.5 else  modeler._models[len(modeler._models)-1].predict(XSplineGenVector)
@@ -1291,9 +1292,10 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
             #if abs(prediction - trueVal)>10:
                 #w=0
         #x=unseenX[:,0].reshape(-1,unseenX.shape[0])
+            lErrors.append(abs(prediction - trueVal))
         #prediction =modeler._models[ 0 ].predict(unseenX.reshape(2,2860))
         #print np.mean(abs(prediction - unseenY))
-        print("EXCEPTIONS :  "+str(count))
+        #print("EXCEPTIONS :  "+str(count))
         errors = np.asarray(lErrors)
 
         return errors, np.mean(errors), np.std(lErrors)
