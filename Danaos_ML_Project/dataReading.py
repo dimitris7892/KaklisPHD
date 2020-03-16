@@ -9,7 +9,7 @@ from sklearn.cluster import KMeans
 from decimal import Decimal
 import random
 #from coordinates.converter import CoordinateConverter, WGS84, L_Est97
-#import pyodbc
+import pyodbc
 import csv
 import locale
 locale.setlocale(locale.LC_ALL, ""); print(locale.localeconv()["decimal_point"])
@@ -21,7 +21,7 @@ from sympy.solvers import solve
 from sympy import Symbol
 from pathlib import Path
 from sympy import cos, sin , tan , exp , sqrt , E
-#from openpyxl import load_workbook
+from openpyxl import load_workbook
 import glob, os
 from pathlib import Path
 import shutil
@@ -1241,8 +1241,11 @@ class BaseSeriesReader:
 
 
         ballastDt10_0 = []
+        numberOfApp10_0=[]
         centralMean = np.mean(np.array([k for k in ballastDt if
                                         k[5] >= vel0Min and k[5] <= vel0Max and   k[8] > 0])[:,8])
+        centralArray = np.array([k for k in ballastDt if
+                                 k[5] >= vel0Min and k[5] <= vel0Max and k[8] > 4])[:, 8]
         for i in range(0, len(wind) - 1):
             arrayFoc = np.array([k for k in ballastDt if
                                  k[4] >= 0 and k[4] <= 1 and k[5] >= vel0Min and k[5] <= vel0Max and k[3] >= wind[i] and k[3] <= wind[i + 1] and k[8] > 5])
@@ -1254,8 +1257,10 @@ class BaseSeriesReader:
 
             if tlgarrayFoc.__len__() > 5:
                 meanFoc =(np.mean(arrayFoc[:, 8])+np.mean(tlgarrayFoc) + centralMean)/3 if arrayFoc.__len__() >= 5 else 0
+                numberOfApp10_0.append(arrayFoc.__len__() + tlgarrayFoc.__len__() + centralArray.__len__())
             else:
                 meanFoc = (np.mean(arrayFoc[:, 8]) + centralMean)/2  if arrayFoc.__len__() >= 5 else 0
+                numberOfApp10_0.append(arrayFoc.__len__() + centralArray.__len__())
             ballastDt10_0.append(round(meanFoc, 2))
 
 
@@ -1265,6 +1270,7 @@ class BaseSeriesReader:
 
         ###SPEED 10  2 < WIND <3
         ballastDt10_3 = []
+        numberOfApp10_3=[]
         for i in range(0, len(wind) - 1):
             arrayFoc = np.array([k for k in ballastDt if
                                  k[4] >= 2 and k[4] <= 3 and k[5] >= vel0Min and k[5] <= vel0Max and k[3] >= wind[i] and
@@ -1277,8 +1283,10 @@ class BaseSeriesReader:
                 [k for k in ballastDt if k[5] >= vel0Min and k[5] <= vel0Max and k[9] >= 3])[:, 9]
             if tlgarrayFoc.__len__() > 5:
                 meanFoc = (np.mean(arrayFoc[:, 8]) + np.mean(tlgarrayFoc) + centralMean)/3 if arrayFoc.__len__() >= 5 else 0
+                numberOfApp10_3.append(arrayFoc.__len__() + tlgarrayFoc.__len__() + centralArray.__len__())
             else:
                 meanFoc = (np.mean(arrayFoc[:, 8]) + centralMean)/2 if arrayFoc.__len__() >= 5 else 0
+                numberOfApp10_3.append(arrayFoc.__len__() +  centralArray.__len__())
             ballastDt10_3.append(round(meanFoc, 2))
 
         for i in range(9, 14):
@@ -1286,6 +1294,7 @@ class BaseSeriesReader:
 
         ###SPEED 10  4 < WIND <5
         ballastDt10_5 = []
+        numberOfApp10_5 = []
         for i in range(0, len(wind) - 1):
             arrayFoc = np.array([k for k in ballastDt if
                                  k[4] >= 4 and k[4] <= 5 and k[5] >=vel0Min and k[5] <= vel0Max and k[3] >= wind[i] and
@@ -1298,8 +1307,10 @@ class BaseSeriesReader:
                 [k for k in ballastDt if k[5] >= vel0Min and k[5] <= vel0Max and k[9] >= 3])[:, 9]
             if tlgarrayFoc.__len__() > 5:
                 meanFoc = (np.mean(arrayFoc[:, 8]) + np.mean(tlgarrayFoc) + centralMean)/3 if arrayFoc.__len__() >= 5 else 0
+                numberOfApp10_5.append(arrayFoc.__len__() + tlgarrayFoc.__len__() + centralArray.__len__())
             else:
                 meanFoc = (np.mean(arrayFoc[:, 8]) + centralMean)/2 if arrayFoc.__len__() >= 5 else 0
+                numberOfApp10_5.append(arrayFoc.__len__()  + centralArray.__len__())
             ballastDt10_5.append(round(meanFoc, 2))
 
         for i in range(9, 14):
@@ -1307,6 +1318,7 @@ class BaseSeriesReader:
 
         ###SPEED 10  7 < WIND <8
         ballastDt10_8 = []
+        numberOfApp10_8 = []
         for i in range(0, len(wind) - 1):
             arrayFoc = np.array([k for k in ballastDt if
                                  k[4] >= 6 and k[5] >= vel0Min and k[5] <= vel0Max and k[3] >= wind[i] and
@@ -1318,8 +1330,10 @@ class BaseSeriesReader:
                 [k for k in ballastDt if k[5] >=vel0Min and k[5] <= vel0Max and k[9] >= 3])[:, 9]
             if tlgarrayFoc.__len__() > 5:
                 meanFoc = (np.mean(arrayFoc[:, 8]) + np.mean(tlgarrayFoc) + centralMean)/3 if arrayFoc.__len__() >= 5 else 0
+                numberOfApp10_8.append(arrayFoc.__len__() + tlgarrayFoc.__len__() + centralArray.__len__())
             else:
                 meanFoc = (np.mean(arrayFoc[:, 8]) + centralMean)/2 if arrayFoc.__len__() >= 5 else 0
+                numberOfApp10_8.append(arrayFoc.__len__() + centralArray.__len__())
             ballastDt10_8.append(round(meanFoc, 2))
 
         for i in range(9, 14):
@@ -1329,9 +1343,13 @@ class BaseSeriesReader:
         ##################################################################################################################
 
         ###SPEED 11.5   WIND <1.5
+
         centralMean = np.mean(np.array([k for k in ballastDt if
                                         k[5] > vel1Min and k[5] <= vel1Max and k[8] > 0])[:, 8])
+        centralArray = np.array([k for k in ballastDt if
+                                 k[5] >= vel1Min and k[5] <= vel1Max and k[8] > 4])[:, 8]
         ballastDt11_0 = []
+        numberOfApp11_0=[]
         for i in range(0, len(wind) - 1):
             arrayFoc = np.array([k for k in ballastDt if
                                  k[4] >= 0 and k[4] <= 1 and k[5] > vel1Min and k[5] <= vel1Max and k[3] >= wind[
@@ -1344,8 +1362,10 @@ class BaseSeriesReader:
                 [k for k in ballastDt if k[5] > vel1Min and k[5] <= vel1Max and k[9] >= 10])[:, 9]
             if tlgarrayFoc.__len__() > 5:
                 meanFoc = (np.mean(arrayFoc[:, 8]) + np.mean(tlgarrayFoc)+ centralMean)/3 if arrayFoc.__len__() >= 10 else 0
+                numberOfApp11_0.append(arrayFoc.__len__() + tlgarrayFoc.__len__() + centralArray.__len__())
             else:
                 meanFoc =(np.mean(arrayFoc[:, 8]) + centralMean)/2 if arrayFoc.__len__() >= 10 else 0
+                numberOfApp11_0.append(arrayFoc.__len__()  + centralArray.__len__())
             ballastDt11_0.append(round(meanFoc, 2))
 
         for i in range(19, 24):
@@ -1353,6 +1373,7 @@ class BaseSeriesReader:
 
         ###SPEED 11.5  2 < WIND <3
         ballastDt11_3 = []
+        numberOfApp11_3 = []
         for i in range(0, len(wind) - 1):
             arrayFoc = np.array([k for k in ballastDt if
                                  k[4] >= 2 and k[4] <= 3 and k[5] >  vel1Min and k[5] <= vel1Max and k[3] >= wind[i] and k[
@@ -1364,8 +1385,10 @@ class BaseSeriesReader:
                 [k for k in ballastDt if k[5] > vel1Min and k[5] <= vel1Max and k[9] >= 10])[:, 9]
             if tlgarrayFoc.__len__() > 5:
                 meanFoc = (np.mean(arrayFoc[:, 8]) + np.mean(tlgarrayFoc)+ centralMean)/3 if arrayFoc.__len__() >= 10 else 0
+                numberOfApp11_3.append(arrayFoc.__len__() + tlgarrayFoc.__len__() + centralArray.__len__())
             else:
                 meanFoc = (np.mean(arrayFoc[:, 8]) + centralMean)/2 if arrayFoc.__len__() >= 10 else 0
+                numberOfApp11_3.append(arrayFoc.__len__()+ centralArray.__len__())
             ballastDt11_3.append(round(meanFoc, 2))
 
         for i in range(19, 24):
@@ -1373,6 +1396,7 @@ class BaseSeriesReader:
 
         ###SPEED 11.5  4 < WIND <5
         ballastDt11_5 = []
+        numberOfApp11_5 = []
         for i in range(0, len(wind) - 1):
             arrayFoc = np.array([k for k in ballastDt if
                                  k[4] >= 4 and k[4] <= 5 and k[5] > vel1Min and k[5] <= vel1Max and k[3] >= wind[i] and k[
@@ -1384,8 +1408,10 @@ class BaseSeriesReader:
                 [k for k in ballastDt if k[5] >vel1Min and k[5] <= vel1Max and k[9] >= 10])[:, 9]
             if tlgarrayFoc.__len__() > 5:
                 meanFoc = (np.mean(arrayFoc[:, 8]) + np.mean(tlgarrayFoc)+ centralMean)/3 if arrayFoc.__len__() >= 10 else 0
+                numberOfApp11_5.append(arrayFoc.__len__() + tlgarrayFoc.__len__() + centralArray.__len__())
             else:
                 meanFoc = (np.mean(arrayFoc[:, 8]) + centralMean)/2 if arrayFoc.__len__() >= 10 else 0
+                numberOfApp11_5.append(arrayFoc.__len__()+ centralArray.__len__())
             ballastDt11_5.append(round(meanFoc, 2))
 
         for i in range(19, 24):
@@ -1393,6 +1419,7 @@ class BaseSeriesReader:
 
             ###SPEED 11.5  7 < WIND <8
         ballastDt11_8 = []
+        numberOfApp11_8=[]
         for i in range(0, len(wind) - 1):
             arrayFoc = np.array([k for k in ballastDt if
                                  k[4] >= 6 and k[5] > vel1Min and k[5] <= vel1Max and k[3] >= wind[i] and k[
@@ -1404,8 +1431,10 @@ class BaseSeriesReader:
                 [k for k in ballastDt if k[5] > vel1Min and k[5] <= vel1Max and k[9] >= 10])[:, 9]
             if tlgarrayFoc.__len__() > 5:
                 meanFoc = (np.mean(arrayFoc[:, 8]) + np.mean(tlgarrayFoc)+ centralMean)/3 if arrayFoc.__len__() >= 10 else 0
+                numberOfApp11_8.append(arrayFoc.__len__() + tlgarrayFoc.__len__() + centralArray.__len__())
             else:
                 meanFoc = (np.mean(arrayFoc[:, 8]) + centralMean)/2 if arrayFoc.__len__() >= 10 else 0
+                numberOfApp11_8.append(arrayFoc.__len__() + centralArray.__len__())
             ballastDt11_8.append(round(meanFoc, 2))
 
         for i in range(19, 24):
@@ -1416,7 +1445,10 @@ class BaseSeriesReader:
         ###SPEED 12.5 WIND <1.5
         centralMean = np.mean(np.array([k for k in ballastDt if
                                         k[5] > vel2Min and k[5] <= vel2Max and k[8] > 0])[:, 8])
+        centralArray = np.array([k for k in ballastDt if
+                                 k[5] >= vel2Min and k[5] <= vel2Max and k[8] > 4])[:, 8]
         ballastDt12_0 = []
+        numberOfApp12_0=[]
         for i in range(0, len(wind) - 1):
             arrayFoc = np.array([k for k in ballastDt if
                                  k[4] >= 0 and k[4] <= 1 and  k[5] > vel2Min and k[5] <= vel2Max and k[3] >= wind[
@@ -1430,8 +1462,10 @@ class BaseSeriesReader:
                 [k for k in ballastDt if  k[5] > vel2Min and k[5] <= vel2Max and k[9] >= 10])[:, 9]
             if tlgarrayFoc.__len__() > 5:
                 meanFoc = (np.mean(arrayFoc[:, 8]) + np.mean(tlgarrayFoc)+ centralMean)/3 if arrayFoc.__len__() >= 10 else 0
+                numberOfApp12_0.append(arrayFoc.__len__()+ tlgarrayFoc.__len__()  + centralArray.__len__())
             else:
                 meanFoc = (np.mean(arrayFoc[:, 8]) + centralMean)/2 if arrayFoc.__len__() >= 10 else 0
+                numberOfApp12_0.append(arrayFoc.__len__() + centralArray.__len__())
             ballastDt12_0.append(round(meanFoc, 2))
 
         for i in range(29, 34):
@@ -1439,6 +1473,7 @@ class BaseSeriesReader:
 
         ###SPEED 11.5  2 < WIND <3
         ballastDt12_3 = []
+        numberOfApp12_3=[]
         for i in range(0, len(wind) - 1):
             arrayFoc = np.array([k for k in ballastDt if
                                  k[4] >= 2 and k[4] <= 3 and  k[5] > vel2Min and k[5] <= vel2Max and k[3] >= wind[
@@ -1451,8 +1486,10 @@ class BaseSeriesReader:
                 [k for k in ballastDt if  k[5] > vel2Min and k[5] <= vel2Max and k[9] >= 10])[:, 9]
             if tlgarrayFoc.__len__() > 5:
                 meanFoc = (np.mean(arrayFoc[:, 8]) + np.mean(tlgarrayFoc)+ centralMean)/3 if arrayFoc.__len__() >= 10 else 0
+                numberOfApp12_3.append(arrayFoc.__len__() + tlgarrayFoc.__len__() + centralArray.__len__())
             else:
                 meanFoc = (np.mean(arrayFoc[:, 8]) + centralMean)/2 if arrayFoc.__len__() >= 10 else 0
+                numberOfApp12_3.append(arrayFoc.__len__() + centralArray.__len__())
             ballastDt12_3.append(round(meanFoc, 2))
 
         for i in range(29, 34):
@@ -1460,6 +1497,7 @@ class BaseSeriesReader:
 
         ###SPEED 11.5  4 < WIND <5
         ballastDt12_5 = []
+        numberOfApp12_5 = []
         for i in range(0, len(wind) - 1):
             arrayFoc = np.array([k for k in ballastDt if
                                  k[4] >= 4 and k[4] <= 5 and  k[5] >vel2Min and k[5] <= vel2Max and k[3] >= wind[
@@ -1472,8 +1510,10 @@ class BaseSeriesReader:
                 [k for k in ballastDt if  k[5] > vel2Min  and k[5] <= vel2Max and k[9] >= 10])[:, 9]
             if tlgarrayFoc.__len__() > 5:
                 meanFoc = (np.mean(arrayFoc[:, 8]) + np.mean(tlgarrayFoc)+ centralMean)/3 if arrayFoc.__len__() >= 10 else 0
+                numberOfApp12_5.append(arrayFoc.__len__() + tlgarrayFoc.__len__() + centralArray.__len__())
             else:
                 meanFoc = (np.mean(arrayFoc[:, 8]) + centralMean)/2 if arrayFoc.__len__() >= 10 else 0
+                numberOfApp12_5.append(arrayFoc.__len__() + tlgarrayFoc.__len__() + centralArray.__len__())
             ballastDt12_5.append(round(meanFoc, 2))
 
         for i in range(29, 34):
@@ -1481,6 +1521,7 @@ class BaseSeriesReader:
 
         ###SPEED 11.5  7 < WIND <8
         ballastDt12_8 = []
+        numberOfApp12_8 = []
         for i in range(0, len(wind) - 1):
             arrayFoc = np.array([k for k in ballastDt if
                                  k[4] >= 6 and  k[5] > vel2Min and k[5] <= vel2Max and k[3] >= wind[i] and k[3] <= wind[i + 1] and k[8] > 2])
@@ -1490,8 +1531,10 @@ class BaseSeriesReader:
                 [k for k in ballastDt if  k[5] > vel2Min and k[5] <= vel2Max and k[9] >= 10])[:, 9]
             if tlgarrayFoc.__len__() > 5:
                 meanFoc = (np.mean(arrayFoc[:, 8]) + np.mean(tlgarrayFoc)+ centralMean)/3 if arrayFoc.__len__() >= 10 else 0
+                numberOfApp12_8.append(arrayFoc.__len__() + tlgarrayFoc.__len__() + centralArray.__len__())
             else:
                 meanFoc = (np.mean(arrayFoc[:, 8]) + centralMean)/2 if arrayFoc.__len__() >= 10 else 0
+                numberOfApp12_8.append(arrayFoc.__len__()  + centralArray.__len__())
             ballastDt12_8.append(round(meanFoc, 2))
 
         for i in range(29, 34):
@@ -1502,7 +1545,10 @@ class BaseSeriesReader:
         ###SPEED 13.5 WIND <1.5
         centralMean = np.mean(np.array([k for k in ballastDt if
                                         k[5] > vel3Min and k[5] <= vel3Max and k[8] > 0])[:, 8])
+        centralArray = np.array([k for k in ballastDt if
+                                 k[5] >= vel3Min and k[5] <= vel3Max and k[8] > 4])[:, 8]
         ballastDt13_0 = []
+        numberOfApp13_0 = []
         for i in range(0, len(wind) - 1):
             arrayFoc = np.array([k for k in ballastDt if
                                  k[4] >= 0 and k[4] <= 1 and   k[5] > vel3Min and k[5] <= vel3Max and k[3] >=
@@ -1517,8 +1563,10 @@ class BaseSeriesReader:
                 [k for k in ballastDt if   k[5] > vel3Min and k[5] <= vel3Max and k[9] >= 10])[:, 9]
             if tlgarrayFoc.__len__() > 5:
                 meanFoc = (np.mean(arrayFoc[:, 8]) + np.mean(tlgarrayFoc)+ centralMean)/3 if arrayFoc.__len__() >= 10 else 0
+                numberOfApp13_0.append(arrayFoc.__len__() + tlgarrayFoc.__len__() + centralArray.__len__())
             else:
                 meanFoc = (np.mean(arrayFoc[:, 8]) + centralMean)/2 if arrayFoc.__len__() >= 10 else 0
+                numberOfApp13_0.append(arrayFoc.__len__()  + centralArray.__len__())
             ballastDt13_0.append(round(meanFoc, 2))
 
         for i in range(39, 44):
@@ -1526,6 +1574,7 @@ class BaseSeriesReader:
 
         ###SPEED 13.5  2 < WIND <3
         ballastDt13_3 = []
+        numberOfApp13_3 = []
         for i in range(0, len(wind) - 1):
             arrayFoc = np.array([k for k in ballastDt if
                                  k[4] >= 2 and k[4] <= 3 and   k[5] > vel3Min and k[5] <= vel3Max and k[3] >= wind[
@@ -1538,8 +1587,10 @@ class BaseSeriesReader:
                 [k for k in ballastDt if   k[5] > vel3Min and k[5] <= vel3Max and k[9] >= 10])[:, 9]
             if tlgarrayFoc.__len__() > 5:
                 meanFoc = (np.mean(arrayFoc[:, 8]) + np.mean(tlgarrayFoc)+ centralMean)/3 if arrayFoc.__len__() >= 10 else 0
+                numberOfApp13_3.append(arrayFoc.__len__() + tlgarrayFoc.__len__() + centralArray.__len__())
             else:
                 meanFoc = (np.mean(arrayFoc[:, 8]) + centralMean)/2 if arrayFoc.__len__() >= 10 else 0
+                numberOfApp13_3.append(arrayFoc.__len__()  + centralArray.__len__())
             ballastDt13_3.append(round(meanFoc, 2))
 
         for i in range(39, 44):
@@ -1547,6 +1598,7 @@ class BaseSeriesReader:
 
         ###SPEED 13.5  4 < WIND <5
         ballastDt13_5 = []
+        numberOfApp13_5 = []
         for i in range(0, len(wind) - 1):
             arrayFoc = np.array([k for k in ballastDt if
                                  k[4] >= 4 and k[4] <= 5 and   k[5] >vel3Min and k[5] <= vel3Max and k[3] >= wind[
@@ -1559,8 +1611,10 @@ class BaseSeriesReader:
                 [k for k in ballastDt if   k[5] > vel3Min and k[5] <= vel3Max and k[9] >= 10])[:, 9]
             if tlgarrayFoc.__len__() > 5:
                 meanFoc = (np.mean(arrayFoc[:, 8]) + np.mean(tlgarrayFoc)+ centralMean)/3 if arrayFoc.__len__() >= 10 else 0
+                numberOfApp13_5.append(arrayFoc.__len__() + tlgarrayFoc.__len__() + centralArray.__len__())
             else:
                 meanFoc = (np.mean(arrayFoc[:, 8]) + centralMean)/2 if arrayFoc.__len__() >= 10 else 0
+                numberOfApp13_5.append(arrayFoc.__len__()  + centralArray.__len__())
             ballastDt13_5.append(round(meanFoc, 2))
 
         for i in range(39, 44):
@@ -1568,6 +1622,7 @@ class BaseSeriesReader:
 
         ###SPEED 13.5  7 < WIND <8
         ballastDt13_8 = []
+        numberOfApp13_8 = []
         for i in range(0, len(wind) - 1):
             arrayFoc = np.array([k for k in ballastDt if
                                  k[4] >= 6 and  k[5] > vel3Min and k[5] <= vel3Max and k[3] >= wind[
@@ -1580,8 +1635,10 @@ class BaseSeriesReader:
             tlgarrayFoc = np.array([k for k in tlgarrayFoc if k > 5])
             if tlgarrayFoc.__len__() > 5:
                 meanFoc = (np.mean(arrayFoc[:, 8]) + np.mean(tlgarrayFoc)+ centralMean)/3 if arrayFoc.__len__() >= 10 else 0
+                numberOfApp13_8.append(arrayFoc.__len__() + tlgarrayFoc.__len__() + centralArray.__len__())
             else:
                 meanFoc = (np.mean(arrayFoc[:, 8]) + centralMean)/2 if arrayFoc.__len__() >= 10 else 0
+                numberOfApp13_8.append(arrayFoc.__len__() + centralArray.__len__())
             ballastDt13_8.append(round(meanFoc, 2))
 
         for i in range(39, 44):
@@ -1601,11 +1658,16 @@ class BaseSeriesReader:
         length = values.__len__()
         for i in range(0, len(ballastDt10_0)):
             if length > 0:
-                if ballastDt10_0[i] == 0:
-                    ##find items !=0
-                    ballastDt10_0[i] = np.sum(values) / length
-                elif np.isnan(ballastDt10_0[i]):
-                    ballastDt10_0[i] = 0
+                if length > 0:
+                    if ballastDt10_0[i] == 0:
+                        ##find items !=0
+                        ballastDt10_0[i] = np.array(np.sum(
+                            [numberOfApp10_0[i] * ballastDt10_0[i] for i in range(0, len(numberOfApp10_0))])) / np.sum(
+                            numberOfApp10_0)
+                    elif np.isnan(ballastDt10_0[i]):
+                        ballastDt10_0[i] = np.array(np.sum(
+                            [numberOfApp10_0[i] * ballastDt10_0[i] for i in range(0, len(numberOfApp10_0))])) / np.sum(
+                            numberOfApp10_0)
 
         values = [k for k in ballastDt11_0 if k != 0]
         length = values.__len__()
@@ -1613,9 +1675,13 @@ class BaseSeriesReader:
             if length > 0:
                 if ballastDt11_0[i] == 0:
                     ##find items !=0
-                    ballastDt11_0[i] = np.sum(values) / length
-                elif np.isnan(ballastDt11_0[i]):
-                    ballastDt11_0[i] = 0
+                    ballastDt11_0[i] = np.array(np.sum(
+                        [numberOfApp11_0[i] * ballastDt11_0[i] for i in range(0, len(numberOfApp11_0))])) / np.sum(
+                        numberOfApp11_0)
+                elif np.isnan(ballastDt10_0[i]):
+                    ballastDt11_0[i] = np.array(np.sum(
+                        [numberOfApp11_0[i] * ballastDt11_0[i] for i in range(0, len(numberOfApp11_0))])) / np.sum(
+                        numberOfApp11_0)
 
         values = [k for k in ballastDt12_0 if k != 0]
         length = values.__len__()
@@ -1623,9 +1689,13 @@ class BaseSeriesReader:
             if length > 0:
                 if ballastDt12_0[i] == 0:
                     ##find items !=0
-                    ballastDt12_0[i] = np.sum(values) / length
-                elif np.isnan(ballastDt12_0[i]):
-                    ballastDt12_0[i] = 0
+                    ballastDt12_0[i] = np.array(np.sum(
+                        [numberOfApp12_0[i] * ballastDt12_0[i] for i in range(0, len(numberOfApp12_0))])) / np.sum(
+                        numberOfApp12_0)
+                elif np.isnan(ballastDt10_0[i]):
+                    ballastDt12_0[i] = np.array(np.sum(
+                        [numberOfApp12_0[i] * ballastDt12_0[i] for i in range(0, len(numberOfApp12_0))])) / np.sum(
+                        numberOfApp12_0)
 
         values = [k for k in ballastDt13_0 if k != 0]
         length = values.__len__()
@@ -1633,9 +1703,13 @@ class BaseSeriesReader:
             if length > 0:
                 if ballastDt13_0[i] == 0:
                     ##find items !=0
-                    ballastDt13_0[i] = np.sum(values) / length
-                elif np.isnan(ballastDt13_0[i]):
-                    ballastDt13_0[i] = 0
+                    ballastDt13_0[i] = np.array(np.sum(
+                        [numberOfApp12_0[i] * ballastDt13_0[i] for i in range(0, len(numberOfApp13_0))])) / np.sum(
+                        numberOfApp13_0)
+                elif np.isnan(ballastDt10_0[i]):
+                    ballastDt13_0[i] = np.array(np.sum(
+                        [numberOfApp13_0[i] * ballastDt13_0[i] for i in range(0, len(numberOfApp13_0))])) / np.sum(
+                        numberOfApp13_0)
 
         values = [k for k in ballastDt10_3 if k != 0]
         length = values.__len__()
@@ -1643,9 +1717,13 @@ class BaseSeriesReader:
             if length > 0:
                 if ballastDt10_3[i] == 0:
                     ##find items !=0
-                    ballastDt10_3[i] = np.sum(values) / length
+                    ballastDt10_3[i] = np.array(np.sum(
+                        [numberOfApp10_3[i] * ballastDt10_3[i] for i in range(0, len(numberOfApp10_3))])) / np.sum(
+                        numberOfApp10_3)
                 elif np.isnan(ballastDt10_3[i]):
-                    ballastDt10_3[i] = 0
+                    ballastDt10_0[i] = np.array(np.sum(
+                        [numberOfApp10_3[i] * ballastDt10_3[i] for i in range(0, len(numberOfApp10_3))])) / np.sum(
+                        numberOfApp10_3)
 
         values = [k for k in ballastDt11_3 if k != 0]
         length = values.__len__()
@@ -1653,9 +1731,13 @@ class BaseSeriesReader:
             if length > 0:
                 if ballastDt11_3[i] == 0:
                     ##find items !=0
-                    ballastDt11_3[i] = np.sum(values) / length
+                    ballastDt11_3[i] = np.array(np.sum(
+                        [numberOfApp11_3[i] * ballastDt11_3[i] for i in range(0, len(numberOfApp11_3))])) / np.sum(
+                        numberOfApp11_3)
                 elif np.isnan(ballastDt11_3[i]):
-                    ballastDt11_3[i] = 0
+                    ballastDt11_3[i] = np.array(np.sum(
+                        [numberOfApp11_3[i] * ballastDt11_3[i] for i in range(0, len(numberOfApp11_3))])) / np.sum(
+                        numberOfApp11_3)
 
         values = [k for k in ballastDt12_3 if k != 0]
         length = values.__len__()
@@ -1663,9 +1745,13 @@ class BaseSeriesReader:
             if length > 0:
                 if ballastDt12_3[i] == 0:
                     ##find items !=0
-                    ballastDt12_3[i] = np.sum(values) / length
+                    ballastDt12_3[i] = np.array(np.sum(
+                        [numberOfApp12_3[i] * ballastDt12_3[i] for i in range(0, len(numberOfApp12_3))])) / np.sum(
+                        numberOfApp12_3)
                 elif np.isnan(ballastDt12_3[i]):
-                    ballastDt12_3[i] = 0
+                    ballastDt12_3[i] = np.array(np.sum(
+                        [numberOfApp12_3[i] * ballastDt12_3[i] for i in range(0, len(numberOfApp11_3))])) / np.sum(
+                        numberOfApp12_3)
 
         values = [k for k in ballastDt13_3 if k != 0]
         length = values.__len__()
@@ -1673,9 +1759,13 @@ class BaseSeriesReader:
             if length > 0:
                 if ballastDt13_3[i] == 0:
                     ##find items !=0
-                    ballastDt13_3[i] = np.sum(values) / length
+                    ballastDt13_3[i] = np.array(np.sum(
+                        [numberOfApp13_3[i] * ballastDt13_3[i] for i in range(0, len(numberOfApp13_3))])) / np.sum(
+                        numberOfApp13_3)
                 elif np.isnan(ballastDt13_3[i]):
-                    ballastDt13_3[i] = 0
+                    ballastDt12_3[i] = np.array(np.sum(
+                        [numberOfApp13_3[i] * ballastDt13_3[i] for i in range(0, len(numberOfApp13_3))])) / np.sum(
+                        numberOfApp13_3)
 
         values = [k for k in ballastDt10_5 if k != 0]
         length = values.__len__()
@@ -1683,9 +1773,13 @@ class BaseSeriesReader:
             if length > 0:
                 if ballastDt10_5[i] == 0:
                     ##find items !=0
-                    ballastDt10_5[i] = np.sum(values) / length
-                elif np.isnan(ballastDt10_5[i]):
-                    ballastDt10_5[i] = 0
+                    ballastDt10_5[i] = np.array(np.sum(
+                        [numberOfApp10_5[i] * ballastDt10_5[i] for i in range(0, len(numberOfApp10_5))])) / np.sum(
+                        numberOfApp10_5)
+                elif np.isnan(ballastDt12_3[i]):
+                    ballastDt12_3[i] = np.array(np.sum(
+                        [numberOfApp10_5[i] * ballastDt10_5[i] for i in range(0, len(numberOfApp10_5))])) / np.sum(
+                        numberOfApp10_5)
 
         values = [k for k in ballastDt11_5 if k != 0]
         length = values.__len__()
@@ -1693,7 +1787,13 @@ class BaseSeriesReader:
             if length > 0:
                 if ballastDt11_5[i] == 0:
                     ##find items !=0
-                    ballastDt11_5[i] = np.sum(values) / length
+                    ballastDt11_5[i] = np.array(np.sum(
+                        [numberOfApp11_5[i] * ballastDt11_5[i] for i in range(0, len(numberOfApp11_5))])) / np.sum(
+                        numberOfApp11_5)
+                elif np.isnan(ballastDt11_5[i]):
+                    ballastDt11_5[i] = np.array(np.sum(
+                        [numberOfApp10_5[i] * ballastDt11_5[i] for i in range(0, len(numberOfApp11_5))])) / np.sum(
+                        numberOfApp11_5)
 
         values = [k for k in ballastDt12_5 if k != 0]
         length = values.__len__()
@@ -1701,9 +1801,13 @@ class BaseSeriesReader:
             if length > 0:
                 if ballastDt12_5[i] == 0:
                     ##find items !=0
-                    ballastDt12_5[i] = np.sum(values) / length
+                    ballastDt12_5[i] = np.array(np.sum(
+                        [numberOfApp12_5[i] * ballastDt12_5[i] for i in range(0, len(numberOfApp12_5))])) / np.sum(
+                        numberOfApp12_5)
                 elif np.isnan(ballastDt12_5[i]):
-                    ballastDt12_5[i] = 0
+                    ballastDt12_5[i] = np.array(np.sum(
+                        [numberOfApp12_5[i] * ballastDt12_5[i] for i in range(0, len(numberOfApp12_5))])) / np.sum(
+                        numberOfApp12_5)
 
         values = [k for k in ballastDt13_5 if k != 0]
         length = values.__len__()
@@ -1711,43 +1815,69 @@ class BaseSeriesReader:
             if length > 0:
                 if ballastDt13_5[i] == 0:
                     ##find items !=0
-                    ballastDt13_5[i] = np.sum(values) / length
+                    ballastDt13_5[i] = np.array(np.sum(
+                        [numberOfApp13_5[i] * ballastDt13_5[i] for i in range(0, len(numberOfApp13_5))])) / np.sum(
+                        numberOfApp13_5)
                 elif np.isnan(ballastDt13_5[i]):
-                    ballastDt13_5[i] = 0
+                    ballastDt13_5[i] = np.array(np.sum(
+                        [numberOfApp13_5[i] * ballastDt13_5[i] for i in range(0, len(numberOfApp13_5))])) / np.sum(
+                        numberOfApp13_5)
 
         values = [k for k in ballastDt10_8 if k != 0]
         length = values.__len__()
         for i in range(0, len(ballastDt10_8)):
             if length > 0:
-                    if ballastDt10_8[i] == 0 :
-                        ##find items !=0
-                        ballastDt10_8[i] = np.sum(values) / length
-                    elif  np.isnan(ballastDt10_8[i]):
-                        ballastDt10_8[i]=0
+                if ballastDt10_8[i] == 0:
+                    ##find items !=0
+                    ballastDt10_8[i] = np.array(np.sum(
+                        [numberOfApp10_8[i] * ballastDt10_8[i] for i in range(0, len(numberOfApp10_8))])) / np.sum(
+                        numberOfApp10_8)
+                elif np.isnan(ballastDt10_8[i]):
+                    ballastDt10_8[i] = np.array(np.sum(
+                        [numberOfApp10_8[i] * ballastDt10_8[i] for i in range(0, len(numberOfApp10_8))])) / np.sum(
+                        numberOfApp10_8)
 
         values = [k for k in ballastDt11_8 if k != 0]
         length = values.__len__()
         for i in range(0, len(ballastDt11_8)):
             if length > 0:
-                    if ballastDt11_8[i] == 0:
-                        ##find items !=0
-                        ballastDt11_8[i] = np.sum(values) / length
+                if ballastDt11_8[i] == 0:
+                    ##find items !=0
+                    ballastDt11_8[i] = np.array(np.sum(
+                        [numberOfApp11_8[i] * ballastDt11_8[i] for i in range(0, len(numberOfApp11_8))])) / np.sum(
+                        numberOfApp11_8)
+                elif np.isnan(ballastDt11_8[i]):
+                    ballastDt11_8[i] = np.array(np.sum(
+                        [numberOfApp11_8[i] * ballastDt11_8[i] for i in range(0, len(numberOfApp11_8))])) / np.sum(
+                        numberOfApp11_8)
 
         values = [k for k in ballastDt12_8 if k != 0]
         length = values.__len__()
         for i in range(0, len(ballastDt12_8)):
             if length > 0:
-                    if ballastDt12_8[i] == 0:
-                        ##find items !=0
-                        ballastDt12_8[i] = np.sum(values) / length
+                if ballastDt12_8[i] == 0:
+                    ##find items !=0
+                    ballastDt12_8[i] = np.array(np.sum(
+                        [numberOfApp12_8[i] * ballastDt12_8[i] for i in range(0, len(numberOfApp12_8))])) / np.sum(
+                        numberOfApp12_8)
+                elif np.isnan(ballastDt12_8[i]):
+                    ballastDt12_8[i] = np.array(np.sum(
+                        [numberOfApp12_8[i] * ballastDt12_8[i] for i in range(0, len(numberOfApp12_8))])) / np.sum(
+                        numberOfApp12_8)
 
         values = [k for k in ballastDt13_8 if k != 0]
         length = values.__len__()
         for i in range(0, len(ballastDt13_8)):
             if length > 0:
-                    if ballastDt13_8[i] == 0:
-                        ##find items !=0
-                        ballastDt13_8[i] = np.sum(values) / length
+                if ballastDt13_8[i] == 0:
+                    ##find items !=0
+                    ballastDt13_8[i] = np.array(np.sum(
+                        [numberOfApp13_8[i] * ballastDt13_8[i] for i in range(0, len(numberOfApp13_8))])) / np.sum(
+                        numberOfApp13_8)
+                elif np.isnan(ballastDt13_8[i]):
+                    ballastDt13_8[i] = np.array(np.sum(
+                        [numberOfApp13_8[i] * ballastDt13_8[i] for i in range(0, len(numberOfApp13_8))])) / np.sum(
+                        numberOfApp13_8)
 
 
         #####################################################################################################################
@@ -2065,7 +2195,7 @@ class BaseSeriesReader:
         # For each label
         for curLbl in np.unique(labels):
             # Create a partition for X using records with corresponding label equal to the current
-            partitionsX.append(np.asarray(velocitiesB[labels == curLbl]))
+            partitionsX.append(np.asarray(velocitiesL[labels == curLbl]))
             # Create a partition for Y using records with corresponding label equal to the current
 
             # Keep partition label to ascertain same order of results
@@ -2104,7 +2234,7 @@ class BaseSeriesReader:
         workbook._sheets[1]['B6'] = vel0Max
         workbook._sheets[1]['B16'] = vel1Max
         workbook._sheets[1]['B26'] = vel2Max
-        workbook._sheets[21]['B36'] = vel3Max
+        workbook._sheets[1]['B36'] = vel3Max
 
         ##END OF VESSEL BASIC INFO
 
@@ -2115,8 +2245,12 @@ class BaseSeriesReader:
         #workbook._sheets[1]['B36'] = round(centroidsL[3][0], 2)
 
         ladenDt10_0 = []
+        vel0Min=vel0Min+2
         centralMean = np.mean(np.array([k for k in ladenDt if
-                                        k[5] >= vel0Min and k[5] <= vel0Max and k[8] > 0])[:, 8])
+                                        k[5] >= vel0Min and k[5] <= vel0Max and k[8] > 4])[:, 8])
+        centralArray = np.array([k for k in ladenDt if
+                  k[5] >= vel0Min and k[5] <= vel0Max and k[8] > 4])[:, 8]
+        numberOfApp10_0 =[]
         for i in range(0, len(wind) - 1):
             arrayFoc = np.array([k for k in ladenDt if
                                  k[4] >= 0 and k[4] <= 1 and k[5] >= vel0Min and k[5] <= vel0Max and k[3] >= wind[i] and
@@ -2130,8 +2264,10 @@ class BaseSeriesReader:
             if tlgarrayFoc.__len__() > 5:
                 meanFoc = (np.mean(arrayFoc[:, 8]) + np.mean(
                     tlgarrayFoc) + centralMean) / 3 if arrayFoc.__len__() >= 5 else 0
+                numberOfApp10_0.append(arrayFoc.__len__()+tlgarrayFoc.__len__() + centralArray.__len__())
             else:
                 meanFoc = (np.mean(arrayFoc[:, 8]) + centralMean) / 2 if arrayFoc.__len__() >= 5 else 0
+                numberOfApp10_0.append(arrayFoc.__len__() + centralArray.__len__())
             ladenDt10_0.append(round(meanFoc, 2))
 
         for i in range(9, 14):
@@ -2139,6 +2275,7 @@ class BaseSeriesReader:
 
         ###SPEED 10  2 < WIND <3
         ladenDt10_3 = []
+        numberOfApp10_3 = []
         for i in range(0, len(wind) - 1):
             arrayFoc = np.array([k for k in ladenDt if
                                  k[4] >= 2 and k[4] <= 3 and k[5] >= vel0Min and k[5] <= vel0Max and k[3] >= wind[i] and
@@ -2152,8 +2289,10 @@ class BaseSeriesReader:
             if tlgarrayFoc.__len__() > 5:
                 meanFoc = (np.mean(arrayFoc[:, 8]) + np.mean(
                     tlgarrayFoc) + centralMean) / 3 if arrayFoc.__len__() >= 5 else 0
+                numberOfApp10_3.append(arrayFoc.__len__() + tlgarrayFoc.__len__() + centralArray.__len__())
             else:
                 meanFoc = (np.mean(arrayFoc[:, 8]) + centralMean) / 2 if arrayFoc.__len__() >= 5 else 0
+                numberOfApp10_3.append(arrayFoc.__len__() + centralArray.__len__())
             ladenDt10_3.append(round(meanFoc, 2))
 
         for i in range(9, 14):
@@ -2161,6 +2300,7 @@ class BaseSeriesReader:
 
         ###SPEED 10  4 < WIND <5
         ladenDt10_5 = []
+        numberOfApp10_5 = []
         for i in range(0, len(wind) - 1):
             arrayFoc = np.array([k for k in ladenDt if
                                  k[4] >= 4 and k[4] <= 5 and k[5] >= vel0Min and k[5] <= vel0Max and k[3] >= wind[i] and
@@ -2174,8 +2314,10 @@ class BaseSeriesReader:
             if tlgarrayFoc.__len__() > 5:
                 meanFoc = (np.mean(arrayFoc[:, 8]) + np.mean(
                     tlgarrayFoc) + centralMean) / 3 if arrayFoc.__len__() >= 5 else 0
+                numberOfApp10_5.append(arrayFoc.__len__() + tlgarrayFoc.__len__() + centralArray.__len__())
             else:
                 meanFoc = (np.mean(arrayFoc[:, 8]) + centralMean) / 2 if arrayFoc.__len__() >= 5 else 0
+                numberOfApp10_5.append(arrayFoc.__len__() + centralArray.__len__())
             ladenDt10_5.append(round(meanFoc, 2))
 
         for i in range(9, 14):
@@ -2183,6 +2325,7 @@ class BaseSeriesReader:
 
         ###SPEED 10  7 < WIND <8
         ladenDt10_8 = []
+        numberOfApp10_8 = []
         for i in range(0, len(wind) - 1):
             arrayFoc = np.array([k for k in ladenDt if
                                  k[4] >= 6 and k[5] >= vel0Min and k[5] <= vel0Max and k[3] >= wind[i] and
@@ -2195,8 +2338,10 @@ class BaseSeriesReader:
             if tlgarrayFoc.__len__() > 5:
                 meanFoc = (np.mean(arrayFoc[:, 8]) + np.mean(
                     tlgarrayFoc) + centralMean) / 3 if arrayFoc.__len__() >= 5 else 0
+                numberOfApp10_8.append(arrayFoc.__len__() + tlgarrayFoc.__len__() + centralArray.__len__())
             else:
                 meanFoc = (np.mean(arrayFoc[:, 8]) + centralMean) / 2 if arrayFoc.__len__() >= 5 else 0
+                numberOfApp10_8.append(arrayFoc.__len__() +  centralArray.__len__())
             ladenDt10_8.append(round(meanFoc, 2))
 
         for i in range(9, 14):
@@ -2208,7 +2353,10 @@ class BaseSeriesReader:
         ###SPEED 11.5   WIND <1.5
         centralMean = np.mean(np.array([k for k in ladenDt if
                                         k[5] > vel1Min and k[5] <= vel1Max and k[8] > 0])[:, 8])
+        centralArray = np.array([k for k in ladenDt if
+                                 k[5] >= vel1Min and k[5] <= vel1Max and k[8] > 4])[:, 8]
         ladenDt11_0 = []
+        numberOfApp11_0 = []
         for i in range(0, len(wind) - 1):
             arrayFoc = np.array([k for k in ladenDt if
                                  k[4] >= 0 and k[4] <= 1 and k[5] > vel1Min and k[5] <= vel1Max and k[3] >= wind[
@@ -2222,8 +2370,10 @@ class BaseSeriesReader:
             if tlgarrayFoc.__len__() > 5:
                 meanFoc = (np.mean(arrayFoc[:, 8]) + np.mean(
                     tlgarrayFoc) + centralMean) / 3 if arrayFoc.__len__() >= 10 else 0
+                numberOfApp11_0.append(arrayFoc.__len__() + tlgarrayFoc.__len__() + centralArray.__len__())
             else:
                 meanFoc = (np.mean(arrayFoc[:, 8]) + centralMean) / 2 if arrayFoc.__len__() >= 10 else 0
+                numberOfApp11_0.append(arrayFoc.__len__() + centralArray.__len__())
             ladenDt11_0.append(round(meanFoc, 2))
 
         for i in range(19, 24):
@@ -2231,6 +2381,7 @@ class BaseSeriesReader:
 
         ###SPEED 11.5  2 < WIND <3
         ladenDt11_3 = []
+        numberOfApp11_3 = []
         for i in range(0, len(wind) - 1):
             arrayFoc = np.array([k for k in ladenDt if
                                  k[4] >= 2 and k[4] <= 3 and k[5] > vel1Min and k[5] <= vel1Max and k[3] >= wind[i] and
@@ -2244,8 +2395,10 @@ class BaseSeriesReader:
             if tlgarrayFoc.__len__() > 5:
                 meanFoc = (np.mean(arrayFoc[:, 8]) + np.mean(
                     tlgarrayFoc) + centralMean) / 3 if arrayFoc.__len__() >= 10 else 0
+                numberOfApp11_3.append(arrayFoc.__len__() + tlgarrayFoc.__len__() + centralArray.__len__())
             else:
                 meanFoc = (np.mean(arrayFoc[:, 8]) + centralMean) / 2 if arrayFoc.__len__() >= 10 else 0
+                numberOfApp11_3.append(arrayFoc.__len__()   + centralArray.__len__())
             ladenDt11_3.append(round(meanFoc, 2))
 
         for i in range(19, 24):
@@ -2253,6 +2406,7 @@ class BaseSeriesReader:
 
         ###SPEED 11.5  4 < WIND <5
         ladenDt11_5 = []
+        numberOfApp11_5 = []
         for i in range(0, len(wind) - 1):
             arrayFoc = np.array([k for k in ladenDt if
                                  k[4] >= 4 and k[4] <= 5 and k[5] > vel1Min and k[5] <= vel1Max and k[3] >= wind[i] and
@@ -2266,8 +2420,10 @@ class BaseSeriesReader:
             if tlgarrayFoc.__len__() > 5:
                 meanFoc = (np.mean(arrayFoc[:, 8]) + np.mean(
                     tlgarrayFoc) + centralMean) / 3 if arrayFoc.__len__() >= 10 else 0
+                numberOfApp11_5.append(arrayFoc.__len__() + tlgarrayFoc.__len__() + centralArray.__len__())
             else:
                 meanFoc = (np.mean(arrayFoc[:, 8]) + centralMean) / 2 if arrayFoc.__len__() >= 10 else 0
+                numberOfApp11_5.append(arrayFoc.__len__() + centralArray.__len__())
             ladenDt11_5.append(round(meanFoc, 2))
 
         for i in range(19, 24):
@@ -2275,6 +2431,7 @@ class BaseSeriesReader:
 
             ###SPEED 11.5  7 < WIND <8
         ladenDt11_8 = []
+        numberOfApp11_8 = []
         for i in range(0, len(wind) - 1):
             arrayFoc = np.array([k for k in ladenDt if
                                  k[4] >= 6 and k[5] > vel1Min and k[5] <= vel1Max and k[3] >= wind[i] and k[
@@ -2287,8 +2444,10 @@ class BaseSeriesReader:
             if tlgarrayFoc.__len__() > 5:
                 meanFoc = (np.mean(arrayFoc[:, 8]) + np.mean(
                     tlgarrayFoc) + centralMean) / 3 if arrayFoc.__len__() >= 10 else 0
+                numberOfApp11_8.append(arrayFoc.__len__() + tlgarrayFoc.__len__() + centralArray.__len__())
             else:
                 meanFoc = (np.mean(arrayFoc[:, 8]) + centralMean) / 2 if arrayFoc.__len__() >= 10 else 0
+                numberOfApp11_8.append(arrayFoc.__len__()  + centralArray.__len__())
             ladenDt11_8.append(round(meanFoc, 2))
 
         for i in range(19, 24):
@@ -2299,7 +2458,11 @@ class BaseSeriesReader:
         ###SPEED 12.5 WIND <1.5
         centralMean = np.mean(np.array([k for k in ladenDt if
                                         k[5] > vel2Min and k[5] <= vel2Max and k[8] > 0])[:, 8])
+
+        centralArray = np.array([k for k in ladenDt if
+                                 k[5] >= vel2Min and k[5] <= vel2Max and k[8] > 4])[:, 8]
         ladenDt12_0 = []
+        numberOfApp12_0 = []
         for i in range(0, len(wind) - 1):
             arrayFoc = np.array([k for k in ladenDt if
                                  k[4] >= 0 and k[4] <= 1 and k[5] > vel2Min and k[5] <= vel2Max and k[3] >= wind[
@@ -2314,8 +2477,10 @@ class BaseSeriesReader:
             if tlgarrayFoc.__len__() > 5:
                 meanFoc = (np.mean(arrayFoc[:, 8]) + np.mean(
                     tlgarrayFoc) + centralMean) / 3 if arrayFoc.__len__() >= 10 else 0
+                numberOfApp12_0.append(arrayFoc.__len__()  + tlgarrayFoc.__len__() + centralArray.__len__())
             else:
                 meanFoc = (np.mean(arrayFoc[:, 8]) + centralMean) / 2 if arrayFoc.__len__() >= 10 else 0
+                numberOfApp12_0.append(arrayFoc.__len__() + centralArray.__len__())
             ladenDt12_0.append(round(meanFoc, 2))
 
         for i in range(29, 34):
@@ -2323,6 +2488,7 @@ class BaseSeriesReader:
 
         ###SPEED 11.5  2 < WIND <3
         ladenDt12_3 = []
+        numberOfApp12_3 = []
         for i in range(0, len(wind) - 1):
             arrayFoc = np.array([k for k in ladenDt if
                                  k[4] >= 2 and k[4] <= 3 and k[5] > vel2Min and k[5] <= vel2Max and k[3] >= wind[
@@ -2336,8 +2502,10 @@ class BaseSeriesReader:
             if tlgarrayFoc.__len__() > 5:
                 meanFoc = (np.mean(arrayFoc[:, 8]) + np.mean(
                     tlgarrayFoc) + centralMean) / 3 if arrayFoc.__len__() >= 10 else 0
+                numberOfApp12_3.append(arrayFoc.__len__() + tlgarrayFoc.__len__() + centralArray.__len__())
             else:
                 meanFoc = (np.mean(arrayFoc[:, 8]) + centralMean) / 2 if arrayFoc.__len__() >= 10 else 0
+                numberOfApp12_3.append(arrayFoc.__len__()  + centralArray.__len__())
             ladenDt12_3.append(round(meanFoc, 2))
 
         for i in range(29, 34):
@@ -2345,6 +2513,7 @@ class BaseSeriesReader:
 
         ###SPEED 11.5  4 < WIND <5
         ladenDt12_5 = []
+        numberOfApp12_5 = []
         for i in range(0, len(wind) - 1):
             arrayFoc = np.array([k for k in ladenDt if
                                  k[4] >= 4 and k[4] <= 5 and k[5] > vel2Min and k[5] <= vel2Max and k[3] >= wind[
@@ -2358,8 +2527,10 @@ class BaseSeriesReader:
             if tlgarrayFoc.__len__() > 5:
                 meanFoc = (np.mean(arrayFoc[:, 8]) + np.mean(
                     tlgarrayFoc) + centralMean) / 3 if arrayFoc.__len__() >= 10 else 0
+                numberOfApp12_5.append(arrayFoc.__len__() + tlgarrayFoc.__len__() + centralArray.__len__())
             else:
                 meanFoc = (np.mean(arrayFoc[:, 8]) + centralMean) / 2 if arrayFoc.__len__() >= 10 else 0
+                numberOfApp12_5.append(arrayFoc.__len__()  + centralArray.__len__())
             ladenDt12_5.append(round(meanFoc, 2))
 
         for i in range(29, 34):
@@ -2367,6 +2538,7 @@ class BaseSeriesReader:
 
         ###SPEED 11.5  7 < WIND <8
         ladenDt12_8 = []
+        numberOfApp12_8 = []
         for i in range(0, len(wind) - 1):
             arrayFoc = np.array([k for k in ladenDt if
                                  k[4] >= 6 and k[5] > vel2Min and k[5] <= vel2Max and k[3] >= wind[i] and k[3] <= wind[
@@ -2378,8 +2550,10 @@ class BaseSeriesReader:
             if tlgarrayFoc.__len__() > 5:
                 meanFoc = (np.mean(arrayFoc[:, 8]) + np.mean(
                     tlgarrayFoc) + centralMean) / 3 if arrayFoc.__len__() >= 10 else 0
+                numberOfApp12_8.append(arrayFoc.__len__() + tlgarrayFoc.__len__() + centralArray.__len__())
             else:
                 meanFoc = (np.mean(arrayFoc[:, 8]) + centralMean) / 2 if arrayFoc.__len__() >= 10 else 0
+                numberOfApp12_8.append(arrayFoc.__len__() + centralArray.__len__())
             ladenDt12_8.append(round(meanFoc, 2))
 
         for i in range(29, 34):
@@ -2390,7 +2564,10 @@ class BaseSeriesReader:
         ###SPEED 13.5 WIND <1.5
         centralMean = np.mean(np.array([k for k in ladenDt if
                                         k[5] > vel3Min and k[5] <= vel3Max and k[8] > 0])[:, 8])
+        centralArray = np.array([k for k in ladenDt if
+                                 k[5] >= vel3Min and k[5] <= vel3Max and k[8] > 4])[:, 8]
         ladenDt13_0 = []
+        numberOfApp13_0 = []
         for i in range(0, len(wind) - 1):
             arrayFoc = np.array([k for k in ladenDt if
                                  k[4] >= 0 and k[4] <= 1 and k[5] > vel3Min and k[5] <= vel3Max and k[3] >=
@@ -2406,8 +2583,10 @@ class BaseSeriesReader:
             if tlgarrayFoc.__len__() > 5:
                 meanFoc = (np.mean(arrayFoc[:, 8]) + np.mean(
                     tlgarrayFoc) + centralMean) / 3 if arrayFoc.__len__() >= 10 else 0
+                numberOfApp13_0.append(arrayFoc.__len__() + tlgarrayFoc.__len__() + centralArray.__len__())
             else:
                 meanFoc = (np.mean(arrayFoc[:, 8]) + centralMean) / 2 if arrayFoc.__len__() >= 10 else 0
+                numberOfApp13_0.append(arrayFoc.__len__() +  centralArray.__len__())
             ladenDt13_0.append(round(meanFoc, 2))
 
         for i in range(39, 44):
@@ -2415,6 +2594,7 @@ class BaseSeriesReader:
 
         ###SPEED 13.5  2 < WIND <3
         ladenDt13_3 = []
+        numberOfApp13_3 = []
         for i in range(0, len(wind) - 1):
             arrayFoc = np.array([k for k in ladenDt if
                                  k[4] >= 2 and k[4] <= 3 and k[5] > vel3Min and k[5] <= vel3Max and k[3] >= wind[
@@ -2437,6 +2617,7 @@ class BaseSeriesReader:
 
         ###SPEED 13.5  4 < WIND <5
         ladenDt13_5 = []
+        numberOfApp13_5 = []
         for i in range(0, len(wind) - 1):
             arrayFoc = np.array([k for k in ladenDt if
                                  k[4] >= 4 and k[4] <= 5 and k[5] > vel3Min and k[5] <= vel3Max and k[3] >= wind[
@@ -2450,8 +2631,10 @@ class BaseSeriesReader:
             if tlgarrayFoc.__len__() > 5:
                 meanFoc = (np.mean(arrayFoc[:, 8]) + np.mean(
                     tlgarrayFoc) + centralMean) / 3 if arrayFoc.__len__() >= 10 else 0
+                numberOfApp13_5.append(arrayFoc.__len__() + tlgarrayFoc.__len__() + centralArray.__len__())
             else:
                 meanFoc = (np.mean(arrayFoc[:, 8]) + centralMean) / 2 if arrayFoc.__len__() >= 10 else 0
+                numberOfApp13_5.append(arrayFoc.__len__() + centralArray.__len__())
             ladenDt13_5.append(round(meanFoc, 2))
 
         for i in range(39, 44):
@@ -2459,6 +2642,7 @@ class BaseSeriesReader:
 
         ###SPEED 13.5  7 < WIND <8
         ladenDt13_8 = []
+        numberOfApp13_8 = []
         for i in range(0, len(wind) - 1):
             arrayFoc = np.array([k for k in ladenDt if
                                  k[4] >= 6 and k[5] > vel3Min and k[5] <= vel3Max and k[3] >= wind[
@@ -2472,8 +2656,10 @@ class BaseSeriesReader:
             if tlgarrayFoc.__len__() > 5:
                 meanFoc = (np.mean(arrayFoc[:, 8]) + np.mean(
                     tlgarrayFoc) + centralMean) / 3 if arrayFoc.__len__() >= 10 else 0
+                numberOfApp13_8.append(arrayFoc.__len__() + tlgarrayFoc.__len__() + centralArray.__len__())
             else:
                 meanFoc = (np.mean(arrayFoc[:, 8]) + centralMean) / 2 if arrayFoc.__len__() >= 10 else 0
+                numberOfApp13_8.append(arrayFoc.__len__() + centralArray.__len__())
             ladenDt13_8.append(round(meanFoc, 2))
 
         for i in range(39, 44):
@@ -2495,9 +2681,9 @@ class BaseSeriesReader:
             if length > 0:
                 if ladenDt10_0[i] == 0:
                     ##find items !=0
-                    ladenDt10_0[i] = np.sum(values) / length
+                    ladenDt10_0[i] = np.array(np.sum([numberOfApp10_0[i] * ladenDt10_0[i] for i in range(0,len(numberOfApp10_0))  ])) / np.sum(numberOfApp10_0)
                 elif np.isnan(ladenDt10_0[i]):
-                    ladenDt10_0[i] = 0
+                    ladenDt10_0[i] = np.array(np.sum([numberOfApp10_0[i] * ladenDt10_0[i] for i in range(0,len(numberOfApp10_0))  ])) / np.sum(numberOfApp10_0)
 
         values = [k for k in ladenDt11_0 if k != 0]
         length = values.__len__()
@@ -2505,9 +2691,13 @@ class BaseSeriesReader:
             if length > 0:
                 if ladenDt11_0[i] == 0:
                     ##find items !=0
-                    ladenDt11_0[i] = np.sum(values) / length
+                    ladenDt11_0[i] = np.array(
+                        np.sum([numberOfApp11_0[i] * ladenDt11_0[i] for i in range(0, len(numberOfApp11_0))])) / np.sum(
+                        numberOfApp11_0)
                 elif np.isnan(ladenDt11_0[i]):
-                    ladenDt11_0[i] = 0
+                    ladenDt11_0[i] = np.array(
+                        np.sum([numberOfApp11_0[i] * ladenDt11_0[i] for i in range(0, len(numberOfApp11_0))])) / np.sum(
+                        numberOfApp11_0)
 
         values = [k for k in ladenDt12_0 if k != 0]
         length = values.__len__()
@@ -2515,131 +2705,180 @@ class BaseSeriesReader:
             if length > 0:
                 if ladenDt12_0[i] == 0:
                     ##find items !=0
-                    ladenDt12_0[i] = np.sum(values) / length
-                elif np.isnan(ladenDt12_0[i]):
-                    ladenDt12_0[i] = 0
+                    ladenDt12_0[i] = np.array(
+                        np.sum([numberOfApp12_0[i] * ladenDt12_0[i] for i in range(0, len(numberOfApp12_0))])) / np.sum(
+                        numberOfApp12_0)
+                elif np.isnan(ladenDt11_0[i]):
+                    ladenDt12_0[i] = np.array(
+                        np.sum([numberOfApp12_0[i] * ladenDt12_0[i] for i in range(0, len(numberOfApp12_0))])) / np.sum(
+                        numberOfApp12_0)
 
         values = [k for k in ladenDt13_0 if k != 0]
         length = values.__len__()
         for i in range(0, len(ladenDt13_0)):
             if length > 0:
                 if ladenDt13_0[i] == 0:
-                    ##find items !=0
-                    ladenDt13_0[i] = np.sum(values) / length
+                    ladenDt13_0[i] = np.array(
+                        np.sum([numberOfApp13_0[i] * ladenDt13_0[i] for i in range(0, len(numberOfApp13_0))])) / np.sum(
+                        numberOfApp13_0)
                 elif np.isnan(ladenDt13_0[i]):
-                    ladenDt13_0[i] = 0
+                    ladenDt13_0[i] = np.array(
+                        np.sum([numberOfApp13_0[i] * ladenDt13_0[i] for i in range(0, len(numberOfApp13_0))])) / np.sum(
+                        numberOfApp13_0)
 
         values = [k for k in ladenDt10_3 if k != 0]
         length = values.__len__()
         for i in range(0, len(ladenDt10_3)):
             if length > 0:
                 if ladenDt10_3[i] == 0:
-                    ##find items !=0
-                    ladenDt10_3[i] = np.sum(values) / length
+                    ladenDt10_3[i] = np.array(
+                        np.sum([numberOfApp10_3[i] * ladenDt10_3[i] for i in range(0, len(numberOfApp10_3))])) / np.sum(
+                        numberOfApp10_3)
                 elif np.isnan(ladenDt10_3[i]):
-                    ladenDt10_3[i] = 0
+                    ladenDt10_3[i] = np.array(
+                        np.sum([numberOfApp10_3[i] * ladenDt10_3[i] for i in range(0, len(numberOfApp10_3))])) / np.sum(
+                        numberOfApp10_3)
 
         values = [k for k in ladenDt11_3 if k != 0]
         length = values.__len__()
         for i in range(0, len(ladenDt11_3)):
             if length > 0:
                 if ladenDt11_3[i] == 0:
-                    ##find items !=0
-                    ladenDt11_3[i] = np.sum(values) / length
-                elif np.isnan(ladenDt11_3[i]):
-                    ladenDt11_3[i] = 0
+                    ladenDt11_3[i] = np.array(
+                        np.sum([numberOfApp11_3[i] * ladenDt11_3[i] for i in range(0, len(numberOfApp11_3))])) / np.sum(
+                        numberOfApp11_3)
+                elif np.isnan(ladenDt10_3[i]):
+                    ladenDt11_3[i] = np.array(
+                        np.sum([numberOfApp11_3[i] * ladenDt11_3[i] for i in range(0, len(numberOfApp11_3))])) / np.sum(
+                        numberOfApp11_3)
 
         values = [k for k in ladenDt12_3 if k != 0]
         length = values.__len__()
         for i in range(0, len(ladenDt12_3)):
             if length > 0:
                 if ladenDt12_3[i] == 0:
-                    ##find items !=0
-                    ladenDt12_3[i] = np.sum(values) / length
-                elif np.isnan(ladenDt12_3[i]):
-                    ladenDt12_3[i] = 0
+                    ladenDt12_3[i] = np.array(
+                        np.sum([numberOfApp12_3[i] * ladenDt12_3[i] for i in range(0, len(numberOfApp12_3))])) / np.sum(
+                        numberOfApp11_3)
+                elif np.isnan(ladenDt10_3[i]):
+                    ladenDt11_3[i] = np.array(
+                        np.sum([numberOfApp12_3[i] * ladenDt12_3[i] for i in range(0, len(numberOfApp12_3))])) / np.sum(
+                        numberOfApp12_3)
 
         values = [k for k in ladenDt13_3 if k != 0]
         length = values.__len__()
         for i in range(0, len(ladenDt13_3)):
             if length > 0:
                 if ladenDt13_3[i] == 0:
-                    ##find items !=0
-                    ladenDt13_3[i] = np.sum(values) / length
+                    ladenDt13_3[i] = np.array(
+                        np.sum([numberOfApp13_3[i] * ladenDt13_3[i] for i in range(0, len(numberOfApp13_3))])) / np.sum(
+                        numberOfApp13_3)
                 elif np.isnan(ladenDt13_3[i]):
-                    ladenDt13_3[i] = 0
+                    ladenDt13_3[i] = np.array(
+                        np.sum([numberOfApp13_3[i] * ladenDt12_3[i] for i in range(0, len(numberOfApp13_3))])) / np.sum(
+                        numberOfApp13_3)
 
         values = [k for k in ladenDt10_5 if k != 0]
         length = values.__len__()
         for i in range(0, len(ladenDt10_5)):
             if length > 0:
                 if ladenDt10_5[i] == 0:
-                    ##find items !=0
-                    ladenDt10_5[i] = np.sum(values) / length
+                    ladenDt10_5[i] = np.array(
+                        np.sum([numberOfApp10_5[i] * ladenDt10_5[i] for i in range(0, len(numberOfApp10_5))])) / np.sum(
+                        numberOfApp10_5)
                 elif np.isnan(ladenDt10_5[i]):
-                    ladenDt10_5[i] = 0
+                    ladenDt10_5[i] = np.array(
+                        np.sum([numberOfApp10_5[i] * ladenDt10_5[i] for i in range(0, len(numberOfApp10_5))])) / np.sum(
+                        numberOfApp10_5)
 
         values = [k for k in ladenDt11_5 if k != 0]
         length = values.__len__()
         for i in range(0, len(ladenDt11_5)):
             if length > 0:
                 if ladenDt11_5[i] == 0:
-                    ##find items !=0
-                    ladenDt11_5[i] = np.sum(values) / length
+                    ladenDt11_5[i] = np.array(
+                        np.sum([numberOfApp11_5[i] * ladenDt11_5[i] for i in range(0, len(numberOfApp11_5))])) / np.sum(
+                        numberOfApp11_5)
+                elif np.isnan(ladenDt11_5[i]):
+                    ladenDt11_5[i] = np.array(
+                        np.sum([numberOfApp11_5[i] * ladenDt11_5[i] for i in range(0, len(numberOfApp11_5))])) / np.sum(
+                        numberOfApp11_5)
 
         values = [k for k in ladenDt12_5 if k != 0]
         length = values.__len__()
         for i in range(0, len(ladenDt12_5)):
             if length > 0:
                 if ladenDt12_5[i] == 0:
-                    ##find items !=0
-                    ladenDt12_5[i] = np.sum(values) / length
+                    ladenDt12_5[i] = np.array(
+                        np.sum([numberOfApp12_5[i] * ladenDt12_5[i] for i in range(0, len(numberOfApp12_5))])) / np.sum(
+                        numberOfApp12_5)
                 elif np.isnan(ladenDt12_5[i]):
-                    ladenDt12_5[i] = 0
+                    ladenDt12_5[i] = np.array(
+                        np.sum([numberOfApp12_5[i] * ladenDt12_5[i] for i in range(0, len(numberOfApp12_5))])) / np.sum(
+                        numberOfApp12_5)
 
         values = [k for k in ladenDt13_5 if k != 0]
         length = values.__len__()
         for i in range(0, len(ladenDt13_5)):
             if length > 0:
                 if ladenDt13_5[i] == 0:
-                    ##find items !=0
-                    ladenDt13_5[i] = np.sum(values) / length
+                    ladenDt13_5[i] = np.array(
+                        np.sum([numberOfApp13_5[i] * ladenDt13_5[i] for i in range(0, len(numberOfApp13_5))])) / np.sum(
+                        numberOfApp13_5)
                 elif np.isnan(ladenDt13_5[i]):
-                    ladenDt13_5[i] = 0
+                    ladenDt13_5[i] = np.array(
+                        np.sum([numberOfApp13_5[i] * ladenDt13_5[i] for i in range(0, len(numberOfApp13_5))])) / np.sum(
+                        numberOfApp13_5)
 
         values = [k for k in ladenDt10_8 if k != 0]
         length = values.__len__()
         for i in range(0, len(ladenDt10_8)):
             if length > 0:
-                if ladenDt10_8[i] == 0:
-                    ##find items !=0
-                    ladenDt10_8[i] = np.sum(values) / length
-                elif np.isnan(ladenDt10_8[i]):
-                    ladenDt10_8[i] = 0
+                ladenDt10_8[i] = np.array(
+                    np.sum([numberOfApp10_8[i] * ladenDt10_8[i] for i in range(0, len(numberOfApp10_8))])) / np.sum(
+                    numberOfApp10_8)
+            elif np.isnan(ladenDt10_8[i]):
+                ladenDt10_8[i] = np.array(
+                    np.sum([numberOfApp10_8[i] * ladenDt10_8[i] for i in range(0, len(numberOfApp10_8))])) / np.sum(
+                    numberOfApp10_8)
 
         values = [k for k in ladenDt11_8 if k != 0]
         length = values.__len__()
         for i in range(0, len(ladenDt11_8)):
             if length > 0:
-                if ladenDt11_8[i] == 0:
-                    ##find items !=0
-                    ladenDt11_8[i] = np.sum(values) / length
+                if length > 0:
+                    ladenDt11_8[i] = np.array(
+                        np.sum([numberOfApp11_8[i] * ladenDt11_8[i] for i in range(0, len(numberOfApp11_8))])) / np.sum(
+                        numberOfApp11_8)
+                elif np.isnan(ladenDt11_8[i]):
+                    ladenDt11_8[i] = np.array(
+                        np.sum([numberOfApp11_8[i] * ladenDt11_8[i] for i in range(0, len(numberOfApp11_8))])) / np.sum(
+                        numberOfApp11_8)
 
         values = [k for k in ladenDt12_8 if k != 0]
         length = values.__len__()
         for i in range(0, len(ladenDt12_8)):
             if length > 0:
-                if ladenDt12_8[i] == 0:
-                    ##find items !=0
-                    ladenDt12_8[i] = np.sum(values) / length
+                if length > 0:
+                    ladenDt12_8[i] = np.array(
+                        np.sum([numberOfApp12_8[i] * ladenDt12_8[i] for i in range(0, len(numberOfApp12_8))])) / np.sum(
+                        numberOfApp12_8)
+                elif np.isnan(ladenDt12_8[i]):
+                    ladenDt12_8[i] = np.array(
+                        np.sum([numberOfApp12_8[i] * ladenDt12_8[i] for i in range(0, len(numberOfApp12_8))])) / np.sum(
+                        numberOfApp12_8)
 
         values = [k for k in ladenDt13_8 if k != 0]
         length = values.__len__()
         for i in range(0, len(ladenDt13_8)):
             if length > 0:
-                if ladenDt13_8[i] == 0:
-                    ##find items !=0
-                    ladenDt13_8[i] = np.sum(values) / length
+                ladenDt13_8[i] = np.array(
+                    np.sum([numberOfApp13_8[i] * ladenDt13_8[i] for i in range(0, len(numberOfApp13_8))])) / np.sum(
+                    numberOfApp13_8)
+            elif np.isnan(ladenDt13_8[i]):
+                ladenDt13_8[i] = np.array(
+                    np.sum([numberOfApp12_8[i] * ladenDt13_8[i] for i in range(0, len(numberOfApp13_8))])) / np.sum(
+                    numberOfApp13_8)
 
         #####################################################################################################################
         for i in range(0, len(ladenDt10_0)):
