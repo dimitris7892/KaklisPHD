@@ -1176,6 +1176,31 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
 
         return piecewiseFunc
 
+    def evaluateKerasNN1(self, unseenX, unseenY, modeler,output,xs,genericModel,partitionsX , scores):
+        lErrors = []
+
+        from tensorflow import keras
+        path = '.\\'
+        clusters = '30'
+
+        count = 0
+        for iCnt in range(np.shape(unseenX)[0]):
+            pPoint =unseenX[iCnt]
+            pPoint= pPoint.reshape(-1,unseenX.shape[1])
+
+            trueVal = unseenY[iCnt]
+
+            ind, fit = modeler.getBestPartitionForPoint(pPoint, partitionsX)
+
+
+            prediction = (abs(modeler._models[ind].predict(pPoint)) + modeler._models[len(modeler._models) - 1].predict(pPoint) )/ 2
+
+            lErrors.append(abs(prediction - trueVal))
+
+        errors = np.asarray(lErrors)
+
+        return errors, np.mean(errors), np.std(lErrors)
+
     def evaluateKerasNN(self, unseenX, unseenY, modeler,output,xs,genericModel,partitionsX , scores):
         lErrors = []
         vectorWeights = scores
@@ -1271,8 +1296,7 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
             #prediction = abs(modeler._models[ 0 ].predict(XSplineVector))
             #XSplineVector = XSplineGenVector if modeler._models[ind][1]=='GEN' else XSplineVector
             #prediction = (abs(modeler._models[ind].predict(XSplineVector)) + modeler._models[len(modeler._models)-1].predict(XSplineGenVector))/2
-            prediction = (abs(modeler._models[ind].predict(pPoint)) + modeler._models[
-                len(modeler._models) - 1].predict(pPoint) )/ 2
+            prediction = (abs(modeler._models[ind].predict(XSplineVector)) + modeler._models[len(modeler._models) - 1].predict(XSplineGenVector) )/ 2
             #try:
                 #if modeler._models[ ind ][ 1 ] == 'GEN':
             #prediction = modeler._models[ len(modeler._models) - 1 ][ 0 ].predict(XSplineGenVector)
