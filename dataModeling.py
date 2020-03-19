@@ -1261,7 +1261,8 @@ class TensorFlowW1(BasePartitionModeler):
         model2.compile(optimizer=keras.optimizers.Adam(), loss='mse')
         model2.fit(X,Y,epochs=100)
 
-
+        NNmodels=[]
+        scores=[]
 
         for idx, pCurLbl in enumerate(partition_labels):
 
@@ -1306,9 +1307,10 @@ class TensorFlowW1(BasePartitionModeler):
                 # model2 = keras.models.Model(inputs=estimator.layers[2].input, outputs=estimator.layers[-1].output)
 
                 modelCl.compile(optimizer=keras.optimizers.Adam(), loss='mse')
-                modelCl.fit(X, Y, epochs=100)
+                modelCl.fit(partitionsX[idx], np.array(partitionsY[idx]), epochs=100)
 
-
+                Clscore = modelCl.evaluate(np.array(partitionsX[idx]), np.array(partitionsY[idx]), verbose=1)
+                scores.append(Clscore)
                 NNmodels.append(modelCl)
 
                 #self._partitionsPerModel[ estimator ] = partitionsX[idx]
@@ -4197,7 +4199,7 @@ class TensorFlowW(BasePartitionModeler):
         #new_model.compile(loss=keras.losses.mean_squared_error, optimizer=keras.optimizers.Adam(),)#experimental_run_tf_function=False )
         #try:
         estimator.fit(XSplineVector, Y, epochs=100, validation_split=0.33)
-        #score = estimator.evaluate(np.array(XSplineVector),Y, verbose=1)
+        score = estimator.evaluate(np.array(XSplineVector),Y, verbose=1)
         #except:
 
 
@@ -4389,8 +4391,8 @@ class TensorFlowW(BasePartitionModeler):
                 #modelCl.compile(optimizer=keras.optimizers.Adam(), loss='mse')
                 #modelCl.fit(X, Y, epochs=100)
 
-                #Clscore = estimatorCl.evaluate(np.array(XSplineClusterVector), np.array(partitionsY[idx]), verbose=1)
-                #scores.append(Clscore)
+                Clscore = estimatorCl.evaluate(np.array(XSplineClusterVector), np.array(partitionsY[idx]), verbose=1)
+                scores.append(Clscore)
                 #NNmodels.append([estimatorCl,'CL'])
                 NNmodels.append(estimatorCl)
                 #except:
