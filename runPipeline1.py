@@ -49,7 +49,7 @@ def main():
 
     #DANreader.GenericParserForDataExtraction('LAROS','MARMARAS','MT_DELTA_MARIA')
     #DANreader.GenericParserForDataExtraction('LEMAG', 'MILLENIA', 'DOMINIA',driver='ORACLE',server='10.2.5.80',sid='OR12',usr='goldenport',password='goldenport',
-                                             rawData=[],telegrams=True,pathOfRawData='C:/Users/dkaklis/Desktop/danaos')
+                                             #rawData=[],telegrams=True,pathOfRawData='C:/Users/dkaklis/Desktop/danaos')
     #DANreader.readExtractNewDataset('MILLENIA','FANTASIA',';')
     #return
     #DANreader.ExtractLAROSDataset("",'2017-06-01 00:00:00','2019-10-09 15:10:00')
