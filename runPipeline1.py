@@ -323,7 +323,7 @@ def initParameters():
     end = 17000
     startU = 30000
     endU = 31000
-    algs=['NNW']
+    algs=['NNW1']
     # ['SR','LR','RF','NN','NNW','TRI']
 
 
