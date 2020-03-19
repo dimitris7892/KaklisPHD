@@ -48,7 +48,8 @@ def main():
     #DANreader.readLarosDAta(datetime.datetime(2018,1,1),datetime.datetime(2019,1,1))
 
     #DANreader.GenericParserForDataExtraction('LAROS','MARMARAS','MT_DELTA_MARIA')
-    #DANreader.GenericParserForDataExtraction('LEMAG', 'GOLDENPORT', 'TRAMMO LAOURA',driver='ORACLE',server='10.2.5.80',sid='OR12',usr='goldenport',password='goldenport',pathOfRawData='C:/Users/dkaklis/Desktop/danaos')
+    #DANreader.GenericParserForDataExtraction('LEMAG', 'MILLENIA', 'DOMINIA',driver='ORACLE',server='10.2.5.80',sid='OR12',usr='goldenport',password='goldenport',
+                                             rawData=[],telegrams=True,pathOfRawData='C:/Users/dkaklis/Desktop/danaos')
     #DANreader.readExtractNewDataset('MILLENIA','FANTASIA',';')
     #return
     #DANreader.ExtractLAROSDataset("",'2017-06-01 00:00:00','2019-10-09 15:10:00')
@@ -67,8 +68,8 @@ def main():
         elif al=='NN' :modelers.append(dModel.TensorFlow())
         elif al=='TRI' : modelers.append(dModel.TriInterpolantModeler())
         elif al == 'NNW':modelers.append(dModel.TensorFlowW())
-        elif al == 'NNWD':
-            modelers.append(dModel.TensorFlowWD())
+        elif al == 'NNWD':modelers.append(dModel.TensorFlowWD())
+        elif al == 'NNW1':modelers.append(dModel.TensorFlowW1())
 
     partitioners=[]
     for cl in cls:
@@ -115,7 +116,7 @@ def main():
     subsetsX=[subsetsX[0:5]] if len(subsetsX) > 5 else subsetsX
     subsetsY = [ subsetsY[ 0:5 ] ] if len(subsetsY) > 5 else subsetsY
     #K=[10]
-    print(len(subsetsX[0]))
+
     for subsetX, subsetY in zip(subsetsX, subsetsY):
       skip_idxx = random.sample(range((rangeSubs * 1000) + 10, num_lines), 12000)
         # Read the data
@@ -263,6 +264,11 @@ def main():
                         eval.MeanAbsoluteErrorEvaluation(),unseenFeaturesX,
                         unseenFeaturesY,
                         modeler,output, None,None,partitionsX , genericModel)
+                elif modeler.__class__.__name__ == 'TensorFlowW1':
+                    _, meanError, sdError = eval.MeanAbsoluteErrorEvaluation.evaluateKerasNN1(
+                        eval.MeanAbsoluteErrorEvaluation(), unseenFeaturesX,
+                        unseenFeaturesY,
+                        modeler, output, None, None, partitionsX, genericModel)
                 else:
                     if flagEvalTri == False:
                         Errors, meanError, sdError = eval.MeanAbsoluteErrorEvaluation.evaluateTriInterpolant(
