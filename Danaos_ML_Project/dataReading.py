@@ -221,7 +221,39 @@ class BaseSeriesReader:
 
         return (360 + windDir) % 360
 
-    def ConvertToBeaufort(self , ws):
+
+    def ConvertMSToBeaufort(self , ws):
+        wsB = 0
+        if ws >= 0 and ws <0.2:
+            wsB = 0
+        elif ws >= 0.3 and ws <1.5:
+            wsB = 1
+        elif ws >= 1.6 and ws < 3.3:
+            wsB = 2
+        elif ws >= 3.4 and ws < 5.4:
+            wsB = 3
+        elif ws >= 5.5 and ws < 7.9:
+            wsB = 4
+
+        elif ws >= 8 and ws < 10.7:
+            wsB = 5
+        elif ws >= 10.8 and ws < 13.8:
+            wsB = 6
+        elif ws >= 13.9 and ws < 17.1:
+            wsB = 7
+        elif ws >= 17.2 and ws < 20.7:
+            wsB = 8
+        elif ws >= 20.8 and ws < 24.4:
+            wsB = 9
+        elif ws >= 24.5 and ws < 28.4:
+            wsB = 10
+        elif ws >= 28.5 and ws < 32.6:
+            wsB = 11
+        elif ws >= 32.7:
+            wsB = 12
+        return wsB
+
+    def ConvertKNotsToBeaufort(self , ws):
         wsB = 0
         if ws <= 1:
             wsB = 0
@@ -283,7 +315,7 @@ class BaseSeriesReader:
 
         return angle
 
-    def extractRawData(self, newDataSet, telegrams,company):
+    def extractRawData(self, newDataSet, telegrams,companyTlgs,company,vessel):
 
         windDirs = []
         windSpeeds = []
@@ -406,20 +438,132 @@ class BaseSeriesReader:
 
                 return np.array(np.append(telegrams.reshape(-1,16),np.asmatrix([telegrams[:,15].reshape(-1)]).T,axis=1))
 
+        if company == 'OCEAN_GOLD':
+            #dataV = newDataSet
+            #dataV = pd.read_csv('./data/PERSEFONE/PERSEFONE_1-30_06_19.csv')
+            # dataV=dataV.drop([ 't_stamp', 'vessel status' ], axis=1)
+            #dtNew = dataV#.values  # .astype(float)##RAW DATA
+
+            telegrams = telegrams.values#pd.read_csv(company+'/'+vessel+'/TELEGRAMS'+vessel+'.csv', sep='\t')
+            companyTlgs=companyTlgs.values
+
+            for i in range(0, len(newDataSet)):
+
+                datetimeV = str(newDataSet[i, 0])
+                dateV = datetimeV.split(" ")[0]
+                hhMMss = datetimeV.split(" ")[1]
+                month = dateV.split("-")[1]
+                day = dateV.split("-")[2]
+                year = dateV.split("-")[0]
+                tlgDate = year + '-' + month + '-' + day
+                newDate1 = year + '-' + month + '-' + day + " " + ":".join(hhMMss.split(":")[0:2])
+                month = '0' + month if month.__len__() == 1 else month
+                day = '0' + day if day.__len__() == 1 else day
+
+                newDate = year + '-' + month + '-' + day
+                newDate1 = year + '-' + month + '-' + day + " " + ":".join(hhMMss.split(":")[0:2])
+                rpm = newDataSet[i,5]
+                telegramRow = np.array([row for row in telegrams if str(row[0]).split(" ")[0]== tlgDate])
+
+                companyTlgFilteredRows= np.array([row for row in companyTlgs if  month == str(row[1]).split(' ')[0].split('.')[1] and day ==
+                                str(row[1]).split(' ')[0].split('.')[0] and year == str(row[1]).split(' ')[0].split('.')[2]])
+
+                if companyTlgFilteredRows.__len__() > 0:
+
+                    filteredDTWs = [ datetime.datetime.strptime(str(date[:len(date)-1]).split(' ')[0].split('.')[2]+"-"+
+                                    str(date[:len(date)-1]).split(' ')[0].split('.')[1]+"-"+
+                                    str(date[:len(date)-1]).split(' ')[0].split('.')[0] + " " + ":".join(date.split(" ")[1].split(":")[0:2]), '%Y-%m-%d %H:%M') for date in companyTlgFilteredRows[:,1] ] if companyTlgFilteredRows.__len__() > 0 else companyTlgFilteredRows
+
+                    filteredDTWsNum=matplotlib.dates.date2num(filteredDTWs)
+                    newDateNum=matplotlib.dates.date2num(datetime.datetime.strptime(newDate1, '%Y-%m-%d %H:%M'))
+                    min = 100000000000000000
+                    for u in range(0,len(filteredDTWs)):
+                        if (newDateNum - filteredDTWsNum[u]) < min:
+                            min = abs(newDateNum - filteredDTWsNum[u])
+                            minIndx=u
+
+                    ws = companyTlgFilteredRows[minIndx,7]
+                    wd = companyTlgFilteredRows[minIndx, 8]
+
+                    wsTlg=(float(ws.split('m')[0])) if ws != 'No data' else  0
+
+                    wdTlg = float(wd[:len(wd) - 1]) if wd!='No data' else 0
+
+                    windSpeed =self.ConvertMSToBeaufort(wsTlg)
+                    windDir = self.getRelativeDirectionWeatherVessel(vCourse,wdTlg)
+
+
+                foc = newDataSet[i, 11]
+                #if (rpm >= 0 and rpm < 1 or np.isnan(rpm)):
+                    #continue
+
+                lat = float(newDataSet[i, 26])
+
+                lon = float(newDataSet[i, 27])
+
+                vCourse = newDataSet[i, 3]
+                stw = newDataSet[i, 2]
+                if stw > 13:
+                    c=0
+                if companyTlgFilteredRows.__len__()==0:
+                    windSpeed, windDir = self.mapWeatherData(vCourse, newDate1, np.round(lat), np.round(lon))
+                    windSpeed = self.ConvertKNotsToBeaufort(windSpeed)
+                ################IF WEATHER DATA NOT AVAILABLE ON WEATHERSERVER_DEV  OR FROM COMPANYS FLEETVIEW TLGS ==> GET WEATHER DATA FROM DANAOS TELEGRAMS
+                if windDir==0 and windSpeed==0:
+                    windSpeed = telegramRow[0][12]
+                    windSpeed = self.ConvertKNotsToBeaufort(windSpeed)
+                    windDir = telegramRow[0][11]
+                    windDir = self.getRelativeDirectionWeatherVessel(vCourse,windDir)
+
+                windDirs.append(windDir)
+                windSpeeds.append(windSpeed)
+
+                drafts.append(0 if telegramRow.__len__() == 0 else telegramRow[:, 8][0])
+                vCourses.append(vCourse)
+                blFlags.append('nan' if telegramRow.__len__() == 0 else telegramRow[:, 2][0])
+                stws.append(stw)
+
+
+                tlgFoc = 0 if telegramRow.__len__() == 0 else telegramRow[:, 15][0]
+
+                focs.append(foc*24)
+                tlgsFocs.append(tlgFoc)
+
+            drafts = np.nan_to_num(drafts).reshape(-1)
+            # foc = np.array([k for k in newDataSet])[:,8].astype(float).reshape(-1)
+            windSpeeds = np.nan_to_num(windSpeeds).reshape(-1)
+            windDirs = np.nan_to_num(windDirs).reshape(-1)
+            blFlags = np.array(blFlags).reshape(-1)
+            drafts = np.array(drafts).reshape(-1)
+            vCourses = np.array(vCourses).reshape(-1)
+            firstColumn = np.array([0] * len(stws)).reshape(-1, 1)
+            otherColumns = np.array([0] * len(stws)).reshape(-1)
+            newDataSet = np.array(
+                np.append(firstColumn, np.asmatrix(
+                    [vCourses, blFlags, otherColumns, otherColumns, otherColumns, otherColumns, otherColumns, drafts,
+                     otherColumns, windDirs, windSpeeds, stws,
+                     otherColumns, otherColumns, focs, tlgsFocs]).T, axis=1))
+
+
+
+
+            x = 0
+
         return newDataSet
 
 
 
-    def GenericParserForDataExtraction(self,systemType, company, vessel ,driver=None,server=None,sid=None,usr=None,password=None,rawData=None,telegrams=None ,fileType=None, granularity=None, fileName=None,
+    def GenericParserForDataExtraction(self,systemType, company, vessel ,driver=None,server=None,sid=None,usr=None,password=None,rawData=None,telegrams=None,companyTelegrams=None,seperator=None ,fileType=None, granularity=None, fileName=None,
                                        pathOfRawData=None):
         if systemType=='LEMAG':
 
             path = '/home/dimitris/Desktop/template.xlsx'
-            path2 = 'C:/Users/dkaklis/Desktop/template.xlsx'
-            #data = pd.read_csv('./data/' + company + '/mappedData.csv')
+            #path2 = 'C:/Users/dkaklis/Desktop/template.xlsx'
+            #data = pd.read_csv('./data/' + company +'/'+vessel +'/mappedData.csv')
             #newDataSet = data.values
 
             #self.fillExcelProfCons(vessel, path, newDataSet)
+
             dataSet=[]
             if rawData:
                 path = './data/' + company + '/' + vessel+'/'
@@ -428,21 +572,29 @@ class BaseSeriesReader:
                     shutil.copytree(pathOfRawData, path)
                 dataSet = []
                 for infile in  sorted(glob.glob(path+'*.csv')):
-                    data = pd.read_csv(infile, sep=';', decimal='.',skiprows=1)
+                    data = pd.read_csv(infile, sep=',', decimal='.',skiprows=1)
                     dataSet.append(data.values)
                     print(str(infile))
                 dataSet = np.concatenate(dataSet)
 
             ##########################################################
             if telegrams:
-                my_file = Path('./data/'+company+'/TELEGRAMS/'+vessel+'.csv')
+                my_file = Path('./data/'+company+'/'+vessel+'/TELEGRAMS/'+vessel+'.csv')
                 if my_file.is_file() == False:
                     self.GenericParserForDataExtraction('TELEGRAMS', company, vessel,driver,server,sid,usr,password)
-                    tlgs = pd.read_csv('./data/' + company + '/TELEGRAMS/' + vessel + '.csv',sep=';')
+                    tlgs = pd.read_csv('./data/'+company+'/'+vessel+'/TELEGRAMS/'+vessel+'.csv',sep=';')
                 else:
-                    tlgs = pd.read_csv('./data/' + company + '/TELEGRAMS/' + vessel + '.csv',sep=';')
+                    tlgs = pd.read_csv('./data/'+company+'/'+vessel+'/TELEGRAMS/'+vessel+'.csv',sep=';')
 
-                telegrams = tlgs.values
+                telegrams = tlgs#.values
+
+            if companyTelegrams:
+                #my_file = Path('./data/' + company + '/TELEGRAMS/' + companyTlgFIle + '.csv')
+
+                companyTlgs = pd.read_excel('./data/' + company + '/' + vessel + '/Penelope TrackReport.xls')
+                #CompanyTlgs = pd.read_csv('./data/' + company + '/TELEGRAMS/' + companyTlgFIle + '.csv', sep=';')
+
+                companyTelegrams = companyTlgs#.values
 
 
             #for k in  range(0,len(dataSet)):
@@ -452,15 +604,16 @@ class BaseSeriesReader:
                    #row = dataSet[k][i]
                    #newDataSet.append(dataSet[k][i])
             ##WRITE NEWDATASET IN A CSV
-            newDataSet = self.extractRawData(dataSet,telegrams,company)
+            newDataSet = self.extractRawData(dataSet,telegrams,companyTelegrams,company,vessel)
 
-            with open('./data/' + company + '/mappedData.csv', mode='w') as data:
+            with open('./data/' + company +'/'+vessel+'/mappedData.csv', mode='w') as data:
                 data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
                 for i in range(0, len(newDataSet)):
                     data_writer.writerow(
                         [0, newDataSet[i][1], newDataSet[i][2], 0, 0, 0, 0, 0, newDataSet[i][8], 0, newDataSet[i][10],
                          newDataSet[i][11], newDataSet[i][12], 0, 0, newDataSet[i][15], newDataSet[i][16]])
 
+            return
             self.fillExcelProfCons(vessel, path, newDataSet)
             #while endYear <= endYear and startDay<=endDay and startMonth<=endMonth:
                 #data = pd.read_csv('./data/' + company + '/' + vessel +'SEEAmag '+startYear+'.'+startMonth+'.'+startDay+'.csv', sep=';', decimal='.')
@@ -469,9 +622,9 @@ class BaseSeriesReader:
 
             if driver=='ORACLE':
                 #cx_Oracle.connect('millenia@/10.2.5.80:1521/OR11')
-                my_file = Path('./data/'+company+'/TELEGRAMS/'+vessel+'.csv')
+                my_file = Path('./data/'+company+'/'+vessel+'/TELEGRAMS/'+vessel+'.csv')
                 if my_file.is_file()==False:
-                    if os.path.isdir('./data/'+company+'/TELEGRAMS/') == False:
+                    if os.path.isdir('./data/'+company+'/'+vessel+'/TELEGRAMS/') == False:
                         Path('./data/'+company+'/TELEGRAMS/').mkdir(parents=True, exist_ok=True)
 
                     dsn = cx_Oracle.makedsn(
@@ -488,13 +641,15 @@ class BaseSeriesReader:
 
                     cursor_myserver = connection.cursor()
 
-                    cursor_myserver.execute('SELECT VESSEL_CODE FROM VESSEL_DATA WHERE VESSEL_NAME =  '"'" + vessel + "'"'  ')
+                    cursor_myserver.execute('SELECT VESSEL_CODE FROM VESSEL_DATA WHERE VESSEL_NAME =  '"'" + vessel + "'"' OR VESSEL_SHORT_NAME='"'" + vessel + "'"'   ')
+                    #if cursor_myserver.fetchall().__len__() > 0:
                     for row in cursor_myserver.fetchall():
-                        vessel_code = row[0]
+                            vessel_code = row[0]
+                    #else: vessel_code = vCode
                     cursor_myserver.execute(
                         'SELECT  TELEGRAM_DATE , TELEGRAM_TYPE,BALAST_FLAG,LATITUDE_DEGREES , LATITUDE_SECONDS ,LONGITUDE_DEGREES , LONGITUDE_SECONDS ,vessel_course,(DRAFT_AFT + DRAFT_FORE)/2 as DRAFT , ENGINE_RPM , WIND_DIRECTION , WIND_FORCE  ,AVERAGE_SPEED ,hours_slc,minutes_slc, (( NVL(ME_HSFO_CONS,0)+ NVL(ME_LSFO_CONS,0)+ NVL(ME_HSDO_CONS,0 ) + NVL(ME_LSDO_CONS,0)))   as ME_CONS_24h  FROM TELEGRAMS where vessel_code = '"'" + vessel_code + "'" 'AND (TELEGRAM_TYPE='"'D'"' or telegram_type='"'N'"' or telegram_type='"'A'"' ) ')
 
-                    with open('./data/'+company+'/TELEGRAMS/'+vessel+'.csv', mode='w') as data:
+                    with open('./data/'+company+'/'+vessel+'/TELEGRAMS/'+vessel+'.csv', mode='w') as data:
                         data_writer = csv.writer(data, delimiter=';', quotechar='"', quoting=csv.QUOTE_MINIMAL)
                         data_writer.writerow(['TELEGRAM_DATE','TELEGRAM_TYPE','BALAST_FLAG','LATITUDE_DEGREES','LATITUDE_SECONDS','LONGITUDE_DEGREES','LONGITUDE_SECONDS','VESSEL_COURSE','DRAFT','ENGINE_RPM','WIND_DIRECTION','WIND_FORCE','AVERAGE_SPEED','HOURS_SLC','MINUTES_SLC','ME_CONS_24H'])
 
@@ -1092,7 +1247,7 @@ class BaseSeriesReader:
         dbDate = year + month + day + h
         #####END WEATHER HISTORY DB NAME
 
-        connWEATHERHISTORY = pyodbc.connect('DRIVER={SQL Server};SERVER=WEATHERSERVER_DEV;'
+        connWEATHERHISTORY = pyodbc.connect('DRIVER={/opt/microsoft/msodbcsql17/lib64/libmsodbcsql-17.5.so.2.1};SERVER= 10.2.4.54;'
                                             'DATABASE=WeatherHistoryDB;'
                                             'UID=sa;'
                                             'PWD=sa1!')
@@ -1268,6 +1423,17 @@ class BaseSeriesReader:
         vel1Max = np.floor(np.max(sorted[1]))+0.5
         vel2Max =np.floor(np.max(sorted[2]))+0.5
         vel3Max = np.floor(np.max(sorted[3]))+0.5
+
+        vel0Min = 9.5
+        vel1Min = 10.5
+        vel2Min = 11.5
+        vel3Min = 12.5
+
+        vel0Max = 10.5
+        vel1Max = 11.7
+        vel2Max = 12.7
+        vel3Max = 14
+
 
         ####VESSEL BASIC INFO
         workbook._sheets[2]['B6']  = vel0Max
@@ -2134,27 +2300,32 @@ class BaseSeriesReader:
                     ballastDt13_8[i] = ballastDt13_8[i] + 0.1 * ballastDt13_8[i]
         # 1!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!#1!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         # 1!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!#1!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        if (np.array(ballastDt10_0)==0).all():
+            ballastDt10_0= np.array(ballastDt10_3) - 1 if(np.array(ballastDt10_3)!=0).any() else np.array(ballastDt10_5) - 2
         for i in range(9, 14):
             ballastDt10_0[0] = ballastDt10_0[0] + 1 if ballastDt10_0[0] <= ballastDt10_0[4] else ballastDt10_0[0]
             ballastDt10_0[2] = ballastDt10_0[2] + 1 if ballastDt10_0[2] <= ballastDt10_0[3] else ballastDt10_0[2]
             workbook._sheets[2]['B' + str(i)] = round(ballastDt10_0[i - 9], 2)
 
             ##TREAT outliers / missing values for ballastt values
-
+        if (np.array(ballastDt10_3)==0).all():
+            ballastDt10_3= np.array(ballastDt10_5) - 1 if(np.array(ballastDt10_5)!=0).any() else np.array(ballastDt10_8) - 3
         for i in range(9, 14):
             ballastDt10_3[0] = ballastDt10_3[0] + 1 if ballastDt10_3[0] <= ballastDt10_3[4] else ballastDt10_3[0]
             ballastDt10_3[2] = ballastDt10_3[2] + 1 if ballastDt10_3[2] <= ballastDt10_3[3] else ballastDt10_3[2]
             workbook._sheets[2]['C' + str(i)] = round(ballastDt10_3[i - 9], 2)
 
             ##TREAT outliers / missing values for ballastt values
-
+        if (np.array(ballastDt10_5) == 0).all():
+            ballastDt10_5 = np.array(ballastDt10_8) - 1.5 if (np.array(ballastDt10_8) != 0).any() else np.array(ballastDt10_3) + 1
         for i in range(9, 14):
             ballastDt10_5[0] = ballastDt10_5[0] + 1 if ballastDt10_5[0] <= ballastDt10_5[4] else ballastDt10_5[0]
             ballastDt10_5[2] = ballastDt10_5[2] + 1 if ballastDt10_5[2] <= ballastDt10_5[3] else ballastDt10_5[2]
             workbook._sheets[2]['D' + str(i)] = round(ballastDt10_5[i - 9], 2)
 
             ##TREAT outliers / missing values for ballastt values
-
+        if (np.array(ballastDt10_8) == 0).all():
+            ballastDt10_8 = np.array(ballastDt10_5) + 2 if (np.array(ballastDt10_5) != 0).any() else np.array(ballastDt10_3) + 3
         for i in range(9, 14):
             ballastDt10_8[0] = ballastDt10_8[0] + 1 if ballastDt10_8[0] <= ballastDt10_8[4] else ballastDt10_8[0]
             ballastDt10_8[2] = ballastDt10_8[2] + 1 if ballastDt10_8[2] <= ballastDt10_8[3] else ballastDt10_8[2]
@@ -3166,28 +3337,32 @@ class BaseSeriesReader:
                     else:
                         ladenDt13_8[i] = ladenDt13_8[i] + 0.1 * ladenDt13_8[i]
         # 1!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!#1!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
+        if (np.array(ladenDt10_0)==0).all():
+            ladenDt10_0= np.array(ladenDt10_3) -1 if(np.array(ladenDt10_0)!=0).any() else np.array(ladenDt10_5) -2
         for i in range(9, 14):
             ladenDt10_0[0] = ladenDt10_0[0] + 1 if ladenDt10_0[0] <= ladenDt10_0[4] else ladenDt10_0[0]
             ladenDt10_0[2] = ladenDt10_0[2] + 1 if ladenDt10_0[2] <= ladenDt10_0[3] else ladenDt10_0[2]
             workbook._sheets[1]['B' + str(i)] = round(ladenDt10_0[i - 9], 2)
 
             ##TREAT outliers / missing values for ladent values
-
+        if (np.array(ladenDt10_3)==0).all():
+            ladenDt10_3= np.array(ladenDt10_5) -1 if(np.array(ladenDt10_5)!=0).any() else np.array(ladenDt10_8) -2
         for i in range(9, 14):
             ladenDt10_3[0] = ladenDt10_3[0] + 1 if ladenDt10_3[0] <= ladenDt10_3[4] else ladenDt10_3[0]
             ladenDt10_3[2] = ladenDt10_3[2] + 1 if ladenDt10_3[2] <= ladenDt10_3[3] else ladenDt10_3[2]
             workbook._sheets[1]['C' + str(i)] = round(ladenDt10_3[i - 9], 2)
 
             ##TREAT outliers / missing values for ladent values
-
+        if (np.array(ladenDt10_5)==0).all():
+            ladenDt10_5= np.array(ladenDt10_8) -1 if(np.array(ladenDt10_8)!=0).any() else np.array(ladenDt10_3) + 1
         for i in range(9, 14):
             ladenDt10_5[0] = ladenDt10_5[0] + 1 if ladenDt10_5[0] <= ladenDt10_5[4] else ladenDt10_5[0]
             ladenDt10_5[2] = ladenDt10_5[2] + 1 if ladenDt10_5[2] <= ladenDt10_5[3] else ladenDt10_5[2]
             workbook._sheets[1]['D' + str(i)] = round(ladenDt10_5[i - 9], 2)
 
             ##TREAT outliers / missing values for ladent values
-
+        if (np.array(ladenDt10_8)==0).all():
+            ladenDt10_8= np.array(ladenDt10_5) + 1 if(np.array(ladenDt10_5)!=0).any() else np.array(ladenDt10_3) + 3
         for i in range(9, 14):
             ladenDt10_8[0] = ladenDt10_8[0] + 1 if ladenDt10_8[0] <= ladenDt10_8[4] else ladenDt10_8[0]
             ladenDt10_8[2] = ladenDt10_8[2] + 1 if ladenDt10_8[2] <= ladenDt10_8[3] else ladenDt10_8[2]
@@ -3811,35 +3986,30 @@ class BaseSeriesReader:
             relWindSpeeds = [ ]
             relWindDirs = [ ]
             for i in range(0, len(Vcourse)):
-                x = np.array([ Vstw[ i ] * 0.514, Vcourse[ i ] ])
-                y = np.array([ windSpeed[ i ], windDir[ i ] ])
+                #x = np.array([ Vstw[ i ] * 0.514, Vcourse[ i ] ])
+                #y = np.array([ windSpeed[ i ], windDir[ i ] ])
                 ##convert cartesian coordinates to polar
-                x = np.array([ x[ 0 ] * np.cos(x[ 1 ]), x[ 0 ] * np.sin(x[ 1 ]) ])
+                #x = np.array([ x[ 0 ] * np.cos(x[ 1 ]), x[ 0 ] * np.sin(x[ 1 ]) ])
 
-                y = np.array([ y[ 0 ] * np.cos(y[ 1 ]), y[ 0 ] * np.sin(y[ 1 ]) ])
+                #y = np.array([ y[ 0 ] * np.cos(y[ 1 ]), y[ 0 ] * np.sin(y[ 1 ]) ])
 
-                x_norm = np.sqrt(sum(x ** 2))
+                #x_norm = np.sqrt(sum(x ** 2))
 
                 # Apply the formula as mentioned above
                 # for projecting a vector onto the orthogonal vector n
                 # find dot product using np.dot()
-                proj_of_y_on_x = (np.dot(y, x) / x_norm ** 2) * x
+                #proj_of_y_on_x = (np.dot(y, x) / x_norm ** 2) * x
 
                 # vecproj =  np.dot(y, x) / np.dot(y, y) * y
-                relWindSpeed = proj_of_y_on_x[ 0 ] + windSpeed[ i ]
-                if relWindSpeed > 40:
-                    d = 0
-                relDir = windDir[ i ] - Vcourse[ i ]
-                relDir += 360 if relDir < 0 else relDir
+                #relWindSpeed = proj_of_y_on_x[ 0 ] + windSpeed[ i ]
+                relDir = self.getRelativeDirectionWeatherVessel(Vcourse[i],windDir[i])
                 relWindDirs.append(relDir)
-                relWindSpeeds.append(relWindSpeed)
+                relWindSpeeds.append(windSpeed[i])
             newMappedData = np.array(
                 np.append(newDataset,
 
                           np.asmatrix([ np.array(relWindSpeeds), np.array(relWindDirs), np.array(draftsVmapped).reshape(-1),
-                                        np.array(ballastLadenFlagsVmapped)[ 0:len(draftsVmapped) ] ]).T,
-
-                          axis=1))  # .astype(float)
+                                        np.array(ballastLadenFlagsVmapped)[ 0:len(draftsVmapped)] ]).T , axis=1))  # .astype(float)
 
             #####################
             ############################MAP TELEGRAM DATES FOR DRAFT
