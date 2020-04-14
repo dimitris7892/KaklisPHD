@@ -15,10 +15,14 @@ import pandas as pd
 import random
 from sklearn.decomposition import PCA
 import datetime
-
+import csv
+import tensorflow as tf
 
 def main():
     # Init parameters based on command line
+
+
+
     end, endU, history, future,sFile, start, startU , algs , cls = initParameters()
     # Load data
     if len(sys.argv) >1:
@@ -43,13 +47,15 @@ def main():
     reader = dRead.BaseSeriesReader()
 
     DANreader = DANdRead.BaseSeriesReader()
+
+
     #DANreader.GenericParserForDataExtraction('LAROS', 'MARMARAS', 'MT_DELTA_MARIA')
     #DANreader = DANRead.BaseSeriesReader()
     #DANreader.readLarosDAta(datetime.datetime(2018,1,1),datetime.datetime(2019,1,1))
 
     #DANreader.GenericParserForDataExtraction('LAROS','MARMARAS','MT_DELTA_MARIA')
-    #DANreader.GenericParserForDataExtraction('LEMAG', 'MILLENIA', 'DOMINIA',driver='ORACLE',server='10.2.5.80',sid='OR12',usr='goldenport',password='goldenport',
-                                             #rawData=[],telegrams=True,companyTelegrams=True,pathOfRawData='C:/Users/dkaklis/Desktop/danaos')
+    #DANreader.GenericParserForDataExtraction('LEMAG', 'MILLENIA', 'FANTASIA',driver='ORACLE',server='10.2.5.80',sid='OR11',usr='millenia',password='millenia',
+                                             #rawData=[],telegrams=True,companyTelegrams=False,pathOfRawData='C:/Users/dkaklis/Desktop/danaos')
 
     #DANreader.GenericParserForDataExtraction('LEMAG', 'OCEAN_GOLD', 'PENELOPE',driver='ORACLE',server='10.2.5.80',sid='OR11',usr='oceangold',password='oceangold',
         #rawData=True,telegrams=True,companyTelegrams=True,seperator='\t',pathOfRawData='C:/Users/dkaklis/Desktop/danaos')
@@ -74,6 +80,7 @@ def main():
         elif al == 'NNW':modelers.append(dModel.TensorFlowW())
         elif al == 'NNWD':modelers.append(dModel.TensorFlowWD())
         elif al == 'NNW1':modelers.append(dModel.TensorFlowW1())
+        elif al == 'NNWCA':modelers.append(dModel.TensorFlowCA())
 
     partitioners=[]
     for cl in cls:
@@ -103,7 +110,7 @@ def main():
         subsetsB.append(targetB)
         var.append(np.var(seriesX))
 
-        if len(subsetsX)>=1:
+        if len(subsetsX)>=5:
             break
     #subsetsX=[subsetsX[0]]
     #subsetsY=[subsetsY[0]]
@@ -115,7 +122,7 @@ def main():
     histTr=[]
     counter=0
 
-    K = range(1,12)
+    K = range(1,31)
     print("Number of Statistically ind. subsets for training: " + str(len(subsetsX)))
     subsetsX=[subsetsX[0:5]] if len(subsetsX) > 5 else subsetsX
     subsetsY = [ subsetsY[ 0:5 ] ] if len(subsetsY) > 5 else subsetsY
@@ -129,8 +136,8 @@ def main():
       for modeler in modelers:
         for partitioner in partitioners:
            if partitioner.__class__.__name__=='DelaunayTriPartitioner':
-                 partK=[0.5]
-                 #np.linspace(0.1,1,11)
+                 partK=np.linspace(0.2,1,11)#[0.5]
+                 #np.linspace(0.2,1,11)
                      #[0.6]
            if partitioner.__class__.__name__=='KMeansPartitioner':
                if modeler.__class__.__name__=='TriInterpolantModeler' or modeler.__class__.__name__ == 'TensorFlow':
@@ -327,12 +334,12 @@ def initParameters():
     end = 17000
     startU = 30000
     endU = 31000
-    algs=['NNW1']
+    algs=['NNWCA']
     # ['SR','LR','RF','NN','NNW','TRI']
 
 
         #['SR','LR','RF','NN','NNW','TRI']
-    cls=['KM']
+    cls=['DC']
     #['SR','LR','RF','NN'] algs
     #['KM','DC'] clusterers / cls
 
