@@ -110,7 +110,7 @@ def main():
         subsetsB.append(targetB)
         var.append(np.var(seriesX))
 
-        if len(subsetsX)>=5:
+        if len(subsetsX)>=1:
             break
     #subsetsX=[subsetsX[0]]
     #subsetsY=[subsetsY[0]]
@@ -122,7 +122,7 @@ def main():
     histTr=[]
     counter=0
 
-    K = range(1,31)
+    K = range(1,3)
     print("Number of Statistically ind. subsets for training: " + str(len(subsetsX)))
     subsetsX=[subsetsX[0:5]] if len(subsetsX) > 5 else subsetsX
     subsetsY = [ subsetsY[ 0:5 ] ] if len(subsetsY) > 5 else subsetsY
@@ -136,7 +136,7 @@ def main():
       for modeler in modelers:
         for partitioner in partitioners:
            if partitioner.__class__.__name__=='DelaunayTriPartitioner':
-                 partK=np.linspace(0.2,1,11)#[0.5]
+                 partK=np.linspace(0.7,1,4)#[0.5]
                  #np.linspace(0.2,1,11)
                      #[0.6]
            if partitioner.__class__.__name__=='KMeansPartitioner':
@@ -300,8 +300,7 @@ def main():
                         #(varExpl)) + " %")
                 # # Evaluate performance
                 numOfclusters= len(partitionsX)
-                if partitioner.__class__.__name__ == 'DelaunayTriPartitioner' and numOfclusters==1:
-                    break
+
                 clusters.append(numOfclusters)
                 varTr.append(np.var(subsetX))
                 if modeler.__class__.__name__  != 'TriInterpolantModeler':
@@ -321,6 +320,8 @@ def main():
                 error["errors"].append(err)
                 if modeler.__class__.__name__ == 'TriInterpolantModeler' and numOfclusters==1:
                     break
+                if partitioner.__class__.__name__ == 'DelaunayTriPartitioner' and numOfclusters==1:
+                    break
 
 
     eval.MeanAbsoluteErrorEvaluation.ANOVAtest(eval.MeanAbsoluteErrorEvaluation(), clusters, varTr, errors,models,part)
@@ -334,12 +335,12 @@ def initParameters():
     end = 17000
     startU = 30000
     endU = 31000
-    algs=['NNWCA']
+    algs=['NNW1']
     # ['SR','LR','RF','NN','NNW','TRI']
 
 
         #['SR','LR','RF','NN','NNW','TRI']
-    cls=['DC']
+    cls=['KM']
     #['SR','LR','RF','NN'] algs
     #['KM','DC'] clusterers / cls
 
