@@ -1,6 +1,6 @@
 import dataReading as dRead
 #from Danaos_ML_Project import dataReading as DANdRead ##   NEWWWW
-#import  Danaos_ML_Project.dataReading as DANdRead
+import  Danaos_ML_Project.dataReading as DANdRead
 import featureCalculation as fCalc
 import dataReadingD as DANRead
 import dataPartitioning as dPart
@@ -46,7 +46,7 @@ def main():
     subsetsB=[]
     reader = dRead.BaseSeriesReader()
 
-    #DANreader = DANdRead.BaseSeriesReader()
+    DANreader = DANdRead.BaseSeriesReader()
 
 
     #DANreader.GenericParserForDataExtraction('LAROS', 'MARMARAS', 'MT_DELTA_MARIA')
@@ -143,7 +143,7 @@ def main():
                if modeler.__class__.__name__=='TriInterpolantModeler' or modeler.__class__.__name__ == 'TensorFlow':
                  partK =K
                else:
-                 partK=K
+                 partK=[2]
            error = {"errors": [ ]}
            #random.seed(1)
 
@@ -300,6 +300,7 @@ def main():
                         #(varExpl)) + " %")
                 # # Evaluate performance
                 numOfclusters= len(partitionsX)
+
                 clusters.append(numOfclusters)
                 varTr.append(np.var(subsetX))
                 if modeler.__class__.__name__  != 'TriInterpolantModeler':
@@ -319,9 +320,8 @@ def main():
                 error["errors"].append(err)
                 if modeler.__class__.__name__ == 'TriInterpolantModeler' and numOfclusters==1:
                     break
-		if partitioner.__class__.__name__ == 'DelaunayTriPartitioner':
+                if partitioner.__class__.__name__ == 'DelaunayTriPartitioner' and numOfclusters==1:
                     break
-
 
 
     eval.MeanAbsoluteErrorEvaluation.ANOVAtest(eval.MeanAbsoluteErrorEvaluation(), clusters, varTr, errors,models,part)
@@ -335,12 +335,12 @@ def initParameters():
     end = 17000
     startU = 30000
     endU = 31000
-    algs=['NNWCA']
+    algs=['NNW1']
     # ['SR','LR','RF','NN','NNW','TRI']
 
 
         #['SR','LR','RF','NN','NNW','TRI']
-    cls=['DC']
+    cls=['KM']
     #['SR','LR','RF','NN'] algs
     #['KM','DC'] clusterers / cls
 
