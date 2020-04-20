@@ -318,7 +318,8 @@ def main():
                 err["error"] = meanError
                 err["k"]=k
                 error["errors"].append(err)
-                if modeler.__class__.__name__ == 'TriInterpolantModeler' and numOfclusters==1:
+                if modeler.__class__.__name__ == 'TriInterpolantModeler' and numOfclusters==1 or modeler.__class__.__name__ == 'TriInterpolantModeler' \
+                        and partitioner.__class__.__name__ == 'DelaunayTriPartitioner':
                     break
                 if partitioner.__class__.__name__ == 'DelaunayTriPartitioner' and numOfclusters==1:
                     break
