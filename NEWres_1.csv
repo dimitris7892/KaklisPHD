@@ -1,2 +1,15 @@
-clusters,var,error,partitioners,models
-4,49.51682634011101,1.9581563472747803,DelaunayTriPartitioner,TensorFlowCA
+clusters,error,models,partitioners,var
+2,2.5512373088217988,SplineRegressionModeler,KMeansPartitioner,49.51682634011101
+1,2.84114509731795,SplineRegressionModeler,DelaunayTriPartitioner,49.51682634011101
+2,1.6909105710925727,LinearRegressionModeler,KMeansPartitioner,49.51682634011101
+1,1.7474774908013366,LinearRegressionModeler,DelaunayTriPartitioner,49.51682634011101
+2,2.847237982032193,RandomForestModeler,KMeansPartitioner,49.51682634011101
+1,2.858424870466322,RandomForestModeler,DelaunayTriPartitioner,49.51682634011101
+2,1.693282961845398,TensorFlowW,KMeansPartitioner,49.51682634011101
+1,1.7465959787368774,TensorFlowW,DelaunayTriPartitioner,49.51682634011101
+2,1.6654754877090454,TensorFlowW1,KMeansPartitioner,49.51682634011101
+1,1.7303848266601562,TensorFlowW1,DelaunayTriPartitioner,49.51682634011101
+2,4.273599147796631,TensorFlowCA,KMeansPartitioner,49.51682634011101
+1,1.9515271186828613,TensorFlowCA,DelaunayTriPartitioner,49.51682634011101
+1,3.4028899254716487,Analytical method,KMeansPartitioner,49.51682634011101
+1,3.2763789691811103,Analytical method,DelaunayTriPartitioner,49.51682634011101
