@@ -926,8 +926,10 @@ class TensorFlowW1(BasePartitionModeler):
             #create model
             model = keras.models.Sequential()
 
-            model.add(keras.layers.Dense(len(partition_labels) +20, input_shape=(2,)))
-            model.add(keras.layers.Dense(len(partition_labels) +10, input_shape=(2,)))
+            model.add(keras.layers.Dense(len(partition_labels), input_shape=(2,)))
+            #model.add(keras.layers.Dense(len(partition_labels), input_shape=(2,)))
+            model.add(keras.layers.Dense(len(partition_labels)+5, input_shape=(2,)))
+            model.add(keras.layers.Dense(len(partition_labels) + 10, input_shape=(2,)))
             model.add(keras.layers.Dense(len(partition_labels), input_shape=(2,)))
             #model.add(keras.layers.Dense(len(partition_labels) * 2, input_shape=(2,)))
             #model.add(keras.layers.Dense(len(partition_labels), input_shape=(2,)))
@@ -944,7 +946,7 @@ class TensorFlowW1(BasePartitionModeler):
             #model.add(keras.layers.Activation(custom_activation))
             #model.add(keras.layers.Activation('linear'))  # activation=custom_activation
             # Compile model
-            model.compile(loss='mse' , optimizer=keras.optimizers.Adam())
+            model.compile(loss=keras.losses.mean_squared_error, optimizer=keras.optimizers.Adam())
             return model
 
 
@@ -1441,7 +1443,7 @@ class TensorFlowW1(BasePartitionModeler):
 
         self.flagGen=False
 
-        estimator = baseline_model()
+        estimator = baseline_modelDeepCl()
         XSplineVector=[]
         velocities = []
         vectorWeights=[]
@@ -1457,29 +1459,31 @@ class TensorFlowW1(BasePartitionModeler):
         weights1 = estimator.layers[0].get_weights()[0][1]
         weights = np.array(np.append(weights0.reshape(-1,1),np.asmatrix(weights0).reshape(-1,1),axis=1).reshape(2,-1))
 
-        estimator.layers[0].set_weights([weights, np.array([0] * (genModelKnots-1))])
+        #estimator.layers[0].set_weights([weights, np.array([0] * (genModelKnots-1))])
 
-        estimator.fit(X, Y, epochs=100, validation_split=0.33)
+        estimator.fit(X, X, epochs=100)
 
         self.flagGen = True
-
+        from scipy.special import softmax
         #estimatorD = baseline_modelDeepCl()
         # dataUpdatedX = np.append(partitionsX, np.asmatrix([partitionsY]).T, axis=1)
 
-        input_img = keras.layers.Input(shape=(2,), name='input')
-        x = input_img
+        #input_img = keras.layers.Input(shape=(2,), name='input')
+        #x = input_img
         # internal layers in encoder
         #for i in range(n_stacks - 1):
-        x =estimator.layers[ 2 ](x)
+        #x =estimator.layers[ 2 ](x)
 
         #estimatorD.fit(X, Y, epochs=100)
         #keras.models.Model(inputs= keras.layers.Dense(input(estimator.layers[2].input)), outputs=estimator.layers[-1].output)
-        model2 = keras.models.Model(inputs=input_img, outputs=x)
+        #model2 = keras.models.Model(inputs=input_img, outputs=x)
         #model2 = keras.models.Model(inputs=estimator.layers[2].input, outputs=estimator.layers[-1].output)
-
-        model2.compile(optimizer=keras.optimizers.Adam(), loss='mse')
-        model2.fit(X,Y,epochs=100)
-
+        #model2 = estimator.layers[-2]
+        model2 =keras.models.Model(inputs=estimator.input, outputs=estimator.layers[-2].output)
+        model2.compile(optimizer=keras.optimizers.Adam(), loss= keras.losses.categorical_crossentropy)
+        #model2.fit(X,X,epochs=20)
+        labels =np.unique(np.argmax(model2.predict(X),axis=1))
+        print(labels)
         NNmodels=[]
         scores=[]
 
@@ -1516,7 +1520,7 @@ class TensorFlowW1(BasePartitionModeler):
                 estimatorCl.layers[ 0 ].set_weights([ weights, np.array([0]*(numOfNeurons-1))])
                     #modelId=idx
 
-                estimatorCl.fit(partitionsX[idx], np.array(partitionsY[idx]),epochs=100)  # validation_split=0.33
+                #estimatorCl.fit(partitionsX[idx], np.array(partitionsY[idx]),epochs=100)  # validation_split=0.33
 
                 x = input_img
 
@@ -1526,7 +1530,7 @@ class TensorFlowW1(BasePartitionModeler):
                 # model2 = keras.models.Model(inputs=estimator.layers[2].input, outputs=estimator.layers[-1].output)
 
                 modelCl.compile(optimizer=keras.optimizers.Adam(), loss='mse')
-                modelCl.fit(partitionsX[idx], np.array(partitionsY[idx]), epochs=100)
+                #modelCl.fit(partitionsX[idx], np.array(partitionsY[idx]), epochs=100)
 
                 Clscore = modelCl.evaluate(np.array(partitionsX[idx]), np.array(partitionsY[idx]), verbose=1)
                 scores.append(Clscore)
@@ -2919,7 +2923,7 @@ class TensorFlowW(BasePartitionModeler):
 
             model.add(keras.layers.Dense(genModelKnots-1, input_shape=(2+genModelKnots-1,)))
                                          #
-
+            model.add(keras.layers.Dense(2, ))
 
             model.add(keras.layers.Dense(1,))
 
