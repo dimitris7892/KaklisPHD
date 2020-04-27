@@ -6,6 +6,7 @@ import dataReadingD as DANRead
 import dataPartitioning as dPart
 import dataModeling as dModel
 import evaluation as eval
+import plotResults as plotRes
 import numpy as np
 from math import sqrt
 import sys
@@ -143,7 +144,7 @@ def main():
                if modeler.__class__.__name__=='TriInterpolantModeler' or modeler.__class__.__name__ == 'TensorFlow':
                  partK =K
                else:
-                 partK=[2]
+                 partK=[10]
            error = {"errors": [ ]}
            #random.seed(1)
 
@@ -219,7 +220,7 @@ def main():
                 unseenY=[]
                 if modeler.__class__.__name__!= 'TriInterpolantModeler' :
                             #and modeler.__class__.__name__ != 'TensorFlow':
-                    modelMap, model2,scores, output,genericModel = modeler.createModelsFor(partitionsX, partitionsY, partitionLabels,None,X,Y)
+                    modelMap, history,scores, output,genericModel = modeler.createModelsFor(partitionsX, partitionsY, partitionLabels,None,X,Y)
                             #, genericModel , partitionsXDC
                     #if modeler.__class__.__name__ != 'TensorFlow':
                         #modelMap = dict(zip(partitionLabels, modelMap))
@@ -300,6 +301,8 @@ def main():
                         #(varExpl)) + " %")
                 # # Evaluate performance
                 numOfclusters= len(partitionsX)
+                pltRes = plotRes()
+                pltRes
 
                 clusters.append(numOfclusters)
                 varTr.append(np.var(subsetX))
