@@ -1,11 +1,12 @@
 import dataReading as dRead
 #from Danaos_ML_Project import dataReading as DANdRead ##   NEWWWW
-#import  Danaos_ML_Project.dataReading as DANdRead
+import  Danaos_ML_Project.dataReading as DANdRead
 import featureCalculation as fCalc
 import dataReadingD as DANRead
 import dataPartitioning as dPart
 import dataModeling as dModel
 import evaluation as eval
+import plotResults as plotRes
 import numpy as np
 from math import sqrt
 import sys
@@ -46,7 +47,7 @@ def main():
     subsetsB=[]
     reader = dRead.BaseSeriesReader()
 
-    #DANreader = DANdRead.BaseSeriesReader()
+    DANreader = DANdRead.BaseSeriesReader()
 
 
     #DANreader.GenericParserForDataExtraction('LAROS', 'MARMARAS', 'MT_DELTA_MARIA')
@@ -110,7 +111,7 @@ def main():
         subsetsB.append(targetB)
         var.append(np.var(seriesX))
 
-        if len(subsetsX)>=5:
+        if len(subsetsX)>=1:
             break
     #subsetsX=[subsetsX[0]]
     #subsetsY=[subsetsY[0]]
@@ -122,7 +123,7 @@ def main():
     histTr=[]
     counter=0
 
-    K = range(1,31)
+    K = range(1,3)
     print("Number of Statistically ind. subsets for training: " + str(len(subsetsX)))
     subsetsX=[subsetsX[0:5]] if len(subsetsX) > 5 else subsetsX
     subsetsY = [ subsetsY[ 0:5 ] ] if len(subsetsY) > 5 else subsetsY
@@ -136,14 +137,14 @@ def main():
       for modeler in modelers:
         for partitioner in partitioners:
            if partitioner.__class__.__name__=='DelaunayTriPartitioner':
-                 partK=np.linspace(0.3,1,9)#[0.5]
+                 partK=np.linspace(0.7,1,4)#[0.5]
                  #np.linspace(0.2,1,11)
                      #[0.6]
            if partitioner.__class__.__name__=='KMeansPartitioner':
                if modeler.__class__.__name__=='TriInterpolantModeler' or modeler.__class__.__name__ == 'TensorFlow':
                  partK =K
                else:
-                 partK=K
+                 partK=[10]
            error = {"errors": [ ]}
            #random.seed(1)
 
@@ -219,7 +220,7 @@ def main():
                 unseenY=[]
                 if modeler.__class__.__name__!= 'TriInterpolantModeler' :
                             #and modeler.__class__.__name__ != 'TensorFlow':
-                    modelMap, model2,scores, output,genericModel = modeler.createModelsFor(partitionsX, partitionsY, partitionLabels,None,X,Y)
+                    modelMap, history,scores, output,genericModel = modeler.createModelsFor(partitionsX, partitionsY, partitionLabels,None,X,Y)
                             #, genericModel , partitionsXDC
                     #if modeler.__class__.__name__ != 'TensorFlow':
                         #modelMap = dict(zip(partitionLabels, modelMap))
@@ -300,6 +301,8 @@ def main():
                         #(varExpl)) + " %")
                 # # Evaluate performance
                 numOfclusters= len(partitionsX)
+                pltRes = plotRes()
+                pltRes
 
                 clusters.append(numOfclusters)
                 varTr.append(np.var(subsetX))
