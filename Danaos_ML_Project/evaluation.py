@@ -2,14 +2,14 @@ import numpy as np
 import dataModeling as dt
 import tensorflow as tf
 import sklearn.ensemble as skl
-import statsmodels.api
-from statsmodels.formula.api import ols
+#import statsmodels.api
+#from statsmodels.formula.api import ols
 import pandas as pd
 #import scikit_posthocs as sp
 from scipy import stats
 from scipy.interpolate import BPoly as Bernstein
 from itertools import combinations
-from statsmodels.stats.multitest import multipletests
+#from statsmodels.stats.multitest import multipletests
 import warnings
 import math
 from scipy import spatial
@@ -19,7 +19,7 @@ import matplotlib.pyplot as plt
 import csv
 import pyearth as sp
 import sklearn.svm as svr
-import latex
+#import latex
 from matplotlib import rc
 
 
