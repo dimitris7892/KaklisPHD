@@ -80,6 +80,8 @@ def main():
         elif al == 'NNW1':modelers.append(dModel.TensorFlowW1())
         elif al == 'NNW2':
             modelers.append(dModel.TensorFlowW2())
+        elif al == 'NNW3':
+            modelers.append(dModel.TensorFlowW3())
         elif al == 'NNWCA':modelers.append(dModel.TensorFlowCA())
 
     partitioners=[]
@@ -125,7 +127,7 @@ def main():
                if modeler.__class__.__name__=='TriInterpolantModeler' or modeler.__class__.__name__ == 'TensorFlow':
                  partK =K
                else:
-                 partK=K
+                 partK=[1]
            error = {"errors": [ ]}
            #random.seed(1)
 
@@ -231,7 +233,7 @@ def main():
                             eval.MeanAbsoluteErrorEvaluation(), unseenX,
                             unseenY,
                             modeler, output, None, None, partitionsX, scores)
-                elif modeler.__class__.__name__ == 'TensorFlowW2':
+                elif modeler.__class__.__name__ == 'TensorFlowW3':
                     _, meanError, sdError = eval.MeanAbsoluteErrorEvaluation.evaluateKerasNN(
                         eval.MeanAbsoluteErrorEvaluation(), unseenX,
                         unseenY,
