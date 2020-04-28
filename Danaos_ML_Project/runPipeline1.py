@@ -233,7 +233,7 @@ def main():
                             eval.MeanAbsoluteErrorEvaluation(), unseenX,
                             unseenY,
                             modeler, output, None, None, partitionsX, scores)
-                elif modeler.__class__.__name__ == 'TensorFlowW3':
+                elif modeler.__class__.__name__ == 'TensorFlowW3' or modeler.__class__.name__ == 'TensorFlowW2':
                     _, meanError, sdError = eval.MeanAbsoluteErrorEvaluation.evaluateKerasNN(
                         eval.MeanAbsoluteErrorEvaluation(), unseenX,
                         unseenY,
