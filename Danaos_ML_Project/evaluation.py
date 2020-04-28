@@ -3,7 +3,7 @@ import dataModeling as dt
 import tensorflow as tf
 import sklearn.ensemble as skl
 import statsmodels.api
-from statsmodels.formula.api import ols
+#from statsmodels.formula.api import ols
 import pandas as pd
 #import scikit_posthocs as sp
 from scipy import stats
