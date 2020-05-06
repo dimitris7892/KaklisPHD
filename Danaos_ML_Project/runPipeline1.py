@@ -97,21 +97,21 @@ def main():
     #random.seed(1)
     stdInU=[]
 
-    dataV = pd.read_csv('/home/dimitris/Desktop/errorSTW25.csv', delimiter=',')
-    dataV =np.array(dataV.values.astype(float))
-    minV =np.min(dataV[:,0])
-    maxV =np.max(dataV[:, 0])
-    i=minV
-    with open('./meanErrorStw.csv', mode='w') as data:
-        data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-        data_writer.writerow(['MAE', 'STW'])
-        while i <=maxV:
-            meanErr =np.mean(np.array([k for k in dataV if k[0]>=i and k[0]<=i+0.5])[:,1])
-            data_writer.writerow([meanErr,i])
-            i=i+0.5
-    data = pd.read_csv(sFile,delimiter=';')
-    data = data.drop(["wind_speed", "wind_dir"],axis=1)
-    data = data.values
+    #dataV = pd.read_csv('/home/dimitris/Desktop/errorSTW25.csv', delimiter=',')
+    #dataV =np.array(dataV.values.astype(float))
+    #minV =np.min(dataV[:,0])
+    #maxV =np.max(dataV[:, 0])
+    #i=minV
+    #with open('./meanErrorStw.csv', mode='w') as data:
+        #data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+        #data_writer.writerow(['MAE', 'STW'])
+        #while i <=maxV:
+            #meanErr =np.mean(np.array([k for k in dataV if k[0]>=i and k[0]<=i+0.5])[:,1])
+            #data_writer.writerow([meanErr,i])
+            #i=i+0.5
+    #data = pd.read_csv(sFile,delimiter=';')
+    #data = data.drop(["wind_speed", "wind_dir"],axis=1)
+    #data = data.values
 
     k=10000
     trData = data[0:89999]
@@ -120,7 +120,7 @@ def main():
     subsets=[]
     for i in range(1,5):
         subsetsX.append(trData[k:n*i,0:7])
-        subsetsy.append(trData[k:n * i, 7])
+        subsetsY.append(trData[k:n * i, 7])
         k=n*i+1000
 
     #indSubsets = []
