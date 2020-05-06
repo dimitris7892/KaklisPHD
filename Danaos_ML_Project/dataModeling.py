@@ -14,11 +14,13 @@ from scipy import spatial
 from sklearn.pipeline import Pipeline
 #from sklearn.model_selection import RandomizedSearchCV
 from sklearn.preprocessing import StandardScaler
+from sklearn.model_selection import train_test_split
 from gekko import GEKKO
 import  matplotlib.pyplot as plt
 from scipy.interpolate import BivariateSpline
 import tensorflow as tf
 from tensorflow import keras
+from scipy.stats import pearsonr
 #from sklearn.model_selection import KFold
 #import pydot
 #import graphviz
@@ -28,7 +30,10 @@ from time import time
 from sklearn.cluster import KMeans
 tf.compat.v1.disable_eager_execution()
 #tf.executing_eagerly()
+from tensorflow.keras.callbacks import EarlyStopping
+from tensorflow.keras.callbacks import Callback
 from sklearn import preprocessing
+from scipy.special import softmax
 
 class BasePartitionModeler:
     def createModelsFor(self,partitionsX, partitionsY, partition_labels):
@@ -104,7 +109,8 @@ class BasePartitionModeler:
                            #np.asmatrix([partitions[ cluster ][:, 3]]).T, axis=1))
         #point = np.array([point[0][0],point[0][3]])
         #return 1.0 / (1.0 + numpy.linalg.norm(np.mean(partCl,axis=0) - point))
-
+        #normalizedPoint = [k for k in point (k - min(point))/(min(point) - max(point)) ]
+        #pearsonr(np.mean(partitions[cluster], axis=0), point[0])
         return 1.0 / (1.0 + numpy.linalg.norm(np.mean(partitions[cluster], axis=0) - point))
 
 
@@ -859,8 +865,8 @@ class TensorFlowW1(BasePartitionModeler):
             model.add(keras.layers.Dense(genModelKnots -1,input_shape=(7+genModelKnots-1,)))
             #model.add(keras.layers.Dense(30))
             #model.add(keras.layers.Dense(20))
-            #model.add(keras.layers.Dense(10))
-            #model.add(keras.layers.Dense(2))
+            #model.add(keras.layers.Dense(genModelKnots - 3,activation='relu'))
+            model.add(keras.layers.Dense(2,))
 
             model.add(keras.layers.Dense(1))
 
@@ -1384,11 +1390,27 @@ class TensorFlowW1(BasePartitionModeler):
         self.flagGen = True
 
         # Plot training & validation accuracy values
+        class TestCallback(Callback):
+            def __init__(self, test_data):
+                self.test_data = test_data
 
+            def on_epoch_end(self, epoch, logs={}):
+                x, y = self.test_data
+                loss, acc = self.model.evaluate(x, y, verbose=0)
+                print('\nTesting loss: {}, acc: {}\n'.format(loss, acc))
 
 
         NNmodels = []
         scores = []
+        clScores=[]
+        clustersTrScores=[]
+        minXVars=[]
+        minYVars = []
+        stdWS=[]
+        stdSTW = []
+        stdsFOC=[]
+        minEpochs=[]
+        clusters=[]
 
         if len(partition_labels) > 1:
             for idx, pCurLbl in enumerate(partition_labels):
@@ -1409,13 +1431,14 @@ class TensorFlowW1(BasePartitionModeler):
                 estimatorCl = keras.models.Sequential()
                 #estimatorCl = baseline_model()
 
-
-                estimatorCl.add(keras.layers.Dense(numOfNeurons -1 ,input_shape=(7+numOfNeurons-1,)))
-                #estimatorCl.add(keras.layers.Dense(genModelKnots -1, input_shape=(6,)))
-                #estimatorCl.add(keras.layers.Dense(5))
-                #estimatorCl.add(keras.layers.Dense(2))
-                estimatorCl.add(keras.layers.Dense(1 ))
-                estimatorCl.compile(loss=keras.losses.mean_squared_error, optimizer=keras.optimizers.Adam(), )  # try:
+                estimatorCl.add(keras.layers.Dense(numOfNeurons - 1, input_shape=(7 + numOfNeurons - 1,)))
+                #estimatorCl.add(keras.layers.Dense(numOfNeurons - 3, input_shape=(7 + numOfNeurons - 1,)))
+                estimatorCl.add(keras.layers.Dropout(0.0001))
+                estimatorCl.add(keras.layers.Dense(2))
+                estimatorCl.add(keras.layers.Dropout(0.01))
+                estimatorCl.add(keras.layers.Dense(1))
+                estimatorCl.compile(loss=keras.losses.mean_squared_error,
+                                    optimizer=keras.optimizers.Adam( ),)  # try:
 
                 #weights0 = np.mean(XSplineClusterVector, axis=0)
                 # weights1 = self.intercepts
@@ -1425,9 +1448,55 @@ class TensorFlowW1(BasePartitionModeler):
 
                 #estimatorCl.layers[0].set_weights([weights, np.array([0] * (numOfNeurons - 1))])
                 # modelId=idx
+                #es = EarlyStopping(monitor='val_loss', mode='min', verbose=1)
+                #X_train, X_test, y_train, y_test =  train_test_split(XSplineClusterVector, partitionsY[idx] ,test_size=0.33, random_state=42)
+                modelsCl = []
+                clustersScore = []
+                clustersTrScore=[]
+                varXCl=[]
+                varYCl = []
+                print("CLUSTER:  " +str(idx))
+                for i in range(1,40):
 
-                estimatorCl.fit(XSplineClusterVector, np.array(partitionsY[idx]), epochs=30 ,validation_split=0.33)
 
+                    #estimatorCl.fit(X_train,y_train, epochs=i ,verbose = 0)
+                    es = EarlyStopping(monitor='val_loss', mode='min', verbose=0)
+                    #val
+                    history = estimatorCl.fit(XSplineClusterVector, partitionsY[idx], validation_split=0.17,epochs=i,verbose = 0,callbacks=[es])
+                    #historyTR = estimatorCl.fit(X_train, y_train, verbose=0,epochs=i)
+                    #Clscore = estimatorCl.evaluate(X_test, y_test, verbose=0)
+                    modelsCl.append(estimatorCl)
+                    lastInd = len(history.history['val_loss'])-1
+
+                    try:
+                        #clustersScore.append(Clscore)
+                        clustersScore.append(history.history['val_loss'][lastInd])
+                        clustersTrScore.append(history.history['loss'][lastInd])
+                        #clustersScore.append(history.history['val_loss'][i - 1])
+                    except:
+                        x=0
+
+                #varXCl.append(np.var(partitionsX[idx]))
+                #varYCl.append(np.var(partitionsY[idx]))
+
+
+                minClscore = min(clustersScore)
+                minClTrscore = min(clustersTrScore)
+                minIndCl = clustersScore.index(min(clustersScore))
+                minEpoch = minIndCl + 1
+                minEpochs.append(minEpoch)
+                #minXvar = varXCl[idx]
+                #minYvar = varYCl[idx]
+
+                minXVars.append(np.std(partitionsX[idx]))
+                minYVars.append(np.std(partitionsY[idx]))
+                stdWS.append(np.std(partitionsX[idx][:,3]))
+                stdSTW.append(np.std(partitionsX[idx][:, 0]))
+                stdsFOC.append(np.std(partitionsY[idx]))
+
+                clScores.append(minClscore)
+                clustersTrScores.append(minClTrscore)
+                clusters.append(idx+1)
                 #x = input_img
 
                 #x = estimatorCl.layers[2](x)
@@ -1440,20 +1509,43 @@ class TensorFlowW1(BasePartitionModeler):
 
                 #Clscore = estimator.evaluate(np.array(partitionsX[idx]), np.array(partitionsY[idx]), verbose=1)
                 #scores.append(Clscore)
-                NNmodels.append(estimatorCl )
+                NNmodels.append(modelsCl[minIndCl] )
 
                 # self._partitionsPerModel[ estimator ] = partitionsX[idx]
         # Update private models
         # models=[]
 
         # Plot training & validation loss values
-        history = estimator.fit(XSplineVectorGen, Y, epochs=50, validation_split=0.33)
+        print("GENERAL MODEL  ")
+        #es = EarlyStopping(monitor='val_loss', mode='min', verbose=0)
+        history = estimator.fit(XSplineVectorGen, Y, epochs=50, validation_split=0.17,verbose=0,)#callbacks=[es])
+
+
+        print("CORRELATION COEFF ERR AND STW: " +str(pearsonr(stdSTW,clustersTrScores)))
+        print("CORRELATION COEFF WS AND STW: " + str(pearsonr(stdSTW, stdWS)))
+        print("CORRELATION COEFF ERR AND WS: " + str(pearsonr(stdWS, clustersTrScores)))
+        print("CORRELATION COEFF ERR AND FOC: " + str(pearsonr(minYVars, clustersTrScores)))
         NNmodels.append(estimator)
 
+        normalizedSTDws = (stdWS - min(stdWS)) / (max(stdWS) - min(stdWS))
+        normalizedSTDstw = (stdSTW - min(stdSTW)) / (max(stdSTW) - min(stdSTW))
+        normalizedSTDFOC = (stdsFOC - min(stdsFOC)) / (max(stdsFOC) - min(stdsFOC))
+        normalizedErr = (clustersTrScores - min(clustersTrScores)) / (max(clustersTrScores) - min(clustersTrScores))
+        normalizedValErr = (clScores - min(clScores)) / (max(clScores) - min(clScores))
+        normalizedStw_ws = abs(normalizedSTDstw - normalizedSTDws)
+
+        print("CORRELATION COEFF Normalized WSstd-STWstd and ERROR: " + str(pearsonr(normalizedErr, normalizedStw_ws)))
 
         self._models = NNmodels
 
         # Return list of models
+        with open('./errorEpochCLusters.csv', mode='w') as data:
+            data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+            data_writer.writerow(['cluster','trError','acc', 'epoch','stdX','stdY','stdSTW','stdWS','nErr','nStdWs','nStdSTW','nValErr','nSTW_WS','NFoc'])
+            for i in range(0,len(clScores)):
+
+                data_writer.writerow([clusters[i], clustersTrScores[i] ,clScores[i],minEpochs[i],minXVars[i],minYVars[i],stdWS[i],stdSTW[i],normalizedErr[i],normalizedSTDws[i],normalizedSTDstw[i],normalizedValErr[i],normalizedStw_ws,normalizedSTDFOC[i]])
+
         return estimator, history, scores, numpy.empty, vectorWeights  # , estimator , DeepCLpartitionsX
 
     def getFitnessOfModelForPoint(self, model, point):
@@ -2092,7 +2184,7 @@ class TensorFlowW3(BasePartitionModeler):
                 estimatorCl.add(keras.layers.Dense(numOfNeurons -1 ,input_shape=(7,)))
                 #estimatorCl.add(keras.layers.Dense(genModelKnots -1, input_shape=(6,)))
                 #estimatorCl.add(keras.layers.Dense(5))
-                estimatorCl.add(keras.layers.Dense(2))
+                #estimatorCl.add(keras.layers.Dense(2))
                 estimatorCl.add(keras.layers.Dense(1 ))
                 estimatorCl.compile(loss=keras.losses.mean_squared_error, optimizer=keras.optimizers.Adam(), )  # try:
 
@@ -2119,7 +2211,7 @@ class TensorFlowW3(BasePartitionModeler):
 
                 #Clscore = estimator.evaluate(np.array(partitionsX[idx]), np.array(partitionsY[idx]), verbose=1)
                 #scores.append(Clscore)
-                NNmodels.append(estimatorCl )
+                NNmodels.append(estimatorCl)
 
                 # self._partitionsPerModel[ estimator ] = partitionsX[idx]
         # Update private models
