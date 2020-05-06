@@ -85,7 +85,40 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
             trueVal = unseenY[iCnt]
 
             ind, fit = modeler.getBestPartitionForPoint(pPoint, partitionsX)
+            #preds=[]
+            #for i in range(0,len(partitionsX[ind])):
+                #pPointCl = partitionsX[ind][i]
+                #vector = self.extractFunctionsFromSplines(pPointCl[0], pPointCl[1], pPointCl[2], pPointCl[3],
+                                                          #pPointCl[4], pPointCl[5], pPointCl[6], ind)
+                #XSplineVector = np.append(pPointCl, vector)
+                #XSplineVector = XSplineVector.reshape(-1, XSplineVector.shape[0])
+                #pred = abs(modeler._models[ind].predict(XSplineVector))
+                #preds.append(pred)
+            distVec = np.mean(partitionsX[ind], axis=0) - pPoint[0]
+            pPointRefined = []
+            for i in range(0, pPoint.shape[1]):
+                if abs(distVec[i])>10:
+                    pPointRefined.append((pPoint[0][i] + (distVec[i])/2))
+                else:
+                    pPointRefined.append(pPoint[0][i])
+            pPointRefined = np.array(pPointRefined)
 
+            meanPointsOfCl = np.mean(partitionsX[ind],axis=0)
+            meanPointsOfCl = np.mean([meanPointsOfCl,pPointRefined],axis=0)
+            #####
+            #vectorPpoint = self.extractFunctionsFromSplines(pPoint[0][0], pPoint[0][1], pPoint[0][2], pPoint[0][3],
+                                                      #pPoint[0][4], pPoint[0][5], pPoint[0][6], ind)
+            #####
+            vector = self.extractFunctionsFromSplines(meanPointsOfCl[0], meanPointsOfCl[1], meanPointsOfCl[2], meanPointsOfCl[3],
+                                                      meanPointsOfCl[4], meanPointsOfCl[5], meanPointsOfCl[6], ind)
+
+            #newVector = np.mean([vector,vectorPpoint],axis=0)
+
+            XSplineVector = np.append(meanPointsOfCl, vector)
+
+            XSplineVector = XSplineVector.reshape(-1, XSplineVector.shape[0])
+            pred = abs(modeler._models[ind].predict(XSplineVector))
+            meanClpred = pred
             #pred=0
             #for i in range(0,len(partitionsX)):
                 #pred +=modeler._models[i].predict(pPoint)
@@ -99,8 +132,8 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
             XSplineGenVector = XSplineGenVector.reshape(-1, XSplineGenVector.shape[0])
             # prediction = abs(modeler._models[ 0 ].predict(XSplineVector))
             # XSplineVector = XSplineGenVector if modeler._models[ind][1]=='GEN' else XSplineVector
-            # prediction = (abs(modeler._models[ind].predict(XSplineVector)) + modeler._models[len(modeler._models)-1].predict(XSplineGenVector))/2
-            prediction = (abs(modeler._models[ind].predict(XSplineVector)) + modeler._models[
+            #prediction = (abs(modeler._models[ind].predict(XSplineVector)) + modeler._models[len(modeler._models)-1].predict(XSplineGenVector))/2
+            prediction = (meanClpred  + modeler._models[
                 len(modeler._models) - 1].predict(XSplineGenVector)) / 2
 
             #prediction = (abs(modeler._models[ind].predict(pPoint)))
@@ -136,18 +169,24 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
 
     def evaluateKerasNN(self, unseenX, unseenY, modeler,output,xs,genericModel,partitionsX , scores):
         lErrors = []
+        with open('./meanErrorStw.csv', mode='w') as data:
+            data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+            data_writer.writerow(['STW','DRAFT','TRIM','WS','WA','CWH','CWD','predFOC','ActualFoc','MAE'])
+            for iCnt in range(np.shape(unseenX)[0]):
+                pPoint =unseenX[iCnt]
+                pPoint= pPoint.reshape(-1,unseenX.shape[1])
 
-        for iCnt in range(np.shape(unseenX)[0]):
-            pPoint =unseenX[iCnt]
-            pPoint= pPoint.reshape(-1,unseenX.shape[1])
 
+                trueVal = unseenY[iCnt]
 
-            trueVal = unseenY[iCnt]
+                ind, fit = modeler.getBestPartitionForPoint(pPoint, partitionsX)
+                prediction = (abs(modeler._models[ind].predict(pPoint)) + modeler._models[len(modeler._models) - 1].predict(
+                    pPoint)) / 2
+                error = abs(prediction - trueVal)
+                lErrors.append(error)
+                if(abs(prediction - trueVal)) > 5:
+                    data_writer.writerow([pPoint[0][0],pPoint[0][1],pPoint[0][2],pPoint[0][3],pPoint[0][4],pPoint[0][5],pPoint[0][6],prediction[0][0],trueVal,error[0][0]])
 
-            ind, fit = modeler.getBestPartitionForPoint(pPoint, partitionsX)
-            prediction = (abs(modeler._models[ind].predict(pPoint)) + modeler._models[len(modeler._models) - 1].predict(
-                pPoint)) / 2
-            lErrors.append(abs(prediction - trueVal))
 
         errors = np.asarray(lErrors)
 

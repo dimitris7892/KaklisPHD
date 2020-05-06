@@ -87,6 +87,8 @@ def main():
     partitioners=[]
     for cl in cls:
         if cl=='KM':partitioners.append(dPart.KMeansPartitioner())
+        if cl == 'KMWSWA': partitioners.append(dPart.KMeansPartitionerWS_WA())
+        if cl == 'KMWHWD': partitioners.append(dPart.KMeansPartitionerWH_WD())
         if cl=='DC' :partitioners.append(dPart.DelaunayTriPartitioner())
 
     print(modelers)
@@ -95,24 +97,40 @@ def main():
     #random.seed(1)
     stdInU=[]
 
-    #dataV = pd.read_csv('/home/dimitris/Desktop/errorSTW20.csv', delimiter=',')
-    #dataV =np.array(dataV.values.astype(float))
-    #minV =np.min(dataV[:,0])
-    #maxV =np.max(dataV[:, 0])
-    #i=minV
-    #with open('./meanErrorStw.csv', mode='w') as data:
-        #data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-        #data_writer.writerow(['MAE', 'STW'])
-        #while i <=maxV:
-            #meanErr =np.mean(np.array([k for k in dataV if k[0]>=i and k[0]<=i+0.5])[:,1])
-            #data_writer.writerow([meanErr,i])
-            #i=i+0.5
+    dataV = pd.read_csv('/home/dimitris/Desktop/errorSTW25.csv', delimiter=',')
+    dataV =np.array(dataV.values.astype(float))
+    minV =np.min(dataV[:,0])
+    maxV =np.max(dataV[:, 0])
+    i=minV
+    with open('./meanErrorStw.csv', mode='w') as data:
+        data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+        data_writer.writerow(['MAE', 'STW'])
+        while i <=maxV:
+            meanErr =np.mean(np.array([k for k in dataV if k[0]>=i and k[0]<=i+0.5])[:,1])
+            data_writer.writerow([meanErr,i])
+            i=i+0.5
     data = pd.read_csv(sFile,delimiter=';')
     data = data.drop(["wind_speed", "wind_dir"],axis=1)
     data = data.values
 
-    subsetsX.append(data[:,0:7][0:40000].astype(float))
-    subsetsY.append(data[:, 7][0:40000].astype(float))
+    k=10000
+    trData = data[0:89999]
+    k=0
+    n=15000
+    subsets=[]
+    for i in range(1,5):
+        subsetsX.append(trData[k:n*i,0:7])
+        subsetsy.append(trData[k:n * i, 7])
+        k=n*i+1000
+
+    #indSubsets = []
+    #for i in range(0,len(subsets)):
+       #X = DANreader.readStatDifferentSubsets(subsets[i],subsets,i)
+       #indSubsets.append(X)
+
+
+    #subsetsX.append(data[:,0:7][0:50000].astype(float))
+    #subsetsY.append(data[:, 7][0:50000].astype(float))
     unseenX = data[:, 0:7][90000:].astype(float)
     unseenY = data[:, 7][90000:].astype(float)
 
@@ -139,7 +157,7 @@ def main():
                if modeler.__class__.__name__=='TriInterpolantModeler' or modeler.__class__.__name__ == 'TensorFlow':
                  partK =K
                else:
-                 partK=K
+                 partK=[25]
            error = {"errors": [ ]}
            #random.seed(1)
 
@@ -300,7 +318,7 @@ def initParameters():
     end = 17000
     startU = 30000
     endU = 31000
-    algs=['NNW1','NNW2','NNW3']
+    algs=['NNW1']
     # ['SR','LR','RF','NN','NNW','TRI']
 
 
