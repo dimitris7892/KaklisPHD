@@ -109,9 +109,9 @@ def main():
             #meanErr =np.mean(np.array([k for k in dataV if k[0]>=i and k[0]<=i+0.5])[:,1])
             #data_writer.writerow([meanErr,i])
             #i=i+0.5
-    #data = pd.read_csv(sFile,delimiter=';')
-    #data = data.drop(["wind_speed", "wind_dir"],axis=1)
-    #data = data.values
+    data = pd.read_csv(sFile,delimiter=';')
+    data = data.drop(["wind_speed", "wind_dir"],axis=1)
+    data = data.values
 
     k=10000
     trData = data[0:89999]

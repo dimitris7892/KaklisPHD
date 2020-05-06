@@ -1433,9 +1433,9 @@ class TensorFlowW1(BasePartitionModeler):
 
                 estimatorCl.add(keras.layers.Dense(numOfNeurons - 1, input_shape=(7 + numOfNeurons - 1,)))
                 #estimatorCl.add(keras.layers.Dense(numOfNeurons - 3, input_shape=(7 + numOfNeurons - 1,)))
-                estimatorCl.add(keras.layers.Dropout(0.0001))
+                #estimatorCl.add(keras.layers.Dropout(0.0001))
                 estimatorCl.add(keras.layers.Dense(2))
-                estimatorCl.add(keras.layers.Dropout(0.01))
+                #estimatorCl.add(keras.layers.Dropout(0.01))
                 estimatorCl.add(keras.layers.Dense(1))
                 estimatorCl.compile(loss=keras.losses.mean_squared_error,
                                     optimizer=keras.optimizers.Adam( ),)  # try:
@@ -1521,30 +1521,30 @@ class TensorFlowW1(BasePartitionModeler):
         history = estimator.fit(XSplineVectorGen, Y, epochs=50, validation_split=0.17,verbose=0,)#callbacks=[es])
 
 
-        print("CORRELATION COEFF ERR AND STW: " +str(pearsonr(stdSTW,clustersTrScores)))
-        print("CORRELATION COEFF WS AND STW: " + str(pearsonr(stdSTW, stdWS)))
-        print("CORRELATION COEFF ERR AND WS: " + str(pearsonr(stdWS, clustersTrScores)))
-        print("CORRELATION COEFF ERR AND FOC: " + str(pearsonr(minYVars, clustersTrScores)))
+        #print("CORRELATION COEFF ERR AND STW: " +str(pearsonr(stdSTW,clustersTrScores)))
+        #print("CORRELATION COEFF WS AND STW: " + str(pearsonr(stdSTW, stdWS)))
+        #print("CORRELATION COEFF ERR AND WS: " + str(pearsonr(stdWS, clustersTrScores)))
+        #print("CORRELATION COEFF ERR AND FOC: " + str(pearsonr(minYVars, clustersTrScores)))
         NNmodels.append(estimator)
 
-        normalizedSTDws = (stdWS - min(stdWS)) / (max(stdWS) - min(stdWS))
-        normalizedSTDstw = (stdSTW - min(stdSTW)) / (max(stdSTW) - min(stdSTW))
-        normalizedSTDFOC = (stdsFOC - min(stdsFOC)) / (max(stdsFOC) - min(stdsFOC))
-        normalizedErr = (clustersTrScores - min(clustersTrScores)) / (max(clustersTrScores) - min(clustersTrScores))
-        normalizedValErr = (clScores - min(clScores)) / (max(clScores) - min(clScores))
-        normalizedStw_ws = abs(normalizedSTDstw - normalizedSTDws)
+        #normalizedSTDws = (stdWS - min(stdWS)) / (max(stdWS) - min(stdWS))
+        #normalizedSTDstw = (stdSTW - min(stdSTW)) / (max(stdSTW) - min(stdSTW))
+        #normalizedSTDFOC = (stdsFOC - min(stdsFOC)) / (max(stdsFOC) - min(stdsFOC))
+        #normalizedErr = (clustersTrScores - min(clustersTrScores)) / (max(clustersTrScores) - min(clustersTrScores))
+        #normalizedValErr = (clScores - min(clScores)) / (max(clScores) - min(clScores))
+        #normalizedStw_ws = abs(normalizedSTDstw - normalizedSTDws)
 
-        print("CORRELATION COEFF Normalized WSstd-STWstd and ERROR: " + str(pearsonr(normalizedErr, normalizedStw_ws)))
+        #print("CORRELATION COEFF Normalized WSstd-STWstd and ERROR: " + str(pearsonr(normalizedErr, normalizedStw_ws)))
 
         self._models = NNmodels
 
         # Return list of models
-        with open('./errorEpochCLusters.csv', mode='w') as data:
-            data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-            data_writer.writerow(['cluster','trError','acc', 'epoch','stdX','stdY','stdSTW','stdWS','nErr','nStdWs','nStdSTW','nValErr','nSTW_WS','NFoc'])
-            for i in range(0,len(clScores)):
+        #with open('./errorEpochCLusters.csv', mode='w') as data:
+            #data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+            #data_writer.writerow(['cluster','trError','acc', 'epoch','stdX','stdY','stdSTW','stdWS','nErr','nStdWs','nStdSTW','nValErr','nSTW_WS','NFoc'])
+            #for i in range(0,len(clScores)):
 
-                data_writer.writerow([clusters[i], clustersTrScores[i] ,clScores[i],minEpochs[i],minXVars[i],minYVars[i],stdWS[i],stdSTW[i],normalizedErr[i],normalizedSTDws[i],normalizedSTDstw[i],normalizedValErr[i],normalizedStw_ws,normalizedSTDFOC[i]])
+                #data_writer.writerow([clusters[i], clustersTrScores[i] ,clScores[i],minEpochs[i],minXVars[i],minYVars[i],stdWS[i],stdSTW[i],normalizedErr[i],normalizedSTDws[i],normalizedSTDstw[i],normalizedValErr[i],normalizedStw_ws,normalizedSTDFOC[i]])
 
         return estimator, history, scores, numpy.empty, vectorWeights  # , estimator , DeepCLpartitionsX
 
