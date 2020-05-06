@@ -32,6 +32,7 @@ from openpyxl.styles import Alignment
 import matplotlib.pyplot as plt
 import seaborn as sns
 from openpyxl.drawing.image import Image
+from scipy.stats import ttest_ind_from_stats
 
 
 #DANAOS_TELEGRAMS_SQL =SELECT  TELEGRAM_DATE , TELEGRAM_TYPE,BALAST_FLAG,LATITUDE_DEGREES , LATITUDE_SECONDS ,LONGITUDE_DEGREES , LONGITUDE_SECONDS ,vessel_course,(DRAFT_AFT + DRAFT_FORE)/2 as DRAFT , ENGINE_RPM , WIND_DIRECTION , WIND_FORCE  ,AVERAGE_SPEED ,hours_slc,minutes_slc, (( NVL(ME_HSFO_CONS,0)+ NVL(ME_LSFO_CONS,0)+ NVL(ME_HSDO_CONS,0 ) + NVL(ME_LSDO_CONS,0)))   as ME_CONS_24h  FROM TELEGRAMS where vessel_code ='486' AND TELEGRAM_TYPE='D' or telegram_type='N';
@@ -44,6 +45,27 @@ class BaseSeriesDataExtraction:
         return data
 
 class BaseSeriesReader:
+
+    def readStatDifferentSubsets(self, X,subsetsX,  k):
+
+        flag = False
+        if np.std(X) > 0:
+            candidateSetDist = X
+            for i in range(0, len(subsetsX)):
+                if i !=k:
+                    mean1 = np.mean(subsetsX[i])
+                    mean2 = np.mean(candidateSetDist)
+                    std1 = np.std(subsetsX[i])
+                    std2 = np.std(candidateSetDist[i])
+                    size1 = len(subsetsX[i])
+                    size2 = len(candidateSetDist)
+                    dataDist = ttest_ind_from_stats(mean1 = mean1,std1 = std1,nobs1 = size1 , mean2 = mean2 , std2= std2 , nobs2 = size2)
+                    if dataDist[1] > 0.05:
+                        flag = True
+            if flag == False :
+                return X
+            else:
+                return []
 
     def readNewDataset(self):
         ####STATSTICAL ANALYSIS PENELOPE
