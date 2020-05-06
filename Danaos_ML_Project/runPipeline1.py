@@ -109,9 +109,9 @@ def main():
             #meanErr =np.mean(np.array([k for k in dataV if k[0]>=i and k[0]<=i+0.5])[:,1])
             #data_writer.writerow([meanErr,i])
             #i=i+0.5
-    #data = pd.read_csv(sFile,delimiter=';')
-    #data = data.drop(["wind_speed", "wind_dir"],axis=1)
-    #data = data.values
+    data = pd.read_csv(sFile,delimiter=';')
+    data = data.drop(["wind_speed", "wind_dir"],axis=1)
+    data = data.values
 
     k=10000
     trData = data[0:89999]
@@ -135,7 +135,7 @@ def main():
     unseenY = data[:, 7][90000:].astype(float)
 
 
-    K = range(1,21)
+    K = range(1,26)
     print("Number of Statistically ind. subsets for training: " + str(len(subsetsX)))
 
     #K=[10]
@@ -157,7 +157,7 @@ def main():
                if modeler.__class__.__name__=='TriInterpolantModeler' or modeler.__class__.__name__ == 'TensorFlow':
                  partK =K
                else:
-                 partK=[25]
+                 partK=K
            error = {"errors": [ ]}
            #random.seed(1)
 
