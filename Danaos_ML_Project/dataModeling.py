@@ -1411,6 +1411,7 @@ class TensorFlowW1(BasePartitionModeler):
         stdsFOC=[]
         minEpochs=[]
         clusters=[]
+        sizeTrDt=[]
 
         if len(partition_labels) > 1:
             for idx, pCurLbl in enumerate(partition_labels):
@@ -1456,13 +1457,13 @@ class TensorFlowW1(BasePartitionModeler):
                 varXCl=[]
                 varYCl = []
                 print("CLUSTER:  " +str(idx))
-                for i in range(1,40):
+                for i in range(1,20):
 
 
                     #estimatorCl.fit(X_train,y_train, epochs=i ,verbose = 0)
                     es = EarlyStopping(monitor='val_loss', mode='min', verbose=0)
                     #val
-                    history = estimatorCl.fit(XSplineClusterVector, partitionsY[idx], validation_split=0.17,epochs=i,verbose = 0,callbacks=[es])
+                    history = estimatorCl.fit(XSplineClusterVector, partitionsY[idx], validation_split=0.33,epochs=i,verbose = 0,callbacks=[es])
                     #historyTR = estimatorCl.fit(X_train, y_train, verbose=0,epochs=i)
                     #Clscore = estimatorCl.evaluate(X_test, y_test, verbose=0)
                     modelsCl.append(estimatorCl)
@@ -1497,6 +1498,7 @@ class TensorFlowW1(BasePartitionModeler):
                 clScores.append(minClscore)
                 clustersTrScores.append(minClTrscore)
                 clusters.append(idx+1)
+                sizeTrDt.append(len(partitionsX[idx]))
                 #x = input_img
 
                 #x = estimatorCl.layers[2](x)
@@ -1518,7 +1520,7 @@ class TensorFlowW1(BasePartitionModeler):
         # Plot training & validation loss values
         print("GENERAL MODEL  ")
         #es = EarlyStopping(monitor='val_loss', mode='min', verbose=0)
-        history = estimator.fit(XSplineVectorGen, Y, epochs=50, validation_split=0.17,verbose=0,)#callbacks=[es])
+        history = estimator.fit(XSplineVectorGen, Y, epochs=30, validation_split=0.17,verbose=0,)#callbacks=[es])
 
 
         #print("CORRELATION COEFF ERR AND STW: " +str(pearsonr(stdSTW,clustersTrScores)))
@@ -1527,24 +1529,41 @@ class TensorFlowW1(BasePartitionModeler):
         #print("CORRELATION COEFF ERR AND FOC: " + str(pearsonr(minYVars, clustersTrScores)))
         NNmodels.append(estimator)
 
-        #normalizedSTDws = (stdWS - min(stdWS)) / (max(stdWS) - min(stdWS))
-        #normalizedSTDstw = (stdSTW - min(stdSTW)) / (max(stdSTW) - min(stdSTW))
-        #normalizedSTDFOC = (stdsFOC - min(stdsFOC)) / (max(stdsFOC) - min(stdsFOC))
-        #normalizedErr = (clustersTrScores - min(clustersTrScores)) / (max(clustersTrScores) - min(clustersTrScores))
-        #normalizedValErr = (clScores - min(clScores)) / (max(clScores) - min(clScores))
-        #normalizedStw_ws = abs(normalizedSTDstw - normalizedSTDws)
+        if stdWS !=[]:
+            normalizedSTDws = (stdWS - min(stdWS)) / (max(stdWS) - min(stdWS))
+            normalizedSTDstw = (stdSTW - min(stdSTW)) / (max(stdSTW) - min(stdSTW))
+            normalizedSTDFOC = (stdsFOC - min(stdsFOC)) / (max(stdsFOC) - min(stdsFOC))
+            normalizedErr = (clustersTrScores - min(clustersTrScores)) / (max(clustersTrScores) - min(clustersTrScores))
+            normalizedValErr = (clScores - min(clScores)) / (max(clScores) - min(clScores))
+            normalizedStw_ws = abs(normalizedSTDstw - normalizedSTDws)
 
         #print("CORRELATION COEFF Normalized WSstd-STWstd and ERROR: " + str(pearsonr(normalizedErr, normalizedStw_ws)))
 
         self._models = NNmodels
+        plt.plot(clusters, sizeTrDt, color='orange', label='Size of Cluster')
+        #plt.plot(clusters, clScores, 'purple', label='Validation Error')
+        plt.xlabel("clusters")
+        # pltyxlabel("validation MSE")
+        plt.scatter(clusters, sizeTrDt, s=clScores, c="blue", alpha=0.4, linewidth=4)
+        plt.legend()
+        #plt.show()
+        x = 0
 
+        plt.plot(  clusters,clScores,color='orange',label='Validation Error')
+        plt.plot( clusters, minEpochs,'purple',label='epochs')
+        plt.xlabel("clusters")
+        #pltyxlabel("validation MSE")
+        plt.scatter(clusters,clScores , s=sizeTrDt, c="blue", alpha=0.4, linewidth=4)
+        plt.legend()
+        #plt.show()
+        x=0
         # Return list of models
-        #with open('./errorEpochCLusters.csv', mode='w') as data:
-            #data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-            #data_writer.writerow(['cluster','trError','acc', 'epoch','stdX','stdY','stdSTW','stdWS','nErr','nStdWs','nStdSTW','nValErr','nSTW_WS','NFoc'])
-            #for i in range(0,len(clScores)):
+        with open('./errorEpochCLusters.csv', mode='w') as data:
+            data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+            data_writer.writerow(['cluster','trError','acc', 'epoch','stdX','stdY','stdSTW','stdWS','nErr','nStdWs','nStdSTW','nValErr','nSTW_WS'])
+            for i in range(0,len(clScores)):
 
-                #data_writer.writerow([clusters[i], clustersTrScores[i] ,clScores[i],minEpochs[i],minXVars[i],minYVars[i],stdWS[i],stdSTW[i],normalizedErr[i],normalizedSTDws[i],normalizedSTDstw[i],normalizedValErr[i],normalizedStw_ws,normalizedSTDFOC[i]])
+                data_writer.writerow([clusters[i], clustersTrScores[i] ,clScores[i],minEpochs[i],minXVars[i],minYVars[i],stdWS[i],stdSTW[i],normalizedErr[i],normalizedSTDws[i],normalizedSTDstw[i],normalizedValErr[i]])
 
         return estimator, history, scores, numpy.empty, vectorWeights  # , estimator , DeepCLpartitionsX
 
