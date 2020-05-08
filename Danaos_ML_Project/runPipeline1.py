@@ -116,7 +116,7 @@ def main():
     k=10000
     trData = data[0:89999]
     k=0
-    n=15000
+    n=10000
     subsets=[]
     for i in range(1,5):
         subsetsX.append(trData[k:n*i,0:7])
@@ -135,7 +135,7 @@ def main():
     unseenY = data[:, 7][90000:].astype(float)
 
 
-    K = range(1,21)
+    K = range(1,15)
     print("Number of Statistically ind. subsets for training: " + str(len(subsetsX)))
 
     #K=[10]
@@ -157,7 +157,7 @@ def main():
                if modeler.__class__.__name__=='TriInterpolantModeler' or modeler.__class__.__name__ == 'TensorFlow':
                  partK =K
                else:
-                 partK=[25]
+                 partK=K
            error = {"errors": [ ]}
            #random.seed(1)
 
