@@ -1540,21 +1540,21 @@ class TensorFlowW1(BasePartitionModeler):
         #print("CORRELATION COEFF Normalized WSstd-STWstd and ERROR: " + str(pearsonr(normalizedErr, normalizedStw_ws)))
 
         self._models = NNmodels
-        plt.plot(clusters, sizeTrDt, color='orange', label='Size of Cluster')
+        #plt.plot(clusters, sizeTrDt, color='orange', label='Size of Cluster')
         #plt.plot(clusters, clScores, 'purple', label='Validation Error')
-        plt.xlabel("clusters")
+        #plt.xlabel("clusters")
         # pltyxlabel("validation MSE")
-        plt.scatter(clusters, sizeTrDt, s=clScores, c="blue", alpha=0.4, linewidth=4)
-        plt.legend()
+        #plt.scatter(clusters, sizeTrDt, s=clScores, c="blue", alpha=0.4, linewidth=4)
+        #plt.legend()
         #plt.show()
         x = 0
 
-        plt.plot(  clusters,clScores,color='orange',label='Validation Error')
-        plt.plot( clusters, minEpochs,'purple',label='epochs')
-        plt.xlabel("clusters")
+        #plt.plot(  clusters,clScores,color='orange',label='Validation Error')
+        #plt.plot( clusters, minEpochs,'purple',label='epochs')
+        #plt.xlabel("clusters")
         #pltyxlabel("validation MSE")
-        plt.scatter(clusters,clScores , s=sizeTrDt, c="blue", alpha=0.4, linewidth=4)
-        plt.legend()
+        #plt.scatter(clusters,clScores , s=sizeTrDt, c="blue", alpha=0.4, linewidth=4)
+        #plt.legend()
         #plt.show()
         x=0
         # Return list of models
