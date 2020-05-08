@@ -17,10 +17,10 @@ from matplotlib import pyplot
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.cluster import SpectralClustering
 sys.setrecursionlimit(1000000)
-import plotly as py
-import plotly.graph_objs as go
+#import plotly as py
+#import plotly.graph_objs as go
 #import SSplines as simplexSplines
-from plotly.offline import download_plotlyjs, init_notebook_mode, plot, iplot
+#from plotly.offline import download_plotlyjs, init_notebook_mode, plot, iplot
 #from utils import *
 #from dtw import dtw
 #from matplotlib import rc
