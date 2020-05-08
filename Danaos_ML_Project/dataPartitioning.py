@@ -17,7 +17,10 @@ from matplotlib import pyplot
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.cluster import SpectralClustering
 sys.setrecursionlimit(1000000)
+import plotly as py
+import plotly.graph_objs as go
 #import SSplines as simplexSplines
+from plotly.offline import download_plotlyjs, init_notebook_mode, plot, iplot
 #from utils import *
 #from dtw import dtw
 #from matplotlib import rc
@@ -41,17 +44,84 @@ class DefaultPartitioner:
             print("WARNING: DefaultPartitioner ignores number of clusters.")
         return ([dataX], [dataY], [0], [dataX[0]], None)
 
-    def showClusterPlot(self, dataX, labels, nClusters,centers):
+    def showClusterPlot(self, dataX, labels, nClusters,centers,partitionsX,partitionsY):
         xData = np.asarray(dataX[:, 0]).T#[0]
         yData = np.asarray(dataX[:, 1]).T#[0]
+        zData  = np.asarray(dataX[:, 2]).T#[0]
         #colors=tuple([numberToRGBAColor(l) for l in labels])
+        ax = plt.axes(projection='3d')
 
-        plt.scatter(xData, yData, c=labels,s=60, cmap='viridis')
+        ax.scatter3D(xData,yData,zData,c= labels,cmap ='viridis')
+        ax.scatter3D(centers[:, 0], centers[:, 1],centers[:,2], c='black', s=230, alpha=0.5)
+
+        #plt.scatter(xData, yData, c=labels,s=60, cmap='viridis')
         plt.xlabel("STW")
-        plt.ylabel("WS")
-        plt.scatter(centers[:, 0], centers[:, 1], c='black', s=230, alpha=0.5);
+        plt.ylabel("DRAFT")
+        #plt.zlabel("DRAFT")
+        #plt.scatter(centers[:, 0], centers[:, 1], c='black', s=230, alpha=0.5);
         plt.title("K-means with " + str(nClusters) + " clusters")
-        plt.show()
+        #plt.show()
+        #for i in range(0,len(partitionsX)):
+        trace1 = go.Scatter3d(
+            x=partitionsX[0][:,0],
+            y=partitionsX[0][:,1],
+            z=partitionsX[0][:,3],
+            mode="markers",
+            name="Cluster 0",
+            marker=dict(color='rgba(255, 128, 255, 0.8)'),
+            text=None)
+
+        # trace2 is for 'Cluster 1'
+        trace2 = go.Scatter3d(
+            x=partitionsX[1][:,0],
+            y=partitionsX[1][:,1],
+            z=partitionsX[1][:,3],
+            mode="markers",
+            name="Cluster 1",
+            marker=dict(color='rgba(255, 128, 2, 0.8)'),
+            text=None)
+
+        # trace3 is for 'Cluster 2'
+        trace3 = go.Scatter3d(
+            x=partitionsX[2][:,0],
+            y=partitionsX[2][:,1],
+            z=partitionsX[2][:,3],
+            mode="markers",
+            name="Cluster 2",
+            marker=dict(color='rgba(0, 255, 200, 0.8)'),
+            text=None)
+
+        trace4 = go.Scatter3d(
+            x=partitionsX[3][:, 0],
+            y=partitionsX[3][:, 1],
+            z=partitionsX[3][:, 3],
+            mode="markers",
+            name="Cluster 3",
+            marker=dict(color='rgba(0, 255, 90, 0.8)'),
+            text=None)
+
+        trace5 = go.Scatter3d(
+            x=partitionsX[4][:, 0],
+            y=partitionsX[4][:, 1],
+            z=partitionsX[4][:, 3],
+            mode="markers",
+            name="Cluster 4",
+            marker=dict(color='rgba(0, 80, 200, 0.8)'),
+            text=None)
+
+        data = [trace1, trace2, trace3,trace4,trace5]
+
+        title = "Visualizing Clusters in Three Dimensions "
+
+        layout = dict(title=title,
+                      xaxis=dict(title='STW', ticklen=5, zeroline=False),
+                      yaxis=dict(title='WS', ticklen=5, zeroline=False)
+                      )
+
+        fig = dict(data=data, layout=layout)
+
+        plot(fig)
+
         x=0
 
 class KMeansPartitioner(DefaultPartitioner):
@@ -122,6 +192,22 @@ class KMeansPartitioner(DefaultPartitioner):
             # Keep partition label to ascertain same order of results
             partitionLabels.append(curLbl)
 
+        #k = len(partitionsX)
+        #i=0
+        #while i <k:
+            #if len(partitionsX[i]) <=1000:
+                #partitionsX.remove(partitionsX[i])
+                #partitionsY.remove(partitionsY[i])
+                #k = len(partitionsX)
+            #i=i+1
+        #partitionLabels = np.linspace(0, len(partitionsX), len(partitionsX))
+        #for i in range(0,len(partitionsX)):
+            #if len(partitionsX[i]) <=1000:
+                #partitionsX, partitionsY, partitionLabels , dataX , dataY,centroids = self.clustering(dataX,dataY,None,nClusters-1 , False)
+                #return partitionsX, partitionsY, partitionLabels , dataX , dataY,centroids
+
+
+
         #pca_2d = PCA(n_components=2)
         #trnslatedDatax = pca_2d.fit_transform(trnslatedDatax)
 
@@ -129,14 +215,14 @@ class KMeansPartitioner(DefaultPartitioner):
         #partitionsY = []
         #partitionLabels = []
         ##ballast
-
+        print("NEW Number of clusters AFTER DELETING clusters with insufficient size: %d" % (len(partitionsX)))
         # Show plot, if requested
         #if (showPlot):
             #self.showClusterPlot(dataUpdatedX, labels, nClusters)
         #for k in partitionLabels:
             #print("RPM variance of cluster "+str(k) +": " + str(np.var(partitionsY[k]))+
             #"\n"+ "Velocity variance of cluster "+str(k)+": "+str(np.var(partitionsX[k])))
-        #self.showClusterPlot(trnslatedDatax,labels,nClusters,centroids)
+        #self.showClusterPlot(trnslatedDatax,labels,nClusters,centroids,partitionsX,partitionsY)
         return partitionsX, partitionsY, partitionLabels , dataX , dataY,centroids
 
 
