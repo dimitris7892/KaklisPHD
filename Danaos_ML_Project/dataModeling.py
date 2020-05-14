@@ -9,6 +9,7 @@ import random
 #from sklearn.cross_validation import train_test_split
 import csv
 import itertools
+import pandas as pd
 #from sklearn.model_selection import KFold as kf
 from scipy import spatial
 from sklearn.pipeline import Pipeline
@@ -25,6 +26,9 @@ from scipy.stats import pearsonr
 #import pydot
 #import graphviz
 import scipy.stats as st
+from scipy import *
+from scipy.interpolate import RegularGridInterpolator
+import scipy as scipy
 #from tensorflow.python.tools import inspect_checkpoint as chkp
 from time import time
 from sklearn.cluster import KMeans
@@ -34,6 +38,7 @@ from tensorflow.keras.callbacks import EarlyStopping
 from tensorflow.keras.callbacks import Callback
 from sklearn import preprocessing
 from scipy.special import softmax
+import dataReading as Dread
 
 class BasePartitionModeler:
     def createModelsFor(self,partitionsX, partitionsY, partition_labels):
@@ -112,6 +117,185 @@ class BasePartitionModeler:
         #normalizedPoint = [k for k in point (k - min(point))/(min(point) - max(point)) ]
         #pearsonr(np.mean(partitions[cluster], axis=0), point[0])
         return 1.0 / (1.0 + numpy.linalg.norm(np.mean(partitions[cluster], axis=0) - point))
+
+class LinearInterpolation(BasePartitionModeler):
+
+    def createModelsFor(self, partitionsX, partitionsY, partition_labels, tri, X, Y):
+        stw= np.array(X[:,0])
+        ws = np.array(X[:,3])
+        wd = list(X[:, 4])
+        #dataset = np.array(np.append(stw.reshape(-1,1),np.asmatrix([ws,wd]).T,axis=1))
+        #y_interp=scipy.interpolate.interpn((stw,ws,wd), Y,np.array([stw,ws,wd]).T)
+        y_interp = scipy.interpolate.SmoothBivariateSpline(stw,ws,wd, Y)
+
+        return y_interp
+
+class PavlosInterpolation(BasePartitionModeler):
+
+    def GetStatisticsOfVessel(self,company,vessel):
+
+        listOfWeatherBeaufort = np.array([0,3,5,8])
+        listOfWeather = [0,4.34,9,34,18.91]
+
+        sFile = './data/'+company+'/'+vessel+'/ListOfSpeeds.csv'
+        data = pd.read_csv(sFile, delimiter=',')
+        listOfSpeeds = np.array(data.values)
+
+
+        sFile = './data/' + company + '/'+vessel+'/ListOfCons.csv'
+        data = pd.read_csv(sFile, delimiter=',')
+        ListOfCons = np.array(data.values)
+
+        sFile = './data/' + company + '/'+vessel+'/ListOfDrafts.csv'
+        data = pd.read_csv(sFile, delimiter=',')
+        ListOfDrafts = np.array(data.values)
+
+        ConsProfileItem= {}
+        speedIndex=0
+        wsIndex=0
+        wdIndex=0
+        draftIndex=0
+        for i in range(0,len(ListOfCons)):
+
+            if i > 0:
+                if i%80==0: ##Ballast
+                    draftIndex=draftIndex+1
+                if i%20==0 : #MinSpeed
+                    speedIndex= speedIndex +1
+                    wsIndex=0
+                if i%5 ==0: #Ws Update
+                    wsIndex = wsIndex +1
+                    wdIndex = 0
+            ConsProfileItem[i]={'speed':speedIndex,'ws':wsIndex,'wd':wdIndex,'draft':draftIndex,'foc':ListOfCons[i]}
+            wdIndex = wdIndex + 1
+
+        return listOfSpeeds , listOfWeather , ListOfCons , ListOfDrafts , ConsProfileItem
+
+    def GetAvgCons(self,_speed, _weatherMperS,_weatherRelDir, _draft):
+
+            listOfSpeeds, listOfWeather, ListOfCons, ListOfDrafts , ConsProfileItem = self.GetStatisticsOfVessel('MARMARAS','MT_DELTA_MARIA')
+            _weatherMperS = _weatherMperS *0.514
+            minSpeed = np.min(listOfSpeeds)
+            maxSpeed = np.max(listOfSpeeds)
+            maxConsumption = np.max(ListOfCons)
+            calcAvgCons = maxConsumption #// Default for "Do not create edge" - to be divided by 24
+            #relDirCode = convertWindRelDirToRelDirIndex(_weatherRelDir) #// Find relative direction
+            relDirCode = 4
+            exactSpeed = False
+            exactWeather = False
+            finalSpeedIndex = len(listOfSpeeds) - 1
+
+            if _speed < minSpeed:
+                _speed = minSpeed
+            elif _speed > maxSpeed:
+                _speed = maxSpeed
+
+            # // Find draft index
+            if _draft <= ListOfDrafts[1] -1:
+                currDraftIndex = 0
+            else:
+                currDraftIndex = 1
+
+            #// Find where it is in the list of speeds
+            curspeedIndex = 0
+            maxLenSpeed = 4 if currDraftIndex ==0 else 7
+            minLenSpeed = 0 if currDraftIndex== 0 else  4
+            for i in range(minLenSpeed,maxLenSpeed):
+                curspeedIndex = i
+                if _speed > listOfSpeeds[i]:
+                    d=0
+                elif _speed == listOfSpeeds[i]:
+                    exactSpeed = True
+                    break
+                else:
+                    break
+
+            #// Find where it is in the list of weathers
+            curweatherIndex = 0
+            for i in range(0,len(listOfWeather)):
+                curweatherIndex = i
+                if _weatherMperS > listOfWeather[i]:
+                    if i == len(listOfWeather) - 1:
+                        exactWeather = True
+                        break
+                    #//else continue
+                elif _weatherMperS == listOfWeather[i]:
+
+                    exactWeather = True
+                    break
+                else:
+                    if i == 0:
+                        exactWeather = True #// This is for 0 BFT
+                    break
+
+            if exactSpeed and exactWeather:
+
+                hashKey = draft + "_" + listOfSpeeds[curspeedIndex] + "_" + listOfWeather[curweatherIndex] + "_" + relDirCode
+                cpi =[]
+                calcAvgCons = cpi.avgCons
+
+            elif (exactSpeed):
+
+                prevweatherIndex = curweatherIndex - 1
+                #hashKey1 = draft + "_" + listOfSpeeds[curspeedIndex] + "_" + listOfWeather[prevweatherIndex] + "_" + relDirCode
+                cpi1 = [k for k in ConsProfileItem.values() if k['speed'] == curspeedIndex and k['ws']==prevweatherIndex and
+                 k['wd'] == relDirCode and k['draft']==currDraftIndex][0]['foc']
+
+                calcAvgConsPrev1 = cpi1#.avgCons
+                #hashKey2 = draft + "_" + listOfSpeeds[curspeedIndex] + "_" + listOfWeather[curweatherIndex] + "_" + relDirCode
+                cpi2 =  [k for k in ConsProfileItem.values() if k['speed'] == curspeedIndex and k['ws']==curweatherIndex and
+                 k['wd'] == relDirCode and k['draft']==currDraftIndex][0]['foc']
+                calcAvgConsCur1 = cpi2#.avgCons
+                difInCons1 = calcAvgConsCur1 - calcAvgConsPrev1
+                percWeatherDif = (math.pow(_weatherMperS, 3) - math.pow(listOfWeather[prevweatherIndex], 3)) / (math.pow(listOfWeather[curweatherIndex], 3) - math.pow(listOfWeather[prevweatherIndex], 3)) #// Cubic interpolation
+                calcAvgCons = calcAvgConsPrev1 + difInCons1 * percWeatherDif
+
+            elif exactWeather:
+
+                prevspeedIndex = curspeedIndex - 1
+                #hashKey3 = draft + "_" + listOfSpeeds[prevspeedIndex] + "_" + listOfWeather[curweatherIndex] + "_" + relDirCode
+                cpi3 =  [k for k in ConsProfileItem.values() if k['speed'] == prevspeedIndex and k['ws']==curweatherIndex and
+                 k['wd'] == relDirCode and k['draft']==currDraftIndex][0]['foc']
+                calcAvgConsPrev2 = cpi3#.avgCons
+
+                #hashKey4 = draft + "_" + listOfSpeeds[curspeedIndex] + "_" + listOfWeather[curweatherIndex] + "_" + relDirCode
+                cpi4 = [k for k in ConsProfileItem.values() if k['speed'] == curspeedIndex and k['ws']==curweatherIndex and
+                 k['wd'] == relDirCode and k['draft']==currDraftIndex][0]['foc']
+                calcAvgConsCur2 = cpi4#.avgCons
+                difInCons2 = calcAvgConsCur2 - calcAvgConsPrev2
+                percSpeedDif = (math.pow(_speed, 3) - math.pow(listOfSpeeds[prevspeedIndex], 3)) / (math.pow(listOfSpeeds[curspeedIndex], 3) - math.pow(listOfSpeeds[prevspeedIndex], 3)) #// Cubic interpolation
+                calcAvgCons = calcAvgConsPrev2 + difInCons2 * percSpeedDif #// Linear interpolation
+
+            else:
+
+                prevweatherIndex = curweatherIndex - 1
+                prevspeedIndex = curspeedIndex - 1
+                #hashKey3 = draft + "_" + listOfSpeeds[prevspeedIndex] + "_" + listOfWeather[prevweatherIndex] + "_" + relDirCode
+                cpi3 = [k for k in ConsProfileItem.values() if k['speed'] == prevspeedIndex and k['ws']==prevweatherIndex and
+                 k['wd'] == relDirCode and k['draft']==currDraftIndex][0]['foc']
+                #cpi3 = []
+
+                calcAvgConsPrev2 = cpi3#.avgCons
+                #hashKey4 = draft + "_" + listOfSpeeds[curspeedIndex] + "_" + listOfWeather[curweatherIndex] + "_" + relDirCode
+                cpi4 = [k for k in ConsProfileItem.values() if k['speed'] == curspeedIndex and k['ws']==curweatherIndex and
+                 k['wd'] == relDirCode and k['draft']==currDraftIndex][0]['foc']
+                calcAvgConsCur2 = cpi4#.avgCons
+                difInCons2 = calcAvgConsCur2 - calcAvgConsPrev2
+                percSpeedDif = (math.pow(_speed, 3) - math.pow(listOfSpeeds[prevspeedIndex], 3)) / (math.pow(listOfSpeeds[curspeedIndex], 3) - math.pow(listOfSpeeds[prevspeedIndex], 3)) #// Cubic interpolation
+                calcAvgCons = calcAvgConsPrev2 + difInCons2 * percSpeedDif #// Linear interpolation
+
+
+            return calcAvgCons[0]
+
+
+
+    def createModelsFor(self, partitionsX, partitionsY, partition_labels, tri, X, Y):
+
+        AvgCons = self.GetAvgCons(X[0,0],X[0,3],X[0,4],X[0,1])
+
+
+
+        return y_interp
 
 
 class TensorFlowW2(BasePartitionModeler):
@@ -1457,7 +1641,7 @@ class TensorFlowW1(BasePartitionModeler):
                 varXCl=[]
                 varYCl = []
                 print("CLUSTER:  " +str(idx))
-                for i in range(1,20):
+                for i in range(1,40):
 
 
                     #estimatorCl.fit(X_train,y_train, epochs=i ,verbose = 0)
