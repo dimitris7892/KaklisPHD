@@ -1,9 +1,6 @@
-clusters,error,models,partitioners,var
-1,5.530546039140848,PavlosInterpolation,KMeansPartitionerWS_WA,9928.959944611977
-25,4.704993724822998,TensorFlowW1,KMeansPartitionerWS_WA,9928.959944611977
-1,5.530546039140848,PavlosInterpolation,KMeansPartitionerWS_WA,8335.066544248051
-25,5.04572868347168,TensorFlowW1,KMeansPartitionerWS_WA,8335.066544248051
-1,5.530546039140848,PavlosInterpolation,KMeansPartitionerWS_WA,8787.654967483542
-25,4.166071891784668,TensorFlowW1,KMeansPartitionerWS_WA,8787.654967483542
-1,5.530546039140848,PavlosInterpolation,KMeansPartitionerWS_WA,9906.428858943964
-25,8.303991317749023,TensorFlowW1,KMeansPartitionerWS_WA,9906.428858943964
+clusters,var,error,partitioners,models
+1,9928.959944611977,8.700446496226744,KMeansPartitioner,PavlosInterpolation
+1,8407.312574666856,10.277978940704095,KMeansPartitioner,PavlosInterpolation
+1,8872.881864867668,2.131421540036736,KMeansPartitioner,PavlosInterpolation
+1,9927.07060170175,2.086021157419378,KMeansPartitioner,PavlosInterpolation
+1,10853.410874144041,3.9974979002202344,KMeansPartitioner,PavlosInterpolation
