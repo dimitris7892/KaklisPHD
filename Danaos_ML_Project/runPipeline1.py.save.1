@@ -153,10 +153,10 @@ def main():
                  partK=np.linspace(0.7,1,4)#[0.5]
                  #np.linspace(0.2,1,11)
                      #[0.6]
-           
-           if modeler.__class__.__name__=='TriInterpolantModeler' or modeler.__class__.__name__ == 'TensorFlow':
+           if partitioner.__class__.__name__=='KMeansPartitioner':
+               if modeler.__class__.__name__=='TriInterpolantModeler' or modeler.__class__.__name__ == 'TensorFlow':
                  partK =K
-           else:
+               else:
                  partK=K
            error = {"errors": [ ]}
            #random.seed(1)
