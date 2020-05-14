@@ -124,7 +124,7 @@ def main():
     k=10000
     trData = data[0:89999]
     k=0
-    n=50000
+    n=20000
     #subsets=[]
     for i in range(1,5):
         subsetsX.append(trData[k:n*i,0:7])
@@ -241,7 +241,7 @@ def main():
                 # ...and keep them in a dict, connecting label to model
                 #modelMap, xs, output, genericModel =None,None,None,None
 
-                if modeler.__class__.__name__!= 'TriInterpolantModeler' :
+                if modeler.__class__.__name__!= 'TriInterpolantModeler' and modeler.__class__.__name__!= 'PavlosInterpolation' :
                             #and modeler.__class__.__name__ != 'TensorFlow':
                     modelMap, history,scores, output,genericModel = modeler.createModelsFor(partitionsX, partitionsY, partitionLabels,None,seriesX,targetY)
                             #, genericModel , partitionsXDC
@@ -287,7 +287,7 @@ def main():
                     _, meanError, sdError = eval.MeanAbsoluteErrorEvaluation.evaluatePavlosInterpolation(
                         eval.MeanAbsoluteErrorEvaluation(), unseenX,
                         unseenY,
-                        modeler, output, None, None, partitionsX, scores)
+                        modeler, None, None, None, partitionsX, None)
 
 
                 print ("Mean absolute error on unseen data: %4.2f (+/- %4.2f standard error)"%(meanError, sdError/sqrt(unseenY.shape[0])))
@@ -338,7 +338,7 @@ def initParameters():
     end = 17000
     startU = 30000
     endU = 31000
-    algs=['NNW1']
+    algs=['LI']
     # ['SR','LR','RF','NN','NNW','TRI']
 
 
