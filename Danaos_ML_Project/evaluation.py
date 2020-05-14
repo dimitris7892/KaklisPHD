@@ -686,7 +686,7 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
                         speedIndex = speedIndex + 1
                         wsIndex = 0
                     if i % 5 == 0:  # Ws Update
-                        wsIndex = wsIndex + 1
+                        wsIndex = 0 if i % 20==0 else wsIndex +1
                         wdIndex = 0
                 ConsProfileItem[i] = {'speed': speedIndex, 'ws': wsIndex, 'wd': wdIndex, 'draft': draftIndex,
                                       'foc': ListOfCons[i]}
@@ -723,10 +723,9 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
 
         return relDirCode
 
-    def GetAvgCons(self, _speed, _weatherMperS, _weatherRelDir, _draft):
+    def GetAvgCons(self, _speed, _weatherMperS, _weatherRelDir, _draft,listOfSpeeds, listOfWeather, ListOfCons, ListOfDrafts, ConsProfileItem):
 
-            listOfSpeeds, listOfWeather, ListOfCons, ListOfDrafts, ConsProfileItem = self.GetStatisticsOfVessel(
-                'MARMARAS', 'MT_DELTA_MARIA')
+
             _weatherMperS = _weatherMperS * 0.514
             minSpeed = np.min(listOfSpeeds)
             maxSpeed = np.max(listOfSpeeds)
@@ -751,7 +750,7 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
 
             # // Find where it is in the list of speeds
             curspeedIndex = 0
-            maxLenSpeed = 4 if currDraftIndex == 0 else 7
+            maxLenSpeed = 4 if currDraftIndex == 0 else 8
             minLenSpeed = 0 if currDraftIndex == 0 else 4
             for i in range(minLenSpeed, maxLenSpeed):
                 curspeedIndex = i
@@ -829,20 +828,34 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
                 calcAvgCons = calcAvgConsPrev2 + difInCons2 * percSpeedDif  # // Linear interpolation
 
             else:
-
+                flg = False
                 prevweatherIndex = curweatherIndex - 1
-                prevspeedIndex = curspeedIndex - 1
+                if currDraftIndex==1 and curspeedIndex==4:
+                    prevspeedIndex = 3
+                    currDraftIndex = 0
+                    flg=True
+                else: prevspeedIndex = curspeedIndex - 1
                 # hashKey3 = draft + "_" + listOfSpeeds[prevspeedIndex] + "_" + listOfWeather[prevweatherIndex] + "_" + relDirCode
-                cpi3 = \
-                [k for k in ConsProfileItem.values() if k['speed'] == prevspeedIndex and k['ws'] == prevweatherIndex and
-                 k['wd'] == relDirCode and k['draft'] == currDraftIndex][0]['foc']
+                cpi3=None
+                try:
+                    cpi3 = \
+                    [k for k in ConsProfileItem.values() if k['speed'] == prevspeedIndex and k['ws'] == prevweatherIndex and
+                     k['wd'] == relDirCode and k['draft'] == currDraftIndex][0]['foc']
+                except:
+                    t=0
                 # cpi3 = []
 
                 calcAvgConsPrev2 = cpi3  # .avgCons
                 # hashKey4 = draft + "_" + listOfSpeeds[curspeedIndex] + "_" + listOfWeather[curweatherIndex] + "_" + relDirCode
-                cpi4 = \
-                [k for k in ConsProfileItem.values() if k['speed'] == curspeedIndex and k['ws'] == curweatherIndex and
-                 k['wd'] == relDirCode and k['draft'] == currDraftIndex][0]['foc']
+                if flg==True:
+                    currDraftIndex = 1
+
+                try:
+                    cpi4 = \
+                    [k for k in ConsProfileItem.values() if k['speed'] == curspeedIndex and k['ws'] == curweatherIndex and
+                     k['wd'] == relDirCode and k['draft'] == currDraftIndex][0]['foc']
+                except:
+                    t=0
                 calcAvgConsCur2 = cpi4  # .avgCons
                 difInCons2 = calcAvgConsCur2 - calcAvgConsPrev2
                 percSpeedDif = (math.pow(_speed, 3) - math.pow(listOfSpeeds[prevspeedIndex], 3)) / (
@@ -852,21 +865,24 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
 
             return calcAvgCons[0]
 
-    def evaluatePavlosInterpolation(self, partitionsX, partitionsY, partition_labels, tri, X, Y):
+    def evaluatePavlosInterpolation(self, unseenX, unseenY, modeler,output,xs,genericModel,partitionsX , scores):
 
             lErrors = []
             foc=[]
             errorStwArr=[]
             errorFoc=[]
-
+            listOfSpeeds, listOfWeather, ListOfCons, ListOfDrafts, ConsProfileItem = self.GetStatisticsOfVessel(
+                'MARMARAS', 'MT_DELTA_MARIA')
             for iCnt in range(np.shape(unseenX)[0]):
                 pPoint = unseenX[iCnt].reshape(1, -1)  # [0] # Convert to matrix
                 trueVal = unseenY[iCnt]
-                prediction =  self.GetAvgCons(pPoint[0], pPoint[3], pPoint[4], pPoint[1])
+                prediction =  self.GetAvgCons(pPoint[0][0], pPoint[0][3], pPoint[0][4], pPoint[0][1],
+                                              listOfSpeeds, listOfWeather, ListOfCons, ListOfDrafts, ConsProfileItem)
 
                 foc.append(trueVal)
+                error = abs(prediction - trueVal)
                 errorStwArr.append(
-                    np.array(np.append(np.asmatrix(pPoint[0][0]).reshape(-1, 1), np.asmatrix([error[0]]).T, axis=1)))
+                    np.array(np.append(np.asmatrix(pPoint[0][0]).reshape(-1, 1), np.asmatrix([error]).T, axis=1)))
                 errorFoc.append(abs((prediction - trueVal) / trueVal) * 100)
 
                 lErrors.append(abs(prediction - trueVal))
@@ -880,7 +896,7 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
                     ['FOC', 'PERC'])
                 for i in range(0, len(errorFoc)):
                     data_writer.writerow(
-                        [foc[i], errorFoc[i][0][0]])
+                        [foc[i], errorFoc[i]])
 
             with open('./errorSTWPavlos' + str(len(partitionsX)) + '.csv', mode='w') as data:
                 data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
