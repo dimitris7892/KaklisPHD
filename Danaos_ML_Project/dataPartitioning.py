@@ -192,15 +192,15 @@ class KMeansPartitioner(DefaultPartitioner):
             # Keep partition label to ascertain same order of results
             partitionLabels.append(curLbl)
 
-        #k = len(partitionsX)
-        #i=0
-        #while i <k:
-            #if len(partitionsX[i]) <=1000:
-                #partitionsX.remove(partitionsX[i])
-                #partitionsY.remove(partitionsY[i])
-                #k = len(partitionsX)
-            #i=i+1
-        #partitionLabels = np.linspace(0, len(partitionsX), len(partitionsX))
+        k = len(partitionsX)
+        i=0
+        while i <k:
+            if len(partitionsX[i]) <=1000:
+                partitionsX.remove(partitionsX[i])
+                partitionsY.remove(partitionsY[i])
+                k = len(partitionsX)
+            i=i+1
+        partitionLabels = np.linspace(0, len(partitionsX), len(partitionsX))
         #for i in range(0,len(partitionsX)):
             #if len(partitionsX[i]) <=1000:
                 #partitionsX, partitionsY, partitionLabels , dataX , dataY,centroids = self.clustering(dataX,dataY,None,nClusters-1 , False)
