@@ -162,7 +162,8 @@ def main():
                  partK=np.linspace(0.7,1,4)#[0.5]
                  #np.linspace(0.2,1,11)
                      #[0.6]
-           if partitioner.__class__.__name__=='KMeansPartitioner':
+           if partitioner.__class__.__name__=='KMeansPartitioner' or partitioner.__class__.__name__=='KMeansPartitionerWS_WA'\
+                    or partitioner.__class__.__name__=='KMeansPartitionerWH_WD':
                if modeler.__class__.__name__ == 'PavlosInterpolation':
                  partK = [1]
                if modeler.__class__.__name__=='TriInterpolantModeler' or modeler.__class__.__name__ == 'TensorFlow':
