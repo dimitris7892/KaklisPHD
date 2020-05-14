@@ -194,29 +194,30 @@ class KMeansPartitioner(DefaultPartitioner):
 
         k = len(partitionsX)
         i=0
-        indxForMerging=[]
-        while i <k:
-            if len(partitionsX[i]) <=1000:
-                partitionsX.remove(partitionsX[i])
-                partitionsY.remove(partitionsY[i])
-                indxForMerging.append(i)
-                k = len(partitionsX)
-            i=i+1
+        if k > 1:
+            indxForMerging=[]
+            while i <k:
+                if len(partitionsX[i]) <=1000:
+                    partitionsX.remove(partitionsX[i])
+                    partitionsY.remove(partitionsY[i])
+                    indxForMerging.append(i)
+                    k = len(partitionsX)
+                i=i+1
 
-        minDist =20000000000
+            minDist =20000000000
 
-        for k in indxForMerging:
-            minI = 0
-            for i in range(0,len(partitionsX)):
-                if i !=k:
-                    dist = np.linalg.norm(np.mean(partitionsX[i],axis=0)-np.mean(partitionsX[k],axis=0))
-                    if dist < minDist:
-                        minDist = dist
-                        minI=i
-            partitionsX[minI] = np.concatenate([partitionsX[minI],partitionsX[k]])
-            partitionsY[minI] = np.concatenate([partitionsY[minI], partitionsY[k]])
+            for k in indxForMerging:
+                minI = 0
+                for i in range(0,len(partitionsX)):
+                    if i !=k:
+                        dist = np.linalg.norm(np.mean(partitionsX[i],axis=0)-np.mean(partitionsX[k],axis=0))
+                        if dist < minDist:
+                            minDist = dist
+                            minI=i
+                partitionsX[minI] = np.concatenate([partitionsX[minI],partitionsX[k]])
+                partitionsY[minI] = np.concatenate([partitionsY[minI], partitionsY[k]])
 
-        partitionLabels = np.linspace(0, len(partitionsX), len(partitionsX))
+            partitionLabels = np.linspace(0, len(partitionsX), len(partitionsX))
         #for i in range(0,len(partitionsX)):
             #if len(partitionsX[i]) <=1000:
                 #partitionsX, partitionsY, partitionLabels , dataX , dataY,centroids = self.clustering(dataX,dataY,None,nClusters-1 , False)
