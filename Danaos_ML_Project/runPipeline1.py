@@ -121,21 +121,30 @@ def main():
     data = data.drop(["wind_speed", "wind_dir"],axis=1)
     data = data.values
 
-    k=10000
+
     trData = data[0:89999]
     k=0
+    kInit =0
     n=20000
     #subsets=[]
-    for i in range(1,5):
-        subsetsX.append(trData[k:n*i,0:7])
-        subsetsY.append(trData[k:n * i, 7])
+    for i in range(1,6):
+        subsetsX.append(trData[(k+kInit):(n+k+kInit),0:7])
+        subsetsY.append(trData[(k+kInit):(n+k+kInit), 7])
         k=n*i+1000
 
     #indSubsets = []
     #for i in range(0,len(subsets)):
        #X = DANreader.readStatDifferentSubsets(subsets[i],subsets,i)
        #indSubsets.append(X)
-
+    n = 1000
+    kInit=90000
+    k=0
+    unseensX=[]
+    unseensY = []
+    for i in range(1,6):
+        unseensX.append(data[(k+kInit):(n+k+kInit) , 0:7])
+        unseensY.append(data[(k+kInit):(n+k+kInit), 7])
+        k = n * i + 10
 
 
     #subsetsX.append(data[:,0:7][0:1000].astype(float))
@@ -144,7 +153,7 @@ def main():
     unseenY = data[:, 7][90000:].astype(float)
 
 
-    K = range(1,26)
+
     print("Number of Statistically ind. subsets for training: " + str(len(subsetsX)))
 
     #K=[10]
@@ -153,6 +162,7 @@ def main():
     varTr = []
     models = []
     part = []
+    subsetInd = 0
 
     for subsetX, subsetY in zip(subsetsX, subsetsY):
 
@@ -166,10 +176,10 @@ def main():
                     or partitioner.__class__.__name__=='KMeansPartitionerWH_WD':
                if modeler.__class__.__name__ == 'PavlosInterpolation':
                  partK = [1]
-               if modeler.__class__.__name__=='TriInterpolantModeler' or modeler.__class__.__name__ == 'TensorFlow':
+               elif modeler.__class__.__name__=='TriInterpolantModeler' or modeler.__class__.__name__ == 'TensorFlow':
                  partK =K
                else:
-                 partK=[25]
+                 partK=range(1,26)
            error = {"errors": [ ]}
            #random.seed(1)
 
@@ -285,8 +295,8 @@ def main():
                         modeler, output, None, None, partitionsX, scores)
                 elif modeler.__class__.__name__=='PavlosInterpolation':
                     _, meanError, sdError = eval.MeanAbsoluteErrorEvaluation.evaluatePavlosInterpolation(
-                        eval.MeanAbsoluteErrorEvaluation(), unseenX,
-                        unseenY,
+                        eval.MeanAbsoluteErrorEvaluation(), unseensX[subsetInd],
+                        unseensY[subsetInd],
                         modeler, None, None, None, partitionsX, None)
 
 
@@ -325,6 +335,7 @@ def main():
                     break
                 if partitioner.__class__.__name__ == 'DelaunayTriPartitioner' and numOfclusters==1:
                     break
+      subsetInd=subsetInd+1
 
 
     eval.MeanAbsoluteErrorEvaluation.ANOVAtest(eval.MeanAbsoluteErrorEvaluation(), clusters, varTr, errors,models,part)
