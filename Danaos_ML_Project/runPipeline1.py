@@ -124,12 +124,12 @@ def main():
     k=10000
     trData = data[0:89999]
     k=0
-    n=3000
-    subsets=[]
-    #for i in range(1,5):
-        #subsetsX.append(trData[k:n*i,0:7])
-        #subsetsY.append(trData[k:n * i, 7])
-        #k=n*i+1000
+    n=50000
+    #subsets=[]
+    for i in range(1,5):
+        subsetsX.append(trData[k:n*i,0:7])
+        subsetsY.append(trData[k:n * i, 7])
+        k=n*i+1000
 
     #indSubsets = []
     #for i in range(0,len(subsets)):
@@ -138,13 +138,13 @@ def main():
 
 
 
-    subsetsX.append(data[:,0:7][0:1000].astype(float))
-    subsetsY.append(data[:, 7][0:1000].astype(float))
+    #subsetsX.append(data[:,0:7][0:1000].astype(float))
+    #subsetsY.append(data[:, 7][0:1000].astype(float))
     unseenX = data[:, 0:7][90000:].astype(float)
     unseenY = data[:, 7][90000:].astype(float)
 
 
-    K = range(1,15)
+    K = range(1,26)
     print("Number of Statistically ind. subsets for training: " + str(len(subsetsX)))
 
     #K=[10]
@@ -163,6 +163,8 @@ def main():
                  #np.linspace(0.2,1,11)
                      #[0.6]
            if partitioner.__class__.__name__=='KMeansPartitioner':
+               if modeler.__class__.__name__ == 'PavlosInterpolation':
+                 partK = [1]
                if modeler.__class__.__name__=='TriInterpolantModeler' or modeler.__class__.__name__ == 'TensorFlow':
                  partK =K
                else:
@@ -335,7 +337,7 @@ def initParameters():
     end = 17000
     startU = 30000
     endU = 31000
-    algs=['LI','NNW1']
+    algs=['NNW1']
     # ['SR','LR','RF','NN','NNW','TRI']
 
 

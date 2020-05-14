@@ -855,12 +855,39 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
     def evaluatePavlosInterpolation(self, partitionsX, partitionsY, partition_labels, tri, X, Y):
 
             lErrors = []
+            foc=[]
+            errorStwArr=[]
+            errorFoc=[]
+
             for iCnt in range(np.shape(unseenX)[0]):
                 pPoint = unseenX[iCnt].reshape(1, -1)  # [0] # Convert to matrix
                 trueVal = unseenY[iCnt]
                 prediction =  self.GetAvgCons(pPoint[0], pPoint[3], pPoint[4], pPoint[1])
 
+                foc.append(trueVal)
+                errorStwArr.append(
+                    np.array(np.append(np.asmatrix(pPoint[0][0]).reshape(-1, 1), np.asmatrix([error[0]]).T, axis=1)))
+                errorFoc.append(abs((prediction - trueVal) / trueVal) * 100)
+
                 lErrors.append(abs(prediction - trueVal))
+
+            errorStwArr = np.array(errorStwArr)
+            errorStwArr = errorStwArr.reshape(-1, 2)
             errors = np.asarray(lErrors)
+            with open('./errorPercFOCPavlos' + str(len(partitionsX)) + '.csv', mode='w') as data:
+                data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+                data_writer.writerow(
+                    ['FOC', 'PERC'])
+                for i in range(0, len(errorFoc)):
+                    data_writer.writerow(
+                        [foc[i], errorFoc[i][0][0]])
+
+            with open('./errorSTWPavlos' + str(len(partitionsX)) + '.csv', mode='w') as data:
+                data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+                data_writer.writerow(
+                    ['STW', 'MAE'])
+                for i in range(0, len(errorStwArr)):
+                    data_writer.writerow(
+                        [errorStwArr[i][0], errorStwArr[i][1]])
 
             return errors, np.mean(errors), np.std(lErrors)
