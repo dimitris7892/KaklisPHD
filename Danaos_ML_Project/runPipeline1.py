@@ -1,3 +1,4 @@
+import glob, os
 import dataReading as dRead
 #from Danaos_ML_Project import dataReading as DANdRead ##   NEWWWW
 import dataReading as DANdRead
@@ -12,7 +13,9 @@ import itertools
 import pandas as pd
 import random
 from sklearn.decomposition import PCA
+from pylab import *
 import datetime
+import  matplotlib.pyplot as plt
 import csv
 import tensorflow as tf
 
@@ -58,6 +61,9 @@ def main():
     #DANreader.GenericParserForDataExtraction('LEMAG', 'OCEAN_GOLD', 'PENELOPE',driver='ORACLE',server='10.2.5.80',sid='OR11',usr='oceangold',password='oceangold',
         #rawData=True,telegrams=True,companyTelegrams=True,seperator='\t',pathOfRawData='C:/Users/dkaklis/Desktop/danaos')
 
+    #DANreader.GenericParserForDataExtraction('LEMAG', 'MARMARAS', 'MT_DELTA_MARIA',driver='ORACLE',server='10.2.5.80',sid='OR11',usr='oceangold',password='oceangold',
+    #rawData=True,telegrams=False,companyTelegrams=False,seperator='\t',pathOfRawData='C:/Users/dkaklis/Desktop/danaos')
+
     #DANreader.readExtractNewDataset('MILLENIA','FANTASIA',';')
     #return
     #DANreader.ExtractLAROSDataset("",'2017-06-01 00:00:00','2019-10-09 15:10:00')
@@ -83,6 +89,8 @@ def main():
         elif al == 'NNW3':
             modelers.append(dModel.TensorFlowW3())
         elif al == 'NNWCA':modelers.append(dModel.TensorFlowCA())
+        elif al == 'LI':
+            modelers.append(dModel.PavlosInterpolation())
 
     partitioners=[]
     for cl in cls:
@@ -113,12 +121,12 @@ def main():
     data = data.drop(["wind_speed", "wind_dir"],axis=1)
     data = data.values
 
-    #k=10000
-    #trData = data[0:89999]
-    #k=0
-    #n=6000
-    #subsets=[]
-    #for i in range(1,6):
+    k=10000
+    trData = data[0:89999]
+    k=0
+    n=3000
+    subsets=[]
+    #for i in range(1,5):
         #subsetsX.append(trData[k:n*i,0:7])
         #subsetsY.append(trData[k:n * i, 7])
         #k=n*i+1000
@@ -129,13 +137,14 @@ def main():
        #indSubsets.append(X)
 
 
-    subsetsX.append(data[:,0:7][0:50000].astype(float))
-    subsetsY.append(data[:, 7][0:50000].astype(float))
-    unseenX = data[:, 0:7][90000:91000].astype(float)
-    unseenY = data[:, 7][90000:91000].astype(float)
+
+    subsetsX.append(data[:,0:7][0:1000].astype(float))
+    subsetsY.append(data[:, 7][0:1000].astype(float))
+    unseenX = data[:, 0:7][90000:].astype(float)
+    unseenY = data[:, 7][90000:].astype(float)
 
 
-    K = range(1,26)
+    K = range(1,15)
     print("Number of Statistically ind. subsets for training: " + str(len(subsetsX)))
 
     #K=[10]
@@ -153,11 +162,11 @@ def main():
                  partK=np.linspace(0.7,1,4)#[0.5]
                  #np.linspace(0.2,1,11)
                      #[0.6]
-           
-           if modeler.__class__.__name__=='TriInterpolantModeler' or modeler.__class__.__name__ == 'TensorFlow':
+           if partitioner.__class__.__name__=='KMeansPartitioner':
+               if modeler.__class__.__name__=='TriInterpolantModeler' or modeler.__class__.__name__ == 'TensorFlow':
                  partK =K
-           else:
-                 partK=K
+               else:
+                 partK=[25]
            error = {"errors": [ ]}
            #random.seed(1)
 
@@ -190,28 +199,31 @@ def main():
 
                 # Extract features
 
-
+                if modeler.__class__.__name__ == 'PavlosInterpolation':
+                        k=1
                 #partitionsX, partitionsY , partitionLabels=X,Y,W
                 #if modeler.__class__.__name__!='TensorFlow':
                 # Partition data
                 print("Partitioning training set...")
+                partitionsX, partitionsY = seriesX , targetY
                 NUM_OF_CLUSTERS =k# TODO: Read from command line
                 NUM_OF_FOLDS=6
                 #if modeler!='TRI':
+
                 if modeler.__class__.__name__ != 'TensorFlowWD':
-                    partitionsX, partitionsY, partitionLabels, partitionRepresentatives, partitioningModel  , centroids  = partitioner.clustering(seriesX, targetY, None ,NUM_OF_CLUSTERS, True,k)
+                        partitionsX, partitionsY, partitionLabels, partitionRepresentatives, partitioningModel  , centroids  = partitioner.clustering(seriesX, targetY, None ,NUM_OF_CLUSTERS, True,k)
                 else:
-                   #partitionLabels=23
+                       #partitionLabels=23
 
-                    partitionsX, partitionsY, partitionLabels, partitionRepresentatives, partitioningModel, tri  = partitioner.clustering(
+                        partitionsX, partitionsY, partitionLabels, partitionRepresentatives, partitioningModel, tri  = partitioner.clustering(
 
-                        seriesX, targetY, None, NUM_OF_CLUSTERS, True, k)
+                            seriesX, targetY, None, NUM_OF_CLUSTERS, True, k)
 
-                    #partitionsXDB6, partitionsYDB6, partitionLabels, partitionRepresentatives, partitioningModel, tri = partitioner.clustering(
-                        #drftB6, targetY, None, 25, True, k)
+                        #partitionsXDB6, partitionsYDB6, partitionLabels, partitionRepresentatives, partitioningModel, tri = partitioner.clustering(
+                            #drftB6, targetY, None, 25, True, k)
 
-                    #partitionsXDBS6, partitionsYDS6, partitionLabels, partitionRepresentatives, partitioningModel, tri = partitioner.clustering(
-                        #drftS6, targetY, None, 25, True, k)
+                        #partitionsXDBS6, partitionsYDS6, partitionLabels, partitionRepresentatives, partitioningModel, tri = partitioner.clustering(
+                            #drftS6, targetY, None, 25, True, k)
 
                 print("Partitioning training set... Done.")
                 # For each partition create model
@@ -268,6 +280,11 @@ def main():
                         eval.MeanAbsoluteErrorEvaluation(), unseenX,
                         unseenY,
                         modeler, output, None, None, partitionsX, scores)
+                elif modeler.__class__.__name__=='PavlosInterpolation':
+                    _, meanError, sdError = eval.MeanAbsoluteErrorEvaluation.evaluatePavlosInterpolation(
+                        eval.MeanAbsoluteErrorEvaluation(), unseenX,
+                        unseenY,
+                        modeler, output, None, None, partitionsX, scores)
 
 
                 print ("Mean absolute error on unseen data: %4.2f (+/- %4.2f standard error)"%(meanError, sdError/sqrt(unseenY.shape[0])))
@@ -318,7 +335,7 @@ def initParameters():
     end = 17000
     startU = 30000
     endU = 31000
-    algs=['NNW1']
+    algs=['LI','NNW1']
     # ['SR','LR','RF','NN','NNW','TRI']
 
 
