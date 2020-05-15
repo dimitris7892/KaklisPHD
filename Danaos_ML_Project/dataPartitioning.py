@@ -198,8 +198,8 @@ class KMeansPartitioner(DefaultPartitioner):
             indxForMerging=[]
             while i <k:
                 if len(partitionsX[i]) <=1000:
-                    partitionsX.remove(partitionsX[i])
-                    partitionsY.remove(partitionsY[i])
+                    #partitionsX.remove(partitionsX[i])
+                    #partitionsY.remove(partitionsY[i])
                     indxForMerging.append(i)
                     k = len(partitionsX)
                 i=i+1
