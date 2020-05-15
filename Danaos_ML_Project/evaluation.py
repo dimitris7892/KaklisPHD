@@ -124,16 +124,37 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
             #vectorPpoint = self.extractFunctionsFromSplines(pPoint[0][0], pPoint[0][1], pPoint[0][2], pPoint[0][3],
                                                       #pPoint[0][4], pPoint[0][5], pPoint[0][6], ind)
             #####
-            vector = self.extractFunctionsFromSplines(meanPointsOfCl[0], meanPointsOfCl[1], meanPointsOfCl[2], meanPointsOfCl[3],
-                                                      meanPointsOfCl[4], meanPointsOfCl[5], meanPointsOfCl[6], ind)
+            #vector = self.extractFunctionsFromSplines(meanPointsOfCl[0], meanPointsOfCl[1], meanPointsOfCl[2], meanPointsOfCl[3],
+                                                      #meanPointsOfCl[4], meanPointsOfCl[5], meanPointsOfCl[6], ind)
+
+            #vector = self.extractFunctionsFromSplines(meanPointsOfCl[0][0], meanPointsOfCl[0][1], meanPointsOfCl[0][2],
+                                                      #meanPointsOfCl[0][3],
+                                                      #meanPointsOfCl[0][4], meanPointsOfCl[0][5], meanPointsOfCl[0][6],'Gen')
 
             #newVector = np.mean([vector,vectorPpoint],axis=0)
+
+            #XSplineVector = np.append(meanPointsOfCl, vector)
+
+            #XSplineVector = XSplineVector.reshape(-1, XSplineVector.shape[0])
+            #pred = abs(modeler._models[ind].predict(XSplineVector))
+            #pred = modeler._models[len(modeler._models) - 1].predict(XSplineVector)
+            #meanClGenpred = pred
+            #################################
+
+            vector = self.extractFunctionsFromSplines(meanPointsOfCl[0], meanPointsOfCl[1], meanPointsOfCl[2],
+                                                      meanPointsOfCl[3],
+                                                      meanPointsOfCl[4], meanPointsOfCl[5], meanPointsOfCl[6],
+                                                      ind)
+
+            # newVector = np.mean([vector,vectorPpoint],axis=0)
 
             XSplineVector = np.append(meanPointsOfCl, vector)
 
             XSplineVector = XSplineVector.reshape(-1, XSplineVector.shape[0])
-            pred = abs(modeler._models[ind].predict(XSplineVector))
+            #pred = abs(modeler._models[ind].predict(XSplineVector))
+            pred = modeler._models[ind].predict(XSplineVector)
             meanClpred = pred
+            ###########################################################################
             #pred=0
             #for i in range(0,len(partitionsX)):
                 #pred +=modeler._models[i].predict(pPoint)
@@ -152,8 +173,15 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
             #except:
                 #print("ERROR ON EVALUATION")
                 #prediction = modeler._models[len(modeler._models)-1].predict(XSplineGenVector)
-            prediction = ((modeler._models[ind].predict(XSplineVector)) + modeler._models[
-                len(modeler._models) - 1].predict(XSplineGenVector))/ 2
+            Genpred = modeler._models[len(modeler._models) - 1].predict(XSplineGenVector)
+            CLpred = modeler._models[ind].predict(XSplineVector)
+            if abs(meanClpred - Genpred) >7:
+                if abs(CLpred - Genpred) > 5:
+                    prediction = Genpred
+                else:
+                    prediction = (Genpred + CLpred )/2
+            else:
+                prediction = (meanClpred + Genpred  )/ 2
 
             #prediction = (abs(modeler._models[ind].predict(pPoint)))
             #prediction =  modeler._models[len(modeler._models) - 1].predict(pPoint)
