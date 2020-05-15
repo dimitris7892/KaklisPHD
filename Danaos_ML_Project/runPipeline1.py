@@ -127,24 +127,35 @@ def main():
     kInit =0
     n=20000
     #subsets=[]
-    for i in range(1,6):
-        subsetsX.append(trData[(k+kInit):(n+k+kInit),0:7])
-        subsetsY.append(trData[(k+kInit):(n+k+kInit), 7])
-        k=n*i+1000
+    #for i in range(1,5):
+        #subsetsX.append(trData[(k+kInit):(n+k+kInit),0:7])
+        #subsetsY.append(trData[(k+kInit):(n+k+kInit), 7])
+        #k=n*i#+1000
 
+    subsetsX.append(trData[0:20000, 0:7])
+    subsetsY.append(trData[0:20000, 7])
+
+    subsetsX.append(trData[20000:40000, 0:7])
+    subsetsY.append(trData[20000:40000, 7])
+
+    subsetsX.append(trData[50000:70000, 0:7])
+    subsetsY.append(trData[50000:70000, 7])
+
+    subsetsX.append(trData[70000:90000, 0:7])
+    subsetsY.append(trData[70000:90000, 7])
     #indSubsets = []
     #for i in range(0,len(subsets)):
        #X = DANreader.readStatDifferentSubsets(subsets[i],subsets,i)
        #indSubsets.append(X)
-    n = 1000
-    kInit=90000
-    k=0
-    unseensX=[]
-    unseensY = []
-    for i in range(1,6):
-        unseensX.append(data[(k+kInit):(n+k+kInit) , 0:7])
-        unseensY.append(data[(k+kInit):(n+k+kInit), 7])
-        k = n * i + 10
+    #n = 1000
+    #kInit=90000
+    #k=0
+    #unseensX=[]
+    #unseensY = []
+    #for i in range(1,6):
+        #unseensX.append(data[(k+kInit):(n+k+kInit) , 0:7])
+        #unseensY.append(data[(k+kInit):(n+k+kInit), 7])
+        #k = n * i + 10
 
 
     #subsetsX.append(data[:,0:7][0:1000].astype(float))
@@ -295,9 +306,9 @@ def main():
                         modeler, output, None, None, partitionsX, scores)
                 elif modeler.__class__.__name__=='PavlosInterpolation':
                     _, meanError, sdError = eval.MeanAbsoluteErrorEvaluation.evaluatePavlosInterpolation(
-                        eval.MeanAbsoluteErrorEvaluation(), unseensX[subsetInd],
-                        unseensY[subsetInd],
-                        modeler, None, None, None, partitionsX, None)
+                        eval.MeanAbsoluteErrorEvaluation(), unseenX,
+                        unseenY,
+                        modeler, None, None, None, partitionsX, None,subsetInd)
 
 
                 print ("Mean absolute error on unseen data: %4.2f (+/- %4.2f standard error)"%(meanError, sdError/sqrt(unseenY.shape[0])))
