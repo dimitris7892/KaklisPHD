@@ -81,7 +81,7 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
             lErrors.append(error)
         return errors, np.mean(errors), np.std(lErrors)
 
-    def evaluateKerasNN1(self, unseenX, unseenY, modeler,output,xs,genericModel,partitionsX , scores):
+    def evaluateKerasNN1(self, unseenX, unseenY, modeler,output,xs,genericModel,partitionsX , scores,subsetInd):
         lErrors = []
 
         from tensorflow import keras
@@ -197,7 +197,7 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
         errorStwArr = np.array(errorStwArr)
         errorStwArr = errorStwArr.reshape(-1, 2)
         errors = np.asarray(lErrors)
-        with open('./errorPercFOC'+str(len(partitionsX))+'.csv', mode='w') as data:
+        with open('./errorPercFOC'+str(len(partitionsX))+'_'+str(subsetInd)+'.csv', mode='w') as data:
             data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
             data_writer.writerow(
                 ['FOC', 'PERC'])
@@ -205,7 +205,7 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
                 data_writer.writerow(
                     [foc[i],errorFoc[i][0][0]])
 
-        with open('./errorSTW'+str(len(partitionsX))+'.csv', mode='w') as data:
+        with open('./errorSTW'+str(len(partitionsX))+'_'+str(subsetInd)+'.csv', mode='w') as data:
             data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
             data_writer.writerow(
                 ['STW', 'MAE'])
@@ -223,7 +223,7 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
 
         return errors, np.mean(errors), np.std(lErrors)
 
-    def evaluateKerasNN(self, unseenX, unseenY, modeler,output,xs,genericModel,partitionsX , scores):
+    def evaluateKerasNN(self, unseenX, unseenY, modeler,output,xs,genericModel,partitionsX , scores,subsetInd):
         lErrors = []
         with open('./meanErrorStw.csv', mode='w') as data:
             data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
