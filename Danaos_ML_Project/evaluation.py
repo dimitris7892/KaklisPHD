@@ -660,15 +660,15 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
             listOfWeatherBeaufort = np.array([0, 3, 5, 8])
             listOfWeather = [0, 4.34, 9, 34, 18.91]
 
-            sFile = './data/' + company + '/' + vessel + '/ListOfSpeeds'+subsetInd+'.csv'
+            sFile = './data/' + company + '/' + vessel + '/ListOfSpeeds'+str(subsetInd+1)+'.csv'
             data = pd.read_csv(sFile, delimiter=',')
             listOfSpeeds = np.array(data.values)
 
-            sFile = './data/' + company + '/' + vessel + '/ListOfCons'+subsetInd+'.csv'
+            sFile = './data/' + company + '/' + vessel + '/ListOfCons'+str(subsetInd+1)+'.csv'
             data = pd.read_csv(sFile, delimiter=',')
             ListOfCons = np.array(data.values)
 
-            sFile = './data/' + company + '/' + vessel + '/ListOfDrafts'+subsetInd+'.csv'
+            sFile = './data/' + company + '/' + vessel + '/ListOfDrafts'+str(subsetInd+1)+'.csv'
             data = pd.read_csv(sFile, delimiter=',')
             ListOfDrafts = np.array(data.values)
 
