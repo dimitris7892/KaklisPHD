@@ -655,20 +655,20 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
         #print(aov_table)
 
 
-    def GetStatisticsOfVessel(self, company, vessel):
+    def GetStatisticsOfVessel(self, company, vessel,subsetInd):
 
             listOfWeatherBeaufort = np.array([0, 3, 5, 8])
             listOfWeather = [0, 4.34, 9, 34, 18.91]
 
-            sFile = './data/' + company + '/' + vessel + '/ListOfSpeeds.csv'
+            sFile = './data/' + company + '/' + vessel + '/ListOfSpeeds'+subsetInd+'.csv'
             data = pd.read_csv(sFile, delimiter=',')
             listOfSpeeds = np.array(data.values)
 
-            sFile = './data/' + company + '/' + vessel + '/ListOfCons.csv'
+            sFile = './data/' + company + '/' + vessel + '/ListOfCons'+subsetInd+'.csv'
             data = pd.read_csv(sFile, delimiter=',')
             ListOfCons = np.array(data.values)
 
-            sFile = './data/' + company + '/' + vessel + '/ListOfDrafts.csv'
+            sFile = './data/' + company + '/' + vessel + '/ListOfDrafts'+subsetInd+'.csv'
             data = pd.read_csv(sFile, delimiter=',')
             ListOfDrafts = np.array(data.values)
 
@@ -865,14 +865,14 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
 
             return calcAvgCons[0]
 
-    def evaluatePavlosInterpolation(self, unseenX, unseenY, modeler,output,xs,genericModel,partitionsX , scores):
+    def evaluatePavlosInterpolation(self, unseenX, unseenY, modeler,output,xs,genericModel,partitionsX , scores,subsetInd):
 
             lErrors = []
             foc=[]
             errorStwArr=[]
             errorFoc=[]
             listOfSpeeds, listOfWeather, ListOfCons, ListOfDrafts, ConsProfileItem = self.GetStatisticsOfVessel(
-                'MARMARAS', 'MT_DELTA_MARIA')
+                'MARMARAS', 'MT_DELTA_MARIA',subsetInd)
             for iCnt in range(np.shape(unseenX)[0]):
                 pPoint = unseenX[iCnt].reshape(1, -1)  # [0] # Convert to matrix
                 trueVal = unseenY[iCnt]
