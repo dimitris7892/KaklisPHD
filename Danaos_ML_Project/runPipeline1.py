@@ -190,7 +190,7 @@ def main():
                elif modeler.__class__.__name__=='TriInterpolantModeler' or modeler.__class__.__name__ == 'TensorFlow':
                  partK =K
                else:
-                 partK=[10]
+                 partK=[15]
            error = {"errors": [ ]}
            #random.seed(1)
 
