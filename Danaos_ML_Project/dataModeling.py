@@ -1704,7 +1704,7 @@ class TensorFlowW1(BasePartitionModeler):
         # Plot training & validation loss values
         print("GENERAL MODEL  ")
         es = EarlyStopping(monitor='val_loss', mode='min', verbose=0)
-        history = estimator.fit(XSplineVectorGen, Y, epochs=30, validation_split=0.17,verbose=0,callbacks=[es])
+        history = estimator.fit(XSplineVectorGen, Y, epochs=50, validation_split=0.17,verbose=0,)#callbacks=[es])
 
 
         #print("CORRELATION COEFF ERR AND STW: " +str(pearsonr(stdSTW,clustersTrScores)))
