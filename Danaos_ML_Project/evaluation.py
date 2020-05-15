@@ -2,7 +2,7 @@ import numpy as np
 import dataModeling as dt
 import tensorflow as tf
 import sklearn.ensemble as skl
-#import statsmodels.api
+import statsmodels.api
 #from statsmodels.formula.api import ols
 import pandas as pd
 #import scikit_posthocs as sp
@@ -19,7 +19,7 @@ import matplotlib.pyplot as plt
 import csv
 import pyearth as sp
 import sklearn.svm as svr
-#import latex
+import latex
 from matplotlib import rc
 
 
@@ -108,17 +108,18 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
                 #XSplineVector = XSplineVector.reshape(-1, XSplineVector.shape[0])
                 #pred = abs(modeler._models[ind].predict(XSplineVector))
                 #preds.append(pred)
-            distVec = np.mean(partitionsX[ind], axis=0) - pPoint[0]
-            pPointRefined = []
-            for i in range(0, pPoint.shape[1]):
-                if abs(distVec[i])>10:
-                    pPointRefined.append((pPoint[0][i] + (distVec[i])/2))
-                else:
-                    pPointRefined.append(pPoint[0][i])
-            pPointRefined = np.array(pPointRefined)
+            #distVec = np.mean(partitionsX[ind], axis=0) - pPoint[0]
+            #pPointRefined = []
+            #for i in range(0, pPoint.shape[1]):
+                #if abs(distVec[i])>10:
+                    #pPointRefined.append((pPoint[0][i] + (distVec[i])/2))
+                #else:
+                    #pPointRefined.append(pPoint[0][i])
+            #pPointRefined = np.array(pPointRefined)
 
             meanPointsOfCl = np.mean(partitionsX[ind],axis=0)
-            meanPointsOfCl = np.mean([meanPointsOfCl,pPointRefined],axis=0)
+            #meanPointsOfCl = np.mean([meanPointsOfCl,pPointRefined],axis=0)
+            #meanPointsOfCl = np.mean([meanPointsOfCl, pPoint], axis=0)
             #####
             #vectorPpoint = self.extractFunctionsFromSplines(pPoint[0][0], pPoint[0][1], pPoint[0][2], pPoint[0][3],
                                                       #pPoint[0][4], pPoint[0][5], pPoint[0][6], ind)
@@ -147,11 +148,12 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
             # prediction = abs(modeler._models[ 0 ].predict(XSplineVector))
             # XSplineVector = XSplineGenVector if modeler._models[ind][1]=='GEN' else XSplineVector
             #try:
-            #prediction = (abs(modeler._models[ind].predict(XSplineVector)) + modeler._models[len(modeler._models)-1].predict(XSplineGenVector))/2
+                #prediction = (abs(modeler._models[ind].predict(XSplineVector)) + modeler._models[len(modeler._models)-1].predict(XSplineGenVector))/2
             #except:
-            prediction = modeler._models[len(modeler._models)-1].predict(XSplineGenVector)
-            #prediction = (meanClpred  + modeler._models[
-                #len(modeler._models) - 1].predict(XSplineGenVector)) / 2
+                #print("ERROR ON EVALUATION")
+                #prediction = modeler._models[len(modeler._models)-1].predict(XSplineGenVector)
+            prediction = ((modeler._models[ind].predict(XSplineVector)) + modeler._models[
+                len(modeler._models) - 1].predict(XSplineGenVector))/ 2
 
             #prediction = (abs(modeler._models[ind].predict(pPoint)))
             #prediction =  modeler._models[len(modeler._models) - 1].predict(pPoint)
@@ -893,7 +895,7 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
             errorStwArr = np.array(errorStwArr)
             errorStwArr = errorStwArr.reshape(-1, 2)
             errors = np.asarray(lErrors)
-            with open('./errorPercFOCPavlos' + str(len(partitionsX)) + '.csv', mode='w') as data:
+            with open('./errorPercFOCPavlos' + str(subsetInd) + '.csv', mode='w') as data:
                 data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
                 data_writer.writerow(
                     ['FOC', 'PERC'])
@@ -901,7 +903,7 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
                     data_writer.writerow(
                         [foc[i], errorFoc[i]])
 
-            with open('./errorSTWPavlos' + str(len(partitionsX)) + '.csv', mode='w') as data:
+            with open('./errorSTWPavlos' + str(subsetInd) + '.csv', mode='w') as data:
                 data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
                 data_writer.writerow(
                     ['STW', 'MAE'])
