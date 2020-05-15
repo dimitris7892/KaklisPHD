@@ -190,7 +190,7 @@ def main():
                elif modeler.__class__.__name__=='TriInterpolantModeler' or modeler.__class__.__name__ == 'TensorFlow':
                  partK =K
                else:
-                 partK=[10] #range(1,26)
+                 partK=[10]
            error = {"errors": [ ]}
            #random.seed(1)
 
@@ -360,7 +360,7 @@ def initParameters():
     end = 17000
     startU = 30000
     endU = 31000
-    algs=['LI']
+    algs=['NNW1']
     # ['SR','LR','RF','NN','NNW','TRI']
 
 
