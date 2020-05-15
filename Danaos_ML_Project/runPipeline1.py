@@ -188,9 +188,9 @@ def main():
                if modeler.__class__.__name__ == 'PavlosInterpolation':
                  partK = [1]
                elif modeler.__class__.__name__=='TriInterpolantModeler' or modeler.__class__.__name__ == 'TensorFlow':
-                 partK =K
+                 partK =[1]
                else:
-                 partK=[10]
+                 partK=[3] #range(1,11)
            error = {"errors": [ ]}
            #random.seed(1)
 
