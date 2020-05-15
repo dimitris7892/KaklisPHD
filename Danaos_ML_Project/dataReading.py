@@ -370,7 +370,7 @@ class BaseSeriesReader:
             data = np.array(newDataSet)
             meanDRaft =np.mean(data[:,1])
             for i in range(0,len(data)):
-                if data[i,1] > np.ceil(meanDRaft + 1.5):
+                if data[i,1] > np.ceil(meanDRaft + 1):
                     blFlags.append('L')
                 else:
                     blFlags.append('B')
@@ -1249,7 +1249,7 @@ class BaseSeriesReader:
                 dataSet = []
                 for infile in  sorted(glob.glob(path+'*.csv')):
                     data = pd.read_csv(infile, sep=';', decimal='.')#,skiprows=1)
-                    dataSet.append(data.values)
+                    dataSet.append(data.values[70000:90000])
                     print(str(infile))
                 #if len(dataSet)>1:
                 dataSet = np.concatenate(dataSet)
