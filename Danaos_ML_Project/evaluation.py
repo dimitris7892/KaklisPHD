@@ -81,7 +81,7 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
             lErrors.append(error)
         return errors, np.mean(errors), np.std(lErrors)
 
-    def evaluateKerasNN1(self, unseenX, unseenY, modeler,output,xs,genericModel,partitionsX , scores):
+    def evaluateKerasNN1(self, unseenX, unseenY, modeler,output,xs,genericModel,partitionsX , scores,subsetInd,type):
         lErrors = []
 
         from tensorflow import keras
@@ -197,21 +197,38 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
         errorStwArr = np.array(errorStwArr)
         errorStwArr = errorStwArr.reshape(-1, 2)
         errors = np.asarray(lErrors)
-        with open('./errorPercFOC'+str(len(partitionsX))+'.csv', mode='w') as data:
-            data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-            data_writer.writerow(
-                ['FOC', 'PERC'])
-            for i in range(0, len(errorFoc)):
+        if type=='train':
+            with open('./TRAINerrorPercFOC'+str(len(partitionsX))+'_'+str(subsetInd)+'.csv', mode='w') as data:
+                data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
                 data_writer.writerow(
-                    [foc[i],errorFoc[i][0][0]])
+                    ['FOC', 'PERC'])
+                for i in range(0, len(errorFoc)):
+                    data_writer.writerow(
+                        [foc[i],errorFoc[i][0][0]])
 
-        with open('./errorSTW'+str(len(partitionsX))+'.csv', mode='w') as data:
-            data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-            data_writer.writerow(
-                ['STW', 'MAE'])
-            for i in range(0, len(errorStwArr)):
+            with open('./TRAINerrorSTW'+str(len(partitionsX))+'_'+str(subsetInd)+'.csv', mode='w') as data:
+                data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
                 data_writer.writerow(
-                    [errorStwArr[i][0],errorStwArr[i][1]])
+                    ['STW', 'MAE'])
+                for i in range(0, len(errorStwArr)):
+                    data_writer.writerow(
+                        [errorStwArr[i][0],errorStwArr[i][1]])
+        else:
+            with open('./TESTerrorPercFOC' + str(len(partitionsX)) + '_' + str(subsetInd) + '.csv', mode='w') as data:
+                data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+                data_writer.writerow(
+                    ['FOC', 'PERC'])
+                for i in range(0, len(errorFoc)):
+                    data_writer.writerow(
+                        [foc[i], errorFoc[i][0][0]])
+
+            with open('./TESTerrorSTW' + str(len(partitionsX)) + '_' + str(subsetInd) + '.csv', mode='w') as data:
+                data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+                data_writer.writerow(
+                    ['STW', 'MAE'])
+                for i in range(0, len(errorStwArr)):
+                    data_writer.writerow(
+                        [errorStwArr[i][0], errorStwArr[i][1]])
 
         #plt.scatter(errorStwArr[:,0],errorStwArr[:,1])
         #plt.ylim(0, 2)
@@ -223,7 +240,7 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
 
         return errors, np.mean(errors), np.std(lErrors)
 
-    def evaluateKerasNN(self, unseenX, unseenY, modeler,output,xs,genericModel,partitionsX , scores):
+    def evaluateKerasNN(self, unseenX, unseenY, modeler,output,xs,genericModel,partitionsX , scores,subsetInd):
         lErrors = []
         with open('./meanErrorStw.csv', mode='w') as data:
             data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
@@ -793,6 +810,8 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
                     exactSpeed = True
                     break
                 else:
+                    if i == 0  or i ==4:
+                        exactSpeed = True
                     break
 
             # // Find where it is in the list of weathers
@@ -820,7 +839,7 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
                 cpi = []
                 calcAvgCons = cpi.avgCons
 
-            elif (exactSpeed):
+            elif exactSpeed:
 
                 prevweatherIndex = curweatherIndex - 1
                 # hashKey1 = draft + "_" + listOfSpeeds[curspeedIndex] + "_" + listOfWeather[prevweatherIndex] + "_" + relDirCode
@@ -861,14 +880,10 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
                 calcAvgCons = calcAvgConsPrev2 + difInCons2 * percSpeedDif  # // Linear interpolation
 
             else:
-                flg = False
+
                 prevweatherIndex = curweatherIndex - 1
-                if currDraftIndex==1 and curspeedIndex==4:
-                    prevspeedIndex = 3
-                    currDraftIndex = 0
-                    flg=True
-                else: prevspeedIndex = curspeedIndex - 1
-                # hashKey3 = draft + "_" + listOfSpeeds[prevspeedIndex] + "_" + listOfWeather[prevweatherIndex] + "_" + relDirCode
+                prevspeedIndex = curspeedIndex - 1
+
                 cpi3=None
                 try:
                     cpi3 = \
@@ -877,12 +892,11 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
                 except:
                     t=0
                 # cpi3 = []
-
                 calcAvgConsPrev2 = cpi3  # .avgCons
                 # hashKey4 = draft + "_" + listOfSpeeds[curspeedIndex] + "_" + listOfWeather[curweatherIndex] + "_" + relDirCode
-                if flg==True:
-                    currDraftIndex = 1
-
+                #if flg==True:
+                    #currDraftIndex = 1
+                cpi4 = None
                 try:
                     cpi4 = \
                     [k for k in ConsProfileItem.values() if k['speed'] == curspeedIndex and k['ws'] == curweatherIndex and
@@ -898,7 +912,7 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
 
             return calcAvgCons[0]
 
-    def evaluatePavlosInterpolation(self, unseenX, unseenY, modeler,output,xs,genericModel,partitionsX , scores,subsetInd):
+    def evaluatePavlosInterpolation(self, unseenX, unseenY, modeler,output,xs,genericModel,partitionsX , scores,subsetInd,type):
 
             lErrors = []
             foc=[]
@@ -923,20 +937,37 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
             errorStwArr = np.array(errorStwArr)
             errorStwArr = errorStwArr.reshape(-1, 2)
             errors = np.asarray(lErrors)
-            with open('./errorPercFOCPavlos' + str(subsetInd) + '.csv', mode='w') as data:
-                data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-                data_writer.writerow(
-                    ['FOC', 'PERC'])
-                for i in range(0, len(errorFoc)):
+            if type=='train':
+                with open('./TRAINerrorPercFOCPavlos' + str(subsetInd) + '.csv', mode='w') as data:
+                    data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
                     data_writer.writerow(
-                        [foc[i], errorFoc[i]])
+                        ['FOC', 'PERC'])
+                    for i in range(0, len(errorFoc)):
+                        data_writer.writerow(
+                            [foc[i], errorFoc[i]])
 
-            with open('./errorSTWPavlos' + str(subsetInd) + '.csv', mode='w') as data:
-                data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-                data_writer.writerow(
-                    ['STW', 'MAE'])
-                for i in range(0, len(errorStwArr)):
+                with open('./TRAINerrorSTWPavlos' + str(subsetInd) + '.csv', mode='w') as data:
+                    data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
                     data_writer.writerow(
-                        [errorStwArr[i][0], errorStwArr[i][1]])
+                        ['STW', 'MAE'])
+                    for i in range(0, len(errorStwArr)):
+                        data_writer.writerow(
+                            [errorStwArr[i][0], errorStwArr[i][1]])
+            else:
+                with open('./TESTerrorPercFOCPavlos' + str(subsetInd) + '.csv', mode='w') as data:
+                    data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+                    data_writer.writerow(
+                        ['FOC', 'PERC'])
+                    for i in range(0, len(errorFoc)):
+                        data_writer.writerow(
+                            [foc[i], errorFoc[i]])
+
+                with open('./TESTerrorSTWPavlos' + str(subsetInd) + '.csv', mode='w') as data:
+                    data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+                    data_writer.writerow(
+                        ['STW', 'MAE'])
+                    for i in range(0, len(errorStwArr)):
+                        data_writer.writerow(
+                            [errorStwArr[i][0], errorStwArr[i][1]])
 
             return errors, np.mean(errors), np.std(lErrors)
