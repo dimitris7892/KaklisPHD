@@ -292,11 +292,12 @@ def main():
                 print("Reading unseen data... Done")
 
                 # Predict and evaluate on seen data
+                print("Evaluating on seen data...")
                 if modeler.__class__.__name__ == 'TensorFlowW1':
                     _, meanError, sdError = eval.MeanAbsoluteErrorEvaluation.evaluateKerasNN1(
                         eval.MeanAbsoluteErrorEvaluation(), subsetX,
                         subsetY,
-                        modeler, output, None, None, partitionsX, scores,'train')
+                        modeler, output, None, None, partitionsX, scores,subsetInd,'train')
                 elif modeler.__class__.__name__ == 'TensorFlowW3' or modeler.__class__.__name__ == 'TensorFlowW2':
                     _, meanError, sdError = eval.MeanAbsoluteErrorEvaluation.evaluateKerasNN(
                         eval.MeanAbsoluteErrorEvaluation(), subsetX,
@@ -319,7 +320,7 @@ def main():
                     _, meanError, sdError = eval.MeanAbsoluteErrorEvaluation.evaluateKerasNN1(
                             eval.MeanAbsoluteErrorEvaluation(), unseenX,
                             unseenY,
-                            modeler, output, None, None, partitionsX, scores,'test')
+                            modeler, output, None, None, partitionsX, scores,subsetInd,'test')
                 elif modeler.__class__.__name__ == 'TensorFlowW3' or modeler.__class__.__name__ == 'TensorFlowW2':
                     _, meanError, sdError = eval.MeanAbsoluteErrorEvaluation.evaluateKerasNN(
                         eval.MeanAbsoluteErrorEvaluation(), unseenX,
