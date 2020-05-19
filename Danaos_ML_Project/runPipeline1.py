@@ -11,6 +11,7 @@ import sys
 import plotResults as plotRes
 import itertools
 import pandas as pd
+from sklearn.model_selection import train_test_split
 import random
 from sklearn.decomposition import PCA
 from pylab import *
@@ -55,7 +56,7 @@ def main():
     #DANreader.readLarosDAta(datetime.datetime(2018,1,1),datetime.datetime(2019,1,1))
 
     #DANreader.GenericParserForDataExtraction('LAROS','MARMARAS','MT_DELTA_MARIA')
-    #DANreader.GenericParserForDataExtraction('LEMAG', 'MILLENIA', 'FANTASIA',driver='ORACLE',server='10.2.5.80',sid='OR11',usr='millenia',password='millenia',
+    #DANreader.GenericParserForDataExtraction('LEMAG', 'MILLENIA', 'METEORA',driver='ORACLE',server='10.2.5.80',sid='OR11',usr='millenia',password='millenia',
                                              #rawData=[],telegrams=True,companyTelegrams=False,pathOfRawData='C:/Users/dkaklis/Desktop/danaos')
 
     #DANreader.GenericParserForDataExtraction('LEMAG', 'OCEAN_GOLD', 'PENELOPE',driver='ORACLE',server='10.2.5.80',sid='OR11',usr='oceangold',password='oceangold',
@@ -132,17 +133,17 @@ def main():
         #subsetsY.append(trData[(k+kInit):(n+k+kInit), 7])
         #k=n*i#+1000
 
-    subsetsX.append(trData[0:20000, 0:7])
-    subsetsY.append(trData[0:20000, 7])
+    #subsetsX.append(trData[0:20000, 0:7])
+    #subsetsY.append(trData[0:20000, 7])
 
-    subsetsX.append(trData[20000:40000, 0:7])
-    subsetsY.append(trData[20000:40000, 7])
+    #subsetsX.append(trData[20000:40000, 0:7])
+    #subsetsY.append(trData[20000:40000, 7])
 
-    subsetsX.append(trData[50000:70000, 0:7])
-    subsetsY.append(trData[50000:70000, 7])
+    #subsetsX.append(trData[50000:70000, 0:7])
+    #subsetsY.append(trData[50000:70000, 7])
 
-    subsetsX.append(trData[70000:90000, 0:7])
-    subsetsY.append(trData[70000:90000, 7])
+    #subsetsX.append(trData[70000:90000, 0:7])
+    #subsetsY.append(trData[70000:90000, 7])
     #indSubsets = []
     #for i in range(0,len(subsets)):
        #X = DANreader.readStatDifferentSubsets(subsets[i],subsets,i)
@@ -163,7 +164,21 @@ def main():
     unseenX = data[:, 0:7][90000:].astype(float)
     unseenY = data[:, 7][90000:].astype(float)
 
+    X_train, X_test, y_train, y_test = train_test_split(data[:,0:7], data[:,7], test_size=0.2,
+                                                        random_state=42)
 
+    #dataTrain = np.array(np.append(X_train, np.asmatrix([y_train.reshape(-1)]).T, axis=1))
+    #DANreader.GenericParserForDataExtraction('LEMAG', 'MARMARAS', 'MT_DELTA_MARIA',driver='ORACLE',server='10.2.5.80',sid='OR11',usr='oceangold',password='oceangold',
+    #rawData=True,telegrams=False,companyTelegrams=False,seperator='\t',pathOfRawData='C:/Users/dkaklis/Desktop/danaos' ,comparisonTest=True,dataTrain = dataTrain )
+
+
+
+
+    subsetsX.append(X_train.astype(float))
+    subsetsY.append(y_train.astype(float))
+
+    unseenX=X_test.astype(float)
+    unseenY=y_test.astype(float)
 
     print("Number of Statistically ind. subsets for training: " + str(len(subsetsX)))
 
@@ -190,7 +205,7 @@ def main():
                elif modeler.__class__.__name__=='TriInterpolantModeler' or modeler.__class__.__name__ == 'TensorFlow':
                  partK =K
                else:
-                 partK=[3]
+                 partK=[30]
            error = {"errors": [ ]}
            #random.seed(1)
 
@@ -277,19 +292,25 @@ def main():
                 print("Reading unseen data... Done")
 
                 # Predict and evaluate on seen data
-                if modeler.__class__.__name__  == 'TensorFlowW1':
-                    print("Evaluating on seen data...")
+                if modeler.__class__.__name__ == 'TensorFlowW1':
+                    _, meanError, sdError = eval.MeanAbsoluteErrorEvaluation.evaluateKerasNN1(
+                        eval.MeanAbsoluteErrorEvaluation(), subsetX,
+                        subsetY,
+                        modeler, output, None, None, partitionsX, scores,'train')
+                elif modeler.__class__.__name__ == 'TensorFlowW3' or modeler.__class__.__name__ == 'TensorFlowW2':
+                    _, meanError, sdError = eval.MeanAbsoluteErrorEvaluation.evaluateKerasNN(
+                        eval.MeanAbsoluteErrorEvaluation(), subsetX,
+                        subsetY,
+                        modeler, output, None, None, partitionsX, scores)
+                elif modeler.__class__.__name__ == 'PavlosInterpolation':
+                    _, meanError, sdError = eval.MeanAbsoluteErrorEvaluation.evaluatePavlosInterpolation(
+                        eval.MeanAbsoluteErrorEvaluation(), subsetX,
+                        subsetY,
+                        modeler, None, None, None, partitionsX, None, subsetInd,'train')
 
-
-                    #_,meanErrorTr, sdErrorTr = eval.MeanAbsoluteErrorEvaluation.evaluateKerasNN1(
-                            #eval.MeanAbsoluteErrorEvaluation(), seriesX,
-                            #targetY,
-                            #modeler, output, None, None, partitionsX, None)
-
-
-                    #print ("Mean absolute error on training data: %4.2f (+/- %4.2f standard error)" % (
-                        #meanErrorTr, sdErrorTr / sqrt(unseenY.shape[ 0 ])))
-                    print("Evaluating on seen data... Done.")
+                print("Mean absolute error on seen data: %4.2f (+/- %4.2f standard error)" % (
+                meanError, sdError / sqrt(unseenY.shape[0])))
+                print("Evaluating on seen data... Done.")
 
                 #Predict and evaluate on unseen data
                 print("Evaluating on unseen data...")
@@ -298,7 +319,7 @@ def main():
                     _, meanError, sdError = eval.MeanAbsoluteErrorEvaluation.evaluateKerasNN1(
                             eval.MeanAbsoluteErrorEvaluation(), unseenX,
                             unseenY,
-                            modeler, output, None, None, partitionsX, scores)
+                            modeler, output, None, None, partitionsX, scores,'test')
                 elif modeler.__class__.__name__ == 'TensorFlowW3' or modeler.__class__.__name__ == 'TensorFlowW2':
                     _, meanError, sdError = eval.MeanAbsoluteErrorEvaluation.evaluateKerasNN(
                         eval.MeanAbsoluteErrorEvaluation(), unseenX,
@@ -308,7 +329,8 @@ def main():
                     _, meanError, sdError = eval.MeanAbsoluteErrorEvaluation.evaluatePavlosInterpolation(
                         eval.MeanAbsoluteErrorEvaluation(), unseenX,
                         unseenY,
-                        modeler, None, None, None, partitionsX, None,subsetInd)
+                        modeler, None, None, None, partitionsX, None,subsetInd,'test')
+
 
 
                 print ("Mean absolute error on unseen data: %4.2f (+/- %4.2f standard error)"%(meanError, sdError/sqrt(unseenY.shape[0])))
