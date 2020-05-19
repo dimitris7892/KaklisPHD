@@ -783,7 +783,7 @@ class BaseSeriesReader:
         ##### END OF DRAFT CELSS
 
         ##TRIM CELLS ######################################################################
-        trim = np.array([k for k in tlgDataset if float(k[16]) >= 0])[:, 16].astype(float)
+        trim = np.array([k for k in tlgDataset ])[:, 17].astype(float)
         trimAmount= trim.__len__()
         minTrim = int(np.floor(np.min(trim)))
         maxTrim = int(np.ceil(np.max(trim)))
@@ -912,7 +912,7 @@ class BaseSeriesReader:
 
             if focArray.__len__() > 0:
                 focsPLot.append(focArray.__len__())
-                speedsPlot.append(np.round((np.mean(np.nan_to_num(focArray[:,12].astype(float)))),2))
+                speedsPlot.append(np.round((np.min(np.nan_to_num(focArray[:,12].astype(float)))),2))
                 ranges.append(i)
             i+= 0.5
             k += 1
@@ -921,13 +921,13 @@ class BaseSeriesReader:
         yi =np.array(ranges)
         zi =np.array(focsPLot)
         # Change color with c and alpha
-        p2 = np.poly1d(np.polyfit(xi, yi, 5))
+        p2 = np.poly1d(np.polyfit(xi, yi, 2))
         xp = np.linspace(min(xi), max(xi), 100)
         plt.plot([], [], '.', xp, p2(xp))
 
         plt.scatter(xi, yi, s=zi , c="red", alpha=0.4,linewidth=4)
-        plt.xticks(np.arange(np.floor(min(xi)), np.ceil(max(xi)) + 1, 1))
-        plt.yticks(np.arange(np.floor(min(yi)), np.ceil(max(yi)) + 1, 5))
+        plt.xticks(np.arange(np.floor(min(xi)) - 1, np.ceil(max(xi)) +1, 1))
+        plt.yticks(np.arange(np.floor(min(yi)) , np.ceil(max(yi)) + 1, 5))
         plt.xlabel("Speed (knots)")
         plt.ylabel("FOC (MT / day)")
         plt.title("Density plot", loc="center")
@@ -948,10 +948,10 @@ class BaseSeriesReader:
 
 
 
-        fig.savefig('./Danaos_ML_Project/Figures/'+company+'_'+vessel+'_1.jpg', dpi=96)
+        fig.savefig('./Figures/'+company+'_'+vessel+'_1.jpg', dpi=96)
         #plt.clf()
 
-        img = Image('./Danaos_ML_Project/Figures/'+company+'_'+vessel+'_1.jpg')
+        img = Image('./Figures/'+company+'_'+vessel+'_1.jpg')
 
         workbook._sheets[4].add_image(img, 'F'+str(id-2))
         #workbook._sheets[4].insert_image('G'+str(id+30), './Danaos_ML_Project/Figures/'+company+'_'+vessel+'.png', {'x_scale': 0.5, 'y_scale': 0.5})
@@ -1179,7 +1179,12 @@ class BaseSeriesReader:
         return workbook
 
     def GenericParserForDataExtraction(self,systemType, company, vessel ,driver=None,server=None,sid=None,usr=None,password=None,rawData=None,telegrams=None,companyTelegrams=None,seperator=None ,fileType=None, granularity=None, fileName=None,
-                                       pathOfRawData=None):
+                                       pathOfRawData=None,comparisonTest=None,dataTrain=None):
+
+        boolTlg = telegrams
+        pathExcel = '/home/dimitris/Desktop/template.xlsx'
+        ##public vars
+
         if systemType=='LEMAG':
             if 1==2:
                 companyTlgs = pd.read_excel('./data/' + company + '/' + vessel + '/Penelope TrackReport.xls')
@@ -1224,54 +1229,56 @@ class BaseSeriesReader:
                             [newDataSetTLG[i][0], newDataSetTLG[i][1], newDataSetTLG[i][2], 0, 0, 0, 0, 0, newDataSetTLG[i][8], 0 ,newDataSetTLG[i][10],
                              newDataSetTLG[i][11], newDataSetTLG[i][12], 0, 0, newDataSetTLG[i][15], newDataSetTLG[i][16]])
 
+            if comparisonTest: ##run experiments with train/test split
+                dataSet = dataTrain
+            else:
 
-            pathExcel = '/home/dimitris/Desktop/template.xlsx'
-            #path2 = 'C:/Users/dkaklis/Desktop/template.xlsx'
-            if Path('./data/' + company + '/' + vessel + '/mappedData.csv').is_file():
-                data = pd.read_csv('./data/' + company +'/'+vessel +'/mappedData.csv')
-                newDataSet = data.values
-                tlgData = pd.read_csv('./data/' + company + '/' + vessel + '/TELEGRAMS/'+vessel+'.csv',sep=';')
-                tlgDataset  = tlgData.values
-                newDataSet = data.values
-                self.fillExcelProfCons(company,vessel, pathExcel, newDataSet,rawData,tlgDataset)
+                #path2 = 'C:/Users/dkaklis/Desktop/template.xlsx'
+                if Path('./data/' + company + '/' + vessel + '/mappedData.csv').is_file():
+                    data = pd.read_csv('./data/' + company +'/'+vessel +'/mappedData.csv')
+                    newDataSet = data.values
+                    tlgData = pd.read_csv('./data/' + company + '/' + vessel + '/TELEGRAMS/'+vessel+'.csv',sep=';')
+                    tlgDataset  = tlgData.values
+                    newDataSet = data.values
+                    self.fillExcelProfCons(company,vessel, pathExcel, newDataSet,rawData,tlgDataset)
 
-            if os.path.isdir('./data/' + company + '/' + vessel) == False:
-                os.mkdir('./data/' + company + '/' + vessel)
-            if os.path.isdir('./data/' + company + '/' + vessel+'/TELEGRAMS') == False:
-                os.mkdir('./data/' + company + '/' + vessel+'/TELEGRAMS')
+                if os.path.isdir('./data/' + company + '/' + vessel) == False:
+                    os.mkdir('./data/' + company + '/' + vessel)
+                if os.path.isdir('./data/' + company + '/' + vessel+'/TELEGRAMS') == False:
+                    os.mkdir('./data/' + company + '/' + vessel+'/TELEGRAMS')
 
-            dataSet=[]
-            if rawData:
-                path = './data/' + company + '/' + vessel+'/'
-                #Path('./data/' + company + '/'+vessel).mkdir(parents=True, exist_ok=True)
-                if os.path.isdir('./data/' + company + '/'+vessel)==False:
-                    shutil.copytree(pathOfRawData, path)
-                dataSet = []
-                for infile in  sorted(glob.glob(path+'*.csv')):
-                    data = pd.read_csv(infile, sep=';', decimal='.')#,skiprows=1)
-                    dataSet.append(data.values[70000:90000])
-                    print(str(infile))
-                #if len(dataSet)>1:
-                dataSet = np.concatenate(dataSet)
+                dataSet=[]
+                if rawData:
+                    path = './data/' + company + '/' + vessel+'/'
+                    #Path('./data/' + company + '/'+vessel).mkdir(parents=True, exist_ok=True)
+                    if os.path.isdir('./data/' + company + '/'+vessel)==False:
+                        shutil.copytree(pathOfRawData, path)
+                    dataSet = []
+                    for infile in  sorted(glob.glob(path+'*.csv')):
+                        data = pd.read_csv(infile, sep=';', decimal='.')#,skiprows=1)
+                        dataSet.append(data.values[70000:90000])
+                        print(str(infile))
+                    #if len(dataSet)>1:
+                    dataSet = np.concatenate(dataSet)
 
-            ##########################################################
-            if telegrams:
-                my_file = Path('./data/'+company+'/'+vessel+'/TELEGRAMS/'+vessel+'.csv')
-                if my_file.is_file() == False:
-                    self.GenericParserForDataExtraction('TELEGRAMS', company, vessel,driver,server,sid,usr,password)
-                    tlgs = pd.read_csv('./data/'+company+'/'+vessel+'/TELEGRAMS/'+vessel+'.csv',sep=';')
-                else:
-                    tlgs = pd.read_csv('./data/'+company+'/'+vessel+'/TELEGRAMS/'+vessel+'.csv',sep=';')
+                ##########################################################
+                if telegrams:
+                    my_file = Path('./data/'+company+'/'+vessel+'/TELEGRAMS/'+vessel+'.csv')
+                    if my_file.is_file() == False:
+                        self.GenericParserForDataExtraction('TELEGRAMS', company, vessel,driver,server,sid,usr,password)
+                        tlgs = pd.read_csv('./data/'+company+'/'+vessel+'/TELEGRAMS/'+vessel+'.csv',sep=';')
+                    else:
+                        tlgs = pd.read_csv('./data/'+company+'/'+vessel+'/TELEGRAMS/'+vessel+'.csv',sep=';')
 
-                telegrams = tlgs#.values
+                    telegrams = tlgs#.values
 
-            if companyTelegrams:
-                #my_file = Path('./data/' + company + '/TELEGRAMS/' + companyTlgFIle + '.csv')
+                if companyTelegrams:
+                    #my_file = Path('./data/' + company + '/TELEGRAMS/' + companyTlgFIle + '.csv')
 
-                companyTlgs = pd.read_excel('./data/' + company + '/' + vessel + '/Penelope TrackReport.xls')
-                #CompanyTlgs = pd.read_csv('./data/' + company + '/TELEGRAMS/' + companyTlgFIle + '.csv', sep=';')
+                    companyTlgs = pd.read_excel('./data/' + company + '/' + vessel + '/Penelope TrackReport.xls')
+                    #CompanyTlgs = pd.read_csv('./data/' + company + '/TELEGRAMS/' + companyTlgFIle + '.csv', sep=';')
 
-                companyTelegrams = companyTlgs#.values
+                    companyTelegrams = companyTlgs#.values
 
 
             ##WRITE NEWDATASET IN A CSV
@@ -1284,8 +1291,11 @@ class BaseSeriesReader:
                         [0, newDataSet[i][1], newDataSet[i][2], 0, 0, 0, 0, 0, newDataSet[i][8], 0 ,newDataSet[i][10],
                          newDataSet[i][11], newDataSet[i][12], 0, 0, newDataSet[i][15], newDataSet[i][16],newDataSet[i][17],newDataSet[i][18]])
 
-            if telegrams==False:
-                tlgDataset=[]
+            #if boolTlg==False and rawData==True:
+                #tlgDataset=[]
+            #if rawData == False and boolTlg == True:
+                #tlgDataset = telegrams
+            tlgDataset=[]
             self.fillExcelProfCons(company,vessel, pathExcel,newDataSet,rawData,tlgDataset)
             return
 
@@ -1963,7 +1973,7 @@ class BaseSeriesReader:
 
         #if float(k[5])>6.5
         lenConditionTlg = 20000000
-        dtNew = np.array([k for k in dataSet if float(k[15])> 0 and float(k[12])>=0])
+        dtNew = np.array([k for k in dataSet if float(k[15])> 0 and float(k[12])>0 and  float(k[8])<20])
 
         ballastDt = np.array([k for k in dtNew if k[2] == 'B' if float(k[8]) < 16])[:, 7:].astype(float)
         ladenDt = np.array([k for k in dtNew if k[2] == 'L' if float(k[8]) < 16])[:, 7:].astype(float)
@@ -1979,14 +1989,14 @@ class BaseSeriesReader:
                 if float(dtNew[i, 8]) >=meanDraftLadden:
                     dtNew[i, 2] = 'L'
                 else:
-                    if float(dtNew[i, 8]) <=meanDraftBallast+1:
-                        dtNew[i, 2] = 'B'
+                    #if float(dtNew[i, 8]) <=meanDraftBallast+1:
+                    dtNew[i, 2] = 'B'
         ########################################################################
         ########################################################################
         ########################################################################
 
-        ballastDt = np.array([k for k in dtNew if k[2] == 'B' if float(k[8])<16])[:, 7:].astype(float)
-        ladenDt = np.array([k for k in dtNew if k[2] == 'L' if float(k[8])<16])[:, 7:].astype(float)
+        ballastDt = np.array([k for k in dtNew if k[2] == 'B' if float(k[8])>0])[:, 7:].astype(float)
+        ladenDt = np.array([k for k in dtNew if k[2] == 'L' if float(k[8])>0])[:, 7:].astype(float)
 
         meanDraftBallast = round(float(np.mean(np.array([k for k in ballastDt if k[1] > 0])[:, 1])), 2)
         meanDraftLadden = round(float(np.mean(np.array([k for k in ladenDt if k[1] > 0])[:, 1])), 2)
@@ -1995,10 +2005,15 @@ class BaseSeriesReader:
 
 
 
-        draft = (np.array((np.array([k for k in dtNew if float(k[8]) > 0 and float(k[8]) < 20])[:, 8])).astype(float))
+        draft = (np.array((np.array([k for k in dtNew if float(k[8]) > 0 and float(k[8]) < 20 ])[:, 8])).astype(float))
         trim = (np.array((np.array([k for k in dtNew  if float(k[17])<20 ])[:, 17])).astype(float))
         velocities = (np.array((np.array([k for k in dtNew if float(k[12]) > 0 ])[:, 12])).astype(float)) #and float(k[12]) < 18
-        #velocitiesTlg = (np.array((np.array([k for k in dtNew if float(k[18]) > 0 and float(k[18])<35 ])[:, 18])).astype(float)) #and float(k[12]) < 18
+        if rawData==[]:
+            tlgDataset = dtNew
+            velocitiesTlg = (
+                np.array((np.array([k for k in dtNew if float(k[18]) > 0 and float(k[18]) < 35])[:, 12])).astype(float))
+        else:
+            velocitiesTlg = (np.array((np.array([k for k in dtNew if float(k[18]) > 0 and float(k[18])<35 ])[:, 18])).astype(float)) #and float(k[12]) < 18
 
         dataModel = KMeans(n_clusters=4)
         velocities = velocities.reshape(-1, 1)
@@ -2150,7 +2165,7 @@ class BaseSeriesReader:
         centralMean = np.mean(np.array([k for k in ballastDt if
                                         k[5] >= vel0Min and k[5] <= vel0Max and k[8] >= 10])[:, 8])
         centralArray = np.array([k for k in ballastDt if
-                                 k[5] >= vel0Min and k[5] <= vel0Max and k[8] > 4])[:, 8]
+                                 k[5] >= vel0Min and k[5] <= vel0Max and k[8] > 0])[:, 8]
         for i in range(0, len(wind) - 1):
             arrayFoc = np.array([k for k in ballastDt if
                                  k[4] >= 0 and k[4] <= 1 and k[5] >= vel0Min and k[5] <= vel0Max and k[3] >= wind[i] and
@@ -2167,7 +2182,7 @@ class BaseSeriesReader:
                     tlgarrayFoc) + centralMean) / 3 if arrayFoc.__len__() >= 5 else 0
                 numberOfApp10_0.append(arrayFoc.__len__() + tlgarrayFoc.__len__() + centralArray.__len__())
             else:
-                meanFoc = (np.mean(arrayFoc[:, 8]) + centralMean) / 2 if arrayFoc.__len__() >= 5 else 0
+                meanFoc = (np.mean(arrayFoc[:, 8]) + centralMean) / 2 if arrayFoc.__len__() >= 5 else centralMean
                 numberOfApp10_0.append(arrayFoc.__len__() + centralArray.__len__())
             ballastDt10_0.append(round(meanFoc, 2))
 
@@ -2195,7 +2210,7 @@ class BaseSeriesReader:
                     tlgarrayFoc) + centralMean) / 3 if arrayFoc.__len__() >= 5 else 0
                 numberOfApp10_3.append(arrayFoc.__len__() + tlgarrayFoc.__len__() + centralArray.__len__())
             else:
-                meanFoc = (np.mean(arrayFoc[:, 8]) + centralMean) / 2 if arrayFoc.__len__() >= 5 else 0
+                meanFoc = (np.mean(arrayFoc[:, 8]) + centralMean) / 2 if arrayFoc.__len__() >= 5 else centralMean
                 numberOfApp10_3.append(arrayFoc.__len__() + centralArray.__len__())
             ballastDt10_3.append(round(meanFoc, 2))
 
@@ -2223,7 +2238,7 @@ class BaseSeriesReader:
                     tlgarrayFoc) + centralMean) / 3 if arrayFoc.__len__() >= 5 else 0
                 numberOfApp10_5.append(arrayFoc.__len__() + tlgarrayFoc.__len__() + centralArray.__len__())
             else:
-                meanFoc = (np.mean(arrayFoc[:, 8]) + centralMean) / 2 if arrayFoc.__len__() >= 5 else 0
+                meanFoc = (np.mean(arrayFoc[:, 8]) + centralMean) / 2 if arrayFoc.__len__() >= 5 else centralMean
                 numberOfApp10_5.append(arrayFoc.__len__() + centralArray.__len__())
             ballastDt10_5.append(round(meanFoc, 2))
 
@@ -2283,7 +2298,7 @@ class BaseSeriesReader:
                     tlgarrayFoc) + centralMean) / 3 if arrayFoc.__len__() >= 3 else 0
                 numberOfApp11_0.append(arrayFoc.__len__() + tlgarrayFoc.__len__() + centralArray.__len__())
             else:
-                meanFoc = (np.mean(arrayFoc[:, 8]) + centralMean) / 2 if arrayFoc.__len__() >= 3 else 0
+                meanFoc = (np.mean(arrayFoc[:, 8]) + centralMean) / 2 if arrayFoc.__len__() >= 3 else centralMean
                 numberOfApp11_0.append(arrayFoc.__len__() + centralArray.__len__())
             ballastDt11_0.append(round(meanFoc, 2))
 
@@ -2309,7 +2324,7 @@ class BaseSeriesReader:
                     tlgarrayFoc) + centralMean) / 3 if arrayFoc.__len__() >= 3 else 0
                 numberOfApp11_3.append(arrayFoc.__len__() + tlgarrayFoc.__len__() + centralArray.__len__())
             else:
-                meanFoc = (np.mean(arrayFoc[:, 8]) + centralMean) / 2 if arrayFoc.__len__() >= 3 else 0
+                meanFoc = (np.mean(arrayFoc[:, 8]) + centralMean) / 2 if arrayFoc.__len__() >= 3 else centralMean
                 numberOfApp11_3.append(arrayFoc.__len__() + centralArray.__len__())
             ballastDt11_3.append(round(meanFoc, 2))
 
@@ -2335,7 +2350,7 @@ class BaseSeriesReader:
                     tlgarrayFoc) + centralMean) / 3 if arrayFoc.__len__() >= 3 else 0
                 numberOfApp11_5.append(arrayFoc.__len__() + tlgarrayFoc.__len__() + centralArray.__len__())
             else:
-                meanFoc = (np.mean(arrayFoc[:, 8]) + centralMean) / 2 if arrayFoc.__len__() >= 3 else 0
+                meanFoc = (np.mean(arrayFoc[:, 8]) + centralMean) / 2 if arrayFoc.__len__() >= 3 else centralMean
                 numberOfApp11_5.append(arrayFoc.__len__() + centralArray.__len__())
             ballastDt11_5.append(round(meanFoc, 2))
 
@@ -2355,6 +2370,7 @@ class BaseSeriesReader:
                 [k for k in ballastDt if k[5] > vel1Min and k[5] <= vel1Max and k[8] >= 10])
             if tlgarrayFoc.__len__() > lenConditionTlg:
                 tlgarrayFoc = np.array(
+
                     [k for k in ballastDt if k[5] > vel1Min and k[5] <= vel1Max and k[8] >= 10])[:, 9]
                 meanFoc = (np.mean(arrayFoc[:, 8]) + np.mean(
                     tlgarrayFoc) + centralMean) / 3 if arrayFoc.__len__() >= 3 else 0
@@ -2903,8 +2919,8 @@ class BaseSeriesReader:
         #####################################################################################################################
         for i in range(0, len(ballastDt10_3)):
 
-            if (ballastDt10_0[i] > ballastDt10_3[i]):
-                while (ballastDt10_0[i] > ballastDt10_3[i]):
+            if (ballastDt10_0[i] >= ballastDt10_3[i]):
+                while (ballastDt10_0[i] >= ballastDt10_3[i]):
                     if ballastDt10_3[i] == 0:
                         ballastDt10_3[i] = ballastDt10_0[i] + 0.1 * ballastDt10_0[i]
                     else:
@@ -2912,8 +2928,8 @@ class BaseSeriesReader:
 
         for i in range(0, len(ballastDt10_5)):
 
-            if (ballastDt10_3[i] > ballastDt10_5[i]):
-                while (ballastDt10_3[i] > ballastDt10_5[i]):
+            if (ballastDt10_3[i] >= ballastDt10_5[i]):
+                while (ballastDt10_3[i] >= ballastDt10_5[i]):
                     if ballastDt10_5[i] == 0:
                         ballastDt10_5[i] = ballastDt10_3[i] + 0.1 * ballastDt10_3[i]
                     else:
@@ -2921,8 +2937,8 @@ class BaseSeriesReader:
 
         for i in range(0, len(ballastDt10_8)):
 
-            if (ballastDt10_5[i] > ballastDt10_8[i]):
-                while (ballastDt10_5[i] > ballastDt10_8[i]):
+            if (ballastDt10_5[i] >= ballastDt10_8[i]):
+                while (ballastDt10_5[i] >= ballastDt10_8[i]):
                     if ballastDt10_8[i] == 0:
                         ballastDt10_8[i] = ballastDt10_5[i] + 0.1 * ballastDt10_5[i]
                     else:
@@ -2931,8 +2947,8 @@ class BaseSeriesReader:
 
         for i in range(0, len(ballastDt11_3)):
 
-            if (ballastDt11_0[i] > ballastDt11_3[i]):
-                while (ballastDt11_0[i] > ballastDt11_3[i]):
+            if (ballastDt11_0[i] >= ballastDt11_3[i]):
+                while (ballastDt11_0[i] >= ballastDt11_3[i]):
                     if ballastDt11_3[i] == 0:
                         ballastDt11_3[i] = ballastDt11_0[i] + 0.1 * ballastDt11_0[i]
                     else:
@@ -2940,8 +2956,8 @@ class BaseSeriesReader:
 
         for i in range(0, len(ballastDt11_5)):
 
-            if (ballastDt11_3[i] > ballastDt11_5[i]):
-                while (ballastDt11_3[i] > ballastDt11_5[i]):
+            if (ballastDt11_3[i] >= ballastDt11_5[i]):
+                while (ballastDt11_3[i] >= ballastDt11_5[i]):
                     if ballastDt11_5[i] == 0:
                         ballastDt11_5[i] = ballastDt11_3[i] + 0.1 * ballastDt11_3[i]
                     else:
@@ -3313,7 +3329,7 @@ class BaseSeriesReader:
                     tlgarrayFoc) + centralMean) / 3 if arrayFoc.__len__() >= 3 else 0
                 numberOfApp10_0.append(arrayFoc.__len__() + tlgarrayFoc.__len__() + centralArray.__len__())
             else:
-                meanFoc = (np.mean(arrayFoc[:, 8]) + centralMean) / 2 if arrayFoc.__len__() >= 3 else 0
+                meanFoc = (np.mean(arrayFoc[:, 8]) + centralMean) / 2 if arrayFoc.__len__() >= 3 else centralMean
                 numberOfApp10_0.append(arrayFoc.__len__() + centralArray.__len__())
             ladenDt10_0.append(round(meanFoc, 2))
 
@@ -3995,27 +4011,27 @@ class BaseSeriesReader:
 
         for i in range(0, len(ladenDt10_0)):
 
-            if (ladenDt10_0[i] > ladenDt11_0[i]) and ladenDt11_0[i] > 0:
-                while (ladenDt10_0[i] > ladenDt11_0[i]):
+            if (ladenDt10_0[i] >= ladenDt11_0[i]) and ladenDt11_0[i] > 0:
+                while (ladenDt10_0[i] >= ladenDt11_0[i]):
                     ladenDt11_0[i] = ladenDt11_0[i] + 0.1 * ladenDt11_0[i]
 
         for i in range(0, len(ladenDt11_0)):
 
-            if (ladenDt11_0[i] > ladenDt12_0[i]) and ladenDt12_0[i] > 0:
-                while (ladenDt11_0[i] > ladenDt12_0[i]):
+            if (ladenDt11_0[i] >= ladenDt12_0[i]) and ladenDt12_0[i] > 0:
+                while (ladenDt11_0[i] >= ladenDt12_0[i]):
                     ladenDt12_0[i] = ladenDt12_0[i] + 0.1 * ladenDt12_0[i]
 
         for i in range(0, len(ladenDt12_0)):
 
-            if (ladenDt12_0[i] > ladenDt13_0[i]) and ladenDt13_0[i] > 0:
-                while (ladenDt12_0[i] > ladenDt13_0[i]):
+            if (ladenDt12_0[i] >= ladenDt13_0[i]) and ladenDt13_0[i] > 0:
+                while (ladenDt12_0[i] >= ladenDt13_0[i]):
                     ladenDt13_0[i] = ladenDt13_0[i] + 0.1 * ladenDt13_0[i]
 
         #####################################################################################################################
         for i in range(0, len(ladenDt10_3)):
 
-            if (ladenDt10_0[i] > ladenDt10_3[i]):
-                while (ladenDt10_0[i] > ladenDt10_3[i]):
+            if (ladenDt10_0[i] >= ladenDt10_3[i]):
+                while (ladenDt10_0[i] >= ladenDt10_3[i]):
                     if ladenDt10_3[i] == 0:
                         ladenDt10_3[i] = ladenDt10_0[i] + 0.1 * ladenDt10_0[i]
                     else:
@@ -4023,8 +4039,8 @@ class BaseSeriesReader:
 
         for i in range(0, len(ladenDt10_5)):
 
-            if (ladenDt10_3[i] > ladenDt10_5[i]):
-                while (ladenDt10_3[i] > ladenDt10_5[i]):
+            if (ladenDt10_3[i] >= ladenDt10_5[i]):
+                while (ladenDt10_3[i] >= ladenDt10_5[i]):
                     if ladenDt10_5[i] == 0:
                         ladenDt10_5[i] = ladenDt10_3[i] + 0.1 * ladenDt10_3[i]
                     else:
@@ -4032,8 +4048,8 @@ class BaseSeriesReader:
 
         for i in range(0, len(ladenDt10_8)):
 
-            if (ladenDt10_5[i] > ladenDt10_8[i]):
-                while (ladenDt10_5[i] > ladenDt10_8[i]):
+            if (ladenDt10_5[i] >= ladenDt10_8[i]):
+                while (ladenDt10_5[i] >= ladenDt10_8[i]):
                     if ladenDt10_8[i] == 0:
                         ladenDt10_8[i] = ladenDt10_5[i] + 0.1 * ladenDt10_5[i]
                     else:
@@ -4042,8 +4058,8 @@ class BaseSeriesReader:
 
         for i in range(0, len(ladenDt11_3)):
 
-            if (ladenDt11_0[i] > ladenDt11_3[i]):
-                while (ladenDt11_0[i] > ladenDt11_3[i]):
+            if (ladenDt11_0[i] >= ladenDt11_3[i]):
+                while (ladenDt11_0[i] >= ladenDt11_3[i]):
                     if ladenDt11_3[i] == 0:
                         ladenDt11_3[i] = ladenDt11_0[i] + 0.1 * ladenDt11_0[i]
                     else:
@@ -4051,8 +4067,8 @@ class BaseSeriesReader:
 
         for i in range(0, len(ladenDt11_5)):
 
-            if (ladenDt11_3[i] > ladenDt11_5[i]):
-                while (ladenDt11_3[i] > ladenDt11_5[i]):
+            if (ladenDt11_3[i] >= ladenDt11_5[i]):
+                while (ladenDt11_3[i] >= ladenDt11_5[i]):
                     if ladenDt11_5[i] == 0:
                         ladenDt11_5[i] = ladenDt11_3[i] + 0.1 * ladenDt11_3[i]
                     else:
@@ -4060,8 +4076,8 @@ class BaseSeriesReader:
 
         for i in range(0, len(ladenDt11_8)):
 
-            if (ladenDt11_5[i] > ladenDt11_8[i]):
-                while (ladenDt11_5[i] > ladenDt11_8[i]):
+            if (ladenDt11_5[i] >= ladenDt11_8[i]):
+                while (ladenDt11_5[i] >= ladenDt11_8[i]):
                     if ladenDt11_8[i] == 0:
                         ladenDt11_8[i] = ladenDt11_5[i] + 0.1 * ladenDt11_5[i]
                     else:
