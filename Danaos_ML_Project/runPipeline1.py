@@ -135,14 +135,14 @@ def main():
     subsetsX.append(trData[0:20000, 0:7])
     subsetsY.append(trData[0:20000, 7])
 
-    #subsetsX.append(trData[20000:40000, 0:7])
-    #subsetsY.append(trData[20000:40000, 7])
+    subsetsX.append(trData[20000:40000, 0:7])
+    subsetsY.append(trData[20000:40000, 7])
 
     subsetsX.append(trData[50000:70000, 0:7])
     subsetsY.append(trData[50000:70000, 7])
 
-    #subsetsX.append(trData[70000:90000, 0:7])
-    #subsetsY.append(trData[70000:90000, 7])
+    subsetsX.append(trData[70000:90000, 0:7])
+    subsetsY.append(trData[70000:90000, 7])
     #indSubsets = []
     #for i in range(0,len(subsets)):
        #X = DANreader.readStatDifferentSubsets(subsets[i],subsets,i)
