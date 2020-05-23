@@ -19,7 +19,10 @@ import datetime
 import  matplotlib.pyplot as plt
 import csv
 import tensorflow as tf
-
+from matplotlib import rc
+import latex
+#rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
+#rc('text', usetex=True)
 def main():
     # Init parameters based on command line
 
@@ -40,6 +43,7 @@ def main():
 
     trSetlen=[500,1000,2000,3000,5000,10000,20000,30000,40000]
     errors=[]
+    trErrors=[]
     var=[]
     clusters=[]
     cutoff=np.linspace(0.1,1,111)
@@ -101,6 +105,292 @@ def main():
         if cl=='DC' :partitioners.append(dPart.DelaunayTriPartitioner())
 
     print(modelers)
+    ###########################################################################
+    dataSetN = []
+    dataSetP = []
+    for infile in sorted(glob.glob('./TRAINerrorSTW15_0.csv')):
+        data = pd.read_csv(infile, sep=',', decimal='.', skiprows=1)
+        dataSetN.append(data.values)  # subsets=[]
+        print(str(infile))  # for i in range(1,5):
+    dataSetN = np.concatenate(dataSetN)  # subsetsX.append(trData[(k+kInit):(n+k+kInit),0:7])
+
+    for infile in sorted(glob.glob('./TRAINerrorSTWPavlos0.csv')):
+        data = pd.read_csv(infile, sep=',', decimal='.', skiprows=1)
+        dataSetP.append(data.values)
+        print(str(infile))
+    dataSetP = np.concatenate(dataSetP)
+    maxSpeed = int(np.ceil(np.max(dataSetP[:, 0])))
+    minSpeed = int(np.ceil(np.min(dataSetP[:, 0])))
+
+
+
+    i = 1
+    rangesN = []
+    percsN = []
+    sizeN = []
+    while i <= maxSpeed:
+
+        lenRange = len(np.array([k for k in dataSetN if k[0] >= i and k[0] <= i + 1]))
+        if lenRange > 0:
+            rangeSTWErrN = np.mean(np.array([k for k in dataSetN if k[0] >= i and k[0] <= i + 1])[:, 1])
+        #if rangeSTWErrN < 40:
+        percRange = rangeSTWErrN if lenRange > 0 else 0
+        rangesN.append(i)
+        percsN.append(percRange)
+        sizeN.append(lenRange)
+        i = i + 1
+
+    i = 1
+    rangesP = []
+    percsP = []
+    sizeP = []
+
+    while i <= maxSpeed:
+
+        lenRange = len(np.array([k for k in dataSetP if k[0] >= i and k[0] <= i +1]))
+        if lenRange > 0:
+            rangeSTWErrP = np.mean(np.array([k for k in dataSetP if k[0] >= i and k[0] <= i + 1])[:, 1])
+        #if rangeSTWErrP < 40 :
+        percRange = rangeSTWErrP if lenRange > 0 else 0
+        rangesP.append(i)
+        percsP.append(percRange)
+        sizeP.append(lenRange)
+        i = i + 1
+    # indSubsets = []
+
+    # unseensY = []
+    sizeN = [k/50 for k in sizeN]
+    axes = plt.gca()
+    #axes.set_xlim([minSpeed, maxSpeed])
+    axes.set_ylim([0, 50])
+    plt.step(rangesN, percsN, color='blue', label='Neural')
+    plt.plot(rangesN, percsN, 'o--', color='grey', alpha=0.4)
+    plt.scatter(rangesN, percsN, s=sizeN, alpha=0.4)
+
+    plt.step(rangesP, percsP, color='orange', label='Interpolation')
+    plt.plot(rangesP, percsP, 'o--', color='grey', alpha=0.4)
+    plt.xticks(np.array(np.linspace(1, maxSpeed, maxSpeed)))
+    #plt.yticks(np.array(np.linspace(1, 40, 10)))
+    plt.xlabel("STW")
+    plt.ylabel("Mean Percentage Error")
+    plt.title("Mean Percentage Error on train data (80 * 10^3) obs.")
+    # plt.scatter(ranges, percs, s=size, c="blue", alpha=0.4, linewidth=4)    #k = n * i + 10
+    plt.legend()
+    plt.show()
+    ####################################################################################################
+    ####################################################################################################
+
+    dataSetN = []
+    dataSetP = []
+    for infile in sorted(glob.glob('./TRAINerrorPercFOC15_0.csv')):
+        data = pd.read_csv(infile, sep=',', decimal='.', skiprows=1)
+        dataSetN.append(data.values)  # subsets=[]
+        print(str(infile))  # for i in range(1,5):
+    dataSetN = np.concatenate(dataSetN)  # subsetsX.append(trData[(k+kInit):(n+k+kInit),0:7])
+
+    for infile in sorted(glob.glob('./TRAINerrorPercFOCPavlos0.csv')):
+        data = pd.read_csv(infile, sep=',', decimal='.', skiprows=1)
+        dataSetP.append(data.values)
+        print(str(infile))
+    dataSetP = np.concatenate(dataSetP)
+
+    maxFOC = int(np.ceil(np.max(dataSetP[:, 0])))
+    minFOC = int(np.ceil(np.min(dataSetP[:, 0])))
+
+    i = 1
+    rangesN = []
+    percsN = []
+    sizeN = []
+    while i <= maxFOC:
+
+        lenRange = len(np.array([k for k in dataSetN if k[0] >= i and k[0] <= i + 5]))
+        if lenRange > 0:
+            rangeSTWErrN = np.mean(np.array([k for k in dataSetN if k[0] >= i and k[0] <= i + 5])[:, 1])
+        percRange = rangeSTWErrN if lenRange > 0 else 0
+        rangesN.append(i)
+        percsN.append(percRange)
+        sizeN.append(lenRange)
+        i = i + 5
+
+    i = 1
+    rangesP = []
+    percsP = []
+    sizeP = []
+
+    while i <= maxFOC:
+
+        lenRange = len(np.array([k for k in dataSetP if k[0] >= i and k[0] <= i + 5]))
+        if lenRange > 0:
+            rangeSTWErrP = np.mean(np.array([k for k in dataSetP if k[0] >= i and k[0] <= i + 5])[:, 1])
+        percRange = rangeSTWErrP if lenRange > 0 else 0
+        rangesP.append(i)
+        percsP.append(percRange)
+        sizeP.append(lenRange)
+        i = i + 5
+
+    sizeN = [k/50 for k in sizeN]
+    axes = plt.gca()
+    #axes.set_xlim([minSpeed, maxSpeed])
+    #axes.set_ylim([0, 40])
+    plt.step(rangesN, percsN, color='blue', label='Neural')
+    plt.plot(rangesN, percsN, 'o--', color='grey', alpha=0.4)
+    plt.scatter(rangesN, percsN, s=sizeN, alpha=0.4)
+
+    plt.step(rangesP, percsP, color='orange', label='Interpolation')
+    plt.plot(rangesP, percsP, 'o--', color='grey', alpha=0.4)
+    #plt.xticks(np.array(np.linspace(1, maxSpeed, maxSpeed)))
+    #plt.yticks(np.array(np.linspace(1, 40, 10)))
+    plt.xlabel("FOC ranges")
+    plt.ylabel("Mean Percentage Error")
+    plt.title("Mean Percentage Error on train data (80 * 10^3) obs.")
+    # plt.scatter(ranges, percs, s=size, c="blue", alpha=0.4, linewidth=4)    #k = n * i + 10
+    plt.legend()
+    plt.show()
+
+    #####################################################################################################
+    #####################################################################################################
+
+    dataSetN = []
+    dataSetP = []
+    for infile in sorted(glob.glob('./TESTerrorSTW15_0.csv')):
+        data = pd.read_csv(infile, sep=',', decimal='.', skiprows=1)
+        dataSetN.append(data.values)  # subsets=[]
+        print(str(infile))  # for i in range(1,5):
+    dataSetN = np.concatenate(dataSetN)  # subsetsX.append(trData[(k+kInit):(n+k+kInit),0:7])
+
+    for infile in sorted(glob.glob('./TESTerrorSTWPavlos0.csv')):
+        data = pd.read_csv(infile, sep=',', decimal='.', skiprows=1)
+        dataSetP.append(data.values)
+        print(str(infile))
+    dataSetP = np.concatenate(dataSetP)
+    maxSpeed = int(np.ceil(np.max(dataSetP[:, 0])))
+    minSpeed = int(np.ceil(np.min(dataSetP[:, 0])))
+
+
+    i = 1
+    rangesN = []
+    percsN = []
+    sizeN = []
+    while i <= maxSpeed:
+
+        lenRange = len(np.array([k for k in dataSetN if k[0] >= i and k[0] <= i + 1]))
+        if lenRange > 0:
+            rangeSTWErrN = np.mean(np.array([k for k in dataSetN if k[0] >= i and k[0] <= i + 1])[:, 1])
+        percRange = rangeSTWErrN if lenRange > 0 else 0
+        rangesN.append(i)
+        percsN.append(percRange)
+        sizeN.append(lenRange)
+        i = i + 1
+
+    i = 1
+    rangesP = []
+    percsP = []
+    sizeP = []
+
+    while i <= maxSpeed:
+
+        lenRange = len(np.array([k for k in dataSetP if k[0] >= i and k[0] <= i + 1]))
+        if lenRange > 0:
+            rangeSTWErrP = np.mean(np.array([k for k in dataSetP if k[0] >= i and k[0] <= i + 1])[:, 1])
+        percRange = rangeSTWErrP if lenRange > 0 else 0
+        rangesP.append(i)
+        percsP.append(percRange)
+        sizeP.append(lenRange)
+        i = i + 1
+    # indSubsets = []
+
+    # unseensY = []
+    sizeN = [k / 10 for k in sizeN]
+    axes = plt.gca()
+    # axes.set_xlim([minSpeed, maxSpeed])
+    # axes.set_ylim([0, 40])
+    plt.step(rangesN, percsN, color='blue', label='Neural')
+    plt.plot(rangesN, percsN, 'o--', color='grey', alpha=0.4)
+    plt.scatter(rangesN, percsN, s=sizeN, alpha=0.4)
+
+    plt.step(rangesP, percsP, color='orange', label='Interpolation')
+    plt.plot(rangesP, percsP, 'o--', color='grey', alpha=0.4)
+    plt.xticks(np.array(np.linspace(1, maxSpeed, maxSpeed)))
+    #plt.yticks(np.array(np.linspace(1, 40, 10)))
+    plt.xlabel("STW")
+    plt.ylabel("Mean Percentage Error")
+    plt.title("Mean Percentage Error on test data (20 * 10^3) obs.")
+    # plt.scatter(ranges, percs, s=size, c="blue", alpha=0.4, linewidth=4)    #k = n * i + 10
+    plt.legend()
+    plt.show()
+    #############################################################################################################
+    #############################################################################################################
+
+    dataSetN = []
+    dataSetP = []
+
+
+    for infile in sorted(glob.glob('./TESTerrorPercFOC15_0.csv')):
+        data = pd.read_csv(infile, sep=',', decimal='.', skiprows=1)
+        dataSetN.append(data.values)  # subsets=[]
+        print(str(infile))  # for i in range(1,5):
+    dataSetN = np.concatenate(dataSetN)  # subsetsX.append(trData[(k+kInit):(n+k+kInit),0:7])
+
+    for infile in sorted(glob.glob('./TESTerrorPercFOCPavlos0.csv')):
+        data = pd.read_csv(infile, sep=',', decimal='.', skiprows=1)
+        dataSetP.append(data.values)
+        print(str(infile))
+    dataSetP = np.concatenate(dataSetP)
+
+
+    maxFOC = int(np.ceil(np.max(dataSetP[:, 0])))
+    minFOC = int(np.ceil(np.min(dataSetP[:, 0])))
+
+    i = 1
+    rangesN = []
+    percsN = []
+    sizeN = []
+    while i <= maxFOC:
+
+        lenRange = len(np.array([k for k in dataSetN if k[0] >= i and k[0] <= i + 5]))
+        if lenRange > 0:
+            rangeSTWErrN = np.mean(np.array([k for k in dataSetN if k[0] >= i and k[0] <= i + 5])[:, 1])
+        percRange = rangeSTWErrN if lenRange > 0 else 0
+        rangesN.append(i)
+        percsN.append(percRange)
+        sizeN.append(lenRange)
+        i = i + 5
+
+    i = 1
+    rangesP = []
+    percsP = []
+    sizeP = []
+
+    while i <= maxFOC:
+
+        lenRange = len(np.array([k for k in dataSetP if k[0] >= i and k[0] <= i + 5]))
+        if lenRange > 0:
+            rangeSTWErrP = np.mean(np.array([k for k in dataSetP if k[0] >= i and k[0] <= i + 5])[:, 1])
+        percRange = rangeSTWErrP if lenRange > 0 else 0
+        rangesP.append(i)
+        percsP.append(percRange)
+        sizeP.append(lenRange)
+        i = i + 5
+
+    # unseensY = []
+    sizeN = [k / 10 for k in sizeN]
+    axes = plt.gca()
+    # axes.set_xlim([minSpeed, maxSpeed])
+    # axes.set_ylim([0, 40])
+    plt.step(rangesN, percsN, color='blue', label='Neural')
+    plt.plot(rangesN, percsN, 'o--', color='grey', alpha=0.4)
+    plt.scatter(rangesN, percsN, s=sizeN, alpha=0.4)
+
+    plt.step(rangesP, percsP, color='orange', label='Interpolation')
+    plt.plot(rangesP, percsP, 'o--', color='grey', alpha=0.4)
+    # plt.xticks(np.array(np.linspace(1, maxSpeed, maxSpeed)))
+    # plt.yticks(np.array(np.linspace(1, 40, 10)))
+    plt.xlabel("FOC ranges")
+    plt.ylabel("Mean Percentage Error")
+    plt.title("Mean Percentage Error on test data (20 * 10^3) obs.")
+    # plt.scatter(ranges, percs, s=size, c="blue", alpha=0.4, linewidth=4)    #k = n * i + 10
+    plt.legend()
+    plt.show()
 
 
     #random.seed(1)
@@ -122,47 +412,47 @@ def main():
     data = data.drop(["wind_speed", "wind_dir"],axis=1)
     data = data.values
 
+    # subsets=[]
+    # for i in range(1,5):
+    # subsetsX.append(trData[(k+kInit):(n+k+kInit),0:7])
+    # subsetsY.append(trData[(k+kInit):(n+k+kInit), 7])
+    # k=n*i#+1000
+
+    # subsetsX.append(trData[0:20000, 0:7])
+    # subsetsY.append(trData[0:20000, 7])
+
+    # subsetsX.append(trData[20000:40000, 0:7])
+    # subsetsY.append(trData[20000:40000, 7])
+
+    # subsetsX.append(trData[50000:70000, 0:7])
+    # subsetsY.append(trData[50000:70000, 7])
+
+    # subsetsX.append(trData[70000:90000, 0:7])
+    # subsetsY.append(trData[70000:90000, 7])
+    # indSubsets = []
+    # for i in range(0,len(subsets)):
+    # X = DANreader.readStatDifferentSubsets(subsets[i],subsets,i)
+    # indSubsets.append(X)
+    # n = 1000
+    # kInit=90000
+    # k=0
+    # unseensX=[]
+    # unseensY = []
+    # for i in range(1,6):
+    # unseensX.append(data[(k+kInit):(n+k+kInit) , 0:7])
+    # unseensY.append(data[(k+kInit):(n+k+kInit), 7])
+    # k = n * i + 10
 
     trData = data[0:89999]
     k=0
     kInit =0
     n=20000
-    #subsets=[]
-    #for i in range(1,5):
-        #subsetsX.append(trData[(k+kInit):(n+k+kInit),0:7])
-        #subsetsY.append(trData[(k+kInit):(n+k+kInit), 7])
-        #k=n*i#+1000
-
-    #subsetsX.append(trData[0:20000, 0:7])
-    #subsetsY.append(trData[0:20000, 7])
-
-    #subsetsX.append(trData[20000:40000, 0:7])
-    #subsetsY.append(trData[20000:40000, 7])
-
-    #subsetsX.append(trData[50000:70000, 0:7])
-    #subsetsY.append(trData[50000:70000, 7])
-
-    #subsetsX.append(trData[70000:90000, 0:7])
-    #subsetsY.append(trData[70000:90000, 7])
-    #indSubsets = []
-    #for i in range(0,len(subsets)):
-       #X = DANreader.readStatDifferentSubsets(subsets[i],subsets,i)
-       #indSubsets.append(X)
-    #n = 1000
-    #kInit=90000
-    #k=0
-    #unseensX=[]
-    #unseensY = []
-    #for i in range(1,6):
-        #unseensX.append(data[(k+kInit):(n+k+kInit) , 0:7])
-        #unseensY.append(data[(k+kInit):(n+k+kInit), 7])
-        #k = n * i + 10
 
 
     #subsetsX.append(data[:,0:7][0:1000].astype(float))
     #subsetsY.append(data[:, 7][0:1000].astype(float))
-    unseenX = data[:, 0:7][90000:].astype(float)
-    unseenY = data[:, 7][90000:].astype(float)
+    #unseenX = data[:, 0:7][90000:].astype(float)
+    #unseenY = data[:, 7][90000:].astype(float)
 
     X_train, X_test, y_train, y_test = train_test_split(data[:,0:7], data[:,7], test_size=0.2,
                                                         random_state=42)
@@ -205,8 +495,8 @@ def main():
                elif modeler.__class__.__name__=='TriInterpolantModeler' or modeler.__class__.__name__ == 'TensorFlow':
                  partK =K
                else:
-                 partK=[30]
-           error = {"errors": [ ]}
+                 partK=[5]
+           error = {"errors": []}
            #random.seed(1)
 
            flagEvalTri = False
@@ -302,9 +592,9 @@ def main():
                     _, meanError, sdError = eval.MeanAbsoluteErrorEvaluation.evaluateKerasNN(
                         eval.MeanAbsoluteErrorEvaluation(), subsetX,
                         subsetY,
-                        modeler, output, None, None, partitionsX, scores)
+                        modeler, output, None, None, partitionsX, scores,subsetInd,'train')
                 elif modeler.__class__.__name__ == 'PavlosInterpolation':
-                    _, meanError, sdError = eval.MeanAbsoluteErrorEvaluation.evaluatePavlosInterpolation(
+                    _, meanErrorTr, sdError = eval.MeanAbsoluteErrorEvaluation.evaluatePavlosInterpolation(
                         eval.MeanAbsoluteErrorEvaluation(), subsetX,
                         subsetY,
                         modeler, None, None, None, partitionsX, None, subsetInd,'train')
@@ -325,7 +615,7 @@ def main():
                     _, meanError, sdError = eval.MeanAbsoluteErrorEvaluation.evaluateKerasNN(
                         eval.MeanAbsoluteErrorEvaluation(), unseenX,
                         unseenY,
-                        modeler, output, None, None, partitionsX, scores)
+                        modeler, output, None, None, partitionsX, scores,subsetInd,'test')
                 elif modeler.__class__.__name__=='PavlosInterpolation':
                     _, meanError, sdError = eval.MeanAbsoluteErrorEvaluation.evaluatePavlosInterpolation(
                         eval.MeanAbsoluteErrorEvaluation(), unseenX,
@@ -357,7 +647,7 @@ def main():
                 #meanVTr.append(np.mean(s ubsetX))
                 #meanBTr.append(np.mean(X[:,2]))
                 errors.append(meanError)
-
+                trErrors.append(meanErrorTr)
 
                 err={}
                 err["model"] =modeler.__class__.__name__
@@ -372,7 +662,7 @@ def main():
       subsetInd=subsetInd+1
 
 
-    eval.MeanAbsoluteErrorEvaluation.ANOVAtest(eval.MeanAbsoluteErrorEvaluation(), clusters, varTr, errors,models,part)
+    eval.MeanAbsoluteErrorEvaluation.ANOVAtest(eval.MeanAbsoluteErrorEvaluation(), clusters, varTr, trErrors,errors,models,part)
 
 def initParameters():
     sFile = "./neural_data/marmaras_data.csv"

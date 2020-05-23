@@ -939,7 +939,7 @@ class TensorFlowW2(BasePartitionModeler):
                 # estimatorCl.layers[0].set_weights([weights, np.array([0] * (numOfNeurons - 1))])
                 # modelId=idx
 
-                estimatorCl.fit(np.array(partitionsX[idx]), np.array(partitionsY[idx]), epochs=30, )
+                estimatorCl.fit(np.array(partitionsX[idx]), np.array(partitionsY[idx]), epochs=30, verbose=0)
 
                 # x = input_img
 
@@ -960,7 +960,7 @@ class TensorFlowW2(BasePartitionModeler):
         # models=[]
 
         # Plot training & validation loss values
-        history = estimator.fit(X, Y, epochs=50, validation_split=0.33)
+        history = estimator.fit(X, Y, epochs=50, validation_split=0.33,verbose=0)
         NNmodels.append(estimator)
 
         self._models = NNmodels
@@ -1704,7 +1704,7 @@ class TensorFlowW1(BasePartitionModeler):
         # Plot training & validation loss values
         print("GENERAL MODEL  ")
         es = EarlyStopping(monitor='val_loss', mode='min', verbose=0)
-        history = estimator.fit(XSplineVectorGen, Y, epochs=50, validation_split=0.17,verbose=0,)#callbacks=[es])
+        history = estimator.fit(XSplineVectorGen, Y, epochs=50, validation_split=0.33,verbose=0)
 
 
         #print("CORRELATION COEFF ERR AND STW: " +str(pearsonr(stdSTW,clustersTrScores)))
