@@ -39,6 +39,7 @@ def main():
 
     trSetlen=[500,1000,2000,3000,5000,10000,20000,30000,40000]
     errors=[]
+    trErrors=[]
     var=[]
     clusters=[]
     cutoff=np.linspace(0.1,1,111)
@@ -47,24 +48,7 @@ def main():
     subsetsB=[]
     reader = dRead.BaseSeriesReader()
 
-    DANreader = DANdRead.BaseSeriesReader()
 
-
-    #DANreader.GenericParserForDataExtraction('LAROS', 'MARMARAS', 'MT_DELTA_MARIA')
-    #DANreader = DANRead.BaseSeriesReader()
-    #DANreader.readLarosDAta(datetime.datetime(2018,1,1),datetime.datetime(2019,1,1))
-
-    #DANreader.GenericParserForDataExtraction('LAROS','MARMARAS','MT_DELTA_MARIA')
-    #DANreader.GenericParserForDataExtraction('LEMAG', 'MILLENIA', 'FANTASIA',driver='ORACLE',server='10.2.5.80',sid='OR11',usr='millenia',password='millenia',
-                                             #rawData=[],telegrams=True,companyTelegrams=False,pathOfRawData='C:/Users/dkaklis/Desktop/danaos')
-
-    #DANreader.GenericParserForDataExtraction('LEMAG', 'OCEAN_GOLD', 'PENELOPE',driver='ORACLE',server='10.2.5.80',sid='OR11',usr='oceangold',password='oceangold',
-        #rawData=True,telegrams=True,companyTelegrams=True,seperator='\t',pathOfRawData='C:/Users/dkaklis/Desktop/danaos')
-
-    #DANreader.readExtractNewDataset('MILLENIA','FANTASIA',';')
-    #return
-    #DANreader.ExtractLAROSDataset("",'2017-06-01 00:00:00','2019-10-09 15:10:00')
-    #return
     ####
     num_lines = sum(1 for l in open(sFile))
     num_linesx = num_lines
@@ -87,6 +71,7 @@ def main():
     for cl in cls:
         if cl=='KM':partitioners.append(dPart.KMeansPartitioner())
         if cl=='DC' :partitioners.append(dPart.DelaunayTriPartitioner())
+        if cl == 'NNCL': partitioners.append(dPart.TensorFlowCl())
 
     print(modelers)
 
@@ -140,11 +125,12 @@ def main():
                  partK=np.linspace(0.7,1,4)#[0.5]
                  #np.linspace(0.2,1,11)
                      #[0.6]
-           if partitioner.__class__.__name__=='KMeansPartitioner':
+           elif partitioner.__class__.__name__=='KMeansPartitioner':
                if modeler.__class__.__name__=='TriInterpolantModeler' or modeler.__class__.__name__ == 'TensorFlow':
                  partK =K
                else:
-                 partK=[10]
+                 partK=[20]
+           else: partK=[1]
            error = {"errors": [ ]}
            #random.seed(1)
 
@@ -243,26 +229,32 @@ def main():
                 print("Reading unseen data... Done")
 
                 # Predict and evaluate on seen data
+                print("Evaluating on seen data...")
                 if modeler.__class__.__name__  != 'TriInterpolantModeler':
                     print("Evaluating on seen data...")
 
                     if modeler.__class__.__name__ != 'TensorFlowW1' and  modeler.__class__.__name__ != 'TensorFlow'and modeler.__class__.__name__ != 'TensorFlowW' and modeler.__class__.__name__ != 'TriInterpolantModeler' and modeler.__class__.__name__ != 'TensorFlowWD':
                         x=1
-                        _, meanError, sdError = eval.MeanAbsoluteErrorEvaluation.evaluate(eval.MeanAbsoluteErrorEvaluation(), X,
+                        _, meanErrorTr, sdError = eval.MeanAbsoluteErrorEvaluation.evaluate(eval.MeanAbsoluteErrorEvaluation(), X,
                                                                                           Y,
                                                                                           modeler, genericModel)
 
 
                     elif modeler.__class__.__name__ == 'TensorFlow' or modeler.__class__.__name__ == 'TensorFlowW' or modeler.__class__.__name__ == 'TensorFlowWD':
-                        #_,meanError, sdError = eval.MeanAbsoluteErrorEvaluation.evaluateKerasNN(
-                            #eval.MeanAbsoluteErrorEvaluation(), X,
-                            #Y,
-                            #modeler, output, xs,genericModel,partitionsXDC)
-                            x=1
+                        _,meanErrorTr, sdError = eval.MeanAbsoluteErrorEvaluation.evaluateKerasNN(
+                            eval.MeanAbsoluteErrorEvaluation(), X,
+                            Y,
+                            modeler, output, xs,genericModel,partitionsXDC)
 
-                    #print ("Mean absolute error on training data: %4.2f (+/- %4.2f standard error)" % (
-                        #meanError, sdError / sqrt(unseenFeaturesY.shape[ 0 ])))
-                    #print("Evaluating on seen data... Done.")
+                    elif modeler.__class__.__name__ == 'TensorFlowW1':
+                           _, meanErrorTr, sdError = eval.MeanAbsoluteErrorEvaluation.evaluateKerasNN1(
+                               eval.MeanAbsoluteErrorEvaluation(), X,
+                               Y,
+                               modeler, output, None, None, partitionsX, genericModel)
+
+                    print ("Mean absolute error on training data: %4.2f (+/- %4.2f standard error)" % (
+                        meanErrorTr, sdError / sqrt(unseenFeaturesY.shape[ 0 ])))
+                    print("Evaluating on seen data... Done.")
 
                 # Predict and evaluate on unseen data
                 print("Evaluating on unseen data...")
@@ -301,8 +293,8 @@ def main():
                         #(varExpl)) + " %")
                 # # Evaluate performance
                 numOfclusters= len(partitionsX)
-                pltRes = plotRes()
-                pltRes
+                #pltRes = plotRes()
+                #pltRes
 
                 clusters.append(numOfclusters)
                 varTr.append(np.var(subsetX))
@@ -314,7 +306,7 @@ def main():
                 #meanVTr.append(np.mean(s ubsetX))
                 #meanBTr.append(np.mean(X[:,2]))
                 errors.append(meanError)
-
+                trErrors.append(meanErrorTr)
 
                 err={}
                 err["model"] =modeler.__class__.__name__
@@ -339,7 +331,7 @@ def initParameters():
     end = 17000
     startU = 30000
     endU = 31000
-    algs=['NNW1']
+    algs=['NNWCA','NNW1','NNW']
     # ['SR','LR','RF','NN','NNW','TRI']
 
 
