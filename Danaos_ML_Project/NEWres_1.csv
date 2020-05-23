@@ -10,5 +10,9 @@ clusters,error,models,partitioners,var
 3,3.4121005535125732,TensorFlowW1,KMeansPartitioner,10386.866629899976
 =======
 clusters,var,error,partitioners,models
+<<<<<<< HEAD
 1,9504.328623091884,6.111400122813064,KMeansPartitioner,PavlosInterpolation
 >>>>>>> 6012680ce53a1390d634b355261b600a81f9a01b
+=======
+5,9504.328623091884,4.23091459274292,KMeansPartitioner,TensorFlowW1
+>>>>>>> 3079fad7b133f9832220e9899597abb31f8bdb3e

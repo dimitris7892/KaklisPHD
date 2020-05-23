@@ -1,2 +1,7 @@
 Basis,Coeff
+<<<<<<< HEAD
 (Intercept),46.1352
+=======
+(Intercept),45.9583
+h(0.778857-x1),-6.43365
+>>>>>>> 3079fad7b133f9832220e9899597abb31f8bdb3e

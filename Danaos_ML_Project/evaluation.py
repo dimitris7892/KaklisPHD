@@ -119,7 +119,7 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
 
             meanPointsOfCl = np.mean(partitionsX[ind],axis=0)
             #meanPointsOfCl = np.mean([meanPointsOfCl,pPointRefined],axis=0)
-            #meanPointsOfCl = np.mean([meanPointsOfCl, pPoint], axis=0)
+            meanPointsOfCl = np.mean([meanPointsOfCl, pPoint], axis=0)
             #####
             #vectorPpoint = self.extractFunctionsFromSplines(pPoint[0][0], pPoint[0][1], pPoint[0][2], pPoint[0][3],
                                                       #pPoint[0][4], pPoint[0][5], pPoint[0][6], ind)
@@ -141,9 +141,9 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
             #meanClGenpred = pred
             #################################
 
-            vector = self.extractFunctionsFromSplines(meanPointsOfCl[0], meanPointsOfCl[1], meanPointsOfCl[2],
-                                                      meanPointsOfCl[3],
-                                                      meanPointsOfCl[4], meanPointsOfCl[5], meanPointsOfCl[6],
+            vector = self.extractFunctionsFromSplines(meanPointsOfCl[0][0], meanPointsOfCl[0][1], meanPointsOfCl[0][2],
+                                                      meanPointsOfCl[0][3],
+                                                      meanPointsOfCl[0][4], meanPointsOfCl[0][5], meanPointsOfCl[0][6],
                                                       ind)
 
             # newVector = np.mean([vector,vectorPpoint],axis=0)
@@ -175,22 +175,30 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
                 #prediction = modeler._models[len(modeler._models)-1].predict(XSplineGenVector)
             Genpred = modeler._models[len(modeler._models) - 1].predict(XSplineGenVector)
             CLpred = modeler._models[ind].predict(XSplineVector)
-            if abs(meanClpred - Genpred) >7:
-                if abs(CLpred - Genpred) > 5:
-                    prediction = Genpred
-                else:
-                    prediction = (Genpred + CLpred )/2
+            #if abs(CLpred - Genpred) >7:
+                #if abs(meanClpred - Genpred) > 5:
+                    #prediction = Genpred
+                #else:
+                    #prediction = (meanClpred + Genpred )/2
+            #else:
+                #prediction = ( Genpred  + CLpred)/ 2
+
+            if abs(CLpred - Genpred) >5:
+
+                prediction = Genpred
+
             else:
-                prediction = (meanClpred + Genpred  )/ 2
+                prediction = ( Genpred  + CLpred)/ 2
+            #prediction = (CLpred + Genpred) / 2
 
             #prediction = (abs(modeler._models[ind].predict(pPoint)))
             #prediction =  modeler._models[len(modeler._models) - 1].predict(pPoint)
             #prediction = (abs(modeler._models[ind].predict(pPoint)) + modeler._models[len(modeler._models) - 1].predict(pPoint) )/ 2
             error = abs(prediction - trueVal)
             lErrors.append(error)
-
-            errorStwArr.append(np.array(np.append(np.asmatrix(pPoint[0][0]).reshape(-1,1), np.asmatrix([error[0]]).T, axis=1)))
-            errorFoc.append(abs((prediction - trueVal)/trueVal) * 100)
+            percError = abs((prediction - trueVal) / trueVal) * 100
+            errorStwArr.append(np.array(np.append(np.asmatrix(pPoint[0][0]).reshape(-1,1), np.asmatrix([percError[0] ]).T, axis=1)))
+            errorFoc.append(percError)
             foc.append(trueVal)
 
 
@@ -240,12 +248,13 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
 
         return errors, np.mean(errors), np.std(lErrors)
 
-    def evaluateKerasNN(self, unseenX, unseenY, modeler,output,xs,genericModel,partitionsX , scores,subsetInd):
+    def evaluateKerasNN(self, unseenX, unseenY, modeler,output,xs,genericModel,partitionsX , scores,subsetInd,type):
         lErrors = []
-        with open('./meanErrorStw.csv', mode='w') as data:
-            data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-            data_writer.writerow(['STW','DRAFT','TRIM','WS','WA','CWH','CWD','predFOC','ActualFoc','MAE'])
-            for iCnt in range(np.shape(unseenX)[0]):
+        errorStwArr=[]
+        foc=[]
+        errorFoc=[]
+
+        for iCnt in range(np.shape(unseenX)[0]):
                 pPoint =unseenX[iCnt]
                 pPoint= pPoint.reshape(-1,unseenX.shape[1])
 
@@ -255,11 +264,54 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
                 ind, fit = modeler.getBestPartitionForPoint(pPoint, partitionsX)
                 prediction = (abs(modeler._models[ind].predict(pPoint)) + modeler._models[len(modeler._models) - 1].predict(
                     pPoint)) / 2
+
+                percError = abs((prediction - trueVal) / trueVal) * 100
+                errorStwArr.append(np.array(
+                    np.append(np.asmatrix(pPoint[0][0]).reshape(-1, 1), np.asmatrix([percError[0]]).T, axis=1)))
+                errorFoc.append(percError)
+                foc.append(trueVal)
+
                 error = abs(prediction - trueVal)
                 lErrors.append(error)
-                if(abs(prediction - trueVal)) > 5:
-                    data_writer.writerow([pPoint[0][0],pPoint[0][1],pPoint[0][2],pPoint[0][3],pPoint[0][4],pPoint[0][5],pPoint[0][6],prediction[0][0],trueVal,error[0][0]])
 
+        errorStwArr = np.array(errorStwArr)
+        errorStwArr = errorStwArr.reshape(-1, 2)
+
+
+        if type == 'train':
+                with open('./TRAINerrorPercFOC' + str(len(partitionsX)) + '_' + str(subsetInd) + '.csv',
+                          mode='w') as data:
+                    data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+                    data_writer.writerow(
+                        ['FOC', 'PERC'])
+                    for i in range(0, len(errorFoc)):
+                        data_writer.writerow(
+                            [foc[i], errorFoc[i][0][0]])
+
+                with open('./TRAINerrorSTW' + str(len(partitionsX)) + '_' + str(subsetInd) + '.csv', mode='w') as data:
+                    data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+                    data_writer.writerow(
+                        ['STW', 'MAE'])
+                    for i in range(0, len(errorStwArr)):
+                        data_writer.writerow(
+                            [errorStwArr[i][0], errorStwArr[i][1]])
+        else:
+                with open('./TESTerrorPercFOC' + str(len(partitionsX)) + '_' + str(subsetInd) + '.csv',
+                          mode='w') as data:
+                    data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+                    data_writer.writerow(
+                        ['FOC', 'PERC'])
+                    for i in range(0, len(errorFoc)):
+                        data_writer.writerow(
+                            [foc[i], errorFoc[i][0][0]])
+
+                with open('./TESTerrorSTW' + str(len(partitionsX)) + '_' + str(subsetInd) + '.csv', mode='w') as data:
+                    data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+                    data_writer.writerow(
+                        ['STW', 'MAE'])
+                    for i in range(0, len(errorStwArr)):
+                        data_writer.writerow(
+                            [errorStwArr[i][0], errorStwArr[i][1]])
 
         errors = np.asarray(lErrors)
 
@@ -672,12 +724,13 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
 
         return piecewiseFunc
 
-    def ANOVAtest(self,clusters,var,error,models,partitioners):
+    def ANOVAtest(self,clusters,var,trError,error,models,partitioners):
 
         df = pd.DataFrame({
                             'clusters': clusters,
                             'var': var,
                             'error':error,
+                            'Trerror': trError,
                             'partitioners':partitioners,
                             'models':models
                             #'meanBearing':trFeatures[1]
@@ -686,7 +739,7 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
 
 
         #data=[error,np.var(unseenX),clusters]
-        print(stats.kruskal(error,clusters,var,models,partitioners))
+        print(stats.kruskal(trError,error,clusters,var,models,partitioners))
         #print(self.kw_dunn(groups,[(0,1),(0,2)]))
 
         #dataf = pd.DataFrame.from_dict(df, orient='index')
@@ -928,8 +981,9 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
 
                 foc.append(trueVal)
                 error = abs(prediction - trueVal)
+                percError = abs((prediction - trueVal) / trueVal) * 100
                 errorStwArr.append(
-                    np.array(np.append(np.asmatrix(pPoint[0][0]).reshape(-1, 1), np.asmatrix([error]).T, axis=1)))
+                    np.array(np.append(np.asmatrix(pPoint[0][0]).reshape(-1, 1), np.asmatrix([percError]).T, axis=1)))
                 errorFoc.append(abs((prediction - trueVal) / trueVal) * 100)
 
                 lErrors.append(abs(prediction - trueVal))
