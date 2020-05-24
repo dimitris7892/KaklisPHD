@@ -477,6 +477,7 @@ def main():
     stdInU = []
     varTr = []
     models = []
+    K = range(1,40)
     part = []
     subsetInd = 0
 
@@ -495,7 +496,7 @@ def main():
                elif modeler.__class__.__name__=='TriInterpolantModeler' or modeler.__class__.__name__ == 'TensorFlow':
                  partK =K
                else:
-                 partK=[5]
+                 partK=K
            error = {"errors": []}
            #random.seed(1)
 
