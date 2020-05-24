@@ -20,7 +20,7 @@ import  matplotlib.pyplot as plt
 import csv
 import tensorflow as tf
 from matplotlib import rc
-import latex
+#import latex
 #rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
 #rc('text', usetex=True)
 def main():
@@ -447,7 +447,6 @@ def main():
     k=0
     kInit =0
     n=20000
-<<<<<<< HEAD
     #subsets=[]
     #for i in range(1,5):
         #subsetsX.append(trData[(k+kInit):(n+k+kInit),0:7])
@@ -478,8 +477,6 @@ def main():
         #unseensX.append(data[(k+kInit):(n+k+kInit) , 0:7])
         #unseensY.append(data[(k+kInit):(n+k+kInit), 7])
         #k = n * i + 10
-=======
->>>>>>> 3079fad7b133f9832220e9899597abb31f8bdb3e
 
 
     #subsetsX.append(data[:,0:7][0:1000].astype(float))
