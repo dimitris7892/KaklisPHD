@@ -244,13 +244,13 @@ def main():
                         _,meanErrorTr, sdError = eval.MeanAbsoluteErrorEvaluation.evaluateKerasNN(
                             eval.MeanAbsoluteErrorEvaluation(), X,
                             Y,
-                            modeler, output, None,genericModel,None,None)
+                            modeler, output, None,genericModel,partitionsX,None)
 
                     elif modeler.__class__.__name__ == 'TensorFlowW1':
                            _, meanErrorTr, sdError = eval.MeanAbsoluteErrorEvaluation.evaluateKerasNN1(
                                eval.MeanAbsoluteErrorEvaluation(), X,
                                Y,
-                               modeler, output, None, None, partitionsX, genericModel)
+                               modeler, output, None,genericModel,partitionsX,None)
 
                     print ("Mean absolute error on training data: %4.2f (+/- %4.2f standard error)" % (
                         meanErrorTr, sdError / sqrt(unseenFeaturesY.shape[ 0 ])))
