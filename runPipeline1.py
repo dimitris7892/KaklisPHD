@@ -108,7 +108,7 @@ def main():
     histTr=[]
     counter=0
 
-    K = range(1,3)
+    K = range(1,20)
     print("Number of Statistically ind. subsets for training: " + str(len(subsetsX)))
     subsetsX=[subsetsX[0:5]] if len(subsetsX) > 5 else subsetsX
     subsetsY = [ subsetsY[ 0:5 ] ] if len(subsetsY) > 5 else subsetsY
@@ -127,9 +127,9 @@ def main():
                      #[0.6]
            elif partitioner.__class__.__name__=='KMeansPartitioner':
                if modeler.__class__.__name__=='TriInterpolantModeler' or modeler.__class__.__name__ == 'TensorFlow':
-                 partK =K
+                 partK =[1]
                else:
-                 partK=[20]
+                 partK=K
            else: partK=[1]
            error = {"errors": [ ]}
            #random.seed(1)
@@ -244,7 +244,7 @@ def main():
                         _,meanErrorTr, sdError = eval.MeanAbsoluteErrorEvaluation.evaluateKerasNN(
                             eval.MeanAbsoluteErrorEvaluation(), X,
                             Y,
-                            modeler, output, None,genericModel,None)
+                            modeler, output, None,genericModel,None,None)
 
                     elif modeler.__class__.__name__ == 'TensorFlowW1':
                            _, meanErrorTr, sdError = eval.MeanAbsoluteErrorEvaluation.evaluateKerasNN1(

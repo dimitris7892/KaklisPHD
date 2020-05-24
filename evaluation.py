@@ -1239,7 +1239,7 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
 
     def evaluateKerasNN(self, unseenX, unseenY, modeler,output,xs,genericModel,partitionsX , scores):
         lErrors = []
-        vectorWeights = scores
+        #vectorWeights = scores
         #unseenX = unseenX.reshape((unseenX.shape[ 0 ], 1, unseenX.shape[ 1 ]))
         #from sklearn.decomposition import PCA
         #pca = PCA()
