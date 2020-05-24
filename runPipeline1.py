@@ -82,7 +82,7 @@ def main():
     #random.seed(1)
     subsetsW=[]
     data = pd.read_csv(sFile)
-    for k in range(0,200):
+    for k in range(0,2000):
         # The row indices to skip - make sure 0 is not included to keep the header!
         skip_idx = random.sample(range(1, num_linesx), num_linesx-size)
         # Read the data
