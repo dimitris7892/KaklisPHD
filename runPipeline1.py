@@ -82,7 +82,7 @@ def main():
     #random.seed(1)
     subsetsW=[]
     data = pd.read_csv(sFile)
-    for k in range(0,200):
+    for k in range(0,2000):
         # The row indices to skip - make sure 0 is not included to keep the header!
         skip_idx = random.sample(range(1, num_linesx), num_linesx-size)
         # Read the data
@@ -244,7 +244,7 @@ def main():
                         _,meanErrorTr, sdError = eval.MeanAbsoluteErrorEvaluation.evaluateKerasNN(
                             eval.MeanAbsoluteErrorEvaluation(), X,
                             Y,
-                            modeler, output, xs,genericModel,partitionsXDC)
+                            modeler, output, None,genericModel,None)
 
                     elif modeler.__class__.__name__ == 'TensorFlowW1':
                            _, meanErrorTr, sdError = eval.MeanAbsoluteErrorEvaluation.evaluateKerasNN1(
@@ -320,7 +320,7 @@ def main():
                     break
 
 
-    eval.MeanAbsoluteErrorEvaluation.ANOVAtest(eval.MeanAbsoluteErrorEvaluation(), clusters, varTr, errors,models,part)
+    eval.MeanAbsoluteErrorEvaluation.ANOVAtest(eval.MeanAbsoluteErrorEvaluation(), clusters, varTr,trErrors ,errors,models,part)
 
 def initParameters():
     sFile = "./kaklis.csv"
