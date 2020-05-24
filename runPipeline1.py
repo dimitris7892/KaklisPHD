@@ -244,7 +244,7 @@ def main():
                         _,meanErrorTr, sdError = eval.MeanAbsoluteErrorEvaluation.evaluateKerasNN(
                             eval.MeanAbsoluteErrorEvaluation(), X,
                             Y,
-                            modeler, output, xs,genericModel,partitionsXDC)
+                            modeler, output, None,genericModel,None)
 
                     elif modeler.__class__.__name__ == 'TensorFlowW1':
                            _, meanErrorTr, sdError = eval.MeanAbsoluteErrorEvaluation.evaluateKerasNN1(
@@ -320,7 +320,7 @@ def main():
                     break
 
 
-    eval.MeanAbsoluteErrorEvaluation.ANOVAtest(eval.MeanAbsoluteErrorEvaluation(), clusters, varTr, errors,models,part)
+    eval.MeanAbsoluteErrorEvaluation.ANOVAtest(eval.MeanAbsoluteErrorEvaluation(), clusters, varTr,trErrors ,errors,models,part)
 
 def initParameters():
     sFile = "./kaklis.csv"
