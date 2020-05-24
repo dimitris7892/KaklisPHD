@@ -122,8 +122,7 @@ def main():
       for modeler in modelers:
         for partitioner in partitioners:
            if partitioner.__class__.__name__=='DelaunayTriPartitioner':
-                 partK=np.linspace(0.7,1,4)#[0.5]
-                 #np.linspace(0.2,1,11)
+                 partK=np.linspace(0.2,1,9)
                      #[0.6]
            elif partitioner.__class__.__name__=='KMeansPartitioner':
                if modeler.__class__.__name__=='TriInterpolantModeler' or modeler.__class__.__name__ == 'TensorFlow':
