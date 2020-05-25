@@ -1,11 +1,12 @@
 import dataReading as dRead
 #from Danaos_ML_Project import dataReading as DANdRead ##   NEWWWW
-#import  Danaos_ML_Project.dataReading as DANdRead
+import  Danaos_ML_Project.dataReading as DANdRead
 import featureCalculation as fCalc
 import dataReadingD as DANRead
 import dataPartitioning as dPart
 import dataModeling as dModel
 import evaluation as eval
+import plotResults as plotRes
 import numpy as np
 from math import sqrt
 import sys
@@ -15,10 +16,14 @@ import pandas as pd
 import random
 from sklearn.decomposition import PCA
 import datetime
-
+import csv
+import tensorflow as tf
 
 def main():
     # Init parameters based on command line
+
+
+
     end, endU, history, future,sFile, start, startU , algs , cls = initParameters()
     # Load data
     if len(sys.argv) >1:
@@ -34,6 +39,7 @@ def main():
 
     trSetlen=[500,1000,2000,3000,5000,10000,20000,30000,40000]
     errors=[]
+    trErrors=[]
     var=[]
     clusters=[]
     cutoff=np.linspace(0.1,1,111)
@@ -42,18 +48,7 @@ def main():
     subsetsB=[]
     reader = dRead.BaseSeriesReader()
 
-    #DANreader = DANdRead.BaseSeriesReader()
-    #DANreader.GenericParserForDataExtraction('LAROS', 'MARMARAS', 'MT_DELTA_MARIA')
-    #DANreader = DANRead.BaseSeriesReader()
-    #DANreader.readLarosDAta(datetime.datetime(2018,1,1),datetime.datetime(2019,1,1))
 
-    #DANreader.GenericParserForDataExtraction('LAROS','MARMARAS','MT_DELTA_MARIA')
-    #DANreader.GenericParserForDataExtraction('LEMAG', 'MILLENIA', 'DOMINIA',driver='ORACLE',server='10.2.5.80',sid='OR12',usr='goldenport',password='goldenport',
-                                             #rawData=[],telegrams=True,pathOfRawData='C:/Users/dkaklis/Desktop/danaos')
-    #DANreader.readExtractNewDataset('MILLENIA','FANTASIA',';')
-    #return
-    #DANreader.ExtractLAROSDataset("",'2017-06-01 00:00:00','2019-10-09 15:10:00')
-    #return
     ####
     num_lines = sum(1 for l in open(sFile))
     num_linesx = num_lines
@@ -70,11 +65,13 @@ def main():
         elif al == 'NNW':modelers.append(dModel.TensorFlowW())
         elif al == 'NNWD':modelers.append(dModel.TensorFlowWD())
         elif al == 'NNW1':modelers.append(dModel.TensorFlowW1())
+        elif al == 'NNWCA':modelers.append(dModel.TensorFlowCA())
 
     partitioners=[]
     for cl in cls:
         if cl=='KM':partitioners.append(dPart.KMeansPartitioner())
         if cl=='DC' :partitioners.append(dPart.DelaunayTriPartitioner())
+        if cl == 'NNCL': partitioners.append(dPart.TensorFlowCl())
 
     print(modelers)
 
@@ -85,7 +82,7 @@ def main():
     #random.seed(1)
     subsetsW=[]
     data = pd.read_csv(sFile)
-    for k in range(0,200):
+    for k in range(0,2000):
         # The row indices to skip - make sure 0 is not included to keep the header!
         skip_idx = random.sample(range(1, num_linesx), num_linesx-size)
         # Read the data
@@ -111,7 +108,7 @@ def main():
     histTr=[]
     counter=0
 
-    K = range(1,12)
+    K = range(1,20)
     print("Number of Statistically ind. subsets for training: " + str(len(subsetsX)))
     subsetsX=[subsetsX[0:5]] if len(subsetsX) > 5 else subsetsX
     subsetsY = [ subsetsY[ 0:5 ] ] if len(subsetsY) > 5 else subsetsY
@@ -125,14 +122,15 @@ def main():
       for modeler in modelers:
         for partitioner in partitioners:
            if partitioner.__class__.__name__=='DelaunayTriPartitioner':
-                 partK=[0.5]
-                 #np.linspace(0.1,1,11)
+                 partK=np.linspace(0.7,1,4)#[0.5]
+                 #np.linspace(0.2,1,11)
                      #[0.6]
-           if partitioner.__class__.__name__=='KMeansPartitioner':
+           elif partitioner.__class__.__name__=='KMeansPartitioner':
                if modeler.__class__.__name__=='TriInterpolantModeler' or modeler.__class__.__name__ == 'TensorFlow':
-                 partK =K
+                 partK =[1]
                else:
                  partK=K
+           else: partK=[1]
            error = {"errors": [ ]}
            #random.seed(1)
 
@@ -208,7 +206,7 @@ def main():
                 unseenY=[]
                 if modeler.__class__.__name__!= 'TriInterpolantModeler' :
                             #and modeler.__class__.__name__ != 'TensorFlow':
-                    modelMap, model2,scores, output,genericModel = modeler.createModelsFor(partitionsX, partitionsY, partitionLabels,None,X,Y)
+                    modelMap, history,scores, output,genericModel = modeler.createModelsFor(partitionsX, partitionsY, partitionLabels,None,X,Y)
                             #, genericModel , partitionsXDC
                     #if modeler.__class__.__name__ != 'TensorFlow':
                         #modelMap = dict(zip(partitionLabels, modelMap))
@@ -231,30 +229,36 @@ def main():
                 print("Reading unseen data... Done")
 
                 # Predict and evaluate on seen data
+                print("Evaluating on seen data...")
                 if modeler.__class__.__name__  != 'TriInterpolantModeler':
                     print("Evaluating on seen data...")
 
-                    if modeler.__class__.__name__ != 'TensorFlow'and modeler.__class__.__name__ != 'TensorFlowW' and modeler.__class__.__name__ != 'TriInterpolantModeler' and modeler.__class__.__name__ != 'TensorFlowWD':
+                    if modeler.__class__.__name__ != 'TensorFlowW1' and  modeler.__class__.__name__ != 'TensorFlow'and modeler.__class__.__name__ != 'TensorFlowW' and modeler.__class__.__name__ != 'TriInterpolantModeler' and modeler.__class__.__name__ != 'TensorFlowWD':
                         x=1
-                        _, meanError, sdError = eval.MeanAbsoluteErrorEvaluation.evaluate(eval.MeanAbsoluteErrorEvaluation(), X,
+                        _, meanErrorTr, sdError = eval.MeanAbsoluteErrorEvaluation.evaluate(eval.MeanAbsoluteErrorEvaluation(), X,
                                                                                           Y,
                                                                                           modeler, genericModel)
 
 
                     elif modeler.__class__.__name__ == 'TensorFlow' or modeler.__class__.__name__ == 'TensorFlowW' or modeler.__class__.__name__ == 'TensorFlowWD':
-                        #_,meanError, sdError = eval.MeanAbsoluteErrorEvaluation.evaluateKerasNN(
-                            #eval.MeanAbsoluteErrorEvaluation(), X,
-                            #Y,
-                            #modeler, output, xs,genericModel,partitionsXDC)
-                            x=1
+                        _,meanErrorTr, sdError = eval.MeanAbsoluteErrorEvaluation.evaluateKerasNN(
+                            eval.MeanAbsoluteErrorEvaluation(), X,
+                            Y,
+                            modeler, output, None,genericModel,partitionsX,None)
 
-                    #print ("Mean absolute error on training data: %4.2f (+/- %4.2f standard error)" % (
-                        #meanError, sdError / sqrt(unseenFeaturesY.shape[ 0 ])))
-                    #print("Evaluating on seen data... Done.")
+                    elif modeler.__class__.__name__ == 'TensorFlowW1':
+                           _, meanErrorTr, sdError = eval.MeanAbsoluteErrorEvaluation.evaluateKerasNN1(
+                               eval.MeanAbsoluteErrorEvaluation(), X,
+                               Y,
+                               modeler, output, None,genericModel,partitionsX,None)
+
+                    print ("Mean absolute error on training data: %4.2f (+/- %4.2f standard error)" % (
+                        meanErrorTr, sdError / sqrt(unseenFeaturesY.shape[ 0 ])))
+                    print("Evaluating on seen data... Done.")
 
                 # Predict and evaluate on unseen data
                 print("Evaluating on unseen data...")
-                if modeler.__class__.__name__ != 'TensorFlow' and modeler.__class__.__name__ != 'TensorFlowW' and modeler.__class__.__name__ != 'TriInterpolantModeler' and modeler.__class__.__name__ != 'TensorFlowWD':
+                if modeler.__class__.__name__ != 'TensorFlowW1' and modeler.__class__.__name__ != 'TensorFlow' and modeler.__class__.__name__ != 'TensorFlowW' and modeler.__class__.__name__ != 'TriInterpolantModeler' and modeler.__class__.__name__ != 'TensorFlowWD':
                     Errors, meanError, sdError = eval.MeanAbsoluteErrorEvaluation.evaluate(eval.MeanAbsoluteErrorEvaluation(),
                                                                                       unseenFeaturesX, unseenFeaturesY, modeler,genericModel)
 
@@ -289,8 +293,9 @@ def main():
                         #(varExpl)) + " %")
                 # # Evaluate performance
                 numOfclusters= len(partitionsX)
-                if partitioner.__class__.__name__ == 'DelaunayTriPartitioner' and numOfclusters==1:
-                    break
+                #pltRes = plotRes()
+                #pltRes
+
                 clusters.append(numOfclusters)
                 varTr.append(np.var(subsetX))
                 if modeler.__class__.__name__  != 'TriInterpolantModeler':
@@ -301,18 +306,21 @@ def main():
                 #meanVTr.append(np.mean(s ubsetX))
                 #meanBTr.append(np.mean(X[:,2]))
                 errors.append(meanError)
-
+                trErrors.append(meanErrorTr)
 
                 err={}
                 err["model"] =modeler.__class__.__name__
                 err["error"] = meanError
                 err["k"]=k
                 error["errors"].append(err)
-                if modeler.__class__.__name__ == 'TriInterpolantModeler' and numOfclusters==1:
+                if modeler.__class__.__name__ == 'TriInterpolantModeler' and numOfclusters==1 or modeler.__class__.__name__ == 'TriInterpolantModeler' \
+                        and partitioner.__class__.__name__ == 'DelaunayTriPartitioner':
+                    break
+                if partitioner.__class__.__name__ == 'DelaunayTriPartitioner' and numOfclusters==1:
                     break
 
 
-    eval.MeanAbsoluteErrorEvaluation.ANOVAtest(eval.MeanAbsoluteErrorEvaluation(), clusters, varTr, errors,models,part)
+    eval.MeanAbsoluteErrorEvaluation.ANOVAtest(eval.MeanAbsoluteErrorEvaluation(), clusters, varTr,trErrors ,errors,models,part)
 
 def initParameters():
     sFile = "./kaklis.csv"
@@ -323,7 +331,7 @@ def initParameters():
     end = 17000
     startU = 30000
     endU = 31000
-    algs=['NNW1']
+    algs=['NNWCA','NNW1','NNW']
     # ['SR','LR','RF','NN','NNW','TRI']
 
 

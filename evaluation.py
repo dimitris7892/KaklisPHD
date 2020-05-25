@@ -19,6 +19,10 @@ import matplotlib.pyplot as plt
 import csv
 import pyearth as sp
 import sklearn.svm as svr
+import latex
+from matplotlib import rc
+
+
 
 class Evaluation:
     def evaluate(self, train, unseen, model,genericModel):
@@ -245,11 +249,11 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
                 #print(str(e))
                 #x=0
 
-        # for v in vertices:
-        # k = np.array([ [ v[ 0 ][ 0 ], v[ 0 ][ 2 ] ], [ v[ 1 ][ 0 ], v[ 1 ][ 2 ] ], [ v[ 2 ][ 0 ], v[ 2 ][ 2 ] ] ])
-        # t = plt.Polygon(k, fill=False,color='red',linewidth=3)
-        # plt.gca().add_patch(t)
-        # plt.show()
+        #for v in triNew.vertices[ i ]:
+            #k = np.array([ [ v[ 0 ][ 0 ], v[ 0 ][ 2 ] ], [ v[ 1 ][ 0 ], v[ 1 ][ 2 ] ], [ v[ 2 ][ 0 ], v[ 2 ][ 2 ] ] ])
+            #t = plt.Polygon(k, fill=False,color='red',linewidth=3)
+            #plt.gca().add_patch(t)
+            #plt.show()
 
         x=9
         errorsTue=[]
@@ -275,7 +279,7 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
                 V2 = dataXnew[triNew.vertices[k]][1]
                 V3 = dataXnew[triNew.vertices[k]][2]
 
-                #plt.plot(candidatePoint[ 0 ], candidatePoint[ 1 ], 'o', markersize=8)
+
                 #plt.show()
                 x=1
                 b = triNew.transform[ k, :2 ].dot(candidatePoint - triNew.transform[ k, 2 ])
@@ -286,6 +290,7 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
                 if W1>0 and W2>0 and W3>0:
 
                     flg  = True
+                    plt.plot(candidatePoint[0], candidatePoint[1], 'o', markersize=8)
 
                     rpm1 = dataYnew[ triNew.vertices[ k ] ][ 0 ]
                     rpm2 = dataYnew[ triNew.vertices[ k ] ][ 1 ]
@@ -447,6 +452,7 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
                                 break
                         neighboringTri = triNew.vertices[
                             triNew.find_simplex(dataXnew[np.concatenate(np.array(neighboringVertices1)) ]) ]
+                        edgesInitial=[]
                         if (W1 > 0 and W2 > 0 and W3 > 0):
 
                             nRpms = [ ]
@@ -466,10 +472,11 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
                             nGammas.append(np.array([ 2 * W23_1 * W23_2, 2 * W23_1 * W23_3, 2 * W23_2 * W23_3 ]))
                             nGammas.append(np.array([ 2 * W31_1 * W31_2, 2 * W31_1 * W31_3, 2 * W31_2 * W31_3 ]))
 
-                            #ki = np.array([ V1, V2,
-                                            #V3 ])
-                            #t5 = plt.Polygon(ki, fill=False, color='blue', linewidth=3)
-                            #plt.gca().add_patch(t5)
+                            ki = np.array([ V1, V2,
+                                            V3 ])
+                            t5 = plt.Polygon(ki, fill=False, color='blue', linewidth=3)
+                            edgesInitial.append(ki)
+                            plt.gca().add_patch(t5)
                             #neighboringTri =triNew.vertices[ triNew.find_simplex(trainX[index])]
                             rpms=[]
                             for s in neighboringTri:
@@ -530,11 +537,27 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
                                 nRpms.append(rpm3n - B1)
                                 nGammas.append(np.array([ 2 * W1n * W2n, 2 * W1n * W3n, 2 * W2n * W3n ]))
 
-                                #ki = np.array([ V1n, V2n,
-                                #V3n ])
-                                #t5 = plt.Polygon(ki, fill=False, color='yellow', linewidth=3)
-                                #plt.gca().add_patch(t5)
-                            #plt.show()
+                                ki = np.array([ V1n, V2n,
+                                V3n ])
+                                flagEdge=False
+                                for t in edgesInitial[0]:
+                                    if (t==ki[0]).all() and (t==ki[1]).all() and (t==ki[2]).all():
+                                        flagEdge = True
+                                #if flagEdge==False:
+                                t5 = plt.Polygon(ki, fill=False, color='yellow', linewidth=3)
+                                plt.gca().add_patch(t5)
+                            ki = np.array([V1, V2,
+                                               V3])
+
+                                #if np.linalg.norm(V1n-V2n) > 2:
+                            t5 = plt.Polygon(ki, fill=False, color='blue', linewidth=3)
+                            plt.rc('text', usetex=True)
+                            edgesInitial.append(ki)
+                            plt.gca().add_patch(t5)
+                            plt.xlabel(r"$V$")
+                            plt.ylabel(r"$\bar{V_N}$")
+                            plt.show()
+                            f=1
                             ####solve least squares opt. problem
                             # nRPms : y [1xn matrix]
                             # nGammas : x [3xn matrix]
@@ -763,7 +786,10 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
             #if flg==False and all(i >= 0 for i in preds):
                 #meanPreds=np.mean(preds) #if flg==False else pred
             if flg==True:
-                meanPreds = Xpred
+                try:
+                    meanPreds = Xpred
+                except:
+                    d=0
                 errorsTue.append(abs(meanPreds - trueVal))
                 if abs(meanPreds-trueVal)>2 :
                     print("Index of point : "+ str(iu)+" "+ "Index of vertice"+ str(k))
@@ -1178,6 +1204,7 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
 
     def evaluateKerasNN1(self, unseenX, unseenY, modeler,output,xs,genericModel,partitionsX , scores):
         lErrors = []
+        from scipy.special import softmax
 
         from tensorflow import keras
         path = '.\\'
@@ -1192,8 +1219,17 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
 
             ind, fit = modeler.getBestPartitionForPoint(pPoint, partitionsX)
 
+            fits = modeler.getFitForEachPartitionForPoint(pPoint, partitionsX)
 
-            prediction = (abs(modeler._models[ind].predict(pPoint)) + modeler._models[len(modeler._models) - 1].predict(pPoint) )/ 2
+            # prediction = modeler._models[len(modeler._models)-1].predict(pPoint)
+
+            #fits = softmax(fits)
+            #pred=modeler._models[len(modeler._models)-1].predict(pPoint)
+            #for i in range(0,len(fits)):
+                #pred+=fits[i]*modeler._models[i].predict(pPoint)
+
+            #prediction = pred / len(fits)
+            prediction = (abs(modeler._models[ind].predict(pPoint)) )#+ modeler._models[len(modeler._models) - 1].predict(pPoint) )/ 2
 
             lErrors.append(abs(prediction - trueVal))
 
@@ -1203,7 +1239,7 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
 
     def evaluateKerasNN(self, unseenX, unseenY, modeler,output,xs,genericModel,partitionsX , scores):
         lErrors = []
-        vectorWeights = scores
+        #vectorWeights = scores
         #unseenX = unseenX.reshape((unseenX.shape[ 0 ], 1, unseenX.shape[ 1 ]))
         #from sklearn.decomposition import PCA
         #pca = PCA()
@@ -1328,12 +1364,13 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
 
 
 
-    def ANOVAtest(self,clusters,var,error,models,partitioners):
+    def ANOVAtest(self,clusters,var,trError,error,models,partitioners):
 
         df = pd.DataFrame({
                             'clusters': clusters,
                             'var': var,
                             'error':error,
+                            'Trerror': trError,
                             'partitioners':partitioners,
                             'models':models
                             #'meanBearing':trFeatures[1]
