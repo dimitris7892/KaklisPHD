@@ -92,6 +92,7 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
         errorStwArr=[]
         errorFoc=[]
         foc=[]
+        preds=[]
         for iCnt in range(np.shape(unseenX)[0]):
             pPoint =unseenX[iCnt]
             pPoint= pPoint.reshape(-1,unseenX.shape[1])
@@ -195,6 +196,7 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
             #prediction =  modeler._models[len(modeler._models) - 1].predict(pPoint)
             #prediction = (abs(modeler._models[ind].predict(pPoint)) + modeler._models[len(modeler._models) - 1].predict(pPoint) )/ 2
             error = abs(prediction - trueVal)
+            preds.append(prediction)
             lErrors.append(error)
             percError = abs((prediction - trueVal) / trueVal) * 100
             errorStwArr.append(np.array(np.append(np.asmatrix(pPoint[0][0]).reshape(-1,1), np.asmatrix([percError[0] ]).T, axis=1)))
@@ -212,7 +214,7 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
                     ['FOC', 'PERC'])
                 for i in range(0, len(errorFoc)):
                     data_writer.writerow(
-                        [foc[i],errorFoc[i][0][0]])
+                        [preds[i],foc[i],errorFoc[i][0][0]])
 
             with open('./TRAINerrorSTW'+str(len(partitionsX))+'_'+str(subsetInd)+'.csv', mode='w') as data:
                 data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
@@ -228,7 +230,7 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
                     ['FOC', 'PERC'])
                 for i in range(0, len(errorFoc)):
                     data_writer.writerow(
-                        [foc[i], errorFoc[i][0][0]])
+                        [preds[i],foc[i], errorFoc[i][0][0]])
 
             with open('./TESTerrorSTW' + str(len(partitionsX)) + '_' + str(subsetInd) + '.csv', mode='w') as data:
                 data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
@@ -971,6 +973,7 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
             foc=[]
             errorStwArr=[]
             errorFoc=[]
+            preds=[]
             listOfSpeeds, listOfWeather, ListOfCons, ListOfDrafts, ConsProfileItem = self.GetStatisticsOfVessel(
                 'MARMARAS', 'MT_DELTA_MARIA',subsetInd)
             for iCnt in range(np.shape(unseenX)[0]):
@@ -985,7 +988,7 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
                 errorStwArr.append(
                     np.array(np.append(np.asmatrix(pPoint[0][0]).reshape(-1, 1), np.asmatrix([percError]).T, axis=1)))
                 errorFoc.append(abs((prediction - trueVal) / trueVal) * 100)
-
+                preds.append(prediction)
                 lErrors.append(abs(prediction - trueVal))
 
             errorStwArr = np.array(errorStwArr)
@@ -998,7 +1001,7 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
                         ['FOC', 'PERC'])
                     for i in range(0, len(errorFoc)):
                         data_writer.writerow(
-                            [foc[i], errorFoc[i]])
+                            [preds[i],foc[i], errorFoc[i]])
 
                 with open('./TRAINerrorSTWPavlos' + str(subsetInd) + '.csv', mode='w') as data:
                     data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
@@ -1014,7 +1017,7 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
                         ['FOC', 'PERC'])
                     for i in range(0, len(errorFoc)):
                         data_writer.writerow(
-                            [foc[i], errorFoc[i]])
+                            [preds[i],foc[i], errorFoc[i]])
 
                 with open('./TESTerrorSTWPavlos' + str(subsetInd) + '.csv', mode='w') as data:
                     data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
