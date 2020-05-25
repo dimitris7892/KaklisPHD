@@ -12,7 +12,6 @@ import random
 import pyodbc
 import csv
 import locale
-locale.setlocale(locale.LC_ALL, ""); print(locale.localeconv()["decimal_point"])
 #locale.setlocale(locale.LC_NUMERIC, "en_DK.UTF-8")
 import datetime
 import cx_Oracle
@@ -20,11 +19,23 @@ from dateutil.rrule import rrule, DAILY, MINUTELY
 from sympy.solvers import solve
 from sympy import Symbol
 from pathlib import Path
+import itertools
 from sympy import cos, sin , tan , exp , sqrt , E
 from openpyxl import load_workbook
 import glob, os
 from pathlib import Path
+from openpyxl.styles.colors import YELLOW
+from openpyxl.styles import Font
+from openpyxl.styles.borders import Border, Side
 import shutil
+from openpyxl.styles import PatternFill
+from openpyxl.styles import Alignment
+import matplotlib.pyplot as plt
+import seaborn as sns
+from openpyxl.drawing.image import Image
+from scipy.stats import ttest_ind_from_stats
+
+
 #DANAOS_TELEGRAMS_SQL =SELECT  TELEGRAM_DATE , TELEGRAM_TYPE,BALAST_FLAG,LATITUDE_DEGREES , LATITUDE_SECONDS ,LONGITUDE_DEGREES , LONGITUDE_SECONDS ,vessel_course,(DRAFT_AFT + DRAFT_FORE)/2 as DRAFT , ENGINE_RPM , WIND_DIRECTION , WIND_FORCE  ,AVERAGE_SPEED ,hours_slc,minutes_slc, (( NVL(ME_HSFO_CONS,0)+ NVL(ME_LSFO_CONS,0)+ NVL(ME_HSDO_CONS,0 ) + NVL(ME_LSDO_CONS,0)))   as ME_CONS_24h  FROM TELEGRAMS where vessel_code ='486' AND TELEGRAM_TYPE='D' or telegram_type='N';
 
 class BaseSeriesDataExtraction:
@@ -35,6 +46,27 @@ class BaseSeriesDataExtraction:
         return data
 
 class BaseSeriesReader:
+
+    def readStatDifferentSubsets(self, X,subsetsX,  k):
+
+        flag = False
+        if np.std(X) > 0:
+            candidateSetDist = X
+            for i in range(0, len(subsetsX)):
+                if i !=k:
+                    mean1 = np.mean(subsetsX[i])
+                    mean2 = np.mean(candidateSetDist)
+                    std1 = np.std(subsetsX[i])
+                    std2 = np.std(candidateSetDist[i])
+                    size1 = len(subsetsX[i])
+                    size2 = len(candidateSetDist)
+                    dataDist = ttest_ind_from_stats(mean1 = mean1,std1 = std1,nobs1 = size1 , mean2 = mean2 , std2= std2 , nobs2 = size2)
+                    if dataDist[1] > 0.05:
+                        flag = True
+            if flag == False :
+                return X
+            else:
+                return []
 
     def readNewDataset(self):
         ####STATSTICAL ANALYSIS PENELOPE
@@ -221,7 +253,39 @@ class BaseSeriesReader:
 
         return (360 + windDir) % 360
 
-    def ConvertToBeaufort(self , ws):
+
+    def ConvertMSToBeaufort(self , ws):
+        wsB = 0
+        if ws >= 0 and ws <0.2:
+            wsB = 0
+        elif ws >= 0.3 and ws <1.5:
+            wsB = 1
+        elif ws >= 1.6 and ws < 3.3:
+            wsB = 2
+        elif ws >= 3.4 and ws < 5.4:
+            wsB = 3
+        elif ws >= 5.5 and ws < 7.9:
+            wsB = 4
+
+        elif ws >= 8 and ws < 10.7:
+            wsB = 5
+        elif ws >= 10.8 and ws < 13.8:
+            wsB = 6
+        elif ws >= 13.9 and ws < 17.1:
+            wsB = 7
+        elif ws >= 17.2 and ws < 20.7:
+            wsB = 8
+        elif ws >= 20.8 and ws < 24.4:
+            wsB = 9
+        elif ws >= 24.5 and ws < 28.4:
+            wsB = 10
+        elif ws >= 28.5 and ws < 32.6:
+            wsB = 11
+        elif ws >= 32.7:
+            wsB = 12
+        return wsB
+
+    def ConvertKNotsToBeaufort(self , ws):
         wsB = 0
         if ws <= 1:
             wsB = 0
@@ -283,7 +347,7 @@ class BaseSeriesReader:
 
         return angle
 
-    def extractRawData(self, newDataSet, telegrams,company):
+    def extractRawData(self, newDataSet, telegrams,companyTlgs,company,vessel):
 
         windDirs = []
         windSpeeds = []
@@ -296,6 +360,41 @@ class BaseSeriesReader:
         lons = []
         bearings = []
         tlgsFocs = []
+        trims=[]
+        tlgSpeeds=[]
+
+        if company=='MARMARAS':
+            #sFile =  "./neural_data/marmaras_data.csv"
+            #data = pd.read_csv(sFile,delimiter=';')
+            #data = newDataSet.drop(["wind_speed", "wind_dir"], axis=1)
+            data = np.array(newDataSet)
+            meanDRaft =np.mean(data[:,1])
+            for i in range(0,len(data)):
+                if data[i,1] > np.ceil(meanDRaft + 1):
+                    blFlags.append('L')
+                else:
+                    blFlags.append('B')
+
+            stws = np.nan_to_num(data[:,0]).reshape(-1)
+            focs = np.nan_to_num(data[:, 9]).reshape(-1)
+            for i in range(0,len(data[:,3])):
+                windSpeeds.append(self.ConvertKNotsToBeaufort(data[i,3]))
+            windSpeeds = np.nan_to_num(windSpeeds).reshape(-1)
+            windDirs = np.nan_to_num(data[:,4]).reshape(-1)
+            blFlags = np.array(blFlags).reshape(-1)
+            drafts = np.array(data[:,1]).reshape(-1)
+            vCourses = np.array([0] * len(stws)).reshape(-1)
+            tlgSpeeds=np.array([random.randint(3,17)] * len(stws)).reshape(-1)
+            firstColumn = np.array([0] * len(stws)).reshape(-1, 1)
+            otherColumns = np.array([0] * len(stws)).reshape(-1)
+            trims=np.array([0] * len(stws)).reshape(-1)
+            tlgsFocs = np.array([0] * len(stws)).reshape(-1)
+
+            newDataSet = np.array(
+                np.append(firstColumn, np.asmatrix(
+                    [vCourses, blFlags, otherColumns, otherColumns, otherColumns, otherColumns, otherColumns, drafts,
+                     otherColumns, windDirs, windSpeeds, stws,
+                     otherColumns, otherColumns, focs, tlgsFocs, trims, tlgSpeeds]).T, axis=1))
 
         if company=='GOLDENPORT':
 
@@ -340,13 +439,9 @@ class BaseSeriesReader:
 
                 prevLAT, prevLON = self.convertLATLONfromDegMinSec(prev_lat, prev_lon, prev_latDir, prev_lonDir)
                 ###########################################
-                # x = math.sin(lons[i] - lons[i - 1]) * math.cos(lats[i])
-                # y = math.cos(lats[i]) * math.sin(lats[i - 1]) - math.sin(lats[i - 1]) * math.sin(lats[i]) * math.cos(lons[i] - lons[i - 1])
-                # bearing = math.atan2(x, y)
-                try:
-                    bearing = self.CalculateVesselDirection(float(LON), float(LAT), float(prevLON), float(prevLAT))
-                except:
-                    c = 0
+
+                bearing = self.CalculateVesselDirection(float(LON), float(LAT), float(prevLON), float(prevLAT))
+
                 bearings.append(bearing)
 
                 windSpeed, windDir = self.mapWeatherData(bearing, newDate1, np.round(LAT), np.round(LON))
@@ -357,19 +452,24 @@ class BaseSeriesReader:
                 vCourses.append(bearing)
                 blFlags.append('nan' if telegramRow.__len__() == 0 else telegramRow[:, 2][0])
                 stws.append(stw)
-                if foc < 500:
-                    x = 0
+
                 focMTd = np.round((foc / 1000) * 24, 2)
 
                 tlgFoc = 0 if telegramRow.__len__() == 0 else telegramRow[:, 15][0]
-                if abs(tlgFoc - focMTd) >= 5:
-                    if stw >= 6:
-                        focs.append(tlgFoc if tlgFoc > focMTd else focMTd)
-                    else:
-                        focs.append(focMTd)
-                else:
-                    focs.append(focMTd)
+                trim = 0 if telegramRow.__len__() == 0 else telegramRow[:, 16][0]
+                tlgSpeed = 0 if telegramRow.__len__()==0 else telegramRow[:,12]
+                #if abs(tlgFoc - focMTd) >= 5:
+                    #if stw >= 6:
+                        #focs.append(tlgFoc if tlgFoc > focMTd else focMTd)
+                    #else:
+                        #focs.append(focMTd)
+                #else:
+                    #focs.append(focMTd)
+
+                focs.append(focMTd)
                 tlgsFocs.append(tlgFoc)
+                tlgSpeeds.append(tlgSpeed)
+                trims.append(trim)
 
                 # filteredDTWs = [d for d in dateTimesW if month == str(d).split('/')[1] and day ==
                 # str(d).split('/')[0] and year[2:] == str(d).split('/')[2]]
@@ -386,15 +486,18 @@ class BaseSeriesReader:
             blFlags = np.array(blFlags).reshape(-1)
             drafts = np.array(drafts).reshape(-1)
             vCourses = np.array(vCourses).reshape(-1)
+            tlgSpeeds = tlgSpeeds.reshape(-1)
+            trims = trims.reshape(-1)
             firstColumn = np.array([0] * len(stws)).reshape(-1, 1)
             otherColumns = np.array([0] * len(stws)).reshape(-1)
             newDataSet = np.array(
                 np.append(firstColumn, np.asmatrix(
                     [vCourses, blFlags, otherColumns, otherColumns, otherColumns, otherColumns, otherColumns, drafts,
                      otherColumns, windDirs, windSpeeds, stws,
-                     otherColumns, otherColumns, focs, tlgsFocs]).T, axis=1))
+                     otherColumns, otherColumns, focs, tlgsFocs,trims,tlgSpeeds]).T, axis=1))
 
         if company=='MILLENIA':
+            telegrams = telegrams.values
             if telegrams!=[] and newDataSet!=[]:
                 ########## extract
                 d=0
@@ -404,74 +507,805 @@ class BaseSeriesReader:
                         value= str(telegrams[i][k])
                         telegrams[i][k] = value.split(',')[0]+'.'+value.split(',')[1] if value.__contains__(',') else value
 
-                return np.array(np.append(telegrams.reshape(-1,16),np.asmatrix([telegrams[:,15].reshape(-1)]).T,axis=1))
+                return np.array(np.append(telegrams[:,:16].reshape(-1,telegrams.shape[1]-1),np.asmatrix([telegrams[:,15].reshape(-1),telegrams[:,16].reshape(-1),telegrams[:,12].reshape(-1)]).T,axis=1))
+                #np.array(np.append(telegrams[:,telegrams.shape[1]-1].reshape(-1,telegrams.shape[1]-1),np.asmatrix([telegrams[:,16].reshape(-1)]).T,axis=1))
+
+        if company == 'OCEAN_GOLD':
+            #dataV = newDataSet
+            #dataV = pd.read_csv('./data/PERSEFONE/PERSEFONE_1-30_06_19.csv')
+            # dataV=dataV.drop([ 't_stamp', 'vessel status' ], axis=1)
+            #dtNew = dataV#.values  # .astype(float)##RAW DATA
+
+            telegrams = telegrams.values#pd.read_csv(company+'/'+vessel+'/TELEGRAMS'+vessel+'.csv', sep='\t')
+            companyTlgs=companyTlgs.values
+
+            for i in range(0, len(newDataSet)):
+
+                datetimeV = str(newDataSet[i, 0])
+                dateV = datetimeV.split(" ")[0]
+                hhMMss = datetimeV.split(" ")[1]
+                month = dateV.split("-")[1]
+                day = dateV.split("-")[2]
+                year = dateV.split("-")[0]
+                tlgDate = year + '-' + month + '-' + day
+                newDate1 = year + '-' + month + '-' + day + " " + ":".join(hhMMss.split(":")[0:2])
+                month = '0' + month if month.__len__() == 1 else month
+                day = '0' + day if day.__len__() == 1 else day
+
+                newDate = year + '-' + month + '-' + day
+                newDate1 = year + '-' + month + '-' + day + " " + ":".join(hhMMss.split(":")[0:2])
+                rpm = newDataSet[i,5]
+                telegramRow = np.array([row for row in telegrams if str(row[0]).split(" ")[0]== tlgDate])
+                if telegramRow.__len__()>0:
+                    companyTlgFilteredRows= np.array([row for row in companyTlgs if  month == str(row[1]).split(' ')[0].split('.')[1] and day ==
+                                    str(row[1]).split(' ')[0].split('.')[0] and year == str(row[1]).split(' ')[0].split('.')[2]])
+                    vCourse = newDataSet[i, 3]
+                    if companyTlgFilteredRows.__len__() > 0:
+
+                        filteredDTWs = [ datetime.datetime.strptime(str(date[:len(date)-1]).split(' ')[0].split('.')[2]+"-"+
+                                        str(date[:len(date)-1]).split(' ')[0].split('.')[1]+"-"+
+                                        str(date[:len(date)-1]).split(' ')[0].split('.')[0] + " " + ":".join(date.split(" ")[1].split(":")[0:2]), '%Y-%m-%d %H:%M') for date in companyTlgFilteredRows[:,1] ] if companyTlgFilteredRows.__len__() > 0 else companyTlgFilteredRows
+
+                        filteredDTWsNum=matplotlib.dates.date2num(filteredDTWs)
+                        newDateNum=matplotlib.dates.date2num(datetime.datetime.strptime(newDate1, '%Y-%m-%d %H:%M'))
+                        min = 100000000000000000
+                        for u in range(0,len(filteredDTWs)):
+                            if (newDateNum - filteredDTWsNum[u]) < min:
+                                min = abs(newDateNum - filteredDTWsNum[u])
+                                minIndx=u
+
+                        ws = companyTlgFilteredRows[minIndx,7]
+                        wd = companyTlgFilteredRows[minIndx, 8]
+
+                        wsTlg=(float(ws.split('m')[0])) if ws != 'No data' else  0
+
+                        wdTlg = float(wd[:len(wd) - 1]) if wd!='No data' else 0
+
+                        windSpeed =self.ConvertMSToBeaufort(wsTlg)
+                        windDir = self.getRelativeDirectionWeatherVessel(vCourse,wdTlg)
+
+
+                    foc = newDataSet[i, 11]
+                    #if (rpm >= 0 and rpm < 1 or np.isnan(rpm)):
+                        #continue
+
+                    lat = float(newDataSet[i, 26])
+
+                    lon = float(newDataSet[i, 27])
+
+
+                    stw = newDataSet[i, 2]
+
+                    if companyTlgFilteredRows.__len__()==0:
+                        windSpeed, windDir = self.mapWeatherData(vCourse, newDate1, np.round(lat), np.round(lon))
+                        windSpeed = self.ConvertKNotsToBeaufort(windSpeed)
+                    ################IF WEATHER DATA NOT AVAILABLE ON WEATHERSERVER_DEV  OR FROM COMPANYS FLEETVIEW TLGS ==> GET WEATHER DATA FROM DANAOS TELEGRAMS
+                    if windDir==0 and windSpeed==0:
+                        windSpeed = telegramRow[0][12]
+                        windSpeed = self.ConvertKNotsToBeaufort(windSpeed)
+                        windDir = telegramRow[0][11]
+                        windDir = self.getRelativeDirectionWeatherVessel(vCourse,windDir)
+
+                    windDirs.append(windDir)
+                    windSpeeds.append(windSpeed)
+
+                    drafts.append(0 if telegramRow.__len__() == 0 else telegramRow[:, 8][0])
+                    vCourses.append(vCourse)
+                    blFlags.append('nan' if telegramRow.__len__() == 0 else telegramRow[:, 2][0])
+                    stws.append(stw)
+
+
+                    tlgFoc = 0 if telegramRow.__len__() == 0 else telegramRow[:, 15][0]
+                    trim = 0 if telegramRow.__len__() == 0 else telegramRow[:, 16][0]
+                    tlgSpeed = 0 if telegramRow.__len__() == 0 else telegramRow[:, 12][0]
+
+                    focs.append(foc*24)
+                    tlgsFocs.append(tlgFoc)
+                    trims.append(trim)
+                    tlgSpeeds.append(tlgSpeed)
+
+            drafts = np.nan_to_num(drafts).reshape(-1)
+            # foc = np.array([k for k in newDataSet])[:,8].astype(float).reshape(-1)
+            windSpeeds = np.nan_to_num(windSpeeds).reshape(-1)
+            windDirs = np.nan_to_num(windDirs).reshape(-1)
+            blFlags = np.array(blFlags).reshape(-1)
+            drafts = np.array(drafts).reshape(-1)
+            vCourses = np.array(vCourses).reshape(-1)
+            tlgSpeeds=np.array(tlgSpeeds).reshape(-1)
+            firstColumn = np.array([0] * len(stws)).reshape(-1, 1)
+            otherColumns = np.array([0] * len(stws)).reshape(-1)
+            trims=np.array(trims).reshape(-1)
+            newDataSet = np.array(
+                np.append(firstColumn, np.asmatrix(
+                    [vCourses, blFlags, otherColumns, otherColumns, otherColumns, otherColumns, otherColumns, drafts,
+                     otherColumns, windDirs, windSpeeds, stws,
+                     otherColumns, otherColumns, focs, tlgsFocs,trims,tlgSpeeds]).T, axis=1))
+
+
+
+
+            x = 0
 
         return newDataSet
 
+    def calculateExcelStatistics(self,workbook,dtNew,velocities,draft,trim,velocitiesTlg , rawData,company,vessel,tlgDataset):
 
 
-    def GenericParserForDataExtraction(self,systemType, company, vessel ,driver=None,server=None,sid=None,usr=None,password=None,rawData=None,telegrams=None ,fileType=None, granularity=None, fileName=None,
-                                       pathOfRawData=None):
+        thin_border = Border(left=Side(style='thin'),
+                             right=Side(style='thin'),
+                             top=Side(style='thin'),
+                             bottom=Side(style='thin'))
+
+        ####STATISTICS TAB
+        ##SPEED CELLS
+        velocitiesTlg = np.array([k for k in tlgDataset])[:,12]
+        velocitiesTlg = np.nan_to_num(velocitiesTlg.astype(float))
+        velocitiesTlg =velocitiesTlg[velocitiesTlg>0]
+        velocitiesTlgAmount = velocitiesTlg.__len__()
+        rowsAmount=56
+        maxSpeed = np.ceil(np.max(velocitiesTlg))
+        minSpeed = np.floor(np.min(velocitiesTlg))
+        i = minSpeed
+        speedsApp=[]
+        k=0
+        workbook._sheets[4].row_dimensions[1].height = 35
+        idh = 1
+
+        workbook._sheets[4]['C' + str(idh + 2)].alignment = Alignment(horizontal='center')
+        workbook._sheets[4]['C' + str(idh + 2)] = np.round(np.min(velocitiesTlg),2)
+        workbook._sheets[4]['C' + str(idh + 2)].font = Font(bold=True, name='Calibri', size='10.5')
+
+
+        workbook._sheets[4]['E' + str(idh + 2)].alignment = Alignment(horizontal='center')
+        workbook._sheets[4]['E' + str(idh + 2)] = np.round(np.max(velocitiesTlg),2)
+        workbook._sheets[4]['E' + str(idh + 2)].font = Font(bold=True, name='Calibri', size='10.5')
+
+
+        while i<maxSpeed:
+            workbook._sheets[4]['A' + str(k + 3)] = ' (' + str(i) + '-' + str(i + 0.5) + ')'
+            workbook._sheets[4]['A' + str(k + 3)].font = Font(bold=True, name='Calibri', size='10.5')
+
+            speedsApp.append(str(np.round((np.array([k for k in velocitiesTlg if k >= i and k <= i+0.5]).__len__() )/ velocitiesTlgAmount * 100,2))+'%')
+            workbook._sheets[4]['A' + str(k + 3)].fill = PatternFill(fgColor='dae3f3', fill_type="solid")
+            workbook._sheets[4]['A' + str(k + 3)].border = thin_border
+
+            i+=0.5
+            k+=1
+
+        speedDeletedRows = 0
+        if k < rowsAmount:
+            # for i in range(k-1,19+1):
+            workbook._sheets[4].delete_rows(idx=3 + k, amount=rowsAmount - k + 1)
+            speedDeletedRows = rowsAmount - k + 1
+
+        elif k > rowsAmount:
+            workbook._sheets[4].insert_rows(idx=3 +k+6, amount=abs(rowsAmount - k + 1))
+            speedDeletedRows = -(abs(rowsAmount - k + 1))
+
+        for i in range(0, len(speedsApp)):
+            workbook._sheets[4]['B' + str(i + 3)] = speedsApp[i]
+            workbook._sheets[4]['B' + str(i + 3)].alignment = Alignment(horizontal='left')
+
+
+        for i in range(3, 3 + len(speedsApp)):
+            try:
+                if float(str(workbook._sheets[4]['B' + str(i)].value).split("%")[0]) > 2:
+                    workbook._sheets[4]['B' + str(i)].fill = PatternFill(fgColor=YELLOW, fill_type="solid")
+                    workbook._sheets[4]['A' + str(i)].fill = PatternFill(fgColor=YELLOW, fill_type="solid")
+            except:
+                c = 0
+
+
+        ##### END OF SPEED CELLS
+
+        ##DRAFT CELLS
+        draft = np.array([k for k in tlgDataset if float(k[8])> 0])[:, 8].astype(float)
+        draftAmount = draft.__len__()
+        minDraft =int(np.floor(np.min(draft)))
+        maxDraft = int(np.ceil(np.max(draft)))
+        draftsApp=[]
+        k=0
+        i=minDraft
+        rowsAmount=31
+        id = 70-speedDeletedRows
+        workbook._sheets[4].row_dimensions[id-2].height = 35
+
+        idh = id - 2
+
+        workbook._sheets[4].merge_cells('C' + str(idh) + ':' + 'F' + str(idh))
+        workbook._sheets[4]['C' + str(idh)].alignment = Alignment(horizontal='center')
+        workbook._sheets[4]['C' + str(idh)] = 'Min and Max draft discovered'
+        workbook._sheets[4]['C' + str(idh)].font = Font(bold=True, name='Calibri', size='10.5')
+        workbook._sheets[4]['C' + str(idh)].border = thin_border
+
+        workbook._sheets[4].merge_cells('C' + str(idh + 1) + ':' + 'D' + str(idh + 1))
+        workbook._sheets[4]['C' + str(idh + 1)].alignment = Alignment(horizontal='center')
+        workbook._sheets[4]['C' + str(idh + 1)] = 'Min'
+        workbook._sheets[4]['C' + str(idh + 1)].font = Font(bold=True, name='Calibri', size='10.5')
+        workbook._sheets[4]['C' + str(idh + 1)].fill = PatternFill(fgColor='dae3f3', fill_type="solid")
+        workbook._sheets[4]['C' + str(idh + 1)].border = thin_border
+
+        workbook._sheets[4].merge_cells('E' + str(idh + 1) + ':' + 'F' + str(idh + 1))
+        workbook._sheets[4]['E' + str(idh + 1)].alignment = Alignment(horizontal='center')
+        workbook._sheets[4]['E' + str(idh + 1)] = 'Max'
+        workbook._sheets[4]['E' + str(idh + 1)].fill = PatternFill(fgColor='dae3f3', fill_type="solid")
+        workbook._sheets[4]['E' + str(idh + 1)].font = Font(bold=True, name='Calibri', size='10.5')
+        workbook._sheets[4]['E' + str(idh + 1)].border = thin_border
+
+        workbook._sheets[4].merge_cells('C' + str(idh + 2) + ':' + 'D' + str(idh + 2))
+        workbook._sheets[4]['C' + str(idh + 2)].alignment = Alignment(horizontal='center')
+        workbook._sheets[4]['C' + str(idh + 2)] = np.round(np.min(draft),2)
+        workbook._sheets[4]['C' + str(idh + 2)].font = Font(bold=True, name='Calibri', size='10.5')
+        workbook._sheets[4]['C' + str(idh + 2)].border = thin_border
+
+        workbook._sheets[4].merge_cells('E' + str(idh + 2) + ':' + 'F' + str(idh + 2))
+        workbook._sheets[4]['E' + str(idh + 2)].alignment = Alignment(horizontal='center')
+        workbook._sheets[4]['E' + str(idh + 2)] =np.round(np.max(draft),2)
+        workbook._sheets[4]['E' + str(idh + 2)].font = Font(bold=True, name='Calibri', size='10.5')
+        workbook._sheets[4]['E' + str(idh + 2)].border = thin_border
+
+        while i<maxDraft:
+            #workbook._sheets[4].insert_rows(k+41)
+            workbook._sheets[4]['A' + str(k + id)] = ' ('+str(i)+'-'+str(i+0.5)+')'
+            workbook._sheets[4]['A' + str(k + id)].font = Font(bold=True,name='Calibri',size='10.5')
+            draftsApp.append(str(np.round((np.array([k for k in tlgDataset if float(k[8]) >= i and float(k[8]) <= i+0.5]).__len__() )/ draftAmount*100,2))+'%')
+            workbook._sheets[4]['A' + str(k + id)].fill = PatternFill(fgColor='dae3f3', fill_type="solid")
+            workbook._sheets[4]['A' + str(k + id)].border = thin_border
+            i+=0.5
+            k+=1
+
+        draftDeletedRows=0
+        if k <rowsAmount :
+            #for i in range(k-1,19+1):
+            workbook._sheets[4].delete_rows(idx=id+k,amount=rowsAmount-k+1)
+            draftDeletedRows=speedDeletedRows+ rowsAmount-k+1
+        elif k > rowsAmount:
+            workbook._sheets[4].insert_rows(idx=id + k, amount=rowsAmount - k + 1)
+            draftDeletedRows = -(abs(speedDeletedRows+ rowsAmount-k+1))
+
+        for i in range(0,len(draftsApp)):
+            workbook._sheets[4]['B'+str(i+id)] = draftsApp[i]
+            workbook._sheets[4]['B' + str(i + id)].alignment = Alignment(horizontal='left')
+            height = workbook._sheets[4].row_dimensions[i + id].height
+            if height!=None:
+                if float(height) > 13.8:
+                    workbook._sheets[4].row_dimensions[i + id].height=13.8
+
+
+
+        for i in range(id, id+len(draftsApp)):
+            try:
+                if float(str(workbook._sheets[4]['B' + str(i)].value).split('%')[0]) > 2:
+                    workbook._sheets[4]['B' + str(i)].fill = PatternFill(fgColor=YELLOW, fill_type="solid")
+                    workbook._sheets[4]['A' + str(i)].fill = PatternFill(fgColor=YELLOW, fill_type="solid")
+            except:
+                c=0
+        ##### END OF DRAFT CELSS
+
+        ##TRIM CELLS ######################################################################
+        trim = np.array([k for k in tlgDataset ])[:, 17].astype(float)
+        trimAmount= trim.__len__()
+        minTrim = int(np.floor(np.min(trim)))
+        maxTrim = int(np.ceil(np.max(trim)))
+        trimsApp = []
+        rowsAmount=40
+        k = 0
+        i = minTrim
+        id = 115 - draftDeletedRows
+        workbook._sheets[4].row_dimensions[id - 2].height = 35
+        idh = id - 2
+
+        workbook._sheets[4].merge_cells('C' + str(idh) + ':' + 'F' + str(idh))
+        workbook._sheets[4]['C' + str(idh)].alignment = Alignment(horizontal='center')
+        workbook._sheets[4]['C' + str(idh)] = 'Min and Max trim discovered'
+        workbook._sheets[4]['C' + str(idh)].font = Font(bold=True, name='Calibri', size='10.5')
+        workbook._sheets[4]['C' + str(idh)].border = thin_border
+
+        workbook._sheets[4].merge_cells('C' + str(idh + 1) + ':' + 'D' + str(idh + 1))
+        workbook._sheets[4]['C' + str(idh + 1)].alignment = Alignment(horizontal='center')
+        workbook._sheets[4]['C' + str(idh + 1)] = 'Min'
+        workbook._sheets[4]['C' + str(idh + 1)].fill = PatternFill(fgColor='dae3f3', fill_type="solid")
+        workbook._sheets[4]['C' + str(idh + 1)].font = Font(bold=True, name='Calibri', size='10.5')
+        workbook._sheets[4]['C' + str(idh + 1)].border = thin_border
+
+        workbook._sheets[4].merge_cells('E' + str(idh + 1) + ':' + 'F' + str(idh + 1))
+        workbook._sheets[4]['E' + str(idh + 1)].alignment = Alignment(horizontal='center')
+        workbook._sheets[4]['E' + str(idh + 1)].fill = PatternFill(fgColor='dae3f3', fill_type="solid")
+        workbook._sheets[4]['E' + str(idh + 1)] = 'Max'
+        workbook._sheets[4]['E' + str(idh + 1)].font = Font(bold=True, name='Calibri', size='10.5')
+        workbook._sheets[4]['E' + str(idh + 1)].border = thin_border
+
+        workbook._sheets[4].merge_cells('C' + str(idh + 2) + ':' + 'D' + str(idh + 2))
+        workbook._sheets[4]['C' + str(idh + 2)].alignment = Alignment(horizontal='center')
+        workbook._sheets[4]['C' + str(idh + 2)] = np.round(np.min(trim),2)
+        workbook._sheets[4]['C' + str(idh + 2)].font = Font(bold=True, name='Calibri', size='10.5')
+        workbook._sheets[4]['C' + str(idh + 2)].border = thin_border
+
+        workbook._sheets[4].merge_cells('E' + str(idh + 2) + ':' + 'F' + str(idh + 2))
+        workbook._sheets[4]['E' + str(idh + 2)].alignment = Alignment(horizontal='center')
+        workbook._sheets[4]['E' + str(idh + 2)] = np.round(np.max(trim),2)
+        workbook._sheets[4]['E' + str(idh + 2)].font = Font(bold=True, name='Calibri', size='10.5')
+        workbook._sheets[4]['E' + str(idh + 2)].border = thin_border
+
+        while i < maxTrim:
+            # workbook._sheets[4].insert_rows(k+27)
+            if i < 0 :
+                workbook._sheets[4]['A' + str(k + id)] = ' (' + str(i) + ' - ' + str(i + 0.5) + ')'
+                workbook._sheets[4]['A' + str(k + id)].font = Font(color='ce181e',bold=True, name='Calibri', size='10.5')
+            else:
+                workbook._sheets[4]['A' + str(k + id)] = ' (' + str(i) + '-' + str(i + 0.5) + ')'
+                workbook._sheets[4]['A' + str(k + id)].font = Font(bold=True, name='Calibri', size='10.5')
+            workbook._sheets[4]['A' + str(k + id)].fill = PatternFill(fgColor='dae3f3', fill_type="solid")
+            workbook._sheets[4]['A' + str(k + id)].border = thin_border
+            trimsApp.append(str(np.round((np.array([k for k in tlgDataset if float(k[16]) >= i and float(k[16]) <= i + 0.5]).__len__()/trimAmount) *100,2))+'%')
+            i += 0.5
+            k += 1
+
+        trimDeletedRows=0
+        if k < rowsAmount:
+            # for i in range(k-1,19+1):
+            workbook._sheets[4].delete_rows(idx=id + k, amount=rowsAmount - k + 1)
+            trimDeletedRows= draftDeletedRows+ rowsAmount-k+1
+        if k > rowsAmount:
+            workbook._sheets[4].insert_rows(idx=id + k, amount=rowsAmount - k + 1)
+            trimDeletedRows = -(abs(draftDeletedRows + rowsAmount - k + 1))
+
+            #speedDeletedRows+
+
+        for i in range(0, len(trimsApp)):
+            workbook._sheets[4]['B' + str(i + id)] = trimsApp[i]
+            workbook._sheets[4]['B' + str(i + id)].alignment = Alignment(horizontal='left')
+            height = workbook._sheets[4].row_dimensions[i + id].height
+            if height != None:
+                if float(height) > 13.8:
+                    workbook._sheets[4].row_dimensions[i + id].height = 13.8
+
+        for i in range(id, id + len(trimsApp)):
+            try:
+                if float(str(workbook._sheets[4]['B' + str(i)].value).split('%')[0]) > 2:
+                    workbook._sheets[4]['B' + str(i)].fill = PatternFill(fgColor=YELLOW, fill_type="solid")
+                    workbook._sheets[4]['A' + str(i)].fill = PatternFill(fgColor=YELLOW, fill_type="solid")
+            except:
+                c = 0
+        ##### END OF TRIM CELLS
+
+        ##FOC TLG CELLS ######################################################################
+        #foc = np.array([k for k in dtNew if float(k[16])>0])[:,16]
+        foc = np.array([k for k in tlgDataset if float(k[15]) > 0 and float(k[15])<40])[:, 15].astype(float)
+
+        rowsAmount=92
+        focAmount = foc.__len__()
+        minFOC = int(np.floor(np.min(foc)))
+        maxFOC = int(np.ceil(np.max(foc)))
+        focsApp = []
+        meanSpeeds=[]
+        stdSpeeds=[]
+        ranges=[]
+        k = 0
+        i = minFOC if minFOC > 0 else 1
+        id = 171-trimDeletedRows
+        workbook._sheets[4].row_dimensions[id - 2].height = 35
+        focsPLot=[]
+        speedsPlot=[]
+        workbook._sheets[4].merge_cells('C'+str(id-2)+':'+'D'+str(id-2))
+        workbook._sheets[4]['C' + str(id-2)].alignment = Alignment(horizontal='center')
+        while i < maxFOC:
+            # workbook._sheets[4].insert_rows(k+27)
+            workbook._sheets[4]['A' + str(k + id)] = ' (' + str(i) + '-' + str(i + 0.5) + ')'
+            workbook._sheets[4]['A' + str(k + id)].alignment = Alignment(horizontal='center')
+
+            workbook._sheets[4]['A' + str(k + id)].font = Font(bold=True, name='Calibri', size='10.5')
+            workbook._sheets[4]['A' + str(k + id)].fill = PatternFill(fgColor='dae3f3', fill_type="solid")
+            workbook._sheets[4]['A' + str(k + id)].border = thin_border
+            focArray = np.array([k for k in tlgDataset if float(k[15]) >= i and float(k[15]) <= i + 0.5])
+            focsApp.append(str(np.round(focArray.__len__()/focAmount*100,2))+'%')
+            meanSpeeds.append(np.round((np.mean(np.nan_to_num(focArray[:,12].astype(float)))),2) if focArray.__len__() >0  else 'N/A')
+            stdSpeeds.append(np.round((np.std(np.nan_to_num(focArray[:,12].astype(float)))),2) if focArray.__len__() >0  else 'N/A')
+
+            workbook._sheets[4]['C' + str(k + id)].font = Font(bold=True, name='Calibri', size='10.5')
+            workbook._sheets[4]['C' + str(k + id)].fill = PatternFill(fgColor='dae3f3', fill_type="solid")
+            workbook._sheets[4]['C' + str(k + id)].border = thin_border
+
+            workbook._sheets[4]['D' + str(k + id)].font = Font(bold=True, name='Calibri', size='10.5')
+            workbook._sheets[4]['D' + str(k + id)].fill = PatternFill(fgColor='dae3f3', fill_type="solid")
+            workbook._sheets[4]['D' + str(k + id)].border = thin_border
+
+            if focArray.__len__() > 0:
+                focsPLot.append(focArray.__len__())
+                speedsPlot.append(np.round((np.min(np.nan_to_num(focArray[:,12].astype(float)))),2))
+                ranges.append(i)
+            i+= 0.5
+            k += 1
+
+        xi = np.array(speedsPlot)
+        yi =np.array(ranges)
+        zi =np.array(focsPLot)
+        # Change color with c and alpha
+        p2 = np.poly1d(np.polyfit(xi, yi, 2))
+        xp = np.linspace(min(xi), max(xi), 100)
+        plt.plot([], [], '.', xp, p2(xp))
+
+        plt.scatter(xi, yi, s=zi , c="red", alpha=0.4,linewidth=4)
+        plt.xticks(np.arange(np.floor(min(xi)) - 1, np.ceil(max(xi)) +1, 1))
+        plt.yticks(np.arange(np.floor(min(yi)) , np.ceil(max(yi)) + 1, 5))
+        plt.xlabel("Speed (knots)")
+        plt.ylabel("FOC (MT / day)")
+        plt.title("Density plot", loc="center")
+        fig = matplotlib.pyplot.gcf()
+        fig.set_size_inches(17.5, 9.5)
+
+        dataModel = KMeans(n_clusters=3)
+        zi = zi.reshape(-1, 1)
+        dataModel.fit(zi)
+        # Extract centroid values
+        centroids = dataModel.cluster_centers_
+        ziSorted = np.sort(centroids, axis=0)
+
+        for z in ziSorted:
+            plt.scatter([], [], c='r', alpha=0.5, s=np.floor(z[0]),
+                        label=str(int(np.floor(z[0]))) + ' obs.')
+        plt.legend(scatterpoints=1, frameon=True, labelspacing=2, title='# of obs')
+
+
+
+        fig.savefig('./Figures/'+company+'_'+vessel+'_1.jpg', dpi=96)
+        #plt.clf()
+
+        img = Image('./Figures/'+company+'_'+vessel+'_1.jpg')
+
+        workbook._sheets[4].add_image(img, 'F'+str(id-2))
+        #workbook._sheets[4].insert_image('G'+str(id+30), './Danaos_ML_Project/Figures/'+company+'_'+vessel+'.png', {'x_scale': 0.5, 'y_scale': 0.5})
+
+        if k < rowsAmount:
+                    # for i in range(k-1,19+1):
+            workbook._sheets[4].delete_rows(idx=id + k, amount=rowsAmount - k + 1)
+            focDeletedRows = rowsAmount - k + 1
+
+        for i in range(0, len(focsApp)):
+            workbook._sheets[4]['B' + str(i + id)] = focsApp[i]
+
+            workbook._sheets[4]['B' + str(i + id)].alignment = Alignment(horizontal='center')
+
+            workbook._sheets[4]['C' + str(i + id)] = meanSpeeds[i]
+            workbook._sheets[4]['D' + str(i + id)] = stdSpeeds[i]
+
+            workbook._sheets[4]['C' + str(i + id)].alignment = Alignment(horizontal='center')
+            workbook._sheets[4]['D' + str(i + id)].alignment = Alignment(horizontal='center')
+
+            workbook._sheets[4]['B' + str(i + id)].border = thin_border
+            workbook._sheets[4]['B' + str(i + id)].font = Font( name='Calibri', size='10.5')
+
+
+            height = workbook._sheets[4].row_dimensions[i + id].height
+            if height != None:
+                if float(height) > 13.8:
+                    workbook._sheets[4].row_dimensions[i + id].height = 13.8
+
+        for i in range(id, id + len(focsApp)):
+            try:
+                if float(str(workbook._sheets[4]['B' + str(i)].value).split('%')[0]) > 1.5:
+                    workbook._sheets[4]['B' + str(i)].fill = PatternFill(fgColor=YELLOW, fill_type="solid")
+                    workbook._sheets[4]['A' + str(i)].fill = PatternFill(fgColor=YELLOW, fill_type="solid")
+                    workbook._sheets[4]['C' + str(i)].fill = PatternFill(fgColor=YELLOW, fill_type="solid")
+                    workbook._sheets[4]['D' + str(i)].fill = PatternFill(fgColor=YELLOW, fill_type="solid")
+            except:
+                c = 0
+        ##### END OF FOC TLG CELLS
+        if rawData:
+            ##############START OF RAW TAB ####################################################################
+            ##############START OF RAW TAB ####################################################################
+            ###START OF STW RAW #####################
+            ##SPEED  RAW CELLS
+            rowsAmount = 56
+            velocities = np.array([k for k in dtNew])[:, 12]
+            velocities = np.nan_to_num(velocities.astype(float))
+            velocities = velocities[velocities >= 0]
+            velocitiesAmount = velocities.__len__()
+            maxSpeed = np.ceil(np.max(velocities))
+            minSpeed = np.floor(np.min(velocities))
+            speedsApp = []
+            id =3
+            k = 0
+            i = minSpeed
+            idh = 1
+
+            workbook._sheets[5]['C' + str(idh + 2)].alignment = Alignment(horizontal='center')
+            workbook._sheets[5]['C' + str(idh + 2)] = np.round(np.min(velocities), 2)
+            workbook._sheets[5]['C' + str(idh + 2)].font = Font(bold=True, name='Calibri', size='10.5')
+
+            workbook._sheets[5]['E' + str(idh + 2)].alignment = Alignment(horizontal='center')
+            workbook._sheets[5]['E' + str(idh + 2)] = np.round(np.max(velocities), 2)
+            workbook._sheets[5]['E' + str(idh + 2)].font = Font(bold=True, name='Calibri', size='10.5')
+
+            workbook._sheets[5].row_dimensions[1].height = 35
+            while i < maxSpeed:
+                workbook._sheets[5]['A' + str(k + 3)] = ' (' + str(i) + '-' + str(i + 0.5) + ')'
+                workbook._sheets[5]['A' + str(k + 3)].font = Font(bold=True, name='Calibri', size='10.5')
+
+                speedsApp.append(str(np.round((np.array([k for k in dtNew if float(k[12]) >= i and float(k[12]) <= i + 0.5]).__len__()) / velocitiesAmount * 100 , 2 ))+'%')
+                i += 0.5
+                k += 1
+
+            speedDeletedRows = 0
+            if k < rowsAmount:
+                # for i in range(k-1,19+1):
+                workbook._sheets[5].delete_rows(idx=3 + k, amount=rowsAmount - k + 1)
+                speedDeletedRows = rowsAmount - k + 1
+
+            for i in range(0, len(speedsApp)):
+                workbook._sheets[5]['B' + str(i + 3)] = speedsApp[i]
+                workbook._sheets[5]['B' + str(k + 3)].alignment = Alignment(horizontal='left')
+                height = workbook._sheets[5].row_dimensions[i + 3].height
+                if height != None:
+                    if float(height) > 13.8:
+                        workbook._sheets[5].row_dimensions[i + 3].height = 13.8
+
+            for i in range(3, 3 + len(speedsApp)):
+                try:
+                    if float(workbook._sheets[5]['B' + str(i)].value) > 500:
+                        workbook._sheets[5]['B' + str(i)].fill = PatternFill(fgColor=YELLOW, fill_type="solid")
+                        workbook._sheets[5]['A' + str(i)].fill = PatternFill(fgColor=YELLOW, fill_type="solid")
+                except:
+                    c = 0
+
+            for i in range(id, id + len(speedsApp)):
+                if float(str(workbook._sheets[5]['B' + str(i)].value).split('%')[0]) > 1.5:
+                    workbook._sheets[5]['B' + str(i)].fill = PatternFill(fgColor=YELLOW, fill_type="solid")
+                    workbook._sheets[5]['A' + str(i)].fill = PatternFill(fgColor=YELLOW, fill_type="solid")
+
+            ##### END OF SPEED RAW CELLS
+
+            ##FOC RAW CELLS ######################################################################
+            foc = np.array([k for k in dtNew if float(k[15]) > 0 and float(k[15]<45)])[:, 15]
+            rowsAmount = 92
+            focAmount = foc.__len__()
+            minFOC = int(np.floor(np.min(foc)))
+            maxFOC = int(np.ceil(np.max(foc)))
+            focsApp = []
+            k = 0
+            i = minFOC
+            id = 171 - speedDeletedRows
+            focsPLot = []
+            speedsPlot = []
+            ranges=[]
+            meanSpeeds=[]
+            stdSpeeds=[]
+            workbook._sheets[5].merge_cells('C' + str(id - 2) + ':' + 'D' + str(id - 2))
+            workbook._sheets[5]['C' + str(id - 2)].alignment = Alignment(horizontal='center')
+            workbook._sheets[5].row_dimensions[id - 2].height = 35
+
+            while i < maxFOC:
+                workbook._sheets[5]['A' + str(k + id)] = ' (' + str(i) + '-' + str(i + 0.5) + ')'
+                workbook._sheets[5]['A' + str(k + id)].alignment = Alignment(horizontal='center')
+
+                workbook._sheets[5]['A' + str(k + id)].font = Font(bold=True, name='Calibri', size='10.5')
+                workbook._sheets[5]['A' + str(k + id)].fill = PatternFill(fgColor='dae3f3', fill_type="solid")
+                workbook._sheets[5]['A' + str(k + id)].border = thin_border
+                focArray = np.array([k for k in dtNew if float(k[15]) >= i and float(k[15]) <= i + 0.5])
+                focsApp.append(str(np.round(focArray.__len__()/focAmount*100,2))+'%')
+                meanSpeeds.append(np.round((np.mean(np.nan_to_num(focArray[:,12].astype(float)))),2) if focArray.__len__() > 0 else 'N/A')
+                stdSpeeds.append(np.round((np.std(np.nan_to_num(focArray[:,12].astype(float)))),2) if focArray.__len__() > 0 else 'N/A')
+
+                workbook._sheets[5]['C' + str(k + id)].font = Font(bold=True, name='Calibri', size='10.5')
+                workbook._sheets[5]['C' + str(k + id)].fill = PatternFill(fgColor='dae3f3', fill_type="solid")
+                workbook._sheets[5]['C' + str(k + id)].border = thin_border
+
+                workbook._sheets[5]['D' + str(k + id)].font = Font(bold=True, name='Calibri', size='10.5')
+                workbook._sheets[5]['D' + str(k + id)].fill = PatternFill(fgColor='dae3f3', fill_type="solid")
+                workbook._sheets[5]['D' + str(k + id)].border = thin_border
+
+                if focArray.__len__() > 0:
+                    focsPLot.append(focArray.__len__())
+                    speedsPlot.append(np.round((np.mean(np.nan_to_num(focArray[:,12].astype(float)))),2))
+                    ranges.append(i)
+                i += 0.5
+                k += 1
+
+            if k < rowsAmount:
+                # for i in range(k-1,19+1):
+                workbook._sheets[5].delete_rows(idx=id + k, amount=rowsAmount - k + 1)
+                focDeletedRows = rowsAmount - k + 1
+
+            for i in range(0, len(focsApp)):
+                workbook._sheets[5]['B' + str(i + id)] = focsApp[i]
+
+                workbook._sheets[5]['B' + str(i + id)].alignment = Alignment(horizontal='center')
+
+                workbook._sheets[5]['C' + str(i + id)] = meanSpeeds[i]
+                workbook._sheets[5]['D' + str(i + id)] = stdSpeeds[i]
+
+                workbook._sheets[5]['C' + str(i + id)].alignment = Alignment(horizontal='center')
+                workbook._sheets[5]['D' + str(i + id)].alignment = Alignment(horizontal='center')
+
+                workbook._sheets[5]['B' + str(i + id)].border = thin_border
+                workbook._sheets[5]['B' + str(i + id)].font = Font(name='Calibri', size='10.5')
+                height = workbook._sheets[5].row_dimensions[i + id].height
+                if height != None:
+                    if float(height) > 13.8:
+                        workbook._sheets[5].row_dimensions[i + id].height = 13.8
+
+            for i in range(id, id + len(focsApp)):
+                try:
+                    if float(str(workbook._sheets[5]['B' + str(i)].value).split('%')[0]) > 1.5:
+                        workbook._sheets[5]['B' + str(i)].fill = PatternFill(fgColor=YELLOW, fill_type="solid")
+                        workbook._sheets[5]['A' + str(i)].fill = PatternFill(fgColor=YELLOW, fill_type="solid")
+                        workbook._sheets[5]['C' + str(i)].fill = PatternFill(fgColor=YELLOW, fill_type="solid")
+                        workbook._sheets[5]['D' + str(i)].fill = PatternFill(fgColor=YELLOW, fill_type="solid")
+                except:
+                    c = 0
+
+            plt.clf()
+            xi = np.array(speedsPlot)
+            yi = np.array(ranges)
+            zi = np.array(focsPLot)
+            # Change color with c and alpha
+            p2 = np.poly1d(np.polyfit(xi, yi, 3))
+            xp = np.linspace(min(xi), max(xi), 100)
+            plt.plot([], [], '.', xp, p2(xp))
+
+            plt.scatter(xi, yi, s=zi, c="red", alpha=0.4, linewidth=4)
+            plt.xticks(np.arange(np.floor(min(xi)), np.ceil(max(xi)) + 1, 1))
+            plt.yticks(np.arange(min(yi), max(yi) + 1, 5))
+            plt.xlabel("Speed (knots)")
+            plt.ylabel("FOC (MT / day)")
+            plt.title("Density plot", loc="center")
+
+            dataModel = KMeans(n_clusters=3)
+            zi = zi.reshape(-1, 1)
+            dataModel.fit(zi)
+            # Extract centroid values
+            centroids = dataModel.cluster_centers_
+            ziSorted = np.sort(centroids, axis=0)
+
+            for z in ziSorted:
+                plt.scatter([], [], c='r', alpha=0.5, s=np.floor(z[0]),
+                            label='       '+str(int(np.floor(z[0]))) + ' obs.')
+            plt.legend( borderpad=4,scatterpoints=1, frameon=True, labelspacing=6, title='# of obs')
+
+            img = Image('./Danaos_ML_Project/Figures/' + company + '_' + vessel + '_2.jpg')
+
+            fig = matplotlib.pyplot.gcf()
+            fig.set_size_inches(17.5, 9.5)
+            fig.savefig('./Danaos_ML_Project/Figures/' + company + '_' + vessel + '_2.jpg', dpi=96)
+            plt.clf()
+
+
+
+            workbook._sheets[5].add_image(img, 'F' + str(id -2))
+            ##### END OF FOC RAW CELLS
+
+
+        ########################################################## END OF STATISTICS TAB #########################################
+        return workbook
+
+    def GenericParserForDataExtraction(self,systemType, company, vessel ,driver=None,server=None,sid=None,usr=None,password=None,rawData=None,telegrams=None,companyTelegrams=None,seperator=None ,fileType=None, granularity=None, fileName=None,
+                                       pathOfRawData=None,comparisonTest=None,dataTrain=None):
+
+        boolTlg = telegrams
+        pathExcel = '/home/dimitris/Desktop/template.xlsx'
+        ##public vars
+
         if systemType=='LEMAG':
+            if 1==2:
+                companyTlgs = pd.read_excel('./data/' + company + '/' + vessel + '/Penelope TrackReport.xls')
+                companyTlgs = companyTlgs.values
 
-            path = '/home/dimitris/Desktop/template.xlsx'
-            path2 = 'C:/Users/dkaklis/Desktop/template.xlsx'
-            #data = pd.read_csv('./data/' + company + '/mappedData.csv')
-            #newDataSet = data.values
-
-            #self.fillExcelProfCons(vessel, path, newDataSet)
-            dataSet=[]
-            if rawData:
-                path = './data/' + company + '/' + vessel+'/'
-                #Path('./data/' + company + '/'+vessel).mkdir(parents=True, exist_ok=True)
-                if os.path.isdir('./data/' + company + '/'+vessel)==False:
-                    shutil.copytree(pathOfRawData, path)
-                dataSet = []
-                for infile in  sorted(glob.glob(path+'*.csv')):
-                    data = pd.read_csv(infile, sep=';', decimal='.',skiprows=1)
-                    dataSet.append(data.values)
-                    print(str(infile))
-                dataSet = np.concatenate(dataSet)
-
-            ##########################################################
-            if telegrams:
-                my_file = Path('./data/'+company+'/TELEGRAMS/'+vessel+'.csv')
-                if my_file.is_file() == False:
-                    self.GenericParserForDataExtraction('TELEGRAMS', company, vessel,driver,server,sid,usr,password)
-                    tlgs = pd.read_csv('./data/' + company + '/TELEGRAMS/' + vessel + '.csv',sep=';')
-                else:
-                    tlgs = pd.read_csv('./data/' + company + '/TELEGRAMS/' + vessel + '.csv',sep=';')
-
+                tlgs = pd.read_csv('./data/' + company + '/' + vessel + '/TELEGRAMS/' + vessel + '.csv', sep=';')
                 telegrams = tlgs.values
+                drafts=[]
+                trims=[]
+                speeds=[]
+                focs=[]
+                dates=[]
+                for i in range(0,len(companyTlgs)):
+                    cmpTlgDate = companyTlgs[i,1]
+                    day = cmpTlgDate.split(" ")[0].split(".")[0]
+                    month = cmpTlgDate.split(" ")[0].split(".")[1]
+                    year = cmpTlgDate.split(" ")[0].split(".")[2]
+                    cmpTlgDateNew = year+'-'+month+"-"+day
+                    filteredRows = [row for row in telegrams if row[0].split(" ")[0]==cmpTlgDateNew]
+                    speeds.append(float(companyTlgs[i,6].split('kn.')[0]) if companyTlgs[i,6].split('kn.')[0]!='Unknown' and float(companyTlgs[i,6].split('kn.')[0])<30 else 0)
+                    drafts.append( float(filteredRows[0].reshape(1,-1)[:,8][0]) if filteredRows.__len__()>0 else 0)
+                    trims.append(float(filteredRows[0].reshape(1,-1)[:,16][0]) if filteredRows.__len__()>0 else 0)
+                    focs.append(float(filteredRows[0].reshape(1,-1)[:,15][0]) if filteredRows.__len__()>0 else 0)
+                    dates.append(cmpTlgDateNew)
 
 
-            #for k in  range(0,len(dataSet)):
-                #if k==11:
-                    #c=0
-                #for i in range(0,len(dataSet[k])):
-                   #row = dataSet[k][i]
-                   #newDataSet.append(dataSet[k][i])
+                drafts = np.nan_to_num(drafts).reshape(-1)
+                focs = np.nan_to_num(focs).reshape(-1)
+                speeds= np.nan_to_num(speeds).reshape(-1)
+                dates = np.array(dates).reshape(-1,1)
+                otherColumns = np.array([0] * len(speeds)).reshape(-1)
+                trims = np.array(trims).reshape(-1)
+                newDataSetTLG = np.array(
+                    np.append(dates, np.asmatrix(
+                        [otherColumns, otherColumns, otherColumns, otherColumns, otherColumns, otherColumns, otherColumns, drafts
+                         , otherColumns, otherColumns,otherColumns, speeds,
+                         otherColumns, otherColumns, focs, trims]).T, axis=1))
+                with open('./data/' + company +'/'+vessel+'/TELEGRAMS/'+vessel+'TLGmappedData.csv', mode='w') as data:
+                    data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+                    for i in range(0, len(newDataSetTLG)):
+                        data_writer.writerow(
+                            [newDataSetTLG[i][0], newDataSetTLG[i][1], newDataSetTLG[i][2], 0, 0, 0, 0, 0, newDataSetTLG[i][8], 0 ,newDataSetTLG[i][10],
+                             newDataSetTLG[i][11], newDataSetTLG[i][12], 0, 0, newDataSetTLG[i][15], newDataSetTLG[i][16]])
+
+            if comparisonTest: ##run experiments with train/test split
+                dataSet = dataTrain
+            else:
+
+                #path2 = 'C:/Users/dkaklis/Desktop/template.xlsx'
+                if Path('./data/' + company + '/' + vessel + '/mappedData.csv').is_file():
+                    data = pd.read_csv('./data/' + company +'/'+vessel +'/mappedData.csv')
+                    newDataSet = data.values
+                    tlgData = pd.read_csv('./data/' + company + '/' + vessel + '/TELEGRAMS/'+vessel+'.csv',sep=';')
+                    tlgDataset  = tlgData.values
+                    newDataSet = data.values
+                    self.fillExcelProfCons(company,vessel, pathExcel, newDataSet,rawData,tlgDataset)
+
+                if os.path.isdir('./data/' + company + '/' + vessel) == False:
+                    os.mkdir('./data/' + company + '/' + vessel)
+                if os.path.isdir('./data/' + company + '/' + vessel+'/TELEGRAMS') == False:
+                    os.mkdir('./data/' + company + '/' + vessel+'/TELEGRAMS')
+
+                dataSet=[]
+                if rawData:
+                    path = './data/' + company + '/' + vessel+'/'
+                    #Path('./data/' + company + '/'+vessel).mkdir(parents=True, exist_ok=True)
+                    if os.path.isdir('./data/' + company + '/'+vessel)==False:
+                        shutil.copytree(pathOfRawData, path)
+                    dataSet = []
+                    for infile in  sorted(glob.glob(path+'*.csv')):
+                        data = pd.read_csv(infile, sep=';', decimal='.')#,skiprows=1)
+                        dataSet.append(data.values[70000:90000])
+                        print(str(infile))
+                    #if len(dataSet)>1:
+                    dataSet = np.concatenate(dataSet)
+
+                ##########################################################
+                if telegrams:
+                    my_file = Path('./data/'+company+'/'+vessel+'/TELEGRAMS/'+vessel+'.csv')
+                    if my_file.is_file() == False:
+                        self.GenericParserForDataExtraction('TELEGRAMS', company, vessel,driver,server,sid,usr,password)
+                        tlgs = pd.read_csv('./data/'+company+'/'+vessel+'/TELEGRAMS/'+vessel+'.csv',sep=';')
+                    else:
+                        tlgs = pd.read_csv('./data/'+company+'/'+vessel+'/TELEGRAMS/'+vessel+'.csv',sep=';')
+
+                    telegrams = tlgs#.values
+
+                if companyTelegrams:
+                    #my_file = Path('./data/' + company + '/TELEGRAMS/' + companyTlgFIle + '.csv')
+
+                    companyTlgs = pd.read_excel('./data/' + company + '/' + vessel + '/Penelope TrackReport.xls')
+                    #CompanyTlgs = pd.read_csv('./data/' + company + '/TELEGRAMS/' + companyTlgFIle + '.csv', sep=';')
+
+                    companyTelegrams = companyTlgs#.values
+
+
             ##WRITE NEWDATASET IN A CSV
-            newDataSet = self.extractRawData(dataSet,telegrams,company)
+            newDataSet = self.extractRawData(dataSet,telegrams,companyTelegrams,company,vessel)
 
-            with open('./data/' + company + '/mappedData.csv', mode='w') as data:
+            with open('./data/' + company +'/'+vessel+'/mappedData.csv', mode='w') as data:
                 data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
                 for i in range(0, len(newDataSet)):
                     data_writer.writerow(
-                        [0, newDataSet[i][1], newDataSet[i][2], 0, 0, 0, 0, 0, newDataSet[i][8], 0, newDataSet[i][10],
-                         newDataSet[i][11], newDataSet[i][12], 0, 0, newDataSet[i][15], newDataSet[i][16]])
+                        [0, newDataSet[i][1], newDataSet[i][2], 0, 0, 0, 0, 0, newDataSet[i][8], 0 ,newDataSet[i][10],
+                         newDataSet[i][11], newDataSet[i][12], 0, 0, newDataSet[i][15], newDataSet[i][16],newDataSet[i][17],newDataSet[i][18]])
 
-            self.fillExcelProfCons(vessel, path, newDataSet)
-            #while endYear <= endYear and startDay<=endDay and startMonth<=endMonth:
-                #data = pd.read_csv('./data/' + company + '/' + vessel +'SEEAmag '+startYear+'.'+startMonth+'.'+startDay+'.csv', sep=';', decimal='.')
-                #startDay=+1
+            #if boolTlg==False and rawData==True:
+                #tlgDataset=[]
+            #if rawData == False and boolTlg == True:
+                #tlgDataset = telegrams
+            tlgDataset=[]
+            self.fillExcelProfCons(company,vessel, pathExcel,newDataSet,rawData,tlgDataset)
+            return
+
         if systemType=='TELEGRAMS':
 
             if driver=='ORACLE':
                 #cx_Oracle.connect('millenia@/10.2.5.80:1521/OR11')
-                my_file = Path('./data/'+company+'/TELEGRAMS/'+vessel+'.csv')
+                my_file = Path('./data/'+company+'/'+vessel+'/TELEGRAMS/'+vessel+'.csv')
                 if my_file.is_file()==False:
-                    if os.path.isdir('./data/'+company+'/TELEGRAMS/') == False:
+                    if os.path.isdir('./data/'+company+'/'+vessel+'/TELEGRAMS/') == False:
                         Path('./data/'+company+'/TELEGRAMS/').mkdir(parents=True, exist_ok=True)
 
                     dsn = cx_Oracle.makedsn(
@@ -479,6 +1313,7 @@ class BaseSeriesReader:
                             '1521',
                             service_name=sid
                         )
+
                     connection = cx_Oracle.connect(
                             user=usr,
                             password=password,
@@ -488,15 +1323,17 @@ class BaseSeriesReader:
 
                     cursor_myserver = connection.cursor()
 
-                    cursor_myserver.execute('SELECT VESSEL_CODE FROM VESSEL_DATA WHERE VESSEL_NAME =  '"'" + vessel + "'"'  ')
+                    cursor_myserver.execute('SELECT VESSEL_CODE FROM VESSEL_DATA WHERE VESSEL_NAME =  '"'" + vessel + "'"' OR VESSEL_SHORT_NAME='"'" + vessel + "'"'   ')
+                    #if cursor_myserver.fetchall().__len__() > 0:
                     for row in cursor_myserver.fetchall():
-                        vessel_code = row[0]
+                            vessel_code = row[0]
+                    #else: vessel_code = vCode
                     cursor_myserver.execute(
-                        'SELECT  TELEGRAM_DATE , TELEGRAM_TYPE,BALAST_FLAG,LATITUDE_DEGREES , LATITUDE_SECONDS ,LONGITUDE_DEGREES , LONGITUDE_SECONDS ,vessel_course,(DRAFT_AFT + DRAFT_FORE)/2 as DRAFT , ENGINE_RPM , WIND_DIRECTION , WIND_FORCE  ,AVERAGE_SPEED ,hours_slc,minutes_slc, (( NVL(ME_HSFO_CONS,0)+ NVL(ME_LSFO_CONS,0)+ NVL(ME_HSDO_CONS,0 ) + NVL(ME_LSDO_CONS,0)))   as ME_CONS_24h  FROM TELEGRAMS where vessel_code = '"'" + vessel_code + "'" 'AND (TELEGRAM_TYPE='"'D'"' or telegram_type='"'N'"' or telegram_type='"'A'"' ) ')
+                        'SELECT  TELEGRAM_DATE , TELEGRAM_TYPE,BALAST_FLAG,LATITUDE_DEGREES , LATITUDE_SECONDS ,LONGITUDE_DEGREES , LONGITUDE_SECONDS ,vessel_course,(DRAFT_AFT + DRAFT_FORE)/2 as DRAFT , ENGINE_RPM , WIND_DIRECTION , WIND_FORCE  ,AVERAGE_SPEED ,hours_slc,minutes_slc, (( NVL(ME_HSFO_CONS,0)+ NVL(ME_LSFO_CONS,0)+ NVL(ME_HSDO_CONS,0 ) + NVL(ME_LSDO_CONS,0)))   as ME_CONS_24h , (DRAFT_AFT-DRAFT_FORE) AS TRIM  FROM TELEGRAMS where vessel_code = '"'" + vessel_code + "'" 'AND (telegram_type='"'N'"' or telegram_type='"'A'"' ) ')
 
-                    with open('./data/'+company+'/TELEGRAMS/'+vessel+'.csv', mode='w') as data:
+                    with open('./data/'+company+'/'+vessel+'/TELEGRAMS/'+vessel+'.csv', mode='w') as data:
                         data_writer = csv.writer(data, delimiter=';', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-                        data_writer.writerow(['TELEGRAM_DATE','TELEGRAM_TYPE','BALAST_FLAG','LATITUDE_DEGREES','LATITUDE_SECONDS','LONGITUDE_DEGREES','LONGITUDE_SECONDS','VESSEL_COURSE','DRAFT','ENGINE_RPM','WIND_DIRECTION','WIND_FORCE','AVERAGE_SPEED','HOURS_SLC','MINUTES_SLC','ME_CONS_24H'])
+                        data_writer.writerow(['TELEGRAM_DATE','TELEGRAM_TYPE','BALAST_FLAG','LATITUDE_DEGREES','LATITUDE_SECONDS','LONGITUDE_DEGREES','LONGITUDE_SECONDS','VESSEL_COURSE','DRAFT','ENGINE_RPM','WIND_DIRECTION','WIND_FORCE','AVERAGE_SPEED','HOURS_SLC','MINUTES_SLC','ME_CONS_24H','TRIM'])
 
                         for row in cursor_myserver.fetchall():
                             telegram_date = str(row[0])
@@ -515,13 +1352,14 @@ class BaseSeriesReader:
                             h_slc = row[13]
                             m_slc = row[14]
                             foc = row[15]
+                            trim = row[16]
 
                             data_writer.writerow(
-                                [telegram_date, telegram_type, ballast_flag, lat_deg, lat_sec, lon_deg, lon_sec, vessel_course, draft,rpm, wd, wf, speed, h_slc,m_slc,foc])
+                                [telegram_date, telegram_type, ballast_flag, lat_deg, lat_sec, lon_deg, lon_sec, vessel_course, draft,rpm, wd, wf, speed, h_slc,m_slc,foc,trim])
 
                     x=0
                 #self.fillExcelProfCons(vessel, 'C:/Users/dkaklis/Desktop/template.xlsx', newDataSet)
-                self.readExtractNewDataset(company,vessel,'C:/Users/dkaklis/Desktop/template.xlsx',';')
+                #self.readExtractNewDataset(company,vessel,'C:/Users/dkaklis/Desktop/template.xlsx',';')
         if systemType == 'LAROS':
 
             #self.readLarosDAta(0,0)
@@ -1092,7 +1930,7 @@ class BaseSeriesReader:
         dbDate = year + month + day + h
         #####END WEATHER HISTORY DB NAME
 
-        connWEATHERHISTORY = pyodbc.connect('DRIVER={SQL Server};SERVER=WEATHERSERVER_DEV;'
+        connWEATHERHISTORY = pyodbc.connect('DRIVER={/opt/microsoft/msodbcsql17/lib64/libmsodbcsql-17.5.so.2.1};SERVER= 10.2.4.54;'
                                             'DATABASE=WeatherHistoryDB;'
                                             'UID=sa;'
                                             'PWD=sa1!')
@@ -1121,17 +1959,21 @@ class BaseSeriesReader:
 
         return windSpeed ,relWindDir
 
-    def fillExcelProfCons(self,vessel,pathToexcel,dataSet):
+    def fillExcelProfCons(self,company,vessel,pathToexcel,dataSet ,rawData,tlgDataset):
         ##FEATURE SET EXACT POSITION OF COLUMNS NEEDED IN ORDER TO PRODUCE EXCEL
         #2nd place BALLAST FLAG
         #8th place DRAFT
+        #17th place TRIM
+        #18th place STW_TLG
         #10th place WD
         #11th place WF
         #12th place SPEED
         #15th place ME FOC 24H
         #16th place ME FOC 24H TLGS
+
         #if float(k[5])>6.5
-        dtNew = np.array([k for k in dataSet if float(k[15])> 0 and float(k[12])>6])
+        lenConditionTlg = 20000000
+        dtNew = np.array([k for k in dataSet if float(k[15])> 0 and float(k[12])>0 and  float(k[8])<20])
 
         ballastDt = np.array([k for k in dtNew if k[2] == 'B' if float(k[8]) < 16])[:, 7:].astype(float)
         ladenDt = np.array([k for k in dtNew if k[2] == 'L' if float(k[8]) < 16])[:, 7:].astype(float)
@@ -1147,14 +1989,14 @@ class BaseSeriesReader:
                 if float(dtNew[i, 8]) >=meanDraftLadden:
                     dtNew[i, 2] = 'L'
                 else:
-                    if float(dtNew[i, 8]) <=meanDraftBallast+1 :
-                        dtNew[i, 2] = 'B'
+                    #if float(dtNew[i, 8]) <=meanDraftBallast+1:
+                    dtNew[i, 2] = 'B'
         ########################################################################
         ########################################################################
         ########################################################################
 
-        ballastDt = np.array([k for k in dtNew if k[2] == 'B' if float(k[8])<16])[:, 7:].astype(float)
-        ladenDt = np.array([k for k in dtNew if k[2] == 'L' if float(k[8])<16])[:, 7:].astype(float)
+        ballastDt = np.array([k for k in dtNew if k[2] == 'B' if float(k[8])>0])[:, 7:].astype(float)
+        ladenDt = np.array([k for k in dtNew if k[2] == 'L' if float(k[8])>0])[:, 7:].astype(float)
 
         meanDraftBallast = round(float(np.mean(np.array([k for k in ballastDt if k[1] > 0])[:, 1])), 2)
         meanDraftLadden = round(float(np.mean(np.array([k for k in ladenDt if k[1] > 0])[:, 1])), 2)
@@ -1163,9 +2005,15 @@ class BaseSeriesReader:
 
 
 
-        draft = (np.array((np.array([k for k in dtNew if float(k[8]) > 5 and float(k[8]) < 20])[:, 8])).astype(float))
-        velocities = (
-        np.array((np.array([k for k in dtNew if float(k[12]) > 5 and float(k[12]) < 18])[:, 12])).astype(float))
+        draft = (np.array((np.array([k for k in dtNew if float(k[8]) > 0 and float(k[8]) < 20 ])[:, 8])).astype(float))
+        trim = (np.array((np.array([k for k in dtNew  if float(k[17])<20 ])[:, 17])).astype(float))
+        velocities = (np.array((np.array([k for k in dtNew if float(k[12]) > 0 ])[:, 12])).astype(float)) #and float(k[12]) < 18
+        if rawData==[]:
+            tlgDataset = dtNew
+            velocitiesTlg = (
+                np.array((np.array([k for k in dtNew if float(k[18]) > 0 and float(k[18]) < 35])[:, 12])).astype(float))
+        else:
+            velocitiesTlg = (np.array((np.array([k for k in dtNew if float(k[18]) > 0 and float(k[18])<35 ])[:, 18])).astype(float)) #and float(k[12]) < 18
 
         dataModel = KMeans(n_clusters=4)
         velocities = velocities.reshape(-1, 1)
@@ -1218,9 +2066,24 @@ class BaseSeriesReader:
         ##end of sea state
         ###
         #meanDraftBallast = round(float(np.mean(np.array([k for k in ballastDt if k[1] > 0])[:, 1])), 2)
-        workbook._sheets[2]['B2'] = meanDraftBallast
+        workbook._sheets[2]['B2'] = np.floor(meanDraftBallast)+0.5
         #meanDraftLadden = round(float(np.mean(np.array([k for k in ladenDt if k[1] > 0])[:, 1])), 2)
-        workbook._sheets[1]['B2'] = meanDraftLadden
+        workbook._sheets[1]['B2'] = np.ceil(meanDraftLadden)+0.5
+
+        ##WRITE DRAFTS TO FILE
+        drafts=[]
+        drafts.append(np.floor(meanDraftBallast)+0.5)
+        drafts.append(np.ceil(meanDraftLadden)+0.5)
+        with open('./data/' + company + '/' + vessel + '/ListOfDrafts.csv', mode='w') as data:
+            data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+            data_writer.writerow(
+                ['Draft'])
+            for i in range(0, 2):
+                data_writer.writerow(
+                    [drafts[i]])
+
+
+
         #############################################################################
         ##BALLAST
         ##delete ballast outliers
@@ -1241,6 +2104,7 @@ class BaseSeriesReader:
 
         sorted=[]
         initialX = len(partitionsX)
+        initialXpart = partitionsX
         while sorted.__len__() < initialX:
             min = 100000000000
             for i in range(0,len(partitionsX)):
@@ -1251,12 +2115,16 @@ class BaseSeriesReader:
             sorted.append(partitionsX[minIndx])
             partitionsX.remove(partitionsX[minIndx])
 
+        ################################################################################################################
 
+        #workbook = self.calculateExcelStatistics(workbook,dtNew,velocities,draft,trim,velocitiesTlg , rawData,company,vessel,tlgDataset)
         ##delete ladden outliers
         #np.delete(ladenDt, [i for (i, v) in enumerate(ladenDt[:, 8]) if v < (
             #np.mean(ladenDt[:, 8]) - np.std(ladenDt[:, 8])) or v > np.mean(
             #ladenDt[:, 8]) + np.std(
             #ladenDt[:, 8])], 0)
+
+
 
         ###SPEED 10 WIND <1.5
         vel0Min = np.floor(np.min(sorted[0])) + 0.5
@@ -1269,11 +2137,22 @@ class BaseSeriesReader:
         vel2Max =np.floor(np.max(sorted[2]))+0.5
         vel3Max = np.floor(np.max(sorted[3]))+0.5
 
+        vel0Mean = np.floor(np.mean(sorted[0])) + 0.5
+        vel1Mean = np.floor(np.mean(sorted[1])) + 0.5
+        vel2Mean = np.floor(np.mean(sorted[2])) + 0.5
+        vel3Mean = np.floor(np.mean(sorted[3])) + 0.5
+
         ####VESSEL BASIC INFO
-        workbook._sheets[2]['B6']  = vel0Max
-        workbook._sheets[2]['B16'] = vel1Max
-        workbook._sheets[2]['B26'] = vel2Max
-        workbook._sheets[2]['B36'] = vel3Max
+        blVelocities =[]
+        blVelocities.append(vel0Mean)
+        blVelocities.append(vel1Mean)
+        blVelocities.append(vel2Mean)
+        blVelocities.append(vel3Mean)
+
+        workbook._sheets[2]['B6'] = vel0Mean
+        workbook._sheets[2]['B16'] = vel1Mean
+        workbook._sheets[2]['B26'] = vel2Mean
+        workbook._sheets[2]['B36'] = vel3Mean
 
         workbook._sheets[0]['B2'] = vessel
         workbook._sheets[0]['B5'] = round(velocitiesSorted[3][0], 1)
@@ -1286,7 +2165,7 @@ class BaseSeriesReader:
         centralMean = np.mean(np.array([k for k in ballastDt if
                                         k[5] >= vel0Min and k[5] <= vel0Max and k[8] >= 10])[:, 8])
         centralArray = np.array([k for k in ballastDt if
-                                 k[5] >= vel0Min and k[5] <= vel0Max and k[8] > 4])[:, 8]
+                                 k[5] >= vel0Min and k[5] <= vel0Max and k[8] > 0])[:, 8]
         for i in range(0, len(wind) - 1):
             arrayFoc = np.array([k for k in ballastDt if
                                  k[4] >= 0 and k[4] <= 1 and k[5] >= vel0Min and k[5] <= vel0Max and k[3] >= wind[i] and
@@ -1295,14 +2174,15 @@ class BaseSeriesReader:
             tlgarrayFoc = np.array([k for k in tlgarrayFoc if k >= 3])
 
             # tlgarrayFoc=np.mean(np.array([k for k in ballastDt if k[5] >= round(centroidsB[0][0], 2) and k[5] <= 10 and k[4] >= 0 and k[4] <= 1 and k[9] > 10])[:, 9])
-            tlgarrayFoc = np.array([k for k in ballastDt if k[5] >= vel0Min and k[5] <= vel0Max and k[8] >= 10])[:, 9]
+            tlgarrayFoc = np.array([k for k in ballastDt if k[5] >= vel0Min and k[5] <= vel0Max and k[8] >= 10])
 
-            if tlgarrayFoc.__len__() > 5:
+            if tlgarrayFoc.__len__() > lenConditionTlg:
+                tlgarrayFoc = np.array([k for k in ballastDt if k[5] >= vel0Min and k[5] <= vel0Max and k[8] >= 10])[:,9]
                 meanFoc = (np.mean(arrayFoc[:, 8]) + np.mean(
                     tlgarrayFoc) + centralMean) / 3 if arrayFoc.__len__() >= 5 else 0
                 numberOfApp10_0.append(arrayFoc.__len__() + tlgarrayFoc.__len__() + centralArray.__len__())
             else:
-                meanFoc = (np.mean(arrayFoc[:, 8]) + centralMean) / 2 if arrayFoc.__len__() >= 5 else 0
+                meanFoc = (np.mean(arrayFoc[:, 8]) + centralMean) / 2 if arrayFoc.__len__() >= 5 else centralMean
                 numberOfApp10_0.append(arrayFoc.__len__() + centralArray.__len__())
             ballastDt10_0.append(round(meanFoc, 2))
 
@@ -1321,13 +2201,16 @@ class BaseSeriesReader:
             tlgarrayFoc = arrayFoc[:, 9] if arrayFoc.__len__() >= 3 else []
             tlgarrayFoc = np.array([k for k in tlgarrayFoc if k > 13])
             tlgarrayFoc = np.array(
-                [k for k in ballastDt if k[5] >= vel0Min and k[5] <= vel0Max and k[9] >= 3])[:, 9]
-            if tlgarrayFoc.__len__() > 5:
+                [k for k in ballastDt if k[5] >= vel0Min and k[5] <= vel0Max and k[9] >= 3])
+            if tlgarrayFoc.__len__() > lenConditionTlg:
+
+                tlgarrayFoc = np.array(
+                    [k for k in ballastDt if k[5] >= vel0Min and k[5] <= vel0Max and k[9] >= 3])[:, 9]
                 meanFoc = (np.mean(arrayFoc[:, 8]) + np.mean(
                     tlgarrayFoc) + centralMean) / 3 if arrayFoc.__len__() >= 5 else 0
                 numberOfApp10_3.append(arrayFoc.__len__() + tlgarrayFoc.__len__() + centralArray.__len__())
             else:
-                meanFoc = (np.mean(arrayFoc[:, 8]) + centralMean) / 2 if arrayFoc.__len__() >= 5 else 0
+                meanFoc = (np.mean(arrayFoc[:, 8]) + centralMean) / 2 if arrayFoc.__len__() >= 5 else centralMean
                 numberOfApp10_3.append(arrayFoc.__len__() + centralArray.__len__())
             ballastDt10_3.append(round(meanFoc, 2))
 
@@ -1346,13 +2229,16 @@ class BaseSeriesReader:
             tlgarrayFoc = arrayFoc[:, 9] if arrayFoc.__len__() >= 3 else []
             tlgarrayFoc = np.array([k for k in tlgarrayFoc if k > 13])
             tlgarrayFoc = np.array(
-                [k for k in ballastDt if k[5] >= vel0Min and k[5] <= vel0Max and k[9] >= 3])[:, 9]
-            if tlgarrayFoc.__len__() > 5:
+                [k for k in ballastDt if k[5] >= vel0Min and k[5] <= vel0Max and k[9] >= 3])
+            if tlgarrayFoc.__len__() > lenConditionTlg:
+                tlgarrayFoc = np.array(
+                    [k for k in ballastDt if k[5] >= vel0Min and k[5] <= vel0Max and k[9] >= 3])[:, 9]
+
                 meanFoc = (np.mean(arrayFoc[:, 8]) + np.mean(
                     tlgarrayFoc) + centralMean) / 3 if arrayFoc.__len__() >= 5 else 0
                 numberOfApp10_5.append(arrayFoc.__len__() + tlgarrayFoc.__len__() + centralArray.__len__())
             else:
-                meanFoc = (np.mean(arrayFoc[:, 8]) + centralMean) / 2 if arrayFoc.__len__() >= 5 else 0
+                meanFoc = (np.mean(arrayFoc[:, 8]) + centralMean) / 2 if arrayFoc.__len__() >= 5 else centralMean
                 numberOfApp10_5.append(arrayFoc.__len__() + centralArray.__len__())
             ballastDt10_5.append(round(meanFoc, 2))
 
@@ -1370,8 +2256,10 @@ class BaseSeriesReader:
             tlgarrayFoc = arrayFoc[:, 9] if arrayFoc.__len__() >= 3 else []
             tlgarrayFoc = np.array([k for k in tlgarrayFoc if k > 13])
             tlgarrayFoc = np.array(
-                [k for k in ballastDt if k[5] >= vel0Min and k[5] <= vel0Max and k[9] >= 3])[:, 9]
-            if tlgarrayFoc.__len__() > 5:
+                [k for k in ballastDt if k[5] >= vel0Min and k[5] <= vel0Max and k[9] >= 3])
+            if tlgarrayFoc.__len__() > lenConditionTlg:
+                tlgarrayFoc = np.array(
+                    [k for k in ballastDt if k[5] >= vel0Min and k[5] <= vel0Max and k[9] >= 3])[:, 9]
                 meanFoc = (np.mean(arrayFoc[:, 8]) + np.mean(
                     tlgarrayFoc) + centralMean) / 3 if arrayFoc.__len__() >= 5 else 0
                 numberOfApp10_8.append(arrayFoc.__len__() + tlgarrayFoc.__len__() + centralArray.__len__())
@@ -1402,13 +2290,15 @@ class BaseSeriesReader:
             tlgarrayFoc = arrayFoc[:, 9] if arrayFoc.__len__() >= 3 else []
             tlgarrayFoc = np.array([k for k in tlgarrayFoc if k > 5])
             tlgarrayFoc = np.array(
-                [k for k in ballastDt if k[5] > vel1Min and k[5] <= vel1Max and k[8] >= 10])[:, 9]
-            if tlgarrayFoc.__len__() > 5:
+                [k for k in ballastDt if k[5] > vel1Min and k[5] <= vel1Max and k[8] >= 10])
+            if tlgarrayFoc.__len__() > lenConditionTlg:
+                tlgarrayFoc = np.array(
+                    [k for k in ballastDt if k[5] > vel1Min and k[5] <= vel1Max and k[8] >= 10])[:, 9]
                 meanFoc = (np.mean(arrayFoc[:, 8]) + np.mean(
                     tlgarrayFoc) + centralMean) / 3 if arrayFoc.__len__() >= 3 else 0
                 numberOfApp11_0.append(arrayFoc.__len__() + tlgarrayFoc.__len__() + centralArray.__len__())
             else:
-                meanFoc = (np.mean(arrayFoc[:, 8]) + centralMean) / 2 if arrayFoc.__len__() >= 3 else 0
+                meanFoc = (np.mean(arrayFoc[:, 8]) + centralMean) / 2 if arrayFoc.__len__() >= 3 else centralMean
                 numberOfApp11_0.append(arrayFoc.__len__() + centralArray.__len__())
             ballastDt11_0.append(round(meanFoc, 2))
 
@@ -1426,13 +2316,15 @@ class BaseSeriesReader:
             tlgarrayFoc = arrayFoc[:, 9] if arrayFoc.__len__() >= 3 else []
             tlgarrayFoc = np.array([k for k in tlgarrayFoc if k > 5])
             tlgarrayFoc = np.array(
-                [k for k in ballastDt if k[5] > vel1Min and k[5] <= vel1Max and k[8] >= 10])[:, 9]
-            if tlgarrayFoc.__len__() > 5:
+                [k for k in ballastDt if k[5] > vel1Min and k[5] <= vel1Max and k[8] >= 10])
+            if tlgarrayFoc.__len__() > lenConditionTlg:
+                tlgarrayFoc = np.array(
+                    [k for k in ballastDt if k[5] > vel1Min and k[5] <= vel1Max and k[8] >= 10])[:, 9]
                 meanFoc = (np.mean(arrayFoc[:, 8]) + np.mean(
                     tlgarrayFoc) + centralMean) / 3 if arrayFoc.__len__() >= 3 else 0
                 numberOfApp11_3.append(arrayFoc.__len__() + tlgarrayFoc.__len__() + centralArray.__len__())
             else:
-                meanFoc = (np.mean(arrayFoc[:, 8]) + centralMean) / 2 if arrayFoc.__len__() >= 3 else 0
+                meanFoc = (np.mean(arrayFoc[:, 8]) + centralMean) / 2 if arrayFoc.__len__() >= 3 else centralMean
                 numberOfApp11_3.append(arrayFoc.__len__() + centralArray.__len__())
             ballastDt11_3.append(round(meanFoc, 2))
 
@@ -1450,13 +2342,15 @@ class BaseSeriesReader:
             tlgarrayFoc = arrayFoc[:, 9] if arrayFoc.__len__() >= 3 else []
             tlgarrayFoc = np.array([k for k in tlgarrayFoc if k > 5])
             tlgarrayFoc = np.array(
-                [k for k in ballastDt if k[5] > vel1Min and k[5] <= vel1Max and k[8] >= 10])[:, 9]
-            if tlgarrayFoc.__len__() > 5:
+                [k for k in ballastDt if k[5] > vel1Min and k[5] <= vel1Max and k[8] >= 10])
+            if tlgarrayFoc.__len__() > lenConditionTlg:
+                tlgarrayFoc = np.array(
+                    [k for k in ballastDt if k[5] > vel1Min and k[5] <= vel1Max and k[8] >= 10])[:, 9]
                 meanFoc = (np.mean(arrayFoc[:, 8]) + np.mean(
                     tlgarrayFoc) + centralMean) / 3 if arrayFoc.__len__() >= 3 else 0
                 numberOfApp11_5.append(arrayFoc.__len__() + tlgarrayFoc.__len__() + centralArray.__len__())
             else:
-                meanFoc = (np.mean(arrayFoc[:, 8]) + centralMean) / 2 if arrayFoc.__len__() >= 3 else 0
+                meanFoc = (np.mean(arrayFoc[:, 8]) + centralMean) / 2 if arrayFoc.__len__() >= 3 else centralMean
                 numberOfApp11_5.append(arrayFoc.__len__() + centralArray.__len__())
             ballastDt11_5.append(round(meanFoc, 2))
 
@@ -1473,8 +2367,11 @@ class BaseSeriesReader:
             tlgarrayFoc = arrayFoc[:, 9] if arrayFoc.__len__() >= 3 else []
             tlgarrayFoc = np.array([k for k in tlgarrayFoc if k > 5])
             tlgarrayFoc = np.array(
-                [k for k in ballastDt if k[5] > vel1Min and k[5] <= vel1Max and k[8] >= 10])[:, 9]
-            if tlgarrayFoc.__len__() > 5:
+                [k for k in ballastDt if k[5] > vel1Min and k[5] <= vel1Max and k[8] >= 10])
+            if tlgarrayFoc.__len__() > lenConditionTlg:
+                tlgarrayFoc = np.array(
+
+                    [k for k in ballastDt if k[5] > vel1Min and k[5] <= vel1Max and k[8] >= 10])[:, 9]
                 meanFoc = (np.mean(arrayFoc[:, 8]) + np.mean(
                     tlgarrayFoc) + centralMean) / 3 if arrayFoc.__len__() >= 3 else 0
                 numberOfApp11_8.append(arrayFoc.__len__() + tlgarrayFoc.__len__() + centralArray.__len__())
@@ -1504,8 +2401,10 @@ class BaseSeriesReader:
             tlgarrayFoc = arrayFoc[:, 9] if arrayFoc.__len__() >= 3 else []
             tlgarrayFoc = np.array([k for k in tlgarrayFoc if k > 5])
             tlgarrayFoc = np.array(
-                [k for k in ballastDt if k[5] > vel2Min and k[5] <= vel2Max and k[8] >= 10])[:, 9]
-            if tlgarrayFoc.__len__() > 5:
+                [k for k in ballastDt if k[5] > vel2Min and k[5] <= vel2Max and k[8] >= 10])
+            if tlgarrayFoc.__len__() > lenConditionTlg:
+                tlgarrayFoc = np.array(
+                    [k for k in ballastDt if k[5] > vel2Min and k[5] <= vel2Max and k[8] >= 10])[:, 9]
                 meanFoc = (np.mean(arrayFoc[:, 8]) + np.mean(
                     tlgarrayFoc) + centralMean) / 3 if arrayFoc.__len__() >= 3 else 0
                 numberOfApp12_0.append(arrayFoc.__len__() + tlgarrayFoc.__len__() + centralArray.__len__())
@@ -1528,8 +2427,10 @@ class BaseSeriesReader:
             tlgarrayFoc = arrayFoc[:, 9] if arrayFoc.__len__() >= 3 else []
             tlgarrayFoc = np.array([k for k in tlgarrayFoc if k > 5])
             tlgarrayFoc = np.array(
-                [k for k in ballastDt if k[5] > vel2Min and k[5] <= vel2Max and k[8] >= 10])[:, 9]
-            if tlgarrayFoc.__len__() > 5:
+                [k for k in ballastDt if k[5] > vel2Min and k[5] <= vel2Max and k[8] >= 10])
+            if tlgarrayFoc.__len__() > lenConditionTlg:
+                tlgarrayFoc = np.array(
+                    [k for k in ballastDt if k[5] > vel2Min and k[5] <= vel2Max and k[8] >= 10])[:, 9]
                 meanFoc = (np.mean(arrayFoc[:, 8]) + np.mean(
                     tlgarrayFoc) + centralMean) / 3 if arrayFoc.__len__() >= 3 else 0
                 numberOfApp12_3.append(arrayFoc.__len__() + tlgarrayFoc.__len__() + centralArray.__len__())
@@ -1552,8 +2453,10 @@ class BaseSeriesReader:
             tlgarrayFoc = arrayFoc[:, 9] if arrayFoc.__len__() >= 3 else []
             tlgarrayFoc = np.array([k for k in tlgarrayFoc if k > 5])
             tlgarrayFoc = np.array(
-                [k for k in ballastDt if k[5] > vel2Min and k[5] <= vel2Max and k[8] >= 10])[:, 9]
-            if tlgarrayFoc.__len__() > 5:
+                [k for k in ballastDt if k[5] > vel2Min and k[5] <= vel2Max and k[8] >= 10])
+            if tlgarrayFoc.__len__() > lenConditionTlg:
+                tlgarrayFoc = np.array(
+                    [k for k in ballastDt if k[5] > vel2Min and k[5] <= vel2Max and k[8] >= 10])[:, 9]
                 meanFoc = (np.mean(arrayFoc[:, 8]) + np.mean(
                     tlgarrayFoc) + centralMean) / 3 if arrayFoc.__len__() >= 3 else 0
                 numberOfApp12_5.append(arrayFoc.__len__() + tlgarrayFoc.__len__() + centralArray.__len__())
@@ -1575,8 +2478,10 @@ class BaseSeriesReader:
             tlgarrayFoc = arrayFoc[:, 9] if arrayFoc.__len__() >= 3 else []
             tlgarrayFoc = np.array([k for k in tlgarrayFoc if k > 5])
             tlgarrayFoc = np.array(
-                [k for k in ballastDt if k[5] > vel2Min and k[5] <= vel2Max and k[8] >= 10])[:, 9]
-            if tlgarrayFoc.__len__() > 5:
+                [k for k in ballastDt if k[5] > vel2Min and k[5] <= vel2Max and k[8] >= 10])
+            if tlgarrayFoc.__len__() > lenConditionTlg:
+                tlgarrayFoc = np.array(
+                    [k for k in ballastDt if k[5] > vel2Min and k[5] <= vel2Max and k[8] >= 10])[:, 9]
                 meanFoc = (np.mean(arrayFoc[:, 8]) + np.mean(
                     tlgarrayFoc) + centralMean) / 3 if arrayFoc.__len__() >= 3 else 0
                 numberOfApp12_8.append(arrayFoc.__len__() + tlgarrayFoc.__len__() + centralArray.__len__())
@@ -1604,8 +2509,10 @@ class BaseSeriesReader:
             tlgarrayFoc = arrayFoc[:, 9] if arrayFoc.__len__() >= 3 else []
             tlgarrayFoc = np.array([k for k in tlgarrayFoc if k > 5])
             tlgarrayFoc = np.array(
-                [k for k in ballastDt if k[5] > vel3Min and k[5] <= vel3Max and k[8] >= 10])[:, 9]
-            if tlgarrayFoc.__len__() > 5:
+                [k for k in ballastDt if k[5] > vel3Min and k[5] <= vel3Max and k[8] >= 10])
+            if tlgarrayFoc.__len__() > lenConditionTlg:
+                tlgarrayFoc = np.array(
+                    [k for k in ballastDt if k[5] > vel3Min and k[5] <= vel3Max and k[8] >= 10])[:, 9]
                 meanFoc = (np.mean(arrayFoc[:, 8]) + np.mean(
                     tlgarrayFoc) + centralMean) / 3 if arrayFoc.__len__() >= 3 else 0
                 numberOfApp13_0.append(arrayFoc.__len__() + tlgarrayFoc.__len__() + centralArray.__len__())
@@ -1628,8 +2535,10 @@ class BaseSeriesReader:
             tlgarrayFoc = arrayFoc[:, 9] if arrayFoc.__len__() >= 3 else []
             tlgarrayFoc = np.array([k for k in tlgarrayFoc if k > 5])
             tlgarrayFoc = np.array(
-                [k for k in ballastDt if k[5] > vel3Min and k[5] <= vel3Max and k[8] >= 10])[:, 9]
-            if tlgarrayFoc.__len__() > 5:
+                [k for k in ballastDt if k[5] > vel3Min and k[5] <= vel3Max and k[8] >= 10])
+            if tlgarrayFoc.__len__() > lenConditionTlg:
+                tlgarrayFoc = np.array(
+                    [k for k in ballastDt if k[5] > vel3Min and k[5] <= vel3Max and k[8] >= 10])[:, 9]
                 meanFoc = (np.mean(arrayFoc[:, 8]) + np.mean(
                     tlgarrayFoc) + centralMean) / 3 if arrayFoc.__len__() >= 3 else 0
                 numberOfApp13_3.append(arrayFoc.__len__() + tlgarrayFoc.__len__() + centralArray.__len__())
@@ -1652,8 +2561,10 @@ class BaseSeriesReader:
             tlgarrayFoc = arrayFoc[:, 9] if arrayFoc.__len__() >= 3 else []
             tlgarrayFoc = np.array([k for k in tlgarrayFoc if k > 5])
             tlgarrayFoc = np.array(
-                [k for k in ballastDt if k[5] > vel3Min and k[5] <= vel3Max and k[8] >= 10])[:, 9]
-            if tlgarrayFoc.__len__() > 5:
+                [k for k in ballastDt if k[5] > vel3Min and k[5] <= vel3Max and k[8] >= 10])
+            if tlgarrayFoc.__len__() > lenConditionTlg:
+                tlgarrayFoc = np.array(
+                    [k for k in ballastDt if k[5] > vel3Min and k[5] <= vel3Max and k[8] >= 10])[:, 9]
                 meanFoc = (np.mean(arrayFoc[:, 8]) + np.mean(
                     tlgarrayFoc) + centralMean) / 3 if arrayFoc.__len__() >= 3 else 0
                 numberOfApp13_5.append(arrayFoc.__len__() + tlgarrayFoc.__len__() + centralArray.__len__())
@@ -1675,9 +2586,11 @@ class BaseSeriesReader:
                                      3] <= wind[i + 1] and k[8] >= 10])
             tlgarrayFoc = arrayFoc[:, 9] if arrayFoc.__len__() >= 3 else []
             tlgarrayFoc = np.array(
-                [k for k in ballastDt if k[5] > vel3Min and k[5] <= vel3Max and k[8] >= 10])[:, 9]
-            tlgarrayFoc = np.array([k for k in tlgarrayFoc if k > 5])
-            if tlgarrayFoc.__len__() > 5:
+                [k for k in ballastDt if k[5] > vel3Min and k[5] <= vel3Max and k[8] >= 10])
+            #tlgarrayFoc = np.array([k for k in tlgarrayFoc if k > 5])
+            if tlgarrayFoc.__len__() > lenConditionTlg:
+                tlgarrayFoc = np.array(
+                    [k for k in ballastDt if k[5] > vel3Min and k[5] <= vel3Max and k[8] >= 10])[:, 9]
                 meanFoc = (np.mean(arrayFoc[:, 8]) + np.mean(
                     tlgarrayFoc) + centralMean) / 3 if arrayFoc.__len__() >= 3 else 0
                 numberOfApp13_8.append(arrayFoc.__len__() + tlgarrayFoc.__len__() + centralArray.__len__())
@@ -1692,6 +2605,10 @@ class BaseSeriesReader:
         ####END OF BALLAST #############################################################
         ####END OF BALLAST #############################################################
         ####END OF BALLAST #############################################################
+
+        ###WRITE BALLAST CONS TO FILE
+
+
         ##TREAT outliers / missing values for ballast values
 
         # workbook.save(filename=pathToexcel.split('.')[0] + '_1.' + pathToexcel.split('.')[1])
@@ -1718,228 +2635,268 @@ class BaseSeriesReader:
         values = [k for k in ballastDt11_0 if k != 0]
         length = values.__len__()
         numberOfApp11_0 = [numberOfApp11_0[i] for i in range(0, len(numberOfApp11_0)) if ballastDt11_0[i] > 0]
-        for i in range(0, len(ballastDt11_0)):
-            if length > 0:
-                if ballastDt11_0[i] == 0:
-                    ##find items !=0
-                    ballastDt11_0[i] = np.array(np.sum(
-                        [numberOfApp11_0[i] * values[i] for i in range(0, len(values))])) / np.sum(
-                        numberOfApp11_0)
-                elif np.isnan(ballastDt10_0[i]):
-                    ballastDt11_0[i] = np.array(np.sum(
-                        [numberOfApp11_0[i] * values[i] for i in range(0, len(values))])) / np.sum(
-                        numberOfApp11_0)
+        if values.__len__()>0:
+            for i in range(0, len(ballastDt11_0)):
+                if length > 0:
+
+
+                    if ballastDt11_0[i] == 0:
+                        ##find items !=0
+                        ballastDt11_0[i] = np.array(np.sum(
+                            [numberOfApp11_0[i] * values[i] for i in range(0, len(values))])) / np.sum(
+                            numberOfApp11_0)
+                    elif np.isnan(ballastDt10_0[i]):
+                        ballastDt11_0[i] = np.array(np.sum(
+                            [numberOfApp11_0[i] * values[i] for i in range(0, len(values))])) / np.sum(
+                            numberOfApp11_0)
 
         values = [k for k in ballastDt12_0 if k != 0]
         length = values.__len__()
         numberOfApp12_0 = [numberOfApp12_0[i] for i in range(0, len(numberOfApp12_0)) if ballastDt12_0[i] > 0]
-        for i in range(0, len(ballastDt12_0)):
-            if length > 0:
-                if ballastDt12_0[i] == 0:
-                    ##find items !=0
-                    ballastDt12_0[i] = np.array(np.sum(
-                        [numberOfApp12_0[i] * values[i] for i in range(0, len(values))])) / np.sum(
-                        numberOfApp12_0)
-                elif np.isnan(ballastDt10_0[i]):
-                    ballastDt12_0[i] = np.array(np.sum(
-                        [numberOfApp12_0[i] * values[i] for i in range(0, len(values))])) / np.sum(
-                        numberOfApp12_0)
+        if values.__len__() > 0:
+            for i in range(0, len(ballastDt12_0)):
+                if length > 0:
+                    if ballastDt12_0[i] == 0:
+                        ##find items !=0
+                        ballastDt12_0[i] = np.array(np.sum(
+                            [numberOfApp12_0[i] * values[i] for i in range(0, len(values))])) / np.sum(
+                            numberOfApp12_0)
+                    elif np.isnan(ballastDt10_0[i]):
+                        ballastDt12_0[i] = np.array(np.sum(
+                            [numberOfApp12_0[i] * values[i] for i in range(0, len(values))])) / np.sum(
+                            numberOfApp12_0)
 
         values = [k for k in ballastDt13_0 if k != 0]
         length = values.__len__()
         numberOfApp13_0 = [numberOfApp13_0[i] for i in range(0, len(numberOfApp13_0)) if ballastDt13_0[i] > 0]
-        for i in range(0, len(ballastDt13_0)):
-            if length > 0:
-                if ballastDt13_0[i] == 0:
-                    ##find items !=0
-                    ballastDt13_0[i] = np.array(np.sum(
-                        [numberOfApp13_0[i] * values[i] for i in range(0, len(values))])) / np.sum(
-                        numberOfApp13_0)
-                elif np.isnan(ballastDt10_0[i]):
-                    ballastDt13_0[i] = np.array(np.sum(
-                        [numberOfApp13_0[i] * values[i] for i in range(0, len(values))])) / np.sum(
-                        numberOfApp13_0)
+        if values.__len__() > 0:
+            for i in range(0, len(ballastDt13_0)):
+                if length > 0:
+                    if ballastDt13_0[i] == 0:
+                        ##find items !=0
+                        ballastDt13_0[i] = np.array(np.sum(
+                            [numberOfApp13_0[i] * values[i] for i in range(0, len(values))])) / np.sum(
+                            numberOfApp13_0)
+                    elif np.isnan(ballastDt10_0[i]):
+                        ballastDt13_0[i] = np.array(np.sum(
+                            [numberOfApp13_0[i] * values[i] for i in range(0, len(values))])) / np.sum(
+                            numberOfApp13_0)
 
         values = [k for k in ballastDt10_3 if k != 0]
         length = values.__len__()
         numberOfApp10_3 = [numberOfApp10_3[i] for i in range(0, len(numberOfApp10_3)) if ballastDt10_3[i] > 0]
-        for i in range(0, len(ballastDt10_3)):
-            if length > 0:
-                if ballastDt10_3[i] == 0:
-                    ##find items !=0
-                    ballastDt10_3[i] = np.array(np.sum(
-                        [numberOfApp10_3[i] * values[i] for i in range(0, len(values))])) / np.sum(
-                        numberOfApp10_3)
-                elif np.isnan(ballastDt10_3[i]):
-                    ballastDt10_0[i] = np.array(np.sum(
-                        [numberOfApp10_3[i] * values[i] for i in range(0, len(values))])) / np.sum(
-                        numberOfApp10_3)
+        if values.__len__() > 0:
+            for i in range(0, len(ballastDt10_3)):
+                if length > 0:
+                    if ballastDt10_3[i] == 0:
+                        ##find items !=0
+                        ballastDt10_3[i] = np.array(np.sum(
+                            [numberOfApp10_3[i] * values[i] for i in range(0, len(values))])) / np.sum(
+                            numberOfApp10_3)
+                    elif np.isnan(ballastDt10_3[i]):
+                        ballastDt10_0[i] = np.array(np.sum(
+                            [numberOfApp10_3[i] * values[i] for i in range(0, len(values))])) / np.sum(
+                            numberOfApp10_3)
 
         values = [k for k in ballastDt11_3 if k != 0]
         length = values.__len__()
-        numberOfApp11_3 = [numberOfApp11_3[i] for i in range(0, len(numberOfApp11_3)) if ballastDt11_3[i] > 0]
-        for i in range(0, len(ballastDt11_3)):
-            if length > 0:
-                if ballastDt11_3[i] == 0:
-                    ##find items !=0
-                    ballastDt11_3[i] = np.array(np.sum(
-                        [numberOfApp11_3[i] * values[i] for i in range(0, len(values))])) / np.sum(
-                        numberOfApp11_3)
-                elif np.isnan(ballastDt11_3[i]):
-                    ballastDt11_3[i] = np.array(np.sum(
-                        [numberOfApp11_3[i] * values[i] for i in range(0, len(values))])) / np.sum(
-                        numberOfApp11_3)
+        if values.__len__() > 0:
+            numberOfApp11_3 = [numberOfApp11_3[i] for i in range(0, len(numberOfApp11_3)) if ballastDt11_3[i] > 0]
+            for i in range(0, len(ballastDt11_3)):
+                if length > 0:
+                    if ballastDt11_3[i] == 0:
+                        ##find items !=0
+                        ballastDt11_3[i] = np.array(np.sum(
+                            [numberOfApp11_3[i] * values[i] for i in range(0, len(values))])) / np.sum(
+                            numberOfApp11_3)
+                    elif np.isnan(ballastDt11_3[i]):
+                        ballastDt11_3[i] = np.array(np.sum(
+                            [numberOfApp11_3[i] * values[i] for i in range(0, len(values))])) / np.sum(
+                            numberOfApp11_3)
 
         values = [k for k in ballastDt12_3 if k != 0]
         length = values.__len__()
         numberOfApp12_3 = [numberOfApp12_3[i] for i in range(0, len(numberOfApp12_3)) if ballastDt12_3[i] > 0]
-        for i in range(0, len(ballastDt12_3)):
-            if length > 0:
-                if ballastDt12_3[i] == 0:
-                    ##find items !=0
-                    ballastDt12_3[i] = np.array(np.sum(
-                        [numberOfApp12_3[i] * values[i] for i in range(0, len(values))])) / np.sum(
-                        numberOfApp12_3)
-                elif np.isnan(ballastDt12_3[i]):
-                    ballastDt12_3[i] = np.array(np.sum(
-                        [numberOfApp12_3[i] * values[i] for i in range(0, len(values))])) / np.sum(
-                        numberOfApp12_3)
+        if values.__len__() > 0:
+            for i in range(0, len(ballastDt12_3)):
+                if length > 0:
+                    if ballastDt12_3[i] == 0:
+                        ##find items !=0
+                        ballastDt12_3[i] = np.array(np.sum(
+                            [numberOfApp12_3[i] * values[i] for i in range(0, len(values))])) / np.sum(
+                            numberOfApp12_3)
+                    elif np.isnan(ballastDt12_3[i]):
+                        ballastDt12_3[i] = np.array(np.sum(
+                            [numberOfApp12_3[i] * values[i] for i in range(0, len(values))])) / np.sum(
+                            numberOfApp12_3)
 
         values = [k for k in ballastDt13_3 if k != 0]
         length = values.__len__()
         numberOfApp13_3 = [numberOfApp13_3[i] for i in range(0, len(numberOfApp13_3)) if ballastDt13_3[i] > 0]
-        for i in range(0, len(ballastDt13_3)):
-            if length > 0:
-                if ballastDt13_3[i] == 0:
-                    ##find items !=0
-                    ballastDt13_3[i] = np.array(np.sum(
-                        [numberOfApp13_3[i] * values[i] for i in range(0, len(values))])) / np.sum(
-                        numberOfApp13_3)
-                elif np.isnan(ballastDt13_3[i]):
-                    ballastDt12_3[i] = np.array(np.sum(
-                        [numberOfApp13_3[i] * values[i] for i in range(0, len(values))])) / np.sum(
-                        numberOfApp13_3)
+        if values.__len__() > 0:
+            for i in range(0, len(ballastDt13_3)):
+                if length > 0:
+                    if ballastDt13_3[i] == 0:
+                        ##find items !=0
+                        ballastDt13_3[i] = np.array(np.sum(
+                            [numberOfApp13_3[i] * values[i] for i in range(0, len(values))])) / np.sum(
+                            numberOfApp13_3)
+                    elif np.isnan(ballastDt13_3[i]):
+                        ballastDt12_3[i] = np.array(np.sum(
+                            [numberOfApp13_3[i] * values[i] for i in range(0, len(values))])) / np.sum(
+                            numberOfApp13_3)
 
         values = [k for k in ballastDt10_5 if k != 0]
         length = values.__len__()
         numberOfApp10_5 = [numberOfApp10_5[i] for i in range(0, len(numberOfApp10_5)) if ballastDt10_5[i] > 0]
-        for i in range(0, len(ballastDt10_5)):
-            if length > 0:
-                if ballastDt10_5[i] == 0:
-                    ##find items !=0
-                    ballastDt10_5[i] = np.array(np.sum(
-                        [numberOfApp10_5[i] * values[i] for i in range(0, len(values))])) / np.sum(
-                        numberOfApp10_5)
-                elif np.isnan(ballastDt12_3[i]):
-                    ballastDt12_3[i] = np.array(np.sum(
-                        [numberOfApp10_5[i] * values[i] for i in range(0, len(values))])) / np.sum(
-                        numberOfApp10_5)
+        if values.__len__() > 0:
+            for i in range(0, len(ballastDt10_5)):
+                if length > 0:
+                    if ballastDt10_5[i] == 0:
+                        ##find items !=0
+                        ballastDt10_5[i] = np.array(np.sum(
+                            [numberOfApp10_5[i] * values[i] for i in range(0, len(values))])) / np.sum(
+                            numberOfApp10_5)
+                    elif np.isnan(ballastDt12_3[i]):
+                        ballastDt12_3[i] = np.array(np.sum(
+                            [numberOfApp10_5[i] * values[i] for i in range(0, len(values))])) / np.sum(
+                            numberOfApp10_5)
 
         values = [k for k in ballastDt11_5 if k != 0]
         length = values.__len__()
         numberOfApp11_5 = [numberOfApp11_5[i] for i in range(0, len(numberOfApp11_5)) if ballastDt11_5[i] > 0]
-        for i in range(0, len(ballastDt11_5)):
-            if length > 0:
-                if ballastDt11_5[i] == 0:
-                    ##find items !=0
-                    ballastDt11_5[i] = np.array(np.sum(
-                        [numberOfApp11_5[i] * values[i] for i in range(0, len(values))])) / np.sum(
-                        numberOfApp11_5)
-                elif np.isnan(ballastDt11_5[i]):
-                    ballastDt11_5[i] = np.array(np.sum(
-                        [numberOfApp10_5[i] * values[i] for i in range(0, len(values))])) / np.sum(
-                        numberOfApp11_5)
+        if values.__len__() > 0:
+            for i in range(0, len(ballastDt11_5)):
+                if length > 0:
+                    if ballastDt11_5[i] == 0:
+                        ##find items !=0
+                        ballastDt11_5[i] = np.array(np.sum(
+                            [numberOfApp11_5[i] * values[i] for i in range(0, len(values))])) / np.sum(
+                            numberOfApp11_5)
+                    elif np.isnan(ballastDt11_5[i]):
+                        ballastDt11_5[i] = np.array(np.sum(
+                            [numberOfApp10_5[i] * values[i] for i in range(0, len(values))])) / np.sum(
+                            numberOfApp11_5)
 
         values = [k for k in ballastDt12_5 if k != 0]
         length = values.__len__()
         numberOfApp12_5 = [numberOfApp12_5[i] for i in range(0, len(numberOfApp12_5)) if ballastDt12_5[i] > 0]
-        for i in range(0, len(ballastDt12_5)):
-            if length > 0:
-                if ballastDt12_5[i] == 0:
-                    ##find items !=0
-                    ballastDt12_5[i] = np.array(np.sum(
-                        [numberOfApp12_5[i] * values[i] for i in range(0, len(values))])) / np.sum(
-                        numberOfApp12_5)
-                elif np.isnan(ballastDt12_5[i]):
-                    ballastDt12_5[i] = np.array(np.sum(
-                        [numberOfApp12_5[i] * values[i] for i in range(0, len(values))])) / np.sum(
-                        numberOfApp12_5)
+        if values.__len__() > 0:
+            for i in range(0, len(ballastDt12_5)):
+                if length > 0:
+                    if ballastDt12_5[i] == 0:
+                        ##find items !=0
+                        ballastDt12_5[i] = np.array(np.sum(
+                            [numberOfApp12_5[i] * values[i] for i in range(0, len(values))])) / np.sum(
+                            numberOfApp12_5)
+                    elif np.isnan(ballastDt12_5[i]):
+                        ballastDt12_5[i] = np.array(np.sum(
+                            [numberOfApp12_5[i] * values[i] for i in range(0, len(values))])) / np.sum(
+                            numberOfApp12_5)
 
         values = [k for k in ballastDt13_5 if k != 0]
         length = values.__len__()
         numberOfApp13_5 = [numberOfApp13_5[i] for i in range(0, len(numberOfApp13_5)) if ballastDt13_5[i] > 0]
-        for i in range(0, len(ballastDt13_5)):
-            if length > 0:
-                if ballastDt13_5[i] == 0:
-                    ##find items !=0
-                    ballastDt13_5[i] = np.array(np.sum(
-                        [numberOfApp13_5[i] * values[i] for i in range(0, len(values))])) / np.sum(
-                        numberOfApp13_5)
-                elif np.isnan(ballastDt13_5[i]):
-                    ballastDt13_5[i] = np.array(np.sum(
-                        [numberOfApp13_5[i] * values[i] for i in range(0, len(values))])) / np.sum(
-                        numberOfApp13_5)
+        if values.__len__() > 0:
+            for i in range(0, len(ballastDt13_5)):
+                if length > 0:
+                    if ballastDt13_5[i] == 0:
+                        ##find items !=0
+                        ballastDt13_5[i] = np.array(np.sum(
+                            [numberOfApp13_5[i] * values[i] for i in range(0, len(values))])) / np.sum(
+                            numberOfApp13_5)
+                    elif np.isnan(ballastDt13_5[i]):
+                        ballastDt13_5[i] = np.array(np.sum(
+                            [numberOfApp13_5[i] * values[i] for i in range(0, len(values))])) / np.sum(
+                            numberOfApp13_5)
 
         values = [k for k in ballastDt10_8 if k != 0]
         length = values.__len__()
         numberOfApp10_8 = [numberOfApp10_8[i] for i in range(0, len(numberOfApp10_8)) if ballastDt10_8[i] > 0]
-        for i in range(0, len(ballastDt10_8)):
-            if length > 0:
-                if ballastDt10_8[i] == 0:
-                    ##find items !=0
-                    ballastDt10_8[i] = np.array(np.sum(
-                        [numberOfApp10_8[i] * values[i] for i in range(0, len(values))])) / np.sum(
-                        numberOfApp10_8)
-                elif np.isnan(ballastDt10_8[i]):
-                    ballastDt10_8[i] = np.array(np.sum(
-                        [numberOfApp10_8[i] * values[i] for i in range(0, len(values))])) / np.sum(
-                        numberOfApp10_8)
+        if values.__len__() > 0:
+            for i in range(0, len(ballastDt10_8)):
+                if length > 0:
+                    if ballastDt10_8[i] == 0:
+                        ##find items !=0
+                        ballastDt10_8[i] = np.array(np.sum(
+                            [numberOfApp10_8[i] * values[i] for i in range(0, len(values))])) / np.sum(
+                            numberOfApp10_8)
+                    elif np.isnan(ballastDt10_8[i]):
+                        ballastDt10_8[i] = np.array(np.sum(
+                            [numberOfApp10_8[i] * values[i] for i in range(0, len(values))])) / np.sum(
+                            numberOfApp10_8)
 
         values = [k for k in ballastDt11_8 if k != 0]
         length = values.__len__()
         numberOfApp11_8 = [numberOfApp11_8[i] for i in range(0, len(numberOfApp11_8)) if ballastDt11_8[i] > 0]
-        for i in range(0, len(ballastDt11_8)):
-            if length > 0:
-                if ballastDt11_8[i] == 0:
-                    ##find items !=0
-                    ballastDt11_8[i] = np.array(np.sum(
-                        [numberOfApp11_8[i] * values[i] for i in range(0, len(values))])) / np.sum(
-                        numberOfApp11_8)
-                elif np.isnan(ballastDt11_8[i]):
-                    ballastDt11_8[i] = np.array(np.sum(
-                        [numberOfApp11_8[i] * values[i] for i in range(0, len(values))])) / np.sum(
-                        numberOfApp11_8)
+        if values.__len__() > 0:
+            for i in range(0, len(ballastDt11_8)):
+                if length > 0:
+                    if ballastDt11_8[i] == 0:
+                        ##find items !=0
+                        ballastDt11_8[i] = np.array(np.sum(
+                            [numberOfApp11_8[i] * values[i] for i in range(0, len(values))])) / np.sum(
+                            numberOfApp11_8)
+                    elif np.isnan(ballastDt11_8[i]):
+                        ballastDt11_8[i] = np.array(np.sum(
+                            [numberOfApp11_8[i] * values[i] for i in range(0, len(values))])) / np.sum(
+                            numberOfApp11_8)
 
         values = [k for k in ballastDt12_8 if k != 0]
         length = values.__len__()
         numberOfApp12_8 = [numberOfApp12_8[i] for i in range(0, len(numberOfApp12_8)) if ballastDt12_8[i] > 0]
-        for i in range(0, len(ballastDt12_8)):
-            if length > 0:
-                if ballastDt12_8[i] == 0:
-                    ##find items !=0
-                    ballastDt12_8[i] = np.array(np.sum(
-                        [numberOfApp12_8[i] * values[i] for i in range(0, len(values))])) / np.sum(
-                        numberOfApp12_8)
-                elif np.isnan(ballastDt12_8[i]):
-                    ballastDt12_8[i] = np.array(np.sum(
-                        [numberOfApp12_8[i] * values[i] for i in range(0, len(values))])) / np.sum(
-                        numberOfApp12_8)
+        if values.__len__() > 0:
+            for i in range(0, len(ballastDt12_8)):
+                if length > 0:
+                    if ballastDt12_8[i] == 0:
+                        ##find items !=0
+                        ballastDt12_8[i] = np.array(np.sum(
+                            [numberOfApp12_8[i] * values[i] for i in range(0, len(values))])) / np.sum(
+                            numberOfApp12_8)
+                    elif np.isnan(ballastDt12_8[i]):
+                        ballastDt12_8[i] = np.array(np.sum(
+                            [numberOfApp12_8[i] * values[i] for i in range(0, len(values))])) / np.sum(
+                            numberOfApp12_8)
 
         values = [k for k in ballastDt13_8 if k != 0]
         length = values.__len__()
         numberOfApp13_8 = [numberOfApp13_8[i] for i in range(0, len(numberOfApp13_8)) if ballastDt13_8[i] > 0]
-        for i in range(0, len(ballastDt13_8)):
-            if length > 0:
-                if ballastDt13_8[i] == 0:
-                    ##find items !=0
-                    ballastDt13_8[i] = np.array(np.sum(
-                        [numberOfApp13_8[i] * values[i] for i in range(0, len(values))])) / np.sum(
-                        numberOfApp13_8)
-                elif np.isnan(ballastDt13_8[i]):
-                    ballastDt13_8[i] = np.array(np.sum(
-                        [numberOfApp13_8[i] * values[i] for i in range(0, len(values))])) / np.sum(
-                        numberOfApp13_8)
+        if values.__len__() > 0:
+            for i in range(0, len(ballastDt13_8)):
+                if length > 0:
+                    if ballastDt13_8[i] == 0:
+                        ##find items !=0
+                        ballastDt13_8[i] = np.array(np.sum(
+                            [numberOfApp13_8[i] * values[i] for i in range(0, len(values))])) / np.sum(
+                            numberOfApp13_8)
+                    elif np.isnan(ballastDt13_8[i]):
+                        ballastDt13_8[i] = np.array(np.sum(
+                            [numberOfApp13_8[i] * values[i] for i in range(0, len(values))])) / np.sum(
+                            numberOfApp13_8)
 
+        ################################################################################################################
+        if (np.array(ballastDt10_0) == 0).all() and (np.array(ballastDt10_3) == 0).all() and (np.array(ballastDt10_5) == 0).all() and (np.array(ballastDt10_8) == 0).all():
+            ballastDt10_0 = np.array(ballastDt11_0) -2
+            ballastDt10_3 = np.array(ballastDt11_3) - 2
+            ballastDt10_5 = np.array(ballastDt11_5) - 2
+            ballastDt10_8 = np.array(ballastDt11_8) - 2
+
+        values = [k for k in ballastDt10_0 if k != 0]
+        if values.__len__()==0 or (np.array(ballastDt10_0) <= 0).all() :
+            ballastDt10_0 = np.array(ballastDt10_3) - 1
+
+        values = [k for k in ballastDt11_0 if k != 0]
+        if values.__len__() == 0 or (np.array(ballastDt11_0) <= 0).all() :
+            ballastDt11_0 = np.array(ballastDt11_3) - 1
+        values = [k for k in ballastDt12_0 if k != 0]
+
+        if values.__len__() == 0 or  (np.array(ballastDt12_0) <= 0).all() :
+            ballastDt12_0 = np.array(ballastDt12_3) - 1
+
+        values = [k for k in ballastDt13_0 if k != 0]
+        if values.__len__() == 0 or  (np.array(ballastDt13_0) <= 0).all() :
+            ballastDt13_0 = np.array(ballastDt13_3) - 1
+        #####################################################################################################################
         #####################################################################################################################
         for i in range(0, len(ballastDt10_0)):
 
@@ -1962,8 +2919,8 @@ class BaseSeriesReader:
         #####################################################################################################################
         for i in range(0, len(ballastDt10_3)):
 
-            if (ballastDt10_0[i] > ballastDt10_3[i]):
-                while (ballastDt10_0[i] > ballastDt10_3[i]):
+            if (ballastDt10_0[i] >= ballastDt10_3[i]):
+                while (ballastDt10_0[i] >= ballastDt10_3[i]):
                     if ballastDt10_3[i] == 0:
                         ballastDt10_3[i] = ballastDt10_0[i] + 0.1 * ballastDt10_0[i]
                     else:
@@ -1971,8 +2928,8 @@ class BaseSeriesReader:
 
         for i in range(0, len(ballastDt10_5)):
 
-            if (ballastDt10_3[i] > ballastDt10_5[i]):
-                while (ballastDt10_3[i] > ballastDt10_5[i]):
+            if (ballastDt10_3[i] >= ballastDt10_5[i]):
+                while (ballastDt10_3[i] >= ballastDt10_5[i]):
                     if ballastDt10_5[i] == 0:
                         ballastDt10_5[i] = ballastDt10_3[i] + 0.1 * ballastDt10_3[i]
                     else:
@@ -1980,8 +2937,8 @@ class BaseSeriesReader:
 
         for i in range(0, len(ballastDt10_8)):
 
-            if (ballastDt10_5[i] > ballastDt10_8[i]):
-                while (ballastDt10_5[i] > ballastDt10_8[i]):
+            if (ballastDt10_5[i] >= ballastDt10_8[i]):
+                while (ballastDt10_5[i] >= ballastDt10_8[i]):
                     if ballastDt10_8[i] == 0:
                         ballastDt10_8[i] = ballastDt10_5[i] + 0.1 * ballastDt10_5[i]
                     else:
@@ -1990,8 +2947,8 @@ class BaseSeriesReader:
 
         for i in range(0, len(ballastDt11_3)):
 
-            if (ballastDt11_0[i] > ballastDt11_3[i]):
-                while (ballastDt11_0[i] > ballastDt11_3[i]):
+            if (ballastDt11_0[i] >= ballastDt11_3[i]):
+                while (ballastDt11_0[i] >= ballastDt11_3[i]):
                     if ballastDt11_3[i] == 0:
                         ballastDt11_3[i] = ballastDt11_0[i] + 0.1 * ballastDt11_0[i]
                     else:
@@ -1999,8 +2956,8 @@ class BaseSeriesReader:
 
         for i in range(0, len(ballastDt11_5)):
 
-            if (ballastDt11_3[i] > ballastDt11_5[i]):
-                while (ballastDt11_3[i] > ballastDt11_5[i]):
+            if (ballastDt11_3[i] >= ballastDt11_5[i]):
+                while (ballastDt11_3[i] >= ballastDt11_5[i]):
                     if ballastDt11_5[i] == 0:
                         ballastDt11_5[i] = ballastDt11_3[i] + 0.1 * ballastDt11_3[i]
                     else:
@@ -2134,29 +3091,35 @@ class BaseSeriesReader:
                     ballastDt13_8[i] = ballastDt13_8[i] + 0.1 * ballastDt13_8[i]
         # 1!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!#1!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         # 1!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!#1!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        if (np.array(ballastDt10_0)==0).all():
+            ballastDt10_0= np.array(ballastDt10_3) - 1 if(np.array(ballastDt10_3)!=0).any() else np.array(ballastDt10_5) - 2
+        #if (np.array(ballastDt10_0)!=0).all()
         for i in range(9, 14):
-            ballastDt10_0[0] = ballastDt10_0[0] + 1 if ballastDt10_0[0] <= ballastDt10_0[4] else ballastDt10_0[0]
-            ballastDt10_0[2] = ballastDt10_0[2] + 1 if ballastDt10_0[2] <= ballastDt10_0[3] else ballastDt10_0[2]
-            workbook._sheets[2]['B' + str(i)] = round(ballastDt10_0[i - 9], 2)
+                ballastDt10_0[0] = ballastDt10_0[4] + 1 if ballastDt10_0[0] <= ballastDt10_0[4] else ballastDt10_0[0]
+                ballastDt10_0[2] = ballastDt10_0[3] + 1 if ballastDt10_0[2] <= ballastDt10_0[3] else ballastDt10_0[2]
+                workbook._sheets[2]['B' + str(i)] = round(ballastDt10_0[i - 9], 2)
 
             ##TREAT outliers / missing values for ballastt values
-
+        if (np.array(ballastDt10_3)==0).all():
+            ballastDt10_3= np.array(ballastDt10_5) - 1 if(np.array(ballastDt10_5)!=0).any() else np.array(ballastDt10_8) - 3
         for i in range(9, 14):
-            ballastDt10_3[0] = ballastDt10_3[0] + 1 if ballastDt10_3[0] <= ballastDt10_3[4] else ballastDt10_3[0]
-            ballastDt10_3[2] = ballastDt10_3[2] + 1 if ballastDt10_3[2] <= ballastDt10_3[3] else ballastDt10_3[2]
+            ballastDt10_3[0] = ballastDt10_3[4] + 1 if ballastDt10_3[0] <= ballastDt10_3[4] else ballastDt10_3[0]
+            ballastDt10_3[2] = ballastDt10_3[3] + 1 if ballastDt10_3[2] <= ballastDt10_3[3] else ballastDt10_3[2]
             workbook._sheets[2]['C' + str(i)] = round(ballastDt10_3[i - 9], 2)
 
             ##TREAT outliers / missing values for ballastt values
-
+        if (np.array(ballastDt10_5) == 0).all():
+            ballastDt10_5 = np.array(ballastDt10_8) - 1.5 if (np.array(ballastDt10_8) != 0).any() else np.array(ballastDt10_3) + 1
         for i in range(9, 14):
-            ballastDt10_5[0] = ballastDt10_5[0] + 1 if ballastDt10_5[0] <= ballastDt10_5[4] else ballastDt10_5[0]
-            ballastDt10_5[2] = ballastDt10_5[2] + 1 if ballastDt10_5[2] <= ballastDt10_5[3] else ballastDt10_5[2]
+            ballastDt10_5[0] = ballastDt10_5[4] + 1 if ballastDt10_5[0] <= ballastDt10_5[4] else ballastDt10_5[0]
+            ballastDt10_5[2] = ballastDt10_5[3] + 1 if ballastDt10_5[2] <= ballastDt10_5[3] else ballastDt10_5[2]
             workbook._sheets[2]['D' + str(i)] = round(ballastDt10_5[i - 9], 2)
 
             ##TREAT outliers / missing values for ballastt values
-
+        if (np.array(ballastDt10_8) == 0).all():
+            ballastDt10_8 = np.array(ballastDt10_5) + 2 if (np.array(ballastDt10_5) != 0).any() else np.array(ballastDt10_3) + 3
         for i in range(9, 14):
-            ballastDt10_8[0] = ballastDt10_8[0] + 1 if ballastDt10_8[0] <= ballastDt10_8[4] else ballastDt10_8[0]
+            ballastDt10_8[0] = ballastDt10_8[4] + 1 if ballastDt10_8[0] <= ballastDt10_8[4] else ballastDt10_8[0]
             ballastDt10_8[2] = ballastDt10_8[2] + 1 if ballastDt10_8[2] <= ballastDt10_8[3] else ballastDt10_8[2]
             workbook._sheets[2]['E' + str(i)] = round(ballastDt10_8[i - 9], 2)
 
@@ -2166,86 +3129,92 @@ class BaseSeriesReader:
             # length = values.__len__()
 
         for i in range(19, 24):
-            ballastDt11_0[0] = ballastDt11_0[0] + 1 if ballastDt11_0[0] <= ballastDt11_0[4] else ballastDt11_0[0]
-            ballastDt11_0[2] = ballastDt11_0[2] + 1 if ballastDt11_0[2] <= ballastDt11_0[3] else ballastDt11_0[2]
+            ballastDt11_0[0] = ballastDt11_0[4] + 1 if ballastDt11_0[0] <= ballastDt11_0[4] else ballastDt11_0[0]
+            ballastDt11_0[2] = ballastDt11_0[3] + 1 if ballastDt11_0[2] <= ballastDt11_0[3] else ballastDt11_0[2]
             workbook._sheets[2]['B' + str(i)] = round(ballastDt11_0[i - 19], 2)
 
             ##TREAT outliers / missing values for ballastt values
 
         for i in range(19, 24):
-            ballastDt11_8[0] = ballastDt11_8[0] + 1 if ballastDt11_8[0] <= ballastDt11_8[4] else ballastDt11_8[0]
-            ballastDt11_8[2] = ballastDt11_8[2] + 1 if ballastDt11_8[2] <= ballastDt11_8[3] else ballastDt11_8[2]
+            ballastDt11_3[0] = ballastDt11_3[4] + 1 if ballastDt11_3[0] <= ballastDt11_3[4] else ballastDt11_3[0]
+            ballastDt11_3[2] = ballastDt11_3[3] + 1 if ballastDt11_3[2] <= ballastDt11_3[3] else ballastDt11_3[2]
             workbook._sheets[2]['C' + str(i)] = round(ballastDt11_3[i - 19], 2)
 
             ##TREAT outliers / missing values for ballastt values
 
         for i in range(19, 24):
-            ballastDt11_5[0] = ballastDt11_5[0] + 1 if ballastDt11_5[0] <= ballastDt11_5[4] else ballastDt11_5[0]
-            ballastDt11_5[2] = ballastDt11_5[2] + 1 if ballastDt11_5[2] <= ballastDt11_5[3] else ballastDt11_5[2]
+            ballastDt11_5[0] = ballastDt11_5[4] + 1 if ballastDt11_5[0] <= ballastDt11_5[4] else ballastDt11_5[0]
+            ballastDt11_5[2] = ballastDt11_5[3] + 1 if ballastDt11_5[2] <= ballastDt11_5[3] else ballastDt11_5[2]
             workbook._sheets[2]['D' + str(i)] = round(ballastDt11_5[i - 19], 2)
 
             ##TREAT outliers / missing values for ballastt values
 
         for i in range(19, 24):
-            ballastDt11_8[0] = ballastDt11_8[0] + 1 if ballastDt11_8[0] <= ballastDt11_8[4] else ballastDt11_8[0]
-            ballastDt11_8[2] = ballastDt11_8[2] + 1 if ballastDt11_8[2] <= ballastDt11_8[3] else ballastDt11_8[2]
+            ballastDt11_8[0] = ballastDt11_8[4] + 1 if ballastDt11_8[0] <= ballastDt11_8[4] else ballastDt11_8[0]
+            ballastDt11_8[2] = ballastDt11_8[3] + 1 if ballastDt11_8[2] <= ballastDt11_8[3] else ballastDt11_8[2]
             workbook._sheets[2]['E' + str(i)] = round(ballastDt11_8[i - 19], 2)
 
             ####################################################################################################
 
         for i in range(29, 34):
-            ballastDt12_0[0] = ballastDt12_0[0] + 1 if ballastDt12_0[0] <= ballastDt12_0[4] else ballastDt12_0[0]
-            ballastDt12_0[2] = ballastDt12_0[2] + 1 if ballastDt12_0[2] <= ballastDt12_0[3] else ballastDt12_0[2]
+            ballastDt12_0[0] = ballastDt12_0[4] + 1 if ballastDt12_0[0] <= ballastDt12_0[4] else ballastDt12_0[0]
+            ballastDt12_0[2] = ballastDt12_0[3] + 1 if ballastDt12_0[2] <= ballastDt12_0[3] else ballastDt12_0[2]
             workbook._sheets[2]['B' + str(i)] = round(ballastDt12_0[i - 29], 2)
 
             ##TREAT outliers / missing values for ballastt values
 
         for i in range(29, 34):
-            ballastDt12_3[0] = ballastDt12_3[0] + 1 if ballastDt12_3[0] <= ballastDt12_3[4] else ballastDt12_3[0]
-            ballastDt12_3[2] = ballastDt12_3[2] + 1 if ballastDt12_3[2] <= ballastDt12_3[3] else ballastDt12_3[2]
+            ballastDt12_3[0] = ballastDt12_3[4] + 1 if ballastDt12_3[0] <= ballastDt12_3[4] else ballastDt12_3[0]
+            ballastDt12_3[2] = ballastDt12_3[3] + 1 if ballastDt12_3[2] <= ballastDt12_3[3] else ballastDt12_3[2]
             workbook._sheets[2]['C' + str(i)] = round(ballastDt12_3[i - 29], 2)
 
             ##TREAT outliers / missing values for ballastt values
 
         for i in range(29, 34):
-            ballastDt12_5[0] = ballastDt12_5[0] + 1 if ballastDt12_5[0] <= ballastDt12_5[4] else ballastDt12_5[0]
-            ballastDt12_5[2] = ballastDt12_5[2] + 1 if ballastDt12_5[2] <= ballastDt12_5[3] else ballastDt12_5[2]
+            ballastDt12_5[0] = ballastDt12_5[4] + 1 if ballastDt12_5[0] <= ballastDt12_5[4] else ballastDt12_5[0]
+            ballastDt12_5[2] = ballastDt12_5[3] + 1 if ballastDt12_5[2] <= ballastDt12_5[3] else ballastDt12_5[2]
             workbook._sheets[2]['D' + str(i)] = round(ballastDt12_5[i - 29], 2)
 
             ##TREAT outliers / missing values for ballastt values
 
         for i in range(29, 34):
-            ballastDt12_8[0] = ballastDt12_8[0] + 1 if ballastDt12_8[0] <= ballastDt12_8[4] else ballastDt12_8[0]
-            ballastDt12_8[2] = ballastDt12_8[2] + 1 if ballastDt12_8[2] <= ballastDt12_8[3] else ballastDt12_8[2]
+            ballastDt12_8[0] = ballastDt12_8[4] + 1 if ballastDt12_8[0] <= ballastDt12_8[4] else ballastDt12_8[0]
+            ballastDt12_8[2] = ballastDt12_8[3] + 1 if ballastDt12_8[2] <= ballastDt12_8[3] else ballastDt12_8[2]
             workbook._sheets[2]['E' + str(i)] = round(ballastDt12_8[i - 29], 2)
 
             ################################################################################################################
         for i in range(39, 44):
-            ballastDt13_0[0] = ballastDt13_0[0] + 1 if ballastDt13_0[0] <= ballastDt13_0[4] else ballastDt13_0[0]
-            ballastDt13_0[2] = ballastDt13_0[2] + 1 if ballastDt13_0[2] <= ballastDt13_0[3] else ballastDt13_0[2]
+            ballastDt13_0[0] = ballastDt13_0[4] + 1 if ballastDt13_0[0] <= ballastDt13_0[4] else ballastDt13_0[0]
+            ballastDt13_0[2] = ballastDt13_0[3] + 1 if ballastDt13_0[2] <= ballastDt13_0[3] else ballastDt13_0[2]
             workbook._sheets[2]['B' + str(i)] = round(ballastDt13_0[i - 39], 2)
 
             ##TREAT outliers / missing values for ballastt values
 
         for i in range(39, 44):
-            ballastDt13_3[0] = ballastDt13_3[0] + 1 if ballastDt13_3[0] <= ballastDt13_3[4] else ballastDt13_3[0]
-            ballastDt13_3[2] = ballastDt13_3[2] + 1 if ballastDt13_3[2] <= ballastDt13_3[3] else ballastDt13_3[2]
+            ballastDt13_3[0] = ballastDt13_3[4] + 1 if ballastDt13_3[0] <= ballastDt13_3[4] else ballastDt13_3[0]
+            ballastDt13_3[2] = ballastDt13_3[3] + 1 if ballastDt13_3[2] <= ballastDt13_3[3] else ballastDt13_3[2]
             workbook._sheets[2]['C' + str(i)] = round(ballastDt13_3[i - 39], 2)
 
             ##TREAT outliers / missing values for ballastt values
 
         for i in range(39, 44):
-            ballastDt13_5[0] = ballastDt13_5[0] + 1 if ballastDt13_5[0] <= ballastDt13_5[4] else ballastDt13_5[0]
-            ballastDt13_5[2] = ballastDt13_5[2] + 1 if ballastDt13_5[2] <= ballastDt13_5[3] else ballastDt13_5[2]
+            ballastDt13_5[0] = ballastDt13_5[4] + 1 if ballastDt13_5[0] <= ballastDt13_5[4] else ballastDt13_5[0]
+            ballastDt13_5[2] = ballastDt13_5[3] + 1 if ballastDt13_5[2] <= ballastDt13_5[3] else ballastDt13_5[2]
             workbook._sheets[2]['D' + str(i)] = round(ballastDt13_5[i - 39], 2)
 
             ##TREAT outliers / missing values for ballastt values
 
         for i in range(39, 44):
-            ballastDt13_8[0] = ballastDt13_8[0] + 1 if ballastDt13_8[0] <= ballastDt13_8[4] else ballastDt13_8[0]
-            ballastDt13_8[2] = ballastDt13_8[2] + 1 if ballastDt13_8[2] <= ballastDt13_8[3] else ballastDt13_8[2]
+            ballastDt13_8[0] = ballastDt13_8[4] + 1 if ballastDt13_8[0] <= ballastDt13_8[4] else ballastDt13_8[0]
+            ballastDt13_8[2] = ballastDt13_8[3] + 1 if ballastDt13_8[2] <= ballastDt13_8[3] else ballastDt13_8[2]
             workbook._sheets[2]['E' + str(i)] = round(ballastDt13_8[i - 39], 2)
 
+        ballastCons = list(itertools.chain(ballastDt10_0, ballastDt10_3, ballastDt10_5, ballastDt10_8,
+                                     ballastDt11_0, ballastDt11_3, ballastDt11_5, ballastDt10_8,
+                                     ballastDt12_0, ballastDt12_3, ballastDt12_5, ballastDt12_8,
+                                     ballastDt13_0, ballastDt13_3, ballastDt13_5, ballastDt13_8))
+
+        
         ###START OF LADDEN##################################################################################
         ####################################################################################################
         ####################################################################################################
@@ -2305,13 +3274,32 @@ class BaseSeriesReader:
         vel2Max = np.floor(np.max(sorted[2])) + 0.5
         vel3Max = np.floor(np.max(sorted[3])) + 0.5
 
+        vel0Mean = np.floor(np.mean(sorted[0])) + 0.5
+        vel1Mean= np.floor(np.mean(sorted[1])) + 0.5
+        vel2Mean = np.floor(np.mean(sorted[2])) + 0.5
+        vel3Mean = np.floor(np.mean(sorted[3])) + 0.5
+
         ####VESSEL BASIC INFO
-        workbook._sheets[1]['B6'] = vel0Max
-        workbook._sheets[1]['B16'] = vel1Max
-        workbook._sheets[1]['B26'] = vel2Max
-        workbook._sheets[1]['B36'] = vel3Max
+        ldVelocities = []
+        ldVelocities.append(vel0Mean)
+        ldVelocities.append(vel1Mean)
+        ldVelocities.append(vel2Mean)
+        ldVelocities.append(vel3Mean)
+
+        workbook._sheets[1]['B6'] = vel0Mean
+        workbook._sheets[1]['B16'] = vel1Mean
+        workbook._sheets[1]['B26'] = vel2Mean
+        workbook._sheets[1]['B36'] = vel3Mean
 
         ##END OF VESSEL BASIC INFO
+        speeds =list(itertools.chain(blVelocities,ldVelocities))
+        with open('./data/'+company+'/'+vessel+'/ListOfSpeeds.csv', mode='w') as data:
+            data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+            data_writer.writerow(
+                ['Speeds'])
+            for i in range(0, len(speeds)):
+                data_writer.writerow(
+                    [speeds[i]])
 
         # workbook._sheets[1]['B6'] = round(centroidsL[0][0], 2)
         # workbook._sheets[1]['B16'] = round(centroidsL[1][0], 2)
@@ -2319,7 +3307,7 @@ class BaseSeriesReader:
         # workbook._sheets[1]['B36'] = round(centroidsL[3][0], 2)
 
         ladenDt10_0 = []
-        vel0Min = vel0Min + 2
+        #vel0Min = vel0Min + 2
         centralMean = np.mean(np.array([k for k in ladenDt if
                                         k[5] >= vel0Min and k[5] <= vel0Max and k[8] >= 10])[:, 8])
         centralArray = np.array([k for k in ladenDt if
@@ -2333,14 +3321,15 @@ class BaseSeriesReader:
             tlgarrayFoc = np.array([k for k in tlgarrayFoc if k >= 3])
 
             # tlgarrayFoc=np.mean(np.array([k for k in ladenDt if k[5] >= round(centroidsB[0][0], 2) and k[5] <= 10 and k[4] >= 0 and k[4] <= 1 and k[9] > 10])[:, 9])
-            tlgarrayFoc = np.array([k for k in ladenDt if k[5] >= vel0Min and k[5] <= vel0Max and k[9] >= 3])[:, 9]
+            tlgarrayFoc = np.array([k for k in ladenDt if k[5] >= vel0Min and k[5] <= vel0Max and k[9] >= 3])
 
-            if tlgarrayFoc.__len__() > 5:
+            if tlgarrayFoc.__len__() > lenConditionTlg:
+                tlgarrayFoc = np.array([k for k in ladenDt if k[5] >= vel0Min and k[5] <= vel0Max and k[9] >= 3])[:, 9]
                 meanFoc = (np.mean(arrayFoc[:, 8]) + np.mean(
                     tlgarrayFoc) + centralMean) / 3 if arrayFoc.__len__() >= 3 else 0
                 numberOfApp10_0.append(arrayFoc.__len__() + tlgarrayFoc.__len__() + centralArray.__len__())
             else:
-                meanFoc = (np.mean(arrayFoc[:, 8]) + centralMean) / 2 if arrayFoc.__len__() >= 3 else 0
+                meanFoc = (np.mean(arrayFoc[:, 8]) + centralMean) / 2 if arrayFoc.__len__() >= 3 else centralMean
                 numberOfApp10_0.append(arrayFoc.__len__() + centralArray.__len__())
             ladenDt10_0.append(round(meanFoc, 2))
 
@@ -2358,8 +3347,10 @@ class BaseSeriesReader:
             tlgarrayFoc = arrayFoc[:, 9] if arrayFoc.__len__() >= 3 else []
             tlgarrayFoc = np.array([k for k in tlgarrayFoc if k > 13])
             tlgarrayFoc = np.array(
-                [k for k in ladenDt if k[5] >= vel0Min and k[5] <= vel0Max and k[9] >= 3])[:, 9]
-            if tlgarrayFoc.__len__() > 5:
+                [k for k in ladenDt if k[5] >= vel0Min and k[5] <= vel0Max and k[9] >= 3])
+            if tlgarrayFoc.__len__() > lenConditionTlg:
+                tlgarrayFoc = np.array(
+                    [k for k in ladenDt if k[5] >= vel0Min and k[5] <= vel0Max and k[9] >= 3])[:, 9]
                 meanFoc = (np.mean(arrayFoc[:, 8]) + np.mean(
                     tlgarrayFoc) + centralMean) / 3 if arrayFoc.__len__() >= 3 else 0
                 numberOfApp10_3.append(arrayFoc.__len__() + tlgarrayFoc.__len__() + centralArray.__len__())
@@ -2382,8 +3373,10 @@ class BaseSeriesReader:
             tlgarrayFoc = arrayFoc[:, 9] if arrayFoc.__len__() >= 3 else []
             tlgarrayFoc = np.array([k for k in tlgarrayFoc if k > 13])
             tlgarrayFoc = np.array(
-                [k for k in ladenDt if k[5] >= vel0Min and k[5] <= vel0Max and k[9] >= 3])[:, 9]
-            if tlgarrayFoc.__len__() > 5:
+                [k for k in ladenDt if k[5] >= vel0Min and k[5] <= vel0Max and k[9] >= 3])
+            if tlgarrayFoc.__len__() > lenConditionTlg:
+                tlgarrayFoc = np.array(
+                    [k for k in ladenDt if k[5] >= vel0Min and k[5] <= vel0Max and k[9] >= 3])[:, 9]
                 meanFoc = (np.mean(arrayFoc[:, 8]) + np.mean(
                     tlgarrayFoc) + centralMean) / 3 if arrayFoc.__len__() >= 3 else 0
                 numberOfApp10_5.append(arrayFoc.__len__() + tlgarrayFoc.__len__() + centralArray.__len__())
@@ -2405,8 +3398,10 @@ class BaseSeriesReader:
             tlgarrayFoc = arrayFoc[:, 9] if arrayFoc.__len__() >= 3 else []
             tlgarrayFoc = np.array([k for k in tlgarrayFoc if k > 13])
             tlgarrayFoc = np.array(
-                [k for k in ladenDt if k[5] >= vel0Min and k[5] <= vel0Max and k[9] >= 3])[:, 9]
-            if tlgarrayFoc.__len__() > 5:
+                [k for k in ladenDt if k[5] >= vel0Min and k[5] <= vel0Max and k[9] >= 3])
+            if tlgarrayFoc.__len__() > lenConditionTlg:
+                tlgarrayFoc = np.array(
+                    [k for k in ladenDt if k[5] >= vel0Min and k[5] <= vel0Max and k[9] >= 3])[:, 9]
                 meanFoc = (np.mean(arrayFoc[:, 8]) + np.mean(
                     tlgarrayFoc) + centralMean) / 3 if arrayFoc.__len__() >= 3 else 0
                 numberOfApp10_8.append(arrayFoc.__len__() + tlgarrayFoc.__len__() + centralArray.__len__())
@@ -2436,8 +3431,10 @@ class BaseSeriesReader:
             tlgarrayFoc = arrayFoc[:, 9] if arrayFoc.__len__() >= 3 else []
             tlgarrayFoc = np.array([k for k in tlgarrayFoc if k > 5])
             tlgarrayFoc = np.array(
-                [k for k in ladenDt if k[5] > vel1Min and k[5] <= vel1Max and k[8] >= 10])[:, 9]
-            if tlgarrayFoc.__len__() > 5:
+                [k for k in ladenDt if k[5] > vel1Min and k[5] <= vel1Max and k[8] >= 10])
+            if tlgarrayFoc.__len__() > lenConditionTlg:
+                tlgarrayFoc = np.array(
+                    [k for k in ladenDt if k[5] > vel1Min and k[5] <= vel1Max and k[8] >= 10])[:, 9]
                 meanFoc = (np.mean(arrayFoc[:, 8]) + np.mean(
                     tlgarrayFoc) + centralMean) / 3 if arrayFoc.__len__() >= 3 else 0
                 numberOfApp11_0.append(arrayFoc.__len__() + tlgarrayFoc.__len__() + centralArray.__len__())
@@ -2460,8 +3457,10 @@ class BaseSeriesReader:
             tlgarrayFoc = arrayFoc[:, 9] if arrayFoc.__len__() >= 3 else []
             tlgarrayFoc = np.array([k for k in tlgarrayFoc if k > 5])
             tlgarrayFoc = np.array(
-                [k for k in ladenDt if k[5] > vel1Min and k[5] <= vel1Max and k[8] >= 10])[:, 9]
-            if tlgarrayFoc.__len__() > 5:
+                [k for k in ladenDt if k[5] > vel1Min and k[5] <= vel1Max and k[8] >= 10])
+            if tlgarrayFoc.__len__() > lenConditionTlg:
+                tlgarrayFoc = np.array(
+                    [k for k in ladenDt if k[5] > vel1Min and k[5] <= vel1Max and k[8] >= 10])[:, 9]
                 meanFoc = (np.mean(arrayFoc[:, 8]) + np.mean(
                     tlgarrayFoc) + centralMean) / 3 if arrayFoc.__len__() >= 3 else 0
                 numberOfApp11_3.append(arrayFoc.__len__() + tlgarrayFoc.__len__() + centralArray.__len__())
@@ -2484,8 +3483,10 @@ class BaseSeriesReader:
             tlgarrayFoc = arrayFoc[:, 9] if arrayFoc.__len__() >= 3 else []
             tlgarrayFoc = np.array([k for k in tlgarrayFoc if k > 5])
             tlgarrayFoc = np.array(
-                [k for k in ladenDt if k[5] > vel1Min and k[5] <= vel1Max and k[8] >= 10])[:, 9]
-            if tlgarrayFoc.__len__() > 5:
+                [k for k in ladenDt if k[5] > vel1Min and k[5] <= vel1Max and k[8] >= 10])
+            if tlgarrayFoc.__len__() > lenConditionTlg:
+                tlgarrayFoc = np.array(
+                    [k for k in ladenDt if k[5] > vel1Min and k[5] <= vel1Max and k[8] >= 10])[:, 9]
                 meanFoc = (np.mean(arrayFoc[:, 8]) + np.mean(
                     tlgarrayFoc) + centralMean) / 3 if arrayFoc.__len__() >= 3 else 0
                 numberOfApp11_5.append(arrayFoc.__len__() + tlgarrayFoc.__len__() + centralArray.__len__())
@@ -2507,8 +3508,10 @@ class BaseSeriesReader:
             tlgarrayFoc = arrayFoc[:, 9] if arrayFoc.__len__() >= 3 else []
             tlgarrayFoc = np.array([k for k in tlgarrayFoc if k > 5])
             tlgarrayFoc = np.array(
-                [k for k in ladenDt if k[5] > vel1Min and k[5] <= vel1Max and k[8] >= 10])[:, 9]
-            if tlgarrayFoc.__len__() > 5:
+                [k for k in ladenDt if k[5] > vel1Min and k[5] <= vel1Max and k[8] >= 10])
+            if tlgarrayFoc.__len__() > lenConditionTlg:
+                tlgarrayFoc = np.array(
+                    [k for k in ladenDt if k[5] > vel1Min and k[5] <= vel1Max and k[8] >= 10])[:, 9]
                 meanFoc = (np.mean(arrayFoc[:, 8]) + np.mean(
                     tlgarrayFoc) + centralMean) / 3 if arrayFoc.__len__() >= 3 else 0
                 numberOfApp11_8.append(arrayFoc.__len__() + tlgarrayFoc.__len__() + centralArray.__len__())
@@ -2539,8 +3542,10 @@ class BaseSeriesReader:
             tlgarrayFoc = arrayFoc[:, 9] if arrayFoc.__len__() >= 3 else []
             tlgarrayFoc = np.array([k for k in tlgarrayFoc if k > 5])
             tlgarrayFoc = np.array(
-                [k for k in ladenDt if k[5] > vel2Min and k[5] <= vel2Max and k[8] >= 10])[:, 9]
-            if tlgarrayFoc.__len__() > 5:
+                [k for k in ladenDt if k[5] > vel2Min and k[5] <= vel2Max and k[8] >= 10])
+            if tlgarrayFoc.__len__() > lenConditionTlg:
+                tlgarrayFoc = np.array(
+                    [k for k in ladenDt if k[5] > vel2Min and k[5] <= vel2Max and k[8] >= 10])[:, 9]
                 meanFoc = (np.mean(arrayFoc[:, 8]) + np.mean(
                     tlgarrayFoc) + centralMean) / 3 if arrayFoc.__len__() >= 3 else 0
                 numberOfApp12_0.append(arrayFoc.__len__() + tlgarrayFoc.__len__() + centralArray.__len__())
@@ -2563,8 +3568,10 @@ class BaseSeriesReader:
             tlgarrayFoc = arrayFoc[:, 9] if arrayFoc.__len__() >= 3 else []
             tlgarrayFoc = np.array([k for k in tlgarrayFoc if k > 5])
             tlgarrayFoc = np.array(
-                [k for k in ladenDt if k[5] > vel2Min and k[5] <= vel2Max and k[8] >= 10])[:, 9]
-            if tlgarrayFoc.__len__() > 5:
+                [k for k in ladenDt if k[5] > vel2Min and k[5] <= vel2Max and k[8] >= 10])
+            if tlgarrayFoc.__len__() > lenConditionTlg:
+                tlgarrayFoc = np.array(
+                    [k for k in ladenDt if k[5] > vel2Min and k[5] <= vel2Max and k[8] >= 10])[:, 9]
                 meanFoc = (np.mean(arrayFoc[:, 8]) + np.mean(
                     tlgarrayFoc) + centralMean) / 3 if arrayFoc.__len__() >= 3 else 0
                 numberOfApp12_3.append(arrayFoc.__len__() + tlgarrayFoc.__len__() + centralArray.__len__())
@@ -2587,8 +3594,10 @@ class BaseSeriesReader:
             tlgarrayFoc = arrayFoc[:, 9] if arrayFoc.__len__() >= 3 else []
             tlgarrayFoc = np.array([k for k in tlgarrayFoc if k > 5])
             tlgarrayFoc = np.array(
-                [k for k in ladenDt if k[5] > vel2Min and k[5] <= vel2Max and k[8] >= 10])[:, 9]
-            if tlgarrayFoc.__len__() > 5:
+                [k for k in ladenDt if k[5] > vel2Min and k[5] <= vel2Max and k[8] >= 10])
+            if tlgarrayFoc.__len__() > lenConditionTlg:
+                tlgarrayFoc = np.array(
+                    [k for k in ladenDt if k[5] > vel2Min and k[5] <= vel2Max and k[8] >= 10])[:, 9]
                 meanFoc = (np.mean(arrayFoc[:, 8]) + np.mean(
                     tlgarrayFoc) + centralMean) / 3 if arrayFoc.__len__() >= 3 else 0
                 numberOfApp12_5.append(arrayFoc.__len__() + tlgarrayFoc.__len__() + centralArray.__len__())
@@ -2610,8 +3619,10 @@ class BaseSeriesReader:
             tlgarrayFoc = arrayFoc[:, 9] if arrayFoc.__len__() >= 3 else []
             tlgarrayFoc = np.array([k for k in tlgarrayFoc if k > 5])
             tlgarrayFoc = np.array(
-                [k for k in ladenDt if k[5] > vel2Min and k[5] <= vel2Max and k[8] >= 10])[:, 9]
-            if tlgarrayFoc.__len__() > 5:
+                [k for k in ladenDt if k[5] > vel2Min and k[5] <= vel2Max and k[8] >= 10])
+            if tlgarrayFoc.__len__() > lenConditionTlg:
+                tlgarrayFoc = np.array(
+                    [k for k in ladenDt if k[5] > vel2Min and k[5] <= vel2Max and k[8] >= 10])[:, 9]
                 meanFoc = (np.mean(arrayFoc[:, 8]) + np.mean(
                     tlgarrayFoc) + centralMean) / 3 if arrayFoc.__len__() >= 3 else 0
                 numberOfApp12_8.append(arrayFoc.__len__() + tlgarrayFoc.__len__() + centralArray.__len__())
@@ -2642,8 +3653,10 @@ class BaseSeriesReader:
             tlgarrayFoc = arrayFoc[:, 9] if arrayFoc.__len__() >= 3 else []
             tlgarrayFoc = np.array([k for k in tlgarrayFoc if k > 5])
             tlgarrayFoc = np.array(
-                [k for k in ladenDt if k[5] > vel3Min and k[5] <= vel3Max and k[8] >= 10])[:, 9]
-            if tlgarrayFoc.__len__() > 5:
+                [k for k in ladenDt if k[5] > vel3Min and k[5] <= vel3Max and k[8] >= 10])
+            if tlgarrayFoc.__len__() > lenConditionTlg:
+                tlgarrayFoc = np.array(
+                    [k for k in ladenDt if k[5] > vel3Min and k[5] <= vel3Max and k[8] >= 10])[:, 9]
                 meanFoc = (np.mean(arrayFoc[:, 8]) + np.mean(
                     tlgarrayFoc) + centralMean) / 3 if arrayFoc.__len__() >= 3 else 0
                 numberOfApp13_0.append(arrayFoc.__len__() + tlgarrayFoc.__len__() + centralArray.__len__())
@@ -2666,12 +3679,16 @@ class BaseSeriesReader:
             tlgarrayFoc = arrayFoc[:, 9] if arrayFoc.__len__() >= 3 else []
             tlgarrayFoc = np.array([k for k in tlgarrayFoc if k > 5])
             tlgarrayFoc = np.array(
-                [k for k in ladenDt if k[5] > vel3Min and k[5] <= vel3Max and k[8] >= 10])[:, 9]
-            if tlgarrayFoc.__len__() > 5:
+                [k for k in ladenDt if k[5] > vel3Min and k[5] <= vel3Max and k[8] >= 10])
+            if tlgarrayFoc.__len__() > lenConditionTlg:
+                tlgarrayFoc = np.array(
+                    [k for k in ladenDt if k[5] > vel3Min and k[5] <= vel3Max and k[8] >= 10])[:, 9]
                 meanFoc = (np.mean(arrayFoc[:, 8]) + np.mean(
                     tlgarrayFoc) + centralMean) / 3 if arrayFoc.__len__() >= 3 else 0
+                numberOfApp13_3.append(arrayFoc.__len__() + tlgarrayFoc.__len__() + centralArray.__len__())
             else:
                 meanFoc = (np.mean(arrayFoc[:, 8]) + centralMean) / 2 if arrayFoc.__len__() >= 3 else 0
+                numberOfApp13_3.append(arrayFoc.__len__() + centralArray.__len__())
             ladenDt13_3.append(round(meanFoc, 2))
 
         for i in range(39, 44):
@@ -2688,8 +3705,10 @@ class BaseSeriesReader:
             tlgarrayFoc = arrayFoc[:, 9] if arrayFoc.__len__() >= 3 else []
             tlgarrayFoc = np.array([k for k in tlgarrayFoc if k > 5])
             tlgarrayFoc = np.array(
-                [k for k in ladenDt if k[5] > vel3Min and k[5] <= vel3Max and k[8] >= 10])[:, 9]
-            if tlgarrayFoc.__len__() > 5:
+                [k for k in ladenDt if k[5] > vel3Min and k[5] <= vel3Max and k[8] >= 10])
+            if tlgarrayFoc.__len__() > lenConditionTlg:
+                tlgarrayFoc = np.array(
+                    [k for k in ladenDt if k[5] > vel3Min and k[5] <= vel3Max and k[8] >= 10])[:, 9]
                 meanFoc = (np.mean(arrayFoc[:, 8]) + np.mean(
                     tlgarrayFoc) + centralMean) / 3 if arrayFoc.__len__() >= 3 else 0
                 numberOfApp13_5.append(arrayFoc.__len__() + tlgarrayFoc.__len__() + centralArray.__len__())
@@ -2711,9 +3730,11 @@ class BaseSeriesReader:
                                      3] <= wind[i + 1] and k[8] >= 10])
             tlgarrayFoc = arrayFoc[:, 9] if arrayFoc.__len__() >= 3 else []
             tlgarrayFoc = np.array(
-                [k for k in ladenDt if k[5] > vel3Min and k[5] <= vel3Max and k[8] >= 10])[:, 9]
-            tlgarrayFoc = np.array([k for k in tlgarrayFoc if k > 5])
-            if tlgarrayFoc.__len__() > 5:
+                [k for k in ladenDt if k[5] > vel3Min and k[5] <= vel3Max and k[8] >= 10])
+            #tlgarrayFoc = np.array([k for k in tlgarrayFoc if k > 5])
+            if tlgarrayFoc.__len__() > lenConditionTlg:
+                tlgarrayFoc = np.array(
+                    [k for k in ladenDt if k[5] > vel3Min and k[5] <= vel3Max and k[8] >= 10])[:, 9]
                 meanFoc = (np.mean(arrayFoc[:, 8]) + np.mean(
                     tlgarrayFoc) + centralMean) / 3 if arrayFoc.__len__() >= 3 else 0
                 numberOfApp13_8.append(arrayFoc.__len__() + tlgarrayFoc.__len__() + centralArray.__len__())
@@ -2934,7 +3955,7 @@ class BaseSeriesReader:
 
         values = [k for k in ladenDt12_8 if k != 0]
         length = values.__len__()
-        numberOfApp12_8 = [numberOfApp11_8[i] for i in range(0, len(numberOfApp12_8)) if ladenDt11_8[i] > 0]
+        numberOfApp12_8 = [numberOfApp12_8[i] for i in range(0, len(numberOfApp12_8)) if ladenDt12_8[i] > 0]
         for i in range(0, len(ladenDt12_8)):
             if length > 0:
                 if ladenDt12_8[i] == 0:
@@ -2961,29 +3982,56 @@ class BaseSeriesReader:
                     numberOfApp13_8)
 
         #####################################################################################################################
+        if (np.array(ladenDt10_0) ==0).all() and (np.array(ladenDt10_3) ==0).all() and (np.array(ladenDt10_5) ==0).all() and (np.array(ladenDt10_8) ==0).all():
+            ladenDt10_0 = np.array(ladenDt11_0) -2
+            ladenDt10_3 = np.array(ladenDt11_3) - 2
+            ladenDt10_5 = np.array(ladenDt11_5) - 2
+            ladenDt10_8 = np.array(ladenDt11_8) - 2
+        ####################
+        values = [k for k in ladenDt10_0 if k != 0]
+        if values.__len__() == 0:
+            if (np.array(ladenDt10_3) != 0).all():
+                ladenDt10_0 = np.array(ladenDt10_3) - 1
+            elif (np.array(ladenDt10_5) != 0).all():
+                ladenDt10_0 = np.array(ladenDt10_5) - 2
+            else: ladenDt10_0 = np.array(ladenDt10_8) - 3
+
+        values = [k for k in ladenDt11_0 if k != 0]
+        if values.__len__() == 0:
+            ladenDt11_0 = np.array(ladenDt11_3) - 1
+        values = [k for k in ladenDt12_0 if k != 0]
+
+        if values.__len__() == 0:
+            ladenDt12_0 = np.array(ladenDt12_3) - 1
+
+        values = [k for k in ladenDt13_0 if k != 0]
+        if values.__len__() == 0:
+            ladenDt13_0 = np.array(ladenDt13_3) - 1
+
+
         for i in range(0, len(ladenDt10_0)):
 
-            if (ladenDt10_0[i] > ladenDt11_0[i]) and ladenDt11_0[i] > 0:
-                while (ladenDt10_0[i] > ladenDt11_0[i]):
+            if (ladenDt10_0[i] >= ladenDt11_0[i]) and ladenDt11_0[i] > 0:
+                while (ladenDt10_0[i] >= ladenDt11_0[i]):
                     ladenDt11_0[i] = ladenDt11_0[i] + 0.1 * ladenDt11_0[i]
 
         for i in range(0, len(ladenDt11_0)):
 
-            if (ladenDt11_0[i] > ladenDt12_0[i]) and ladenDt12_0[i] > 0:
-                while (ladenDt11_0[i] > ladenDt12_0[i]):
+            if (ladenDt11_0[i] >= ladenDt12_0[i]) and ladenDt12_0[i] > 0:
+                while (ladenDt11_0[i] >= ladenDt12_0[i]):
                     ladenDt12_0[i] = ladenDt12_0[i] + 0.1 * ladenDt12_0[i]
 
         for i in range(0, len(ladenDt12_0)):
 
-            if (ladenDt12_0[i] > ladenDt13_0[i]) and ladenDt13_0[i] > 0:
-                while (ladenDt12_0[i] > ladenDt13_0[i]):
+            if (ladenDt12_0[i] >= ladenDt13_0[i]) and ladenDt13_0[i] > 0:
+                while (ladenDt12_0[i] >= ladenDt13_0[i]):
                     ladenDt13_0[i] = ladenDt13_0[i] + 0.1 * ladenDt13_0[i]
 
         #####################################################################################################################
         for i in range(0, len(ladenDt10_3)):
 
-            if (ladenDt10_0[i] > ladenDt10_3[i]):
-                while (ladenDt10_0[i] > ladenDt10_3[i]):
+            if (ladenDt10_0[i] >= ladenDt10_3[i]):
+                while (ladenDt10_0[i] >= ladenDt10_3[i]):
                     if ladenDt10_3[i] == 0:
                         ladenDt10_3[i] = ladenDt10_0[i] + 0.1 * ladenDt10_0[i]
                     else:
@@ -2991,8 +4039,8 @@ class BaseSeriesReader:
 
         for i in range(0, len(ladenDt10_5)):
 
-            if (ladenDt10_3[i] > ladenDt10_5[i]):
-                while (ladenDt10_3[i] > ladenDt10_5[i]):
+            if (ladenDt10_3[i] >= ladenDt10_5[i]):
+                while (ladenDt10_3[i] >= ladenDt10_5[i]):
                     if ladenDt10_5[i] == 0:
                         ladenDt10_5[i] = ladenDt10_3[i] + 0.1 * ladenDt10_3[i]
                     else:
@@ -3000,8 +4048,8 @@ class BaseSeriesReader:
 
         for i in range(0, len(ladenDt10_8)):
 
-            if (ladenDt10_5[i] > ladenDt10_8[i]):
-                while (ladenDt10_5[i] > ladenDt10_8[i]):
+            if (ladenDt10_5[i] >= ladenDt10_8[i]):
+                while (ladenDt10_5[i] >= ladenDt10_8[i]):
                     if ladenDt10_8[i] == 0:
                         ladenDt10_8[i] = ladenDt10_5[i] + 0.1 * ladenDt10_5[i]
                     else:
@@ -3010,8 +4058,8 @@ class BaseSeriesReader:
 
         for i in range(0, len(ladenDt11_3)):
 
-            if (ladenDt11_0[i] > ladenDt11_3[i]):
-                while (ladenDt11_0[i] > ladenDt11_3[i]):
+            if (ladenDt11_0[i] >= ladenDt11_3[i]):
+                while (ladenDt11_0[i] >= ladenDt11_3[i]):
                     if ladenDt11_3[i] == 0:
                         ladenDt11_3[i] = ladenDt11_0[i] + 0.1 * ladenDt11_0[i]
                     else:
@@ -3019,8 +4067,8 @@ class BaseSeriesReader:
 
         for i in range(0, len(ladenDt11_5)):
 
-            if (ladenDt11_3[i] > ladenDt11_5[i]):
-                while (ladenDt11_3[i] > ladenDt11_5[i]):
+            if (ladenDt11_3[i] >= ladenDt11_5[i]):
+                while (ladenDt11_3[i] >= ladenDt11_5[i]):
                     if ladenDt11_5[i] == 0:
                         ladenDt11_5[i] = ladenDt11_3[i] + 0.1 * ladenDt11_3[i]
                     else:
@@ -3028,8 +4076,8 @@ class BaseSeriesReader:
 
         for i in range(0, len(ladenDt11_8)):
 
-            if (ladenDt11_5[i] > ladenDt11_8[i]):
-                while (ladenDt11_5[i] > ladenDt11_8[i]):
+            if (ladenDt11_5[i] >= ladenDt11_8[i]):
+                while (ladenDt11_5[i] >= ladenDt11_8[i]):
                     if ladenDt11_8[i] == 0:
                         ladenDt11_8[i] = ladenDt11_5[i] + 0.1 * ladenDt11_5[i]
                     else:
@@ -3166,31 +4214,35 @@ class BaseSeriesReader:
                     else:
                         ladenDt13_8[i] = ladenDt13_8[i] + 0.1 * ladenDt13_8[i]
         # 1!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!#1!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
+        if (np.array(ladenDt10_0)==0).all():
+            ladenDt10_0= np.array(ladenDt10_3) -1 if(np.array(ladenDt10_0)!=3).all() else np.array(ladenDt10_5) -2
         for i in range(9, 14):
-            ladenDt10_0[0] = ladenDt10_0[0] + 1 if ladenDt10_0[0] <= ladenDt10_0[4] else ladenDt10_0[0]
-            ladenDt10_0[2] = ladenDt10_0[2] + 1 if ladenDt10_0[2] <= ladenDt10_0[3] else ladenDt10_0[2]
+            ladenDt10_0[0] = ladenDt10_0[4] + 1 if ladenDt10_0[0] <= ladenDt10_0[4] else ladenDt10_0[0]
+            ladenDt10_0[2] = ladenDt10_0[3] + 1 if ladenDt10_0[2] <= ladenDt10_0[3] else ladenDt10_0[2]
             workbook._sheets[1]['B' + str(i)] = round(ladenDt10_0[i - 9], 2)
 
             ##TREAT outliers / missing values for ladent values
-
+        if (np.array(ladenDt10_3)==0).all():
+            ladenDt10_3= np.array(ladenDt10_5) -1 if(np.array(ladenDt10_5)!=0).any() else np.array(ladenDt10_8) -2
         for i in range(9, 14):
-            ladenDt10_3[0] = ladenDt10_3[0] + 1 if ladenDt10_3[0] <= ladenDt10_3[4] else ladenDt10_3[0]
-            ladenDt10_3[2] = ladenDt10_3[2] + 1 if ladenDt10_3[2] <= ladenDt10_3[3] else ladenDt10_3[2]
+            ladenDt10_3[0] = ladenDt10_3[4] + 1 if ladenDt10_3[0] <= ladenDt10_3[4] else ladenDt10_3[0]
+            ladenDt10_3[2] = ladenDt10_3[3] + 1 if ladenDt10_3[2] <= ladenDt10_3[3] else ladenDt10_3[2]
             workbook._sheets[1]['C' + str(i)] = round(ladenDt10_3[i - 9], 2)
 
             ##TREAT outliers / missing values for ladent values
-
+        if (np.array(ladenDt10_5)==0).all():
+            ladenDt10_5= np.array(ladenDt10_8) -1 if(np.array(ladenDt10_8)!=0).any() else np.array(ladenDt10_3) + 1
         for i in range(9, 14):
-            ladenDt10_5[0] = ladenDt10_5[0] + 1 if ladenDt10_5[0] <= ladenDt10_5[4] else ladenDt10_5[0]
-            ladenDt10_5[2] = ladenDt10_5[2] + 1 if ladenDt10_5[2] <= ladenDt10_5[3] else ladenDt10_5[2]
+            ladenDt10_5[0] = ladenDt10_5[4] + 1 if ladenDt10_5[0] <= ladenDt10_5[4] else ladenDt10_5[0]
+            ladenDt10_5[2] = ladenDt10_5[3] + 1 if ladenDt10_5[2] <= ladenDt10_5[3] else ladenDt10_5[2]
             workbook._sheets[1]['D' + str(i)] = round(ladenDt10_5[i - 9], 2)
 
             ##TREAT outliers / missing values for ladent values
-
+        if (np.array(ladenDt10_8)==0).all():
+            ladenDt10_8= np.array(ladenDt10_5) + 1 if(np.array(ladenDt10_5)!=0).any() else np.array(ladenDt10_3) + 3
         for i in range(9, 14):
-            ladenDt10_8[0] = ladenDt10_8[0] + 1 if ladenDt10_8[0] <= ladenDt10_8[4] else ladenDt10_8[0]
-            ladenDt10_8[2] = ladenDt10_8[2] + 1 if ladenDt10_8[2] <= ladenDt10_8[3] else ladenDt10_8[2]
+            ladenDt10_8[0] = ladenDt10_8[4] + 1 if ladenDt10_8[0] <= ladenDt10_8[4] else ladenDt10_8[0]
+            ladenDt10_8[2] = ladenDt10_8[3] + 1 if ladenDt10_8[2] <= ladenDt10_8[3] else ladenDt10_8[2]
             workbook._sheets[1]['E' + str(i)] = round(ladenDt10_8[i - 9], 2)
 
             ####################################################################################################
@@ -3199,85 +4251,100 @@ class BaseSeriesReader:
             # length = values.__len__()
 
         for i in range(19, 24):
-            ladenDt11_0[0] = ladenDt11_0[0] + 1 if ladenDt11_0[0] <= ladenDt11_0[4] else ladenDt11_0[0]
-            ladenDt11_0[2] = ladenDt11_0[2] + 1 if ladenDt11_0[2] <= ladenDt11_0[3] else ladenDt11_0[2]
+            ladenDt11_0[0] = ladenDt11_0[4] + 1 if ladenDt11_0[0] <= ladenDt11_0[4] else ladenDt11_0[0]
+            ladenDt11_0[2] = ladenDt11_0[3] + 1 if ladenDt11_0[2] <= ladenDt11_0[3] else ladenDt11_0[2]
             workbook._sheets[1]['B' + str(i)] = round(ladenDt11_0[i - 19], 2)
 
             ##TREAT outliers / missing values for ladent values
 
         for i in range(19, 24):
-            ladenDt11_8[0] = ladenDt11_8[0] + 1 if ladenDt11_8[0] <= ladenDt11_8[4] else ladenDt11_8[0]
-            ladenDt11_8[2] = ladenDt11_8[2] + 1 if ladenDt11_8[2] <= ladenDt11_8[3] else ladenDt11_8[2]
+            ladenDt11_8[0] = ladenDt11_8[4] + 1 if ladenDt11_8[0] <= ladenDt11_8[4] else ladenDt11_8[0]
+            ladenDt11_8[2] = ladenDt11_8[3] + 1 if ladenDt11_8[2] <= ladenDt11_8[3] else ladenDt11_8[2]
             workbook._sheets[1]['C' + str(i)] = round(ladenDt11_3[i - 19], 2)
 
             ##TREAT outliers / missing values for ladent values
 
         for i in range(19, 24):
-            ladenDt11_5[0] = ladenDt11_5[0] + 1 if ladenDt11_5[0] <= ladenDt11_5[4] else ladenDt11_5[0]
-            ladenDt11_5[2] = ladenDt11_5[2] + 1 if ladenDt11_5[2] <= ladenDt11_5[3] else ladenDt11_5[2]
+            ladenDt11_5[0] = ladenDt11_5[4] + 1 if ladenDt11_5[0] <= ladenDt11_5[4] else ladenDt11_5[0]
+            ladenDt11_5[2] = ladenDt11_5[3] + 1 if ladenDt11_5[2] <= ladenDt11_5[3] else ladenDt11_5[2]
             workbook._sheets[1]['D' + str(i)] = round(ladenDt11_5[i - 19], 2)
 
             ##TREAT outliers / missing values for ladent values
 
         for i in range(19, 24):
-            ladenDt11_8[0] = ladenDt11_8[0] + 1 if ladenDt11_8[0] <= ladenDt11_8[4] else ladenDt11_8[0]
-            ladenDt11_8[2] = ladenDt11_8[2] + 1 if ladenDt11_8[2] <= ladenDt11_8[3] else ladenDt11_8[2]
+            ladenDt11_8[0] = ladenDt11_8[4] + 1 if ladenDt11_8[0] <= ladenDt11_8[4] else ladenDt11_8[0]
+            ladenDt11_8[2] = ladenDt11_8[3] + 1 if ladenDt11_8[2] <= ladenDt11_8[3] else ladenDt11_8[2]
             workbook._sheets[1]['E' + str(i)] = round(ladenDt11_8[i - 19], 2)
 
             ####################################################################################################
 
         for i in range(29, 34):
-            ladenDt12_0[0] = ladenDt12_0[0] + 1 if ladenDt12_0[0] <= ladenDt12_0[4] else ladenDt12_0[0]
-            ladenDt12_0[2] = ladenDt12_0[2] + 1 if ladenDt12_0[2] <= ladenDt12_0[3] else ladenDt12_0[2]
+            ladenDt12_0[0] = ladenDt12_0[4] + 1 if ladenDt12_0[0] <= ladenDt12_0[4] else ladenDt12_0[0]
+            ladenDt12_0[2] = ladenDt12_0[3] + 1 if ladenDt12_0[2] <= ladenDt12_0[3] else ladenDt12_0[2]
             workbook._sheets[1]['B' + str(i)] = round(ladenDt12_0[i - 29], 2)
 
             ##TREAT outliers / missing values for ladent values
 
         for i in range(29, 34):
-            ladenDt12_3[0] = ladenDt12_3[0] + 1 if ladenDt12_3[0] <= ladenDt12_3[4] else ladenDt12_3[0]
-            ladenDt12_3[2] = ladenDt12_3[2] + 1 if ladenDt12_3[2] <= ladenDt12_3[3] else ladenDt12_3[2]
+            ladenDt12_3[0] = ladenDt12_3[4] + 1 if ladenDt12_3[0] <= ladenDt12_3[4] else ladenDt12_3[0]
+            ladenDt12_3[2] = ladenDt12_3[3] + 1 if ladenDt12_3[2] <= ladenDt12_3[3] else ladenDt12_3[2]
             workbook._sheets[1]['C' + str(i)] = round(ladenDt12_3[i - 29], 2)
 
             ##TREAT outliers / missing values for ladent values
 
         for i in range(29, 34):
-            ladenDt12_5[0] = ladenDt12_5[0] + 1 if ladenDt12_5[0] <= ladenDt12_5[4] else ladenDt12_5[0]
-            ladenDt12_5[2] = ladenDt12_5[2] + 1 if ladenDt12_5[2] <= ladenDt12_5[3] else ladenDt12_5[2]
+            ladenDt12_5[0] = ladenDt12_5[4] + 1 if ladenDt12_5[0] <= ladenDt12_5[4] else ladenDt12_5[0]
+            ladenDt12_5[2] = ladenDt12_5[3] + 1 if ladenDt12_5[2] <= ladenDt12_5[3] else ladenDt12_5[2]
             workbook._sheets[1]['D' + str(i)] = round(ladenDt12_5[i - 29], 2)
 
             ##TREAT outliers / missing values for ladent values
 
         for i in range(29, 34):
-            ladenDt12_8[0] = ladenDt12_8[0] + 1 if ladenDt12_8[0] <= ladenDt12_8[4] else ladenDt12_8[0]
-            ladenDt12_8[2] = ladenDt12_8[2] + 1 if ladenDt12_8[2] <= ladenDt12_8[3] else ladenDt12_8[2]
+            ladenDt12_8[0] = ladenDt12_8[4] + 1 if ladenDt12_8[0] <= ladenDt12_8[4] else ladenDt12_8[0]
+            ladenDt12_8[2] = ladenDt12_8[3] + 1 if ladenDt12_8[2] <= ladenDt12_8[3] else ladenDt12_8[2]
             workbook._sheets[1]['E' + str(i)] = round(ladenDt12_8[i - 29], 2)
 
             ################################################################################################################
         for i in range(39, 44):
-            ladenDt13_0[0] = ladenDt13_0[0] + 1 if ladenDt13_0[0] <= ladenDt13_0[4] else ladenDt13_0[0]
-            ladenDt13_0[2] = ladenDt13_0[2] + 1 if ladenDt13_0[2] <= ladenDt13_0[3] else ladenDt13_0[2]
+            ladenDt13_0[0] = ladenDt13_0[4] + 1 if ladenDt13_0[0] <= ladenDt13_0[4] else ladenDt13_0[0]
+            ladenDt13_0[2] = ladenDt13_0[3] + 1 if ladenDt13_0[2] <= ladenDt13_0[3] else ladenDt13_0[2]
             workbook._sheets[1]['B' + str(i)] = round(ladenDt13_0[i - 39], 2)
 
             ##TREAT outliers / missing values for ladent values
 
         for i in range(39, 44):
-            ladenDt13_3[0] = ladenDt13_3[0] + 1 if ladenDt13_3[0] <= ladenDt13_3[4] else ladenDt13_3[0]
-            ladenDt13_3[2] = ladenDt13_3[2] + 1 if ladenDt13_3[2] <= ladenDt13_3[3] else ladenDt13_3[2]
+            ladenDt13_3[0] = ladenDt13_3[4] + 1 if ladenDt13_3[0] <= ladenDt13_3[4] else ladenDt13_3[0]
+            ladenDt13_3[2] = ladenDt13_3[3] + 1 if ladenDt13_3[2] <= ladenDt13_3[3] else ladenDt13_3[2]
             workbook._sheets[1]['C' + str(i)] = round(ladenDt13_3[i - 39], 2)
 
             ##TREAT outliers / missing values for ladent values
 
         for i in range(39, 44):
-            ladenDt13_5[0] = ladenDt13_5[0] + 1 if ladenDt13_5[0] <= ladenDt13_5[4] else ladenDt13_5[0]
-            ladenDt13_5[2] = ladenDt13_5[2] + 1 if ladenDt13_5[2] <= ladenDt13_5[3] else ladenDt13_5[2]
+            ladenDt13_5[0] = ladenDt13_5[4] + 1 if ladenDt13_5[0] <= ladenDt13_5[4] else ladenDt13_5[0]
+            ladenDt13_5[2] = ladenDt13_5[3] + 1 if ladenDt13_5[2] <= ladenDt13_5[3] else ladenDt13_5[2]
             workbook._sheets[1]['D' + str(i)] = round(ladenDt13_5[i - 39], 2)
 
             ##TREAT outliers / missing values for ladent values
 
         for i in range(39, 44):
-            ladenDt13_8[0] = ladenDt13_8[0] + 1 if ladenDt13_8[0] <= ladenDt13_8[4] else ladenDt13_8[0]
-            ladenDt13_8[2] = ladenDt13_8[2] + 1 if ladenDt13_8[2] <= ladenDt13_8[3] else ladenDt13_8[2]
+            ladenDt13_8[0] = ladenDt13_8[4] + 1 if ladenDt13_8[0] <= ladenDt13_8[4] else ladenDt13_8[0]
+            ladenDt13_8[2] = ladenDt13_8[3] + 1 if ladenDt13_8[2] <= ladenDt13_8[3] else ladenDt13_8[2]
             workbook._sheets[1]['E' + str(i)] = round(ladenDt13_8[i - 39], 2)
+
+        ladenCons = list(itertools.chain(ladenDt10_0, ladenDt10_3, ladenDt10_5, ladenDt10_8,
+                                     ladenDt11_0, ladenDt11_3, ladenDt11_5, ladenDt10_8,
+                                     ladenDt12_0, ladenDt12_3, ladenDt12_5, ladenDt12_8,
+                                     ladenDt13_0, ladenDt13_3, ladenDt13_5, ladenDt13_8))
+
+        profCons = list(itertools.chain(ballastCons,ladenCons))
+
+        with open('./data/' + company + '/' + vessel + '/ListOfCons.csv', mode='w') as data:
+            data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+            data_writer.writerow(
+                ['FOC'])
+            for i in range(0, len(profCons)):
+                data_writer.writerow(
+                    [profCons[i]])
 
         workbook.save(filename=pathToexcel.split('.')[0] + '_1.' + pathToexcel.split('.')[1])
         return
@@ -3811,35 +4878,30 @@ class BaseSeriesReader:
             relWindSpeeds = [ ]
             relWindDirs = [ ]
             for i in range(0, len(Vcourse)):
-                x = np.array([ Vstw[ i ] * 0.514, Vcourse[ i ] ])
-                y = np.array([ windSpeed[ i ], windDir[ i ] ])
+                #x = np.array([ Vstw[ i ] * 0.514, Vcourse[ i ] ])
+                #y = np.array([ windSpeed[ i ], windDir[ i ] ])
                 ##convert cartesian coordinates to polar
-                x = np.array([ x[ 0 ] * np.cos(x[ 1 ]), x[ 0 ] * np.sin(x[ 1 ]) ])
+                #x = np.array([ x[ 0 ] * np.cos(x[ 1 ]), x[ 0 ] * np.sin(x[ 1 ]) ])
 
-                y = np.array([ y[ 0 ] * np.cos(y[ 1 ]), y[ 0 ] * np.sin(y[ 1 ]) ])
+                #y = np.array([ y[ 0 ] * np.cos(y[ 1 ]), y[ 0 ] * np.sin(y[ 1 ]) ])
 
-                x_norm = np.sqrt(sum(x ** 2))
+                #x_norm = np.sqrt(sum(x ** 2))
 
                 # Apply the formula as mentioned above
                 # for projecting a vector onto the orthogonal vector n
                 # find dot product using np.dot()
-                proj_of_y_on_x = (np.dot(y, x) / x_norm ** 2) * x
+                #proj_of_y_on_x = (np.dot(y, x) / x_norm ** 2) * x
 
                 # vecproj =  np.dot(y, x) / np.dot(y, y) * y
-                relWindSpeed = proj_of_y_on_x[ 0 ] + windSpeed[ i ]
-                if relWindSpeed > 40:
-                    d = 0
-                relDir = windDir[ i ] - Vcourse[ i ]
-                relDir += 360 if relDir < 0 else relDir
+                #relWindSpeed = proj_of_y_on_x[ 0 ] + windSpeed[ i ]
+                relDir = self.getRelativeDirectionWeatherVessel(Vcourse[i],windDir[i])
                 relWindDirs.append(relDir)
-                relWindSpeeds.append(relWindSpeed)
+                relWindSpeeds.append(windSpeed[i])
             newMappedData = np.array(
                 np.append(newDataset,
 
                           np.asmatrix([ np.array(relWindSpeeds), np.array(relWindDirs), np.array(draftsVmapped).reshape(-1),
-                                        np.array(ballastLadenFlagsVmapped)[ 0:len(draftsVmapped) ] ]).T,
-
-                          axis=1))  # .astype(float)
+                                        np.array(ballastLadenFlagsVmapped)[ 0:len(draftsVmapped)] ]).T , axis=1))  # .astype(float)
 
             #####################
             ############################MAP TELEGRAM DATES FOR DRAFT
