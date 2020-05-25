@@ -158,7 +158,7 @@ def main():
     # unseensY.append(data[(k+kInit):(n+k+kInit), 7])
     # k = n * i + 10
 
-    trData = data[0:89999]
+    trData = data[0:1000]
     k=0
     kInit =0
     n=20000
@@ -346,7 +346,7 @@ def main():
                         modeler, None, None, None, partitionsX, None, subsetInd,'train')
 
                 print("Mean absolute error on seen data: %4.2f (+/- %4.2f standard error)" % (
-                meanError, sdError / sqrt(unseenY.shape[0])))
+                meanErrorTr, sdError / sqrt(unseenY.shape[0])))
                 print("Evaluating on seen data... Done.")
 
                 #Predict and evaluate on unseen data

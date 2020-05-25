@@ -3,57 +3,10 @@
   <component name="ChangeListManager">
     <list default="true" id="9e10e853-69bc-4a18-9c9f-e2f3d9527f23" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/errorEpochCLusters.csv" beforeDir="false" afterPath="$PROJECT_DIR$/Danaos_ML_Project/errorEpochCLusters.csv" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/evaluation.py" beforeDir="false" afterPath="$PROJECT_DIR$/Danaos_ML_Project/evaluation.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/model_0_.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/model_10_.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/model_11_.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/model_12_.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/model_13_.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/model_14_.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/model_15_.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/model_16_.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/model_17_.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/model_18_.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/model_19_.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/model_1_.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/model_20_.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/model_21_.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/model_22_.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/model_23_.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/model_24_.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/model_25_.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/model_26_.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/model_27_.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/model_28_.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/model_29_.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/model_2_.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/model_30_.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/model_31_.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/model_32_.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/model_33_.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/model_34_.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/model_35_.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/model_36_.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/model_37_.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/model_38_.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/model_39_.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/model_3_.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/model_40_.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/model_41_.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/model_42_.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/model_43_.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/model_44_.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/model_45_.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/model_46_.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/model_47_.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/model_48_.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/model_49_.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/model_4_.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/model_5_.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/model_6_.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/model_7_.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/model_8_.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/model_9_.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/model_Gen_.csv" beforeDir="false" afterPath="$PROJECT_DIR$/Danaos_ML_Project/model_Gen_.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/runPipeline1.py" beforeDir="false" afterPath="$PROJECT_DIR$/Danaos_ML_Project/runPipeline1.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -114,7 +67,7 @@
   <component name="PropertiesComponent">
     <property name="full.screen.before.presentation.mode" value="false" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/../neurals/use/Danaos_Prediction_Module.py" />
-    <property name="settings.editor.selected.configurable" value="preferences.lookFeel" />
+    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
     <property name="two.files.diff.last.used.file" value="$PROJECT_DIR$/estimatorCl_1.h5" />
   </component>
   <component name="RecentsManager">
@@ -133,7 +86,7 @@
       <recent name="C:\Users\dkaklis\Desktop\KaklisPHD\data\OCEAN_GOLD" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.runPipeline1">
+  <component name="RunManager" selected="Python.runPipeline1 (1)">
     <configuration name="Danaos_Prediction_Module" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="KaklisPHD" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -168,6 +121,27 @@
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <option name="SCRIPT_NAME" value="" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="runPipeline1 (1)" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="KaklisPHD" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/Danaos_ML_Project" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/Danaos_ML_Project/runPipeline1.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -223,9 +197,11 @@
       <item itemvalue="Python.Danaos_Prediction_Module" />
       <item itemvalue="Python.runPipeline1" />
       <item itemvalue="Python.runPipelineD" />
+      <item itemvalue="Python.runPipeline1 (1)" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.runPipeline1 (1)" />
         <item itemvalue="Python.runPipeline1" />
         <item itemvalue="Python.runPipelineD" />
         <item itemvalue="Python.Danaos_Prediction_Module" />
@@ -258,10 +234,82 @@
     <option name="LAST_COMMIT_MESSAGE" value="forgot to commit" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="461" y="151" key="SettingsEditor" timestamp="1590390990302">
+    <state x="715" y="222" key="#xdebugger.evaluate" timestamp="1590398237111">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="461" y="151" key="SettingsEditor/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1590390990302" />
+    <state x="715" y="222" key="#xdebugger.evaluate/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1590398237111" />
+    <state width="1898" height="176" key="GridCell.Tab.0.bottom" timestamp="1590398336454">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1898" height="176" key="GridCell.Tab.0.bottom/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1590398336454" />
+    <state width="1898" height="176" key="GridCell.Tab.0.center" timestamp="1590398336454">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1898" height="176" key="GridCell.Tab.0.center/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1590398336454" />
+    <state width="1898" height="176" key="GridCell.Tab.0.left" timestamp="1590398336453">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1898" height="176" key="GridCell.Tab.0.left/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1590398336453" />
+    <state width="1898" height="176" key="GridCell.Tab.0.right" timestamp="1590398336454">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1898" height="176" key="GridCell.Tab.0.right/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1590398336454" />
+    <state width="1898" height="176" key="GridCell.Tab.1.bottom" timestamp="1590398336454">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1898" height="176" key="GridCell.Tab.1.bottom/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1590398336454" />
+    <state width="1898" height="176" key="GridCell.Tab.1.center" timestamp="1590398336454">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1898" height="176" key="GridCell.Tab.1.center/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1590398336454" />
+    <state width="1898" height="176" key="GridCell.Tab.1.left" timestamp="1590398336454">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1898" height="176" key="GridCell.Tab.1.left/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1590398336454" />
+    <state width="1898" height="176" key="GridCell.Tab.1.right" timestamp="1590398336454">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1898" height="176" key="GridCell.Tab.1.right/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1590398336454" />
+    <state x="919" y="134" width="752" height="906" key="GridCell.Tab.2.bottom" timestamp="1590397859590">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="919" y="134" width="752" height="906" key="GridCell.Tab.2.bottom/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1590397859590" />
+    <state x="919" y="134" width="752" height="906" key="GridCell.Tab.2.center" timestamp="1590397859589">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="919" y="134" width="752" height="906" key="GridCell.Tab.2.center/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1590397859589" />
+    <state x="919" y="134" width="752" height="906" key="GridCell.Tab.2.left" timestamp="1590398336454">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="919" y="134" width="752" height="906" key="GridCell.Tab.2.left/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1590398336454" />
+    <state x="919" y="134" width="752" height="906" key="GridCell.Tab.2.right" timestamp="1590397859589">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="919" y="134" width="752" height="906" key="GridCell.Tab.2.right/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1590397859589" />
+    <state x="919" y="134" width="752" height="906" key="GridCell.Tab.3.bottom" timestamp="1590397859550">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="919" y="134" width="752" height="906" key="GridCell.Tab.3.bottom/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1590397859550" />
+    <state x="919" y="134" width="752" height="906" key="GridCell.Tab.3.center" timestamp="1590397859550">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="919" y="134" width="752" height="906" key="GridCell.Tab.3.center/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1590397859550" />
+    <state x="919" y="134" width="752" height="906" key="GridCell.Tab.3.left" timestamp="1590397859549">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="919" y="134" width="752" height="906" key="GridCell.Tab.3.left/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1590397859549" />
+    <state x="919" y="134" width="752" height="906" key="GridCell.Tab.3.right" timestamp="1590397859550">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="919" y="134" width="752" height="906" key="GridCell.Tab.3.right/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1590397859550" />
+    <state x="461" y="151" key="SettingsEditor" timestamp="1590396791491">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="461" y="151" key="SettingsEditor/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1590396791491" />
+    <state x="919" y="134" width="768" height="944" key="dock-window-1" timestamp="1590398294361">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="919" y="134" width="768" height="944" key="dock-window-1/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1590398294361" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -350,6 +398,16 @@
           <url>file://$PROJECT_DIR$/Danaos_ML_Project/dataReading.py</url>
           <line>3766</line>
           <option name="timeStamp" value="1401" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/Danaos_ML_Project/runPipeline1.py</url>
+          <line>181</line>
+          <option name="timeStamp" value="1405" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/Danaos_ML_Project/evaluation.py</url>
+          <line>122</line>
+          <option name="timeStamp" value="1406" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
