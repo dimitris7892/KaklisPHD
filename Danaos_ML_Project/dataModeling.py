@@ -1753,6 +1753,9 @@ class TensorFlowW1(BasePartitionModeler):
 
     def getFitnessOfModelForPoint(self, model, point):
         return 1.0 / (1.0 + numpy.linalg.norm(np.mean(self._partitionsPerModel[model]) - point))
+    def getFitnessOfPoint(self,partitions ,cluster, point):
+
+        return 1.0 / (1.0 + numpy.linalg.norm(np.mean(partitions[cluster], axis=0) - point))
 
 class TensorFlowW3(BasePartitionModeler):
 
@@ -1773,6 +1776,9 @@ class TensorFlowW3(BasePartitionModeler):
             return 0, 0
         else:
             return mBest, dBestFit
+
+    def getFitnessOfModelForPoint(self, model, point):
+        return 1.0 / (1.0 + numpy.linalg.norm(np.mean(self._partitionsPerModel[model]) - point))
 
     def createModelsFor(self, partitionsX, partitionsY, partition_labels, tri, X, Y):
 

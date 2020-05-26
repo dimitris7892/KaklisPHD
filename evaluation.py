@@ -19,7 +19,7 @@ import matplotlib.pyplot as plt
 import csv
 import pyearth as sp
 import sklearn.svm as svr
-import latex
+#import latex
 from matplotlib import rc
 
 
