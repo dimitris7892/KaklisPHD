@@ -16,7 +16,7 @@ from sklearn.pipeline import Pipeline
 #from sklearn.model_selection import RandomizedSearchCV
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
-from gekko import GEKKO
+#from gekko import GEKKO
 import  matplotlib.pyplot as plt
 from scipy.interpolate import BivariateSpline
 import tensorflow as tf
@@ -1644,7 +1644,7 @@ class TensorFlowW1(BasePartitionModeler):
                 varXCl=[]
                 varYCl = []
                 print("CLUSTER:  " +str(idx))
-                for i in range(1,40):
+                for i in range(1,30):
 
 
                     #estimatorCl.fit(X_train,y_train, epochs=i ,verbose = 0)
@@ -1716,13 +1716,13 @@ class TensorFlowW1(BasePartitionModeler):
         #print("CORRELATION COEFF ERR AND FOC: " + str(pearsonr(minYVars, clustersTrScores)))
         NNmodels.append(estimator)
 
-        if stdWS !=[]:
-            normalizedSTDws = (stdWS - min(stdWS)) / (max(stdWS) - min(stdWS))
-            normalizedSTDstw = (stdSTW - min(stdSTW)) / (max(stdSTW) - min(stdSTW))
-            normalizedSTDFOC = (stdsFOC - min(stdsFOC)) / (max(stdsFOC) - min(stdsFOC))
-            normalizedErr = (clustersTrScores - min(clustersTrScores)) / (max(clustersTrScores) - min(clustersTrScores))
-            normalizedValErr = (clScores - min(clScores)) / (max(clScores) - min(clScores))
-            normalizedStw_ws = abs(normalizedSTDstw - normalizedSTDws)
+        #if stdWS !=[]:
+            #normalizedSTDws = (stdWS - min(stdWS)) / (max(stdWS) - min(stdWS))
+            #normalizedSTDstw = (stdSTW - min(stdSTW)) / (max(stdSTW) - min(stdSTW))
+            #normalizedSTDFOC = (stdsFOC - min(stdsFOC)) / (max(stdsFOC) - min(stdsFOC))
+            #normalizedErr = (clustersTrScores - min(clustersTrScores)) / (max(clustersTrScores) - min(clustersTrScores))
+            #normalizedValErr = (clScores - min(clScores)) / (max(clScores) - min(clScores))
+            #normalizedStw_ws = abs(normalizedSTDstw - normalizedSTDws)
 
         #print("CORRELATION COEFF Normalized WSstd-STWstd and ERROR: " + str(pearsonr(normalizedErr, normalizedStw_ws)))
 
@@ -1750,7 +1750,7 @@ class TensorFlowW1(BasePartitionModeler):
             data_writer.writerow(['cluster','trError','acc', 'epoch','stdX','stdY','stdSTW','stdWS','nErr','nStdWs','nStdSTW','nValErr','nSTW_WS'])
             for i in range(0,len(clScores)):
 
-                data_writer.writerow([clusters[i], clustersTrScores[i] ,clScores[i],minEpochs[i],minXVars[i],minYVars[i],stdWS[i],stdSTW[i],normalizedErr[i],normalizedSTDws[i],normalizedSTDstw[i],normalizedValErr[i]])
+                data_writer.writerow([clusters[i], clustersTrScores[i] ,clScores[i],minEpochs[i],minXVars[i],minYVars[i],stdWS[i],stdSTW[i]])
 
         return estimator, history, scores, numpy.empty, vectorWeights  # , estimator , DeepCLpartitionsX
 

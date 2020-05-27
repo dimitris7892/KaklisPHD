@@ -14,7 +14,7 @@ import csv
 import locale
 #locale.setlocale(locale.LC_NUMERIC, "en_DK.UTF-8")
 import datetime
-import cx_Oracle
+#import cx_Oracle
 from dateutil.rrule import rrule, DAILY, MINUTELY
 from sympy.solvers import solve
 from sympy import Symbol
@@ -31,7 +31,7 @@ import shutil
 from openpyxl.styles import PatternFill
 from openpyxl.styles import Alignment
 import matplotlib.pyplot as plt
-import seaborn as sns
+#import seaborn as sns
 from openpyxl.drawing.image import Image
 from scipy.stats import ttest_ind_from_stats
 

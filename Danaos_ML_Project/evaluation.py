@@ -106,9 +106,9 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
                     #pPointRefined.append(pPoint[0][i])
             #pPointRefined = np.array(pPointRefined)
 
-            meanPointsOfCl = np.mean(partitionsX[ind],axis=0)
+            #meanPointsOfCl = np.mean(partitionsX[ind],axis=0)
             #meanPointsOfCl = np.mean([meanPointsOfCl,pPointRefined],axis=0)
-            meanPointsOfCl = np.mean([meanPointsOfCl, pPoint], axis=0)
+            #meanPointsOfCl = np.mean([meanPointsOfCl, pPoint], axis=0)
             #####
             #vectorPpoint = self.extractFunctionsFromSplines(pPoint[0][0], pPoint[0][1], pPoint[0][2], pPoint[0][3],
                                                       #pPoint[0][4], pPoint[0][5], pPoint[0][6], ind)
@@ -130,19 +130,19 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
             #meanClGenpred = pred
             #################################
 
-            vector = self.extractFunctionsFromSplines(meanPointsOfCl[0][0], meanPointsOfCl[0][1], meanPointsOfCl[0][2],
-                                                      meanPointsOfCl[0][3],
-                                                      meanPointsOfCl[0][4], meanPointsOfCl[0][5], meanPointsOfCl[0][6],
-                                                      ind)
+            #vector = self.extractFunctionsFromSplines(meanPointsOfCl[0][0], meanPointsOfCl[0][1], meanPointsOfCl[0][2],
+                                                      #meanPointsOfCl[0][3],
+                                                      #meanPointsOfCl[0][4], meanPointsOfCl[0][5], meanPointsOfCl[0][6],
+                                                      #ind)
 
             # newVector = np.mean([vector,vectorPpoint],axis=0)
 
-            XSplineVector = np.append(meanPointsOfCl, vector)
+            #XSplineVector = np.append(meanPointsOfCl, vector)
 
-            XSplineVector = XSplineVector.reshape(-1, XSplineVector.shape[0])
+            #XSplineVector = XSplineVector.reshape(-1, XSplineVector.shape[0])
             #pred = abs(modeler._models[ind].predict(XSplineVector))
-            pred = modeler._models[ind].predict(XSplineVector)
-            meanClpred = pred
+            #pred = modeler._models[ind].predict(XSplineVector)
+            #meanClpred = pred
             ###########################################################################
             #pred=0
             #for i in range(0,len(partitionsX)):
@@ -178,7 +178,7 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
                 #XSplineVectorCl = XSplineVectorCl.reshape(-1, XSplineVectorCl.shape[0])
                 #preds.append(modeler._models[i].predict(XSplineVectorCl)[0][0])
 
-            prediction = np.mean(preds)
+            #prediction = np.mean(preds)
             #weighted_avg = np.average(preds, weights=weights)
             #print("MEAN PRED: " + str(prediction))
             #print("WEIGHTED MEAN PRED: " + str(weighted_avg))
@@ -207,7 +207,7 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
             preds.append(prediction)
             lErrors.append(error)
             percError = abs((prediction - trueVal) / trueVal) * 100
-            errorStwArr.append(np.array(np.append(np.asmatrix(pPoint[0][0]).reshape(-1,1), np.asmatrix([percError ]).T, axis=1)))
+            errorStwArr.append(np.array(np.append(np.asmatrix(pPoint[0][0]).reshape(-1,1), np.asmatrix([percError[0] ]).T, axis=1)))
             errorFoc.append(percError)
             foc.append(trueVal)
 
@@ -234,7 +234,7 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
                         [errorStwArr[i][0], errorStwArr[i][1]])
         else:
             with open('./TESTerrorPercFOC' + str(len(partitionsX)) + '_' + str(subsetInd) + '.csv', mode='w') as data:
-                data_writer = csv.writer(data, delimiater=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+                data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
                 data_writer.writerow(
                     ['FOC', 'PERC'])
                 for i in range(0, len(errorFoc)):
