@@ -32,14 +32,17 @@ import scipy as scipy
 #from tensorflow.python.tools import inspect_checkpoint as chkp
 from time import time
 from sklearn.cluster import KMeans
-tf.compat.v1.disable_eager_execution()
+#tf.compat.v1.disable_eager_execution()
 #tf.executing_eagerly()
 from tensorflow.keras.callbacks import EarlyStopping
 from tensorflow.keras.callbacks import Callback
 from sklearn import preprocessing
 from scipy.special import softmax
 import dataReading as Dread
-
+from tensorflow.keras import backend as K
+#sess = tf.Session(config=tf.ConfigProto(log_device_placement=True))
+print("Num GPUs Available: ", len(tf.config.experimental.list_physical_devices('GPU')))
+x=0
 class BasePartitionModeler:
     def createModelsFor(self,partitionsX, partitionsY, partition_labels):
         pass
@@ -1753,6 +1756,9 @@ class TensorFlowW1(BasePartitionModeler):
 
     def getFitnessOfModelForPoint(self, model, point):
         return 1.0 / (1.0 + numpy.linalg.norm(np.mean(self._partitionsPerModel[model]) - point))
+    def getFitnessOfPoint(self,partitions ,cluster, point):
+
+        return 1.0 / (1.0 + numpy.linalg.norm(np.mean(partitions[cluster], axis=0) - point))
 
 class TensorFlowW3(BasePartitionModeler):
 
@@ -1773,6 +1779,9 @@ class TensorFlowW3(BasePartitionModeler):
             return 0, 0
         else:
             return mBest, dBestFit
+
+    def getFitnessOfModelForPoint(self, model, point):
+        return 1.0 / (1.0 + numpy.linalg.norm(np.mean(self._partitionsPerModel[model]) - point))
 
     def createModelsFor(self, partitionsX, partitionsY, partition_labels, tri, X, Y):
 
