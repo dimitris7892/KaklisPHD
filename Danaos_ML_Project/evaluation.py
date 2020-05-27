@@ -179,7 +179,7 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
                 #preds.append(modeler._models[i].predict(XSplineVectorCl)[0][0])
 
             prediction = np.mean(preds)
-            weighted_avg = np.average(preds, weights=weights)
+            #weighted_avg = np.average(preds, weights=weights)
             #print("MEAN PRED: " + str(prediction))
             #print("WEIGHTED MEAN PRED: " + str(weighted_avg))
             #print("TRUE VAL: " + str(trueVal))
