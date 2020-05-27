@@ -169,7 +169,7 @@ def main():
     #unseenX = data[:, 0:7][90000:].astype(float)
     #unseenY = data[:, 7][90000:].astype(float)
 
-    X_train, X_test, y_train, y_test = train_test_split(trData[:,0:7], trData[:,7], test_size=0.2,
+    X_train, X_test, y_train, y_test = train_test_split(data[:,0:7], data[:,7], test_size=0.2,
                                                         random_state=42)
 
     #dataTrain = np.array(np.append(X_train, np.asmatrix([y_train.reshape(-1)]).T, axis=1))
@@ -192,7 +192,7 @@ def main():
     stdInU = []
     varTr = []
     models = []
-    K = range(1,40)
+    K = range(1,25)
     part = []
     subsetInd = 0
 
@@ -211,7 +211,7 @@ def main():
                elif modeler.__class__.__name__=='TriInterpolantModeler' or modeler.__class__.__name__ == 'TensorFlow':
                  partK =K
                else:
-                 partK=[10]
+                 partK=K
            error = {"errors": []}
            #random.seed(1)
 
