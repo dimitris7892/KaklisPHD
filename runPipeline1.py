@@ -79,10 +79,10 @@ def main():
     data = pd.read_csv(sFile)
     meanBTr=[]
     meanVTr=[]
-    #random.seed(1)
+    random.seed(1)
     subsetsW=[]
     data = pd.read_csv(sFile)
-    for k in range(0,2000):
+    for k in range(0,200):
         # The row indices to skip - make sure 0 is not included to keep the header!
         skip_idx = random.sample(range(1, num_linesx), num_linesx-size)
         # Read the data
@@ -96,7 +96,7 @@ def main():
         subsetsB.append(targetB)
         var.append(np.var(seriesX))
 
-        if len(subsetsX)>=5:
+        if len(subsetsX)>=1:
             break
     #subsetsX=[subsetsX[0]]
     #subsetsY=[subsetsY[0]]
@@ -108,7 +108,7 @@ def main():
     histTr=[]
     counter=0
 
-    K = range(1,20)
+    K = range(1,25)
     print("Number of Statistically ind. subsets for training: " + str(len(subsetsX)))
     subsetsX=[subsetsX[0:5]] if len(subsetsX) > 5 else subsetsX
     subsetsY = [ subsetsY[ 0:5 ] ] if len(subsetsY) > 5 else subsetsY
@@ -128,8 +128,9 @@ def main():
                if modeler.__class__.__name__=='TriInterpolantModeler' or modeler.__class__.__name__ == 'TensorFlow':
                  partK =[1]
                else:
-                 partK=K
-           else: partK=[1]
+                 partK=[2]
+           else:
+               partK=[1]
            error = {"errors": [ ]}
            #random.seed(1)
 
@@ -230,7 +231,7 @@ def main():
                 # Predict and evaluate on seen data
                 print("Evaluating on seen data...")
                 if modeler.__class__.__name__  != 'TriInterpolantModeler':
-                    print("Evaluating on seen data...")
+                    #print("Evaluating on seen data...")
 
                     if modeler.__class__.__name__ != 'TensorFlowW1' and  modeler.__class__.__name__ != 'TensorFlow'and modeler.__class__.__name__ != 'TensorFlowW' and modeler.__class__.__name__ != 'TriInterpolantModeler' and modeler.__class__.__name__ != 'TensorFlowWD':
                         x=1
@@ -330,12 +331,12 @@ def initParameters():
     end = 17000
     startU = 30000
     endU = 31000
-    algs=['NNWCA','NNW1','NNW']
+    algs=['SR']
     # ['SR','LR','RF','NN','NNW','TRI']
 
 
         #['SR','LR','RF','NN','NNW','TRI']
-    cls=['KM']
+    cls=['NNCL']
     #['SR','LR','RF','NN'] algs
     #['KM','DC'] clusterers / cls
 

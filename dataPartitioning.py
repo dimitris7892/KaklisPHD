@@ -6,11 +6,13 @@ import itertools
 import math
 import numpy as np
 import pyearth as sp
+from tensorflow.keras import *
 from scipy.spatial import Delaunay,ConvexHull
 import tensorflow as tf
 from tensorflow import keras
 from scipy import spatial,random
 import colorsys
+from keras import losses
 #from sklearn.model_selection import KFold
 import sys
 sys.setrecursionlimit(1000000)
@@ -102,18 +104,24 @@ class TensorFlowCl(DefaultPartitioner):
 
 
         def getFitnessOfPoint(partitions, cluster, point):
-            return 1.0 / (1.0 + numpy.linalg.norm(np.mean(partitions[cluster]) - point))
+            return 1.0 / (1.0 + np.linalg.norm(np.mean(partitions[cluster]) - point))
+
 
         def baseline_modelDeepCl():
             # create model
+            neurons=3
             model = keras.models.Sequential()
 
-            model.add(keras.layers.Dense(genModelKnots - 1, input_shape=(2,)))
+            model.add(keras.layers.Dense(2, input_shape=(2,)))
 
+            while neurons < genModelKnots -1:
+                model.add(keras.layers.Dense(neurons, ))
+                neurons = neurons+1
             model.add(keras.layers.Dense(genModelKnots - 1, ))
 
             # Compile model
-            model.compile(loss=keras.losses.mean_squared_error, optimizer=keras.optimizers.Adam())
+            model.compile(loss=losses.mean_squared_error, optimizer=keras.optimizers.Adam())
+            ###print(model.summary())
             return model
 
 
@@ -130,6 +138,8 @@ class TensorFlowCl(DefaultPartitioner):
         import csv
         csvModels = []
         genModelKnots = []
+        neurons=3
+
 
         self.modelId = 'Gen'
         self.countTimes = 0
@@ -572,7 +582,7 @@ class TensorFlowCl(DefaultPartitioner):
 
         # estimator.layers[0].set_weights([weights, np.array([0] * (genModelKnots-1))])
 
-        estimator.fit(X, XSplineVector, epochs=10)
+        estimator.fit(X, XSplineVector, epochs=20,verbose=0)
 
         self.flagGen = True
         from scipy.special import softmax
@@ -617,7 +627,7 @@ class TensorFlowCl(DefaultPartitioner):
         return partitionsX, partitionsY, partitionLabels , dataX , dataY,None
 
     def getFitnessOfModelForPoint(self, model, point):
-        return 1.0 / (1.0 + numpy.linalg.norm(np.mean(self._partitionsPerModel[model]) - point))
+        return 1.0 / (1.0 + np.linalg.norm(np.mean(self._partitionsPerModel[model]) - point))
 
 class KMeansPartitioner(DefaultPartitioner):
     # Clusters data, for a given number of clusters
