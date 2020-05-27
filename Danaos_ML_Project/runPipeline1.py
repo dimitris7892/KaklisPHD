@@ -158,7 +158,7 @@ def main():
     # unseensY.append(data[(k+kInit):(n+k+kInit), 7])
     # k = n * i + 10
 
-    trData = data[0:10000]
+    trData = data[0:1000]
     k=0
     kInit =0
     n=20000
@@ -169,7 +169,7 @@ def main():
     #unseenX = data[:, 0:7][90000:].astype(float)
     #unseenY = data[:, 7][90000:].astype(float)
 
-    X_train, X_test, y_train, y_test = train_test_split(data[:,0:7], data[:,7], test_size=0.2,
+    X_train, X_test, y_train, y_test = train_test_split(trData[:,0:7], trData[:,7], test_size=0.2,
                                                         random_state=42)
 
     #dataTrain = np.array(np.append(X_train, np.asmatrix([y_train.reshape(-1)]).T, axis=1))
@@ -209,7 +209,7 @@ def main():
                if modeler.__class__.__name__ == 'PavlosInterpolation':
                  partK = [1]
                elif modeler.__class__.__name__=='TriInterpolantModeler' or modeler.__class__.__name__ == 'TensorFlow':
-                 partK =K
+                 partK =[1]
                else:
                  partK=K
            error = {"errors": []}
