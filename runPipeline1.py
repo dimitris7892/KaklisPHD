@@ -108,7 +108,7 @@ def main():
     histTr=[]
     counter=0
 
-    K = range(1,20)
+    K = range(1,25)
     print("Number of Statistically ind. subsets for training: " + str(len(subsetsX)))
     subsetsX=[subsetsX[0:5]] if len(subsetsX) > 5 else subsetsX
     subsetsY = [ subsetsY[ 0:5 ] ] if len(subsetsY) > 5 else subsetsY
@@ -129,8 +129,9 @@ def main():
                if modeler.__class__.__name__=='TriInterpolantModeler' or modeler.__class__.__name__ == 'TensorFlow':
                  partK =[1]
                else:
-                 partK=[10]
-           else: partK=[1]
+                 partK=[2]
+           else:
+               partK=[1]
            error = {"errors": [ ]}
            #random.seed(1)
 
