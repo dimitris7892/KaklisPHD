@@ -1182,7 +1182,8 @@ class BaseSeriesReader:
                                        pathOfRawData=None,comparisonTest=None,dataTrain=None):
 
         boolTlg = telegrams
-        pathExcel = '/home/dimitris/Desktop/template.xlsx'
+        pathExcel = 'C:/Users/dkaklis/Desktop/template.xlsx'
+        #'/home/dimitris/Desktop/template.xlsx'
         ##public vars
 
         if systemType=='LEMAG':
@@ -1328,6 +1329,7 @@ class BaseSeriesReader:
                     for row in cursor_myserver.fetchall():
                             vessel_code = row[0]
                     #else: vessel_code = vCode
+                    vessel_code='502'
                     cursor_myserver.execute(
                         'SELECT  TELEGRAM_DATE , TELEGRAM_TYPE,BALAST_FLAG,LATITUDE_DEGREES , LATITUDE_SECONDS ,LONGITUDE_DEGREES , LONGITUDE_SECONDS ,vessel_course,(DRAFT_AFT + DRAFT_FORE)/2 as DRAFT , ENGINE_RPM , WIND_DIRECTION , WIND_FORCE  ,AVERAGE_SPEED ,hours_slc,minutes_slc, (( NVL(ME_HSFO_CONS,0)+ NVL(ME_LSFO_CONS,0)+ NVL(ME_HSDO_CONS,0 ) + NVL(ME_LSDO_CONS,0)))   as ME_CONS_24h , (DRAFT_AFT-DRAFT_FORE) AS TRIM  FROM TELEGRAMS where vessel_code = '"'" + vessel_code + "'" 'AND (telegram_type='"'N'"' or telegram_type='"'A'"' ) ')
 

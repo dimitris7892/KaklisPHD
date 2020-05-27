@@ -2,310 +2,37 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="9e10e853-69bc-4a18-9c9f-e2f3d9527f23" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/NEWres_1.csv" beforeDir="false" afterPath="$PROJECT_DIR$/Danaos_ML_Project/NEWres_1.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/dataModeling.py" beforeDir="false" afterPath="$PROJECT_DIR$/Danaos_ML_Project/dataModeling.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/dataReading.py" beforeDir="false" afterPath="$PROJECT_DIR$/Danaos_ML_Project/dataReading.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/errorEpochCLusters.csv" beforeDir="false" afterPath="$PROJECT_DIR$/Danaos_ML_Project/errorEpochCLusters.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/evaluation.py" beforeDir="false" afterPath="$PROJECT_DIR$/Danaos_ML_Project/evaluation.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/model_Gen_.csv" beforeDir="false" afterPath="$PROJECT_DIR$/Danaos_ML_Project/model_Gen_.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/runPipeline1.py" beforeDir="false" afterPath="$PROJECT_DIR$/Danaos_ML_Project/runPipeline1.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/NEWres_1.csv" beforeDir="false" afterPath="$PROJECT_DIR$/NEWres_1.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dataPartitioning.py" beforeDir="false" afterPath="$PROJECT_DIR$/dataPartitioning.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/evaluation.py" beforeDir="false" afterPath="$PROJECT_DIR$/evaluation.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/model_Gen_.csv" beforeDir="false" afterPath="$PROJECT_DIR$/model_Gen_.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/runPipeline1.py" beforeDir="false" afterPath="$PROJECT_DIR$/runPipeline1.py" afterDir="false" />
     </list>
-    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
-    <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
-  <component name="FileEditorManager">
-    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="dataPartitioning.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/dataPartitioning.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1717">
-              <caret line="112" column="42" lean-forward="false" selection-start-line="102" selection-start-column="7" selection-end-line="112" selection-end-column="42" />
-              <folding>
-                <element signature="e#5784#10879#0" expanded="false" />
-                <element signature="e#10916#24857#0" expanded="false" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="dataReading.py" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/Danaos_ML_Project/dataReading.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-1751">
-              <caret line="2366" column="69" lean-forward="true" selection-start-line="2366" selection-start-column="69" selection-end-line="2366" selection-end-column="69" />
-              <folding>
-                <element signature="e#0#18#0" expanded="true" />
-                <element signature="e#156177#184033#0" expanded="false" />
-                <element signature="e#184088#217551#0" expanded="false" />
-                <element signature="e#233765#274899#0" expanded="false" />
-                <element signature="e#255562#274834#0" expanded="false" />
-                <element signature="e#297420#300501#0" expanded="false" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="runPipeline1.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/runPipeline1.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="476">
-              <caret line="44" column="4" lean-forward="false" selection-start-line="44" selection-start-column="4" selection-end-line="44" selection-end-column="4" />
-              <folding>
-                <element signature="e#0#27#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="evaluation.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/evaluation.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="289">
-              <caret line="37" column="35" lean-forward="false" selection-start-line="37" selection-start-column="35" selection-end-line="37" selection-end-column="35" />
-              <folding>
-                <element signature="e#0#18#0" expanded="true" />
-                <element signature="e#1483#2229#0" expanded="false" />
-                <element signature="e#2271#2363#0" expanded="false" />
-                <element signature="e#2403#2468#0" expanded="false" />
-                <element signature="e#2513#2584#0" expanded="false" />
-                <element signature="e#2642#2896#0" expanded="false" />
-                <element signature="e#2956#3629#0" expanded="false" />
-                <element signature="e#3677#3878#0" expanded="false" />
-                <element signature="e#3915#3983#0" expanded="false" />
-                <element signature="e#4084#4172#0" expanded="false" />
-                <element signature="e#4277#37594#0" expanded="false" />
-                <element signature="e#37657#37858#0" expanded="false" />
-                <element signature="e#37926#61173#0" expanded="false" />
-                <element signature="e#61285#67786#0" expanded="false" />
-                <element signature="e#67863#68996#0" expanded="false" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="dataReading.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/dataReading.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="646">
-              <caret line="51" column="51" lean-forward="false" selection-start-line="51" selection-start-column="51" selection-end-line="51" selection-end-column="51" />
-              <folding>
-                <element signature="e#27#45#0" expanded="true" />
-                <element signature="e#1072#1427#0" expanded="false" />
-                <element signature="e#1492#3106#0" expanded="false" />
-                <element signature="e#3173#4808#0" expanded="false" />
-                <element signature="e#4892#5332#0" expanded="false" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="dataModeling.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/dataModeling.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="76245">
-              <caret line="6646" column="39" lean-forward="false" selection-start-line="6646" selection-start-column="39" selection-end-line="6646" selection-end-column="39" />
-              <folding>
-                <element signature="e#0#33#0" expanded="true" />
-                <element signature="e#1806#2050#0" expanded="false" />
-                <element signature="e#2122#2681#0" expanded="false" />
-                <element signature="e#2743#2799#0" expanded="false" />
-                <element signature="e#2865#2875#0" expanded="false" />
-                <element signature="e#2934#3085#0" expanded="false" />
-                <element signature="e#3156#3830#0" expanded="false" />
-                <element signature="e#3889#4031#0" expanded="false" />
-                <element signature="e#4091#5007#0" expanded="false" />
-                <element signature="e#5055#31673#0" expanded="false" />
-                <element signature="e#6878#21962#0" expanded="false" />
-                <element signature="e#22007#23971#0" expanded="false" />
-                <element signature="e#259950#329435#0" expanded="false" />
-                <element signature="e#329490#330840#0" expanded="false" />
-                <element signature="e#330987#333423#0" expanded="false" />
-                <element signature="e#334256#334851#0" expanded="false" />
-                <element signature="e#334914#335824#0" expanded="false" />
-                <element signature="e#335885#337597#0" expanded="false" />
-                <element signature="e#337655#339971#0" expanded="false" />
-                <marker date="1584347356429" expanded="true" signature="251047:251212" ph="..." />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="model_Gen_.csv" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/model_Gen_.csv">
-          <provider selected="true" editor-type-id="csv-text-editor">
-            <state relative-caret-position="238">
-              <caret line="14" column="0" lean-forward="false" selection-start-line="14" selection-start-column="0" selection-end-line="14" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-          <provider editor-type-id="csv-table-editor">
-            <state showInfoPanel="true" fixedHeaders="false" rowLines="3" />
-          </provider>
-        </entry>
-      </file>
-    </leaf>
-  </component>
-  <component name="FindInProjectRecents">
-    <findStrings>
-      <find>trim</find>
-      <find>strp</find>
-      <find>mileni</find>
-      <find>%</find>
-      <find>:</find>
-      <find>strptime</find>
-      <find>weights</find>
-      <find>self.intercepts</find>
-      <find>connect</find>
-      <find>datetime</find>
-      <find>2019-01-01</find>
-      <find>2019-01-02</find>
-      <find>np.std</find>
-      <find>np.append(</find>
-      <find>join</find>
-      <find>np.delete</find>
-      <find>fillExcelProfCons</find>
-      <find>readExtractNewDataset</find>
-      <find>data_writer</find>
-      <find>ballastDt10_3</find>
-      <find>vector</find>
-      <find>earth</find>
-      <find>bearing</find>
-      <find>sp</find>
-      <find>getActualWindDirFromWindSensor</find>
-      <find>getRelativeDirectionWeatherVessel</find>
-      <find>tlgarrayFoc.__len__() &gt; 5</find>
-      <find>tlgarrayFoc.__len__() &gt; 40</find>
-      <find>and k[8] &gt; 0</find>
-      <find>tlgarrayFoc.__len__() &gt; 1400</find>
-    </findStrings>
-    <replaceStrings>
-      <replace>&gt; 9</replace>
-      <replace>data[0], data[1], data[2], data[3], data[4], data[5],data[6],data[7],data[8]</replace>
-      <replace>0</replace>
-      <replace>tlgarrayFoc.__len__() &gt; 40</replace>
-      <replace>tlgarrayFoc.__len__() &gt; 1400</replace>
-      <replace>and k[8] &gt; 2</replace>
-      <replace>tlgarrayFoc.__len__() &gt; 5</replace>
-    </replaceStrings>
-  </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="IdeDocumentHistory">
-    <option name="CHANGED_PATHS">
-      <list>
-        <option value="$PROJECT_DIR$/MT_DELTA_MARIA_data.csv" />
-        <option value="$PROJECT_DIR$/results.csv" />
-        <option value="$PROJECT_DIR$/cluster_0_.csv" />
-        <option value="$USER_HOME$/AppData/Roaming/python/python36/site-packages/keras/models.py" />
-        <option value="$PROJECT_DIR$/model_6_.csv" />
-        <option value="$PROJECT_DIR$/model_7_.csv" />
-        <option value="$PROJECT_DIR$/model_3_.csv" />
-        <option value="$PROJECT_DIR$/model_9_.csv" />
-        <option value="$PROJECT_DIR$/model_11_.csv" />
-        <option value="$PROJECT_DIR$/model_2_.csv" />
-        <option value="$PROJECT_DIR$/model_4_.csv" />
-        <option value="$PROJECT_DIR$/model_5_.csv" />
-        <option value="$PROJECT_DIR$/featureCalculation.py" />
-        <option value="$PROJECT_DIR$/model_0_.csv" />
-        <option value="$PROJECT_DIR$/model_1_.csv" />
-        <option value="$PROJECT_DIR$/cluster_7_.csv" />
-        <option value="$PROJECT_DIR$/Danaos_Prediction_Module.py" />
-        <option value="$PROJECT_DIR$/MT_DELTA_MARIA_draft6_7stw_8_8.5.csv" />
-        <option value="$PROJECT_DIR$/MT_DELTA_MARIA_draftS_9_stw_8_8.5.csv" />
-        <option value="$PROJECT_DIR$/runPipelineD.py" />
-        <option value="$PROJECT_DIR$/daysSinceLastDryDock.csv" />
-        <option value="$PROJECT_DIR$/utils.py" />
-        <option value="$PROJECT_DIR$/dataPartitioning.py" />
-        <option value="$PROJECT_DIR$/windDirMapped.csv" />
-        <option value="$PROJECT_DIR$/newUtils.py" />
-        <option value="$PROJECT_DIR$/WSraw.csv" />
-        <option value="$PROJECT_DIR$/data/LAROS/Draft.csv" />
-        <option value="$PROJECT_DIR$/data/LAROS/DraftAFT.csv" />
-        <option value="$PROJECT_DIR$/data/LAROS/UNK.csv" />
-        <option value="$PROJECT_DIR$/dataReadingD.py" />
-        <option value="$PROJECT_DIR$/data/MARMARAS/noon_reports_MT_DELTA_MARIA.csv" />
-        <option value="$PROJECT_DIR$/dataReading.py" />
-        <option value="$PROJECT_DIR$/model_Gen_.csv" />
-        <option value="$USER_HOME$/AppData/Roaming/python/python36/site-packages/cx_Oracle/custom_exceptions.py" />
-        <option value="$USER_HOME$/AppData/Roaming/python/python36/site-packages/cx_Oracle/utils.py" />
-        <option value="$USER_HOME$/AppData/Roaming/python/python36/site-packages/cx_Oracle/connection.py" />
-        <option value="$USER_HOME$/AppData/Roaming/python/python36/site-packages/cx_Oracle/__init__.py" />
-        <option value="$USER_HOME$/AppData/Roaming/python/python36/site-packages/cx_Oracle/oci.py" />
-        <option value="$USER_HOME$/AppData/Roaming/python/python36/site-packages/cx_Oracle/buffer.py" />
-        <option value="$USER_HOME$/AppData/Roaming/python/python36/site-packages/cx_Oracle/environment.py" />
-        <option value="$USER_HOME$/AppData/Roaming/python/python36/site-packages/cx_Oracle/error.py" />
-        <option value="$USER_HOME$/AppData/Roaming/python/python36/site-packages/cx_Oracle/cursor.py" />
-        <option value="$USER_HOME$/AppData/Roaming/python/python36/site-packages/cx_Oracle/pythonic_oci.py" />
-        <option value="$PROJECT_DIR$/data/MILLENIA/TELEGRAMS/FANTASIA.csv" />
-        <option value="/fragment.py" />
-        <option value="$PROJECT_DIR$/evaluation.py" />
-        <option value="$PROJECT_DIR$/dataModeling.py" />
-        <option value="$PROJECT_DIR$/data/GOLDENPORT/TELEGRAMS/TRAMMO LAOURA.csv" />
-        <option value="$PROJECT_DIR$/runPipeline1.py" />
-        <option value="$PROJECT_DIR$/Danaos_ML_Project/dataReading.py" />
-      </list>
-    </option>
-  </component>
-  <component name="ProjectFrameBounds" extendedState="7">
-    <option name="x" value="185" />
-    <option name="y" value="127" />
-    <option name="width" value="1040" />
-    <option name="height" value="744" />
-  </component>
-  <component name="ProjectView">
-    <navigator currentView="ProjectPane" proportions="" version="1">
-      <flattenPackages />
-      <showMembers />
-      <showModules />
-      <showLibraryContents />
-      <hideEmptyPackages />
-      <abbreviatePackageNames />
-      <autoscrollToSource />
-      <autoscrollFromSource />
-      <sortByType />
-      <manualOrder />
-      <foldersAlwaysOnTop value="true" />
-    </navigator>
-    <panes>
-      <pane id="Scope" />
-      <pane id="Scratches" />
-      <pane id="ProjectPane">
-        <subPane>
-          <expand>
-            <path>
-              <item name="KaklisPHD" type="b2602c69:ProjectViewProjectNode" />
-              <item name="KaklisPHD" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="KaklisPHD" type="b2602c69:ProjectViewProjectNode" />
-              <item name="KaklisPHD" type="462c0819:PsiDirectoryNode" />
-              <item name="Danaos_ML_Project" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="KaklisPHD" type="b2602c69:ProjectViewProjectNode" />
-              <item name="KaklisPHD" type="462c0819:PsiDirectoryNode" />
-              <item name="data" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="KaklisPHD" type="b2602c69:ProjectViewProjectNode" />
-              <item name="KaklisPHD" type="462c0819:PsiDirectoryNode" />
-              <item name="data" type="462c0819:PsiDirectoryNode" />
-              <item name="GOLDENPORT" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="KaklisPHD" type="b2602c69:ProjectViewProjectNode" />
-              <item name="KaklisPHD" type="462c0819:PsiDirectoryNode" />
-              <item name="data" type="462c0819:PsiDirectoryNode" />
-              <item name="OCEAN_GOLD" type="462c0819:PsiDirectoryNode" />
-            </path>
-          </expand>
-          <select />
-        </subPane>
-      </pane>
-    </panes>
+  <component name="ProjectId" id="1cODYAyIkjonpcqbEyf1oZbczPg" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">
-    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
+    <property name="full.screen.before.presentation.mode" value="false" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/../neurals/use/Danaos_Prediction_Module.py" />
+    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
     <property name="two.files.diff.last.used.file" value="$PROJECT_DIR$/estimatorCl_1.h5" />
   </component>
   <component name="RecentsManager">
@@ -324,20 +51,9 @@
       <recent name="C:\Users\dkaklis\Desktop\KaklisPHD\data\OCEAN_GOLD" />
     </key>
   </component>
-  <component name="RunDashboard">
-    <option name="ruleStates">
-      <list>
-        <RuleState>
-          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
-        </RuleState>
-        <RuleState>
-          <option name="name" value="StatusDashboardGroupingRule" />
-        </RuleState>
-      </list>
-    </option>
-  </component>
-  <component name="RunManager" selected="Python.runPipeline1">
+  <component name="RunManager" selected="Python.runPipeline1 (1)">
     <configuration name="Danaos_Prediction_Module" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="KaklisPHD" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <envs>
@@ -348,13 +64,17 @@
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <module name="KaklisPHD" />
       <option name="SCRIPT_NAME" value="C:\Users\dkaklis\Desktop\KaklisPHD\Neurals_pvlos\Danaos_Prediction_Module.py" />
       <option name="PARAMETERS" value="p_eng_foc_paulos.h5 p_eng_foc_paulos_my_scaler_x p_eng_foc_paulos_my_scaler_y ShipData.csv" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
     </configuration>
     <configuration name="Unnamed" type="PythonConfigurationType" factoryName="Python">
+      <module name="KaklisPHD" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <envs>
@@ -365,13 +85,38 @@
       <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <module name="KaklisPHD" />
       <option name="SCRIPT_NAME" value="" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="runPipeline1 (1)" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="KaklisPHD" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/Danaos_ML_Project" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/Danaos_ML_Project/runPipeline1.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
     </configuration>
     <configuration name="runPipeline1" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="KaklisPHD" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <envs>
@@ -382,13 +127,17 @@
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <module name="KaklisPHD" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/runPipeline1.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
     </configuration>
     <configuration name="runPipelineD" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="KaklisPHD" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <envs>
@@ -399,28 +148,33 @@
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <module name="KaklisPHD" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/runPipelineD.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
     </configuration>
-    <list size="4">
-      <item index="0" class="java.lang.String" itemvalue="Python.Unnamed" />
-      <item index="1" class="java.lang.String" itemvalue="Python.runPipeline1" />
-      <item index="2" class="java.lang.String" itemvalue="Python.runPipelineD" />
-      <item index="3" class="java.lang.String" itemvalue="Python.Danaos_Prediction_Module" />
+    <list>
+      <item itemvalue="Python.Unnamed" />
+      <item itemvalue="Python.Danaos_Prediction_Module" />
+      <item itemvalue="Python.runPipeline1" />
+      <item itemvalue="Python.runPipelineD" />
+      <item itemvalue="Python.runPipeline1 (1)" />
     </list>
     <recent_temporary>
-      <list size="3">
-        <item index="0" class="java.lang.String" itemvalue="Python.runPipeline1" />
-        <item index="1" class="java.lang.String" itemvalue="Python.runPipelineD" />
-        <item index="2" class="java.lang.String" itemvalue="Python.Danaos_Prediction_Module" />
+      <list>
+        <item itemvalue="Python.runPipeline1 (1)" />
+        <item itemvalue="Python.runPipeline1" />
+        <item itemvalue="Python.runPipelineD" />
+        <item itemvalue="Python.Danaos_Prediction_Module" />
       </list>
     </recent_temporary>
   </component>
-  <component name="ShelveChangesManager" show_recycled="false">
-    <option name="remove_strategy" value="false" />
+  <component name="SvnConfiguration">
+    <configuration />
   </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
@@ -440,55 +194,134 @@
     <option name="localTasksCounter" value="2" />
     <servers />
   </component>
-  <component name="ToolWindowManager">
-    <frame x="-8" y="-8" width="1936" height="1052" extended-state="7" />
-    <layout>
-      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.21927084" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
-      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.2777191" sideWeight="0.50208336" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.17317846" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.2745512" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.22069694" sideWeight="0.49791667" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Data View" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.56927085" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
-      <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
-      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3273495" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-    </layout>
-    <layout-to-restore>
-      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
-      <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.2777191" sideWeight="0.50208336" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.17317846" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
-      <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.2745512" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.17916666" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
-      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3273495" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.22069694" sideWeight="0.49791667" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Data View" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.56927085" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-    </layout-to-restore>
-  </component>
-  <component name="VcsContentAnnotationSettings">
-    <option name="myLimit" value="2678400000" />
-  </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="forgot to commit" />
     <option name="LAST_COMMIT_MESSAGE" value="forgot to commit" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="715" y="222" key="#xdebugger.evaluate" timestamp="1590500401014">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="715" y="222" key="#xdebugger.evaluate/0.0.1920.1040/1920.0.1920.1080@0.0.1920.1040" timestamp="1590411530247" />
+    <state x="715" y="222" key="#xdebugger.evaluate/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1590500401014" />
+    <state width="1898" height="176" key="GridCell.Tab.0.bottom" timestamp="1590500489248">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1898" height="225" key="GridCell.Tab.0.bottom/-1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1590486405344" />
+    <state width="1898" height="225" key="GridCell.Tab.0.bottom/0.0.1920.1040/1920.0.1920.1080@0.0.1920.1040" timestamp="1590482788109" />
+    <state width="1898" height="176" key="GridCell.Tab.0.bottom/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1590500489248" />
+    <state width="1898" height="176" key="GridCell.Tab.0.center" timestamp="1590500489248">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1898" height="225" key="GridCell.Tab.0.center/-1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1590486405344" />
+    <state width="1898" height="225" key="GridCell.Tab.0.center/0.0.1920.1040/1920.0.1920.1080@0.0.1920.1040" timestamp="1590482788109" />
+    <state width="1898" height="176" key="GridCell.Tab.0.center/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1590500489248" />
+    <state width="1898" height="176" key="GridCell.Tab.0.left" timestamp="1590500489248">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1898" height="225" key="GridCell.Tab.0.left/-1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1590486405344" />
+    <state width="1898" height="225" key="GridCell.Tab.0.left/0.0.1920.1040/1920.0.1920.1080@0.0.1920.1040" timestamp="1590482788109" />
+    <state width="1898" height="176" key="GridCell.Tab.0.left/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1590500489248" />
+    <state width="1898" height="176" key="GridCell.Tab.0.right" timestamp="1590500489248">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1898" height="225" key="GridCell.Tab.0.right/-1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1590486405344" />
+    <state width="1898" height="225" key="GridCell.Tab.0.right/0.0.1920.1040/1920.0.1920.1080@0.0.1920.1040" timestamp="1590482788109" />
+    <state width="1898" height="176" key="GridCell.Tab.0.right/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1590500489248" />
+    <state width="1898" height="176" key="GridCell.Tab.1.bottom" timestamp="1590500489248">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1898" height="176" key="GridCell.Tab.1.bottom/0.0.1920.1040/1920.0.1920.1080@0.0.1920.1040" timestamp="1590480545382" />
+    <state width="1898" height="176" key="GridCell.Tab.1.bottom/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1590500489248" />
+    <state width="1898" height="176" key="GridCell.Tab.1.center" timestamp="1590500489248">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1898" height="176" key="GridCell.Tab.1.center/0.0.1920.1040/1920.0.1920.1080@0.0.1920.1040" timestamp="1590480545382" />
+    <state width="1898" height="176" key="GridCell.Tab.1.center/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1590500489248" />
+    <state width="1898" height="176" key="GridCell.Tab.1.left" timestamp="1590500489248">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1898" height="176" key="GridCell.Tab.1.left/0.0.1920.1040/1920.0.1920.1080@0.0.1920.1040" timestamp="1590480545382" />
+    <state width="1898" height="176" key="GridCell.Tab.1.left/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1590500489248" />
+    <state width="1898" height="176" key="GridCell.Tab.1.right" timestamp="1590500489248">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1898" height="176" key="GridCell.Tab.1.right/0.0.1920.1040/1920.0.1920.1080@0.0.1920.1040" timestamp="1590480545382" />
+    <state width="1898" height="176" key="GridCell.Tab.1.right/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1590500489248" />
+    <state x="1168" y="134" width="752" height="906" key="GridCell.Tab.2.bottom" timestamp="1590500352302">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="921" y="127" width="752" height="906" key="GridCell.Tab.2.bottom/0.0.1920.1040/1920.0.1920.1080@0.0.1920.1040" timestamp="1590480489632" />
+    <state x="1168" y="134" width="752" height="906" key="GridCell.Tab.2.bottom/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1590500352302" />
+    <state x="1168" y="134" width="752" height="906" key="GridCell.Tab.2.center" timestamp="1590500352302">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="921" y="127" width="752" height="906" key="GridCell.Tab.2.center/0.0.1920.1040/1920.0.1920.1080@0.0.1920.1040" timestamp="1590480489632" />
+    <state x="1168" y="134" width="752" height="906" key="GridCell.Tab.2.center/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1590500352302" />
+    <state x="1168" y="134" width="752" height="906" key="GridCell.Tab.2.left" timestamp="1590500489248">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="921" y="127" width="752" height="906" key="GridCell.Tab.2.left/0.0.1920.1040/1920.0.1920.1080@0.0.1920.1040" timestamp="1590480545382" />
+    <state x="1168" y="134" width="752" height="906" key="GridCell.Tab.2.left/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1590500489248" />
+    <state x="1168" y="134" width="752" height="906" key="GridCell.Tab.2.right" timestamp="1590500352302">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="921" y="127" width="752" height="906" key="GridCell.Tab.2.right/0.0.1920.1040/1920.0.1920.1080@0.0.1920.1040" timestamp="1590480489632" />
+    <state x="1168" y="134" width="752" height="906" key="GridCell.Tab.2.right/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1590500352302" />
+    <state x="1168" y="134" width="752" height="906" key="GridCell.Tab.3.bottom" timestamp="1590500352286">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="921" y="127" width="752" height="906" key="GridCell.Tab.3.bottom/0.0.1920.1040/1920.0.1920.1080@0.0.1920.1040" timestamp="1590480489601" />
+    <state x="1168" y="134" width="752" height="906" key="GridCell.Tab.3.bottom/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1590500352286" />
+    <state x="1168" y="134" width="752" height="906" key="GridCell.Tab.3.center" timestamp="1590500352286">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="921" y="127" width="752" height="906" key="GridCell.Tab.3.center/0.0.1920.1040/1920.0.1920.1080@0.0.1920.1040" timestamp="1590480489601" />
+    <state x="1168" y="134" width="752" height="906" key="GridCell.Tab.3.center/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1590500352286" />
+    <state x="1168" y="134" width="752" height="906" key="GridCell.Tab.3.left" timestamp="1590500352286">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="921" y="127" width="752" height="906" key="GridCell.Tab.3.left/0.0.1920.1040/1920.0.1920.1080@0.0.1920.1040" timestamp="1590480489601" />
+    <state x="1168" y="134" width="752" height="906" key="GridCell.Tab.3.left/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1590500352286" />
+    <state x="1168" y="134" width="752" height="906" key="GridCell.Tab.3.right" timestamp="1590500352286">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="921" y="127" width="752" height="906" key="GridCell.Tab.3.right/0.0.1920.1040/1920.0.1920.1080@0.0.1920.1040" timestamp="1590480489601" />
+    <state x="1168" y="134" width="752" height="906" key="GridCell.Tab.3.right/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1590500352286" />
+    <state x="461" y="151" key="SettingsEditor" timestamp="1590504069127">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="461" y="151" key="SettingsEditor/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1590504069127" />
+    <state x="921" y="127" width="768" height="944" key="dock-window-1" timestamp="1590412364556">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="921" y="127" width="768" height="944" key="dock-window-1/0.0.1920.1040/1920.0.1920.1080@0.0.1920.1040" timestamp="1590412364556" />
+    <state x="921" y="127" width="768" height="944" key="dock-window-1/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1590407479170" />
+    <state x="921" y="127" width="768" height="944" key="dock-window-2" timestamp="1590480505926">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="921" y="127" width="768" height="944" key="dock-window-2/0.0.1920.1040/1920.0.1920.1080@0.0.1920.1040" timestamp="1590480505926" />
+    <state x="921" y="127" width="768" height="944" key="dock-window-2/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1590407479170" />
+    <state x="921" y="127" width="768" height="944" key="dock-window-3" timestamp="1590491595237">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="921" y="127" width="768" height="944" key="dock-window-3/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1590491595237" />
+    <state x="1208" y="1005" width="768" height="944" key="dock-window-4" timestamp="1590491595237">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="1208" y="1005" width="768" height="944" key="dock-window-4/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1590491595237" />
+    <state x="1168" y="134" width="768" height="944" key="dock-window-5" timestamp="1590491595237">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="1168" y="134" width="768" height="944" key="dock-window-5/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1590491595237" />
+    <state x="1168" y="134" width="768" height="944" key="dock-window-6" timestamp="1590491595237">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="1168" y="134" width="768" height="944" key="dock-window-6/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1590491595237" />
+    <state x="1168" y="134" width="768" height="944" key="dock-window-7" timestamp="1590500493292">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="1168" y="134" width="768" height="944" key="dock-window-7/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1590500493292" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -505,63 +338,13 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/dataModeling.py</url>
-          <line>3562</line>
+          <line>1799</line>
           <option name="timeStamp" value="469" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/dataModeling.py</url>
-          <line>3588</line>
-          <option name="timeStamp" value="470" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/dataModeling.py</url>
-          <line>3604</line>
-          <option name="timeStamp" value="471" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/dataModeling.py</url>
-          <line>3619</line>
-          <option name="timeStamp" value="472" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/dataModeling.py</url>
-          <line>3636</line>
-          <option name="timeStamp" value="473" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/dataModeling.py</url>
-          <line>3648</line>
-          <option name="timeStamp" value="474" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/dataModeling.py</url>
-          <line>3663</line>
-          <option name="timeStamp" value="475" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/dataModeling.py</url>
-          <line>3676</line>
+          <line>1800</line>
           <option name="timeStamp" value="477" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/dataModeling.py</url>
-          <line>3519</line>
-          <option name="timeStamp" value="479" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/dataModeling.py</url>
-          <line>3530</line>
-          <option name="timeStamp" value="483" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/dataModeling.py</url>
-          <line>3506</line>
-          <option name="timeStamp" value="485" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/dataModeling.py</url>
-          <line>3226</line>
-          <option name="timeStamp" value="497" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$USER_HOME$/AppData/Roaming/python/python36/site-packages/tensorflow/python/keras/_impl/keras/engine/training.py</url>
@@ -580,17 +363,17 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/Danaos_ML_Project/dataReading.py</url>
-          <line>4649</line>
+          <line>5834</line>
           <option name="timeStamp" value="1022" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/Danaos_ML_Project/dataReading.py</url>
-          <line>4503</line>
+          <line>5688</line>
           <option name="timeStamp" value="1028" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/Danaos_ML_Project/dataReading.py</url>
-          <line>4488</line>
+          <line>5673</line>
           <option name="timeStamp" value="1031" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
@@ -600,33 +383,58 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/Danaos_ML_Project/dataReading.py</url>
-          <line>659</line>
+          <line>1530</line>
           <option name="timeStamp" value="1147" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/Danaos_ML_Project/dataReading.py</url>
-          <line>647</line>
+          <line>1518</line>
           <option name="timeStamp" value="1148" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/Danaos_ML_Project/dataReading.py</url>
-          <line>609</line>
+          <line>1480</line>
           <option name="timeStamp" value="1150" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/Danaos_ML_Project/dataReading.py</url>
-          <line>3160</line>
+          <line>4350</line>
           <option name="timeStamp" value="1278" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/Danaos_ML_Project/dataReading.py</url>
-          <line>1009</line>
+          <line>1880</line>
           <option name="timeStamp" value="1334" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/Danaos_ML_Project/dataReading.py</url>
-          <line>2683</line>
+          <line>3767</line>
           <option name="timeStamp" value="1401" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/Danaos_ML_Project/evaluation.py</url>
+          <line>110</line>
+          <option name="timeStamp" value="1406" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/Danaos_ML_Project/dataReading.py</url>
+          <line>1978</line>
+          <option name="timeStamp" value="1407" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/Danaos_ML_Project/dataReading.py</url>
+          <line>1334</line>
+          <option name="timeStamp" value="1409" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/dataPartitioning.py</url>
+          <line>175</line>
+          <option name="timeStamp" value="1412" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/Danaos_ML_Project/evaluation.py</url>
+          <line>181</line>
+          <option name="timeStamp" value="1413" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
@@ -636,366 +444,6 @@
           </properties>
         </breakpoint>
       </default-breakpoints>
-      <option name="time" value="1402" />
     </breakpoint-manager>
-    <watches-manager />
-  </component>
-  <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/data/MARMARAS/noon_reports.csv" />
-    <entry file="file://$PROJECT_DIR$/data/MILLENIA/TELEGRAMS/MARIA_M_TLG.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="194" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/data/MILLENIA/DOMINIA .csv" />
-    <entry file="file://$PROJECT_DIR$/dataReadingD.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-2227">
-          <caret line="891" column="63" lean-forward="false" selection-start-line="891" selection-start-column="63" selection-end-line="891" selection-end-column="63" />
-          <folding>
-            <element signature="e#0#18#0" expanded="true" />
-            <element signature="e#149108#152189#0" expanded="false" />
-            <marker date="1582704801802" expanded="false" signature="311:4622" ph="..." />
-            <marker date="1582704801802" expanded="false" signature="4747:9686" ph="..." />
-            <marker date="1582704801802" expanded="false" signature="9734:36023" ph="..." />
-            <marker date="1582704801802" expanded="false" signature="9855:13762" ph="..." />
-            <marker date="1582704801802" expanded="false" signature="14124:36023" ph="..." />
-            <marker date="1582704801802" expanded="false" signature="87910:106459" ph="..." />
-            <marker date="1582704801802" expanded="false" signature="126634:149055" ph="..." />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$APPLICATION_HOME_DIR$/helpers/typeshed/stdlib/3/datetime.pyi">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/AppData/Local/Programs/Python/Python36/Lib/operator.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/AppData/Roaming/python/python36/site-packages/cx_Oracle/connection.py" />
-    <entry file="file://$USER_HOME$/AppData/Roaming/python/python36/site-packages/cx_Oracle/utils.py" />
-    <entry file="file://$USER_HOME$/AppData/Roaming/python/python36/site-packages/cx_Oracle/custom_exceptions.py" />
-    <entry file="file://$USER_HOME$/AppData/Roaming/python/python36/site-packages/cx_Oracle/oci.py" />
-    <entry file="file://$USER_HOME$/AppData/Roaming/python/python36/site-packages/cx_Oracle/buffer.py" />
-    <entry file="file://$USER_HOME$/AppData/Roaming/python/python36/site-packages/cx_Oracle/environment.py" />
-    <entry file="file://$USER_HOME$/AppData/Roaming/python/python36/site-packages/cx_Oracle/error.py" />
-    <entry file="file://$USER_HOME$/AppData/Roaming/python/python36/site-packages/cx_Oracle/datetimevar.py" />
-    <entry file="file://$USER_HOME$/AppData/Roaming/python/python36/site-packages/cx_Oracle/pythonic_oci.py" />
-    <entry file="file://$USER_HOME$/AppData/Local/Programs/Python/Python36/Lib/locale.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/AppData/Local/Programs/Python/Python36/Lib/site-packages/sklearn/cluster/__init__.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/cx_Oracle/oci.py" />
-    <entry file="file://$USER_HOME$/AppData/Roaming/python/python36/site-packages/cx_Oracle/__init__.py" />
-    <entry file="file://$PROJECT_DIR$/cx_Oracle/cursor.py" />
-    <entry file="file://$USER_HOME$/AppData/Roaming/python/python36/site-packages/cx_Oracle/cursor.py" />
-    <entry file="file://$USER_HOME$/.PyCharmCE2017.2/system/python_stubs/-1519680916/cx_Oracle/__init__.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/data/MILLENIA/FANTASIA.csv" />
-    <entry file="file://$PROJECT_DIR$/data/MILLENIA/TELEGRAMS/MARIA_M_TLG.csv">
-      <provider selected="true" editor-type-id="csv-text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-      <provider editor-type-id="csv-table-editor">
-        <state showInfoPanel="true" fixedHeaders="false" rowLines="3" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/data/MILLENIA/TELEGRAMS/MARIA_M.csv">
-      <provider selected="true" editor-type-id="csv-text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-      <provider editor-type-id="csv-table-editor">
-        <state showInfoPanel="true" fixedHeaders="false" rowLines="3" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/data/MILLENIA/FANTASIA" />
-    <entry file="file://$PROJECT_DIR$/data/MILLENIA/TELEGRAMS/FANTASIA.csv">
-      <provider selected="true" editor-type-id="csv-text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="204" lean-forward="true" selection-start-line="0" selection-start-column="204" selection-end-line="0" selection-end-column="204" />
-        </state>
-      </provider>
-      <provider editor-type-id="csv-table-editor">
-        <state showInfoPanel="true" fixedHeaders="false" rowLines="3" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/data/MARMARAS/MT_DELTA_MARIA.csv">
-      <provider selected="true" editor-type-id="LargeFileEditor">
-        <state relative-caret-position="-14142">
-          <caret line="16" column="50" lean-forward="true" selection-start-line="16" selection-start-column="50" selection-end-line="16" selection-end-column="50" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/data/MARMARAS/noon_reports_MT_DELTA_MARIA.csv">
-      <provider selected="true" editor-type-id="csv-text-editor">
-        <state relative-caret-position="-1683">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-      <provider editor-type-id="csv-table-editor">
-        <state showInfoPanel="true" fixedHeaders="false" rowLines="3" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/daysSinceLastDryDock.csv">
-      <provider selected="true" editor-type-id="csv-text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-      <provider editor-type-id="csv-table-editor">
-        <state showInfoPanel="true" fixedHeaders="false" rowLines="3" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/results.csv" />
-    <entry file="file://$PROJECT_DIR$/WSraw.csv">
-      <provider selected="true" editor-type-id="LargeFileEditor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/dataY_.csv">
-      <provider selected="true" editor-type-id="csv-text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-      <provider editor-type-id="csv-table-editor">
-        <state showInfoPanel="true" fixedHeaders="false" rowLines="3" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/model_11_.csv">
-      <provider selected="true" editor-type-id="csv-text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-      <provider editor-type-id="csv-table-editor">
-        <state showInfoPanel="true" fixedHeaders="false" rowLines="3" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/data/MARMARAS/MT_DELTA_MARIA.txt" />
-    <entry file="file://$PROJECT_DIR$/data/MILLENIA/TELEGRAMS/DOMINIA.csv">
-      <provider selected="true" editor-type-id="csv-text-editor">
-        <state relative-caret-position="-1275">
-          <caret line="27" column="21" lean-forward="false" selection-start-line="27" selection-start-column="21" selection-end-line="27" selection-end-column="21" />
-        </state>
-      </provider>
-      <provider editor-type-id="csv-table-editor">
-        <state showInfoPanel="true" fixedHeaders="false" rowLines="3" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/model_Gen_.csv">
-      <provider selected="true" editor-type-id="csv-text-editor">
-        <state relative-caret-position="238">
-          <caret line="14" column="0" lean-forward="false" selection-start-line="14" selection-start-column="0" selection-end-line="14" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-      <provider editor-type-id="csv-table-editor">
-        <state showInfoPanel="true" fixedHeaders="false" rowLines="3" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/data/GOLDENPORT/mappedData.csv">
-      <provider selected="true" editor-type-id="csv-text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="39" lean-forward="true" selection-start-line="0" selection-start-column="39" selection-end-line="0" selection-end-column="39" />
-        </state>
-      </provider>
-      <provider editor-type-id="csv-table-editor">
-        <state showInfoPanel="true" fixedHeaders="false" rowLines="3" />
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/AppData/Local/Programs/Python/Python36/Lib/site-packages/pyearth/__init__.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/AppData/Local/Programs/Python/Python36/Lib/site-packages/pyearth/earth.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="219">
-          <caret line="296" column="8" lean-forward="false" selection-start-line="296" selection-start-column="8" selection-end-line="296" selection-end-column="8" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/data/GOLDENPORT/TRAMMO LAOURA/SEEAmag 2019.01.12.csv">
-      <provider selected="true" editor-type-id="csv-text-editor">
-        <state relative-caret-position="340">
-          <caret line="38" column="53" lean-forward="true" selection-start-line="38" selection-start-column="53" selection-end-line="38" selection-end-column="53" />
-        </state>
-      </provider>
-      <provider editor-type-id="csv-table-editor">
-        <state showInfoPanel="true" fixedHeaders="false" rowLines="3" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/data/GOLDENPORT/TRAMMO LAOURA/SEEAmag 2019.01.06.csv">
-      <provider selected="true" editor-type-id="csv-text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-      <provider editor-type-id="csv-table-editor">
-        <state showInfoPanel="true" fixedHeaders="false" rowLines="3" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/dataModeling.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="76245">
-          <caret line="6646" column="39" lean-forward="false" selection-start-line="6646" selection-start-column="39" selection-end-line="6646" selection-end-column="39" />
-          <folding>
-            <element signature="e#0#33#0" expanded="true" />
-            <element signature="e#1806#2050#0" expanded="false" />
-            <element signature="e#2122#2681#0" expanded="false" />
-            <element signature="e#2743#2799#0" expanded="false" />
-            <element signature="e#2865#2875#0" expanded="false" />
-            <element signature="e#2934#3085#0" expanded="false" />
-            <element signature="e#3156#3830#0" expanded="false" />
-            <element signature="e#3889#4031#0" expanded="false" />
-            <element signature="e#4091#5007#0" expanded="false" />
-            <element signature="e#5055#31673#0" expanded="false" />
-            <element signature="e#6878#21962#0" expanded="false" />
-            <element signature="e#22007#23971#0" expanded="false" />
-            <element signature="e#259950#329435#0" expanded="false" />
-            <element signature="e#329490#330840#0" expanded="false" />
-            <element signature="e#330987#333423#0" expanded="false" />
-            <element signature="e#334256#334851#0" expanded="false" />
-            <element signature="e#334914#335824#0" expanded="false" />
-            <element signature="e#335885#337597#0" expanded="false" />
-            <element signature="e#337655#339971#0" expanded="false" />
-            <marker date="1584347356429" expanded="true" signature="251047:251212" ph="..." />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/evaluation.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="289">
-          <caret line="37" column="35" lean-forward="false" selection-start-line="37" selection-start-column="35" selection-end-line="37" selection-end-column="35" />
-          <folding>
-            <element signature="e#0#18#0" expanded="true" />
-            <element signature="e#1483#2229#0" expanded="false" />
-            <element signature="e#2271#2363#0" expanded="false" />
-            <element signature="e#2403#2468#0" expanded="false" />
-            <element signature="e#2513#2584#0" expanded="false" />
-            <element signature="e#2642#2896#0" expanded="false" />
-            <element signature="e#2956#3629#0" expanded="false" />
-            <element signature="e#3677#3878#0" expanded="false" />
-            <element signature="e#3915#3983#0" expanded="false" />
-            <element signature="e#4084#4172#0" expanded="false" />
-            <element signature="e#4277#37594#0" expanded="false" />
-            <element signature="e#37657#37858#0" expanded="false" />
-            <element signature="e#37926#61173#0" expanded="false" />
-            <element signature="e#61285#67786#0" expanded="false" />
-            <element signature="e#67863#68996#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/data/GOLDENPORT/mappedData.csv">
-      <provider selected="true" editor-type-id="csv-text-editor">
-        <state relative-caret-position="68">
-          <caret line="25" column="0" lean-forward="false" selection-start-line="25" selection-start-column="0" selection-end-line="25" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/AppData/Local/Programs/Python/Python36/Lib/site-packages/numpy/core/fromnumeric.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="236">
-          <caret line="3075" column="0" lean-forward="false" selection-start-line="3075" selection-start-column="0" selection-end-line="3075" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/dataReading.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="646">
-          <caret line="51" column="51" lean-forward="false" selection-start-line="51" selection-start-column="51" selection-end-line="51" selection-end-column="51" />
-          <folding>
-            <element signature="e#27#45#0" expanded="true" />
-            <element signature="e#1072#1427#0" expanded="false" />
-            <element signature="e#1492#3106#0" expanded="false" />
-            <element signature="e#3173#4808#0" expanded="false" />
-            <element signature="e#4892#5332#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/data/GOLDENPORT/TELEGRAMS/TRAMMO LAOURA.csv">
-      <provider selected="true" editor-type-id="csv-text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="206" lean-forward="false" selection-start-line="0" selection-start-column="206" selection-end-line="0" selection-end-column="206" />
-        </state>
-      </provider>
-      <provider editor-type-id="csv-table-editor">
-        <state showInfoPanel="true" fixedHeaders="false" rowLines="3" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/dataPartitioning.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1717">
-          <caret line="112" column="42" lean-forward="false" selection-start-line="102" selection-start-column="7" selection-end-line="112" selection-end-column="42" />
-          <folding>
-            <element signature="e#5784#10879#0" expanded="false" />
-            <element signature="e#10916#24857#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/runPipeline1.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="476">
-          <caret line="44" column="4" lean-forward="false" selection-start-line="44" selection-start-column="4" selection-end-line="44" selection-end-column="4" />
-          <folding>
-            <element signature="e#0#27#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Danaos_ML_Project/dataReading.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-1751">
-          <caret line="2366" column="69" lean-forward="true" selection-start-line="2366" selection-start-column="69" selection-end-line="2366" selection-end-column="69" />
-          <folding>
-            <element signature="e#0#18#0" expanded="true" />
-            <element signature="e#156177#184033#0" expanded="false" />
-            <element signature="e#184088#217551#0" expanded="false" />
-            <element signature="e#233765#274899#0" expanded="false" />
-            <element signature="e#255562#274834#0" expanded="false" />
-            <element signature="e#297420#300501#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
   </component>
 </project>
