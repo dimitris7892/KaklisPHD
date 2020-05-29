@@ -9,7 +9,7 @@ from sklearn.cluster import KMeans
 from decimal import Decimal
 import random
 #from coordinates.converter import CoordinateConverter, WGS84, L_Est97
-#import pyodbc
+import pyodbc
 import csv
 import locale
 #locale.setlocale(locale.LC_NUMERIC, "en_DK.UTF-8")
@@ -21,18 +21,18 @@ from sympy import Symbol
 from pathlib import Path
 import itertools
 from sympy import cos, sin , tan , exp , sqrt , E
-#from openpyxl import load_workbook
+from openpyxl import load_workbook
 import glob, os
 from pathlib import Path
-#from openpyxl.styles.colors import YELLOW
-#from openpyxl.styles import Font
-#from openpyxl.styles.borders import Border, Side
+from openpyxl.styles.colors import YELLOW
+from openpyxl.styles import Font
+from openpyxl.styles.borders import Border, Side
 import shutil
-#from openpyxl.styles import PatternFill
-#from openpyxl.styles import Alignment
+from openpyxl.styles import PatternFill
+from openpyxl.styles import Alignment
 import matplotlib.pyplot as plt
-import seaborn as sns
-#from openpyxl.drawing.image import Image
+#import seaborn as sns
+from openpyxl.drawing.image import Image
 from scipy.stats import ttest_ind_from_stats
 
 

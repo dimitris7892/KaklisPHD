@@ -158,7 +158,7 @@ def main():
     # unseensY.append(data[(k+kInit):(n+k+kInit), 7])
     # k = n * i + 10
 
-    trData = data[0:10000]
+    trData = data[0:1000]
     k=0
     kInit =0
     n=20000
@@ -239,7 +239,7 @@ def main():
                if modeler.__class__.__name__ == 'PavlosInterpolation':
                  partK = [1]
                elif modeler.__class__.__name__=='TriInterpolantModeler' or modeler.__class__.__name__ == 'TensorFlow':
-                 partK =K
+                 partK =[1]
                else:
                  partK=K
            error = {"errors": []}
