@@ -148,13 +148,16 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
             #for i in range(0,len(partitionsX)):
                 #pred +=modeler._models[i].predict(pPoint)
             #prediction = pred / len(partitionsX)
-            vector = self.extractFunctionsFromSplines(pPoint[0][0], pPoint[0][1],pPoint[0][2],pPoint[0][3],pPoint[0][4],pPoint[0][5],pPoint[0][6], ind)
-            XSplineVector = np.append(pPoint, vector)
-            XSplineVector = XSplineVector.reshape(-1, XSplineVector.shape[0])
+
+            #vector = self.extractFunctionsFromSplines(pPoint[0][0], pPoint[0][1],pPoint[0][2],pPoint[0][3],pPoint[0][4],pPoint[0][5],pPoint[0][6], ind)
+            #XSplineVector = np.append(pPoint, vector)
+            #XSplineVector = XSplineVector.reshape(-1, XSplineVector.shape[0])
 
             vector = self.extractFunctionsFromSplines(pPoint[0][0], pPoint[0][1],pPoint[0][2],pPoint[0][3],pPoint[0][4],pPoint[0][5],pPoint[0][6], 'Gen')
             XSplineGenVector = np.append(pPoint, vector)
             XSplineGenVector = XSplineGenVector.reshape(-1, XSplineGenVector.shape[0])
+
+
             # prediction = abs(modeler._models[ 0 ].predict(XSplineVector))
             # XSplineVector = XSplineGenVector if modeler._models[ind][1]=='GEN' else XSplineVector
             #try:
@@ -163,9 +166,9 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
                 #print("ERROR ON EVALUATION")
                 #prediction = modeler._models[len(modeler._models)-1].predict(XSplineGenVector)
             Genpred = modeler._models[len(modeler._models) - 1].predict(XSplineGenVector)
-            CLpred = modeler._models[ind].predict(XSplineVector)
+            #CLpred = modeler._models[ind].predict(XSplineVector)
 
-            preds=[]
+            predsCl=[]
             weights =[]
             for i in range(0,len(partitionsX)):
                 fit = modeler.getFitnessOfPoint(partitionsX,i ,pPoint)
@@ -176,14 +179,14 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
 
                 XSplineVectorCl = np.append(pPoint, vectorCl)
                 XSplineVectorCl = XSplineVectorCl.reshape(-1, XSplineVectorCl.shape[0])
-                preds.append(modeler._models[i].predict(XSplineVectorCl)[0][0])
+                predsCl.append(modeler._models[i].predict(XSplineVectorCl)[0][0])
 
             #prediction = np.mean(preds)
-            weighted_avg = np.average(preds, weights=weights)
+            weighted_avg = np.average(predsCl, weights=weights)
             #print("MEAN PRED: " + str(prediction))
             #print("WEIGHTED MEAN PRED: " + str(weighted_avg))
             #print("TRUE VAL: " + str(trueVal))
-            #prediction = weighted_avg
+            prediction = (weighted_avg + Genpred) / 2
             #if abs(CLpred - Genpred) >7:
                 #if abs(meanClpred - Genpred) > 5:
                     #prediction = Genpred
@@ -198,7 +201,7 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
 
             #else:
                 #prediction = ( Genpred  + CLpred)/ 2
-            prediction = (CLpred + Genpred) / 2
+            #prediction = (CLpred + Genpred) / 2
 
             #prediction = (abs(modeler._models[ind].predict(pPoint)))
             #prediction =  modeler._models[len(modeler._models) - 1].predict(pPoint)
@@ -223,7 +226,7 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
                     ['FOC', 'PERC'])
                 for i in range(0, len(errorFoc)):
                     data_writer.writerow(
-                        [preds[i], foc[i], errorFoc[i][0][0]])
+                        [preds[i], foc[i], errorFoc[i]])
 
             with open('./TRAINerrorSTW' + str(len(partitionsX)) + '_' + str(subsetInd) + '.csv', mode='w') as data:
                 data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
@@ -239,7 +242,7 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
                     ['FOC', 'PERC'])
                 for i in range(0, len(errorFoc)):
                     data_writer.writerow(
-                        [preds[i], foc[i], errorFoc[i][0][0]])
+                        [preds[i], foc[i], errorFoc[i]])
 
             with open('./TESTerrorSTW' + str(len(partitionsX)) + '_' + str(subsetInd) + '.csv', mode='w') as data:
                 data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
