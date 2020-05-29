@@ -165,21 +165,21 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
             Genpred = modeler._models[len(modeler._models) - 1].predict(XSplineGenVector)
             CLpred = modeler._models[ind].predict(XSplineVector)
 
-            #preds=[]
-            #weights =[]
-            #for i in range(0,len(partitionsX)):
-                #fit = modeler.getFitnessOfPoint(partitionsX,i ,pPoint)
-                #weights.append(fit)
-                #vectorCl = self.extractFunctionsFromSplines(pPoint[0][0], pPoint[0][1], pPoint[0][2], pPoint[0][3],
-                                                          #pPoint[0][4], pPoint[0][5], pPoint[0][6], i)
+            preds=[]
+            weights =[]
+            for i in range(0,len(partitionsX)):
+                fit = modeler.getFitnessOfPoint(partitionsX,i ,pPoint)
+                weights.append(fit)
+                vectorCl = self.extractFunctionsFromSplines(pPoint[0][0], pPoint[0][1], pPoint[0][2], pPoint[0][3],
+                                                          pPoint[0][4], pPoint[0][5], pPoint[0][6], i)
 
 
-                #XSplineVectorCl = np.append(pPoint, vectorCl)
-                #XSplineVectorCl = XSplineVectorCl.reshape(-1, XSplineVectorCl.shape[0])
-                #preds.append(modeler._models[i].predict(XSplineVectorCl)[0][0])
+                XSplineVectorCl = np.append(pPoint, vectorCl)
+                XSplineVectorCl = XSplineVectorCl.reshape(-1, XSplineVectorCl.shape[0])
+                preds.append(modeler._models[i].predict(XSplineVectorCl)[0][0])
 
             #prediction = np.mean(preds)
-            #weighted_avg = np.average(preds, weights=weights)
+            weighted_avg = np.average(preds, weights=weights)
             #print("MEAN PRED: " + str(prediction))
             #print("WEIGHTED MEAN PRED: " + str(weighted_avg))
             #print("TRUE VAL: " + str(trueVal))
