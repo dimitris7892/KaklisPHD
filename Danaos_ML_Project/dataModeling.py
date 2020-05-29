@@ -41,8 +41,8 @@ from scipy.special import softmax
 import dataReading as Dread
 from tensorflow.keras import backend as K
 #sess = tf.Session(config=tf.ConfigProto(log_device_placement=True))
-print("Num GPUs Available: ", len(tf.config.experimental.list_physical_devices('GPU')))
-x=0
+#print("Num GPUs Available: ", len(tf.config.experimental.list_physical_devices('GPU')))
+#x=0
 class BasePartitionModeler:
     def createModelsFor(self,partitionsX, partitionsY, partition_labels):
         pass
