@@ -106,7 +106,7 @@ def main():
 
     print(modelers)
     ###########################################################################
-  
+
 
     #random.seed(1)
     stdInU=[]
@@ -158,7 +158,7 @@ def main():
     # unseensY.append(data[(k+kInit):(n+k+kInit), 7])
     # k = n * i + 10
 
-    trData = data[0:10000]
+    trData = data[0:1000]
     k=0
     kInit =0
     n=20000
@@ -192,7 +192,7 @@ def main():
     stdInU = []
     varTr = []
     models = []
-    K = range(1,40)
+    K = range(1,25)
     part = []
     subsetInd = 0
 
@@ -209,9 +209,9 @@ def main():
                if modeler.__class__.__name__ == 'PavlosInterpolation':
                  partK = [1]
                elif modeler.__class__.__name__=='TriInterpolantModeler' or modeler.__class__.__name__ == 'TensorFlow':
-                 partK =K
+                 partK =[1]
                else:
-                 partK=[10]
+                 partK=K
            error = {"errors": []}
            #random.seed(1)
 
