@@ -103,6 +103,7 @@ def main():
         if cl == 'KMWSWA': partitioners.append(dPart.KMeansPartitionerWS_WA())
         if cl == 'KMWHWD': partitioners.append(dPart.KMeansPartitionerWH_WD())
         if cl=='DC' :partitioners.append(dPart.DelaunayTriPartitioner())
+        if cl == 'NNCL': partitioners.append(dPart.TensorFlowCl())
 
     print(modelers)
     ###########################################################################
@@ -127,83 +128,7 @@ def main():
     data = data.drop(["wind_speed", "wind_dir"],axis=1)
     data = data.values
 
-    dataSetTrue = []
-    dataSetPred = []
-    for infile in sorted(glob.glob('./TRAINerrorPercFOC7_0.csv')):
-        dataN = pd.read_csv(infile, sep=',', decimal='.', skiprows=1)
-        dataSetTrue.append(dataN.values[:,1])  # subsets=[]
-        dataSetPred.append(dataN.values[:, 0])  # subsets=[]
-        print(str(infile))  # for i in range(1,5):
-    dataSetTrue = np.concatenate(dataSetTrue)
-    dataSetPred = np.concatenate(dataSetPred)# subsetsX.append(trData[(k+kInit):(n+k+kInit),0:7])
-    dtTPreds = []
-    for i in range(0, len(dataSetTrue)):
-        dtTPreds.append(float(dataSetPred[i].split('[')[2].split(']')[0]))
 
-    dataSetPred = np.array(dtTPreds)
-    dataset =  np.array(np.append(dataSetTrue.reshape(-1,1), np.asmatrix([dataSetPred]).T, axis=1)).astype(float)
-
-
-
-    maxFoc = int(np.ceil(np.max(dataSetTrue)))
-
-
-    i = 1
-    rangesN = []
-    percsN = []
-    sizeN = []
-    while i <= maxFoc:
-
-        lenRange = len(np.array([k for k in dataset if k[0] >= i and k[0] <= i + 1]))
-        if lenRange > 0:
-            rangeFOCErrN = np.mean(np.array([k for k in dataset if k[0] >= i and k[0] <= i +1])[:,1])
-        # if rangeSTWErrN < 40:
-            percRange = rangeFOCErrN #if lenRange > 0 else 0
-            rangesN.append(i)
-            percsN.append(percRange)
-            sizeN.append(lenRange)
-        i = i +1
-
-    i = 1
-    rangesT = []
-    percsT = []
-    sizeT = []
-    while i <= maxFoc:
-
-        lenRange = len(np.array([k for k in dataset if k[0] >= i and k[0] <= i + 1]))
-        if lenRange > 0:
-            rangeFOCErrN = np.mean(np.array([k for k in dataset if k[0] >= i and k[0] <= i +1])[:,0])
-        # if rangeSTWErrN < 40:
-            percRange = rangeFOCErrN #if lenRange > 0 else 0
-            rangesT.append(i)
-            percsT.append(percRange)
-            sizeT.append(lenRange)
-        i = i + 1
-
-
-    # unseensY = []
-    sizeN = [k / 20 for k in sizeN]
-    axes = plt.gca()
-    # axes.set_xlim([minSpeed, maxSpeed])
-    axes.set_ylim([0, 65])
-    #plt.xticks(np.array(np.linspace(1, maxFoc, 13)))
-    plt.plot(rangesN, percsN, color='blue', label='Predicted')
-    #plt.plot(rangesN, percsN, 'o--', color='grey', alpha=0.4)
-    scatterRange = [k+1.5 for k in rangesN]
-    plt.scatter(rangesN, percsN, s=sizeN, alpha=0.4)
-
-    plt.plot(rangesT, percsT, color='orange', label='True')
-    #plt.plot(rangesT, percsT, 'o--', color='grey', alpha=0.4)
-    plt.xticks(np.array([int(k) for k in np.array(np.linspace(1, maxFoc, maxFoc))]))
-    # plt.yticks(np.array(np.linspace(1, 40, 10)))
-    plt.xlabel("FOC ranges")
-    plt.ylabel("FOC")
-    plt.title("Deviation of true from predicted values on test data (20 * 10^3) obs.")
-    # plt.scatter(ranges, percs, s=size, c="blue", alpha=0.4, linewidth=4)    #k = n * i + 10
-    plt.legend()
-    plt.grid(True)
-
-    #plt.show()
     ####################################################################################################
     ####################################################################################################
 
@@ -238,7 +163,7 @@ def main():
     #     # unseensY.append(data[(k+kInit):(n+k+kInit), 7])
     # k = n * i + 10
 
-    trData = data[0:1000]
+    trData = data[0:500]
     k=0
     kInit =0
     n=20000
@@ -322,6 +247,8 @@ def main():
                  partK =[1]
                else:
                  partK=[7]
+           else:
+               partK=[1]
            error = {"errors": []}
            #random.seed(1)
 
@@ -504,7 +431,7 @@ def initParameters():
 
 
         #['SR','LR','RF','NN','NNW','TRI']
-    cls=['KM']
+    cls=['NNCL']
     #['SR','LR','RF','NN'] algs
     #['KM','DC'] clusterers / cls
 
