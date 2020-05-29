@@ -1,2 +1,2 @@
-clusters,var,error,Trerror,partitioners,models
-2,11676.917912975307,1.4996200799942017,1.6529736518859863,TensorFlowCl,TensorFlowW1
+Trerror,clusters,error,models,partitioners,var
+7.401410102844238,5,7.404230117797852,TensorFlowW1,TensorFlowCl,9504.328623091884
