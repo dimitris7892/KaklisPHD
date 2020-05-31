@@ -103,6 +103,7 @@ def main():
         if cl == 'KMWSWA': partitioners.append(dPart.KMeansPartitionerWS_WA())
         if cl == 'KMWHWD': partitioners.append(dPart.KMeansPartitionerWH_WD())
         if cl=='DC' :partitioners.append(dPart.DelaunayTriPartitioner())
+        if cl == 'NNCL': partitioners.append(dPart.TensorFlowCl())
 
     print(modelers)
     ###########################################################################
@@ -126,6 +127,10 @@ def main():
     data = pd.read_csv(sFile,delimiter=';')
     data = data.drop(["wind_speed", "wind_dir"],axis=1)
     data = data.values
+
+
+    ####################################################################################################
+    ####################################################################################################
 
     # subsets=[]
     # for i in range(1,5):
@@ -154,11 +159,11 @@ def main():
     # unseensX=[]
     # unseensY = []
     # for i in range(1,6):
-    # unseensX.append(data[(k+kInit):(n+k+kInit) , 0:7])
-    # unseensY.append(data[(k+kInit):(n+k+kInit), 7])
+    #     # unseensX.append(data[(k+kInit):(n+k+kInit) , 0:7])
+    #     # unseensY.append(data[(k+kInit):(n+k+kInit), 7])
     # k = n * i + 10
 
-    trData = data[0:80000]
+    trData = data[0:10000]
     k=0
     kInit =0
     n=20000
@@ -211,7 +216,9 @@ def main():
                elif modeler.__class__.__name__=='TriInterpolantModeler' or modeler.__class__.__name__ == 'TensorFlow':
                  partK =[1]
                else:
-                 partK=[2]
+                 partK=[7]
+           else:
+               partK=[1]
            error = {"errors": []}
            #random.seed(1)
 
@@ -394,7 +401,7 @@ def initParameters():
 
 
         #['SR','LR','RF','NN','NNW','TRI']
-    cls=['KM']
+    cls=['NNCL']
     #['SR','LR','RF','NN'] algs
     #['KM','DC'] clusterers / cls
 
