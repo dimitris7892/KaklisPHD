@@ -10,9 +10,9 @@ from tensorflow.keras import *
 from scipy.spatial import Delaunay,ConvexHull
 import tensorflow as tf
 from tensorflow import keras
-from scipy import spatial,random
+#from scipy import spatial,random
 import colorsys
-from keras import losses
+#from keras import losses
 #from sklearn.model_selection import KFold
 import sys
 #from utils import *
@@ -163,7 +163,7 @@ class TensorFlowCl(DefaultPartitioner):
             neurons=3
             model = keras.models.Sequential()
 
-            model.add(keras.layers.Dense(genModelKnots -1, input_shape=(7+ genModelKnots -1,)))
+            model.add(keras.layers.Dense(7, input_shape=(7,)))
 
             while neurons < genModelKnots -1:
                 model.add(keras.layers.Dense(neurons, ))
@@ -650,14 +650,15 @@ class TensorFlowCl(DefaultPartitioner):
 
         for i in range(0, len(X)):
             vector = extractFunctionsFromSplines(X[i][0], X[i][1],X[i][2],X[i][3],X[i][4],X[i][5],X[i][6])
-            XSplineVector.append(np.append(X[i], vector))
+            #XSplineVector.append(np.append(X[i], vector))
+            XSplineVector.append(vector)
 
         XSplineVector = np.array(XSplineVector)
 
 
         # estimator.layers[0].set_weights([weights, np.array([0] * (genModelKnots-1))])
 
-        estimator.fit(XSplineVector, Y, epochs=20,verbose=0)
+        estimator.fit(X, XSplineVector, epochs=20,verbose=0)
 
         self.flagGen = True
         from scipy.special import softmax
