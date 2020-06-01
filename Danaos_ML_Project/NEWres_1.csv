@@ -1,3 +1,8 @@
+<<<<<<< HEAD
 Trerror,clusters,error,models,partitioners,var
 4.841698169708252,6,4.831178665161133,TensorFlowW1,TensorFlowCl,9504.328623091884
 6.073519676348529,6,6.111400122813064,PavlosInterpolation,TensorFlowCl,9504.328623091884
+=======
+clusters,var,error,Trerror,partitioners,models
+4,9121.383366395896,2.0896737575531006,2.1105408668518066,TensorFlowCl,TensorFlowW1
+>>>>>>> 49791f73b2ce83b5015e8dedd926ee89763b92d0

@@ -1651,7 +1651,7 @@ class TensorFlowW1(BasePartitionModeler):
                     #estimatorCl.fit(X_train,y_train, epochs=i ,verbose = 0)
                     es = EarlyStopping(monitor='val_loss', mode='min', verbose=0)
                     #val
-                    history = estimatorCl.fit(XSplineClusterVector, partitionsY[idx], validation_split=0.17,epochs=i,verbose = 0,callbacks=[es])
+                    history = estimatorCl.fit(XSplineClusterVector, partitionsY[idx], validation_split=0.17,epochs=i,verbose = 0,callbacks=[es])#
                     #historyTR = estimatorCl.fit(X_train, y_train, verbose=0,epochs=i)
                     #Clscore = estimatorCl.evaluate(X_test, y_test, verbose=0)
                     modelsCl.append(estimatorCl)
