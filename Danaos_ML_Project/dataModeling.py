@@ -16,7 +16,7 @@ from sklearn.pipeline import Pipeline
 #from sklearn.model_selection import RandomizedSearchCV
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
-from gekko import GEKKO
+#from gekko import GEKKO
 import  matplotlib.pyplot as plt
 from scipy.interpolate import BivariateSpline
 import tensorflow as tf
