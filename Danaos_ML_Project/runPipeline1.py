@@ -163,7 +163,7 @@ def main():
     #     # unseensY.append(data[(k+kInit):(n+k+kInit), 7])
     # k = n * i + 10
 
-    trData = data[0:500]
+    trData = data[0:30000]
     k=0
     kInit =0
     n=20000

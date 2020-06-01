@@ -10,7 +10,7 @@ from tensorflow.keras import *
 from scipy.spatial import Delaunay,ConvexHull
 import tensorflow as tf
 from tensorflow import keras
-from scipy import spatial,random
+#from scipy import spatial,random
 import colorsys
 #from keras import losses
 #from sklearn.model_selection import KFold
@@ -163,7 +163,7 @@ class TensorFlowCl(DefaultPartitioner):
             neurons=3
             model = keras.models.Sequential()
 
-            model.add(keras.layers.Dense(2, input_shape=(7,)))
+            model.add(keras.layers.Dense(7, input_shape=(7,)))
 
             while neurons < genModelKnots -1:
                 model.add(keras.layers.Dense(neurons, ))
@@ -171,9 +171,17 @@ class TensorFlowCl(DefaultPartitioner):
             model.add(keras.layers.Dense(genModelKnots - 1, ))
 
             # Compile model
-            model.compile(loss=losses.mean_squared_error, optimizer=keras.optimizers.Adam())
+            model.compile(loss=custom_loss
+                          , optimizer=keras.optimizers.Adam())
             ###print(model.summary())
             return model
+
+        def custom_loss(y_true,y_pred):
+
+            # Create a loss function that adds the MSE loss to the mean of all squared activations of a specific layer
+
+            return tf.keras.losses.mean_squared_error(y_true,y_pred) + tf.keras.losses.categorical_crossentropy(y_true,y_pred) +\
+                    tf.keras.losses.kullback_leibler_divergence(y_true, y_pred)
 
 
 
@@ -642,6 +650,7 @@ class TensorFlowCl(DefaultPartitioner):
 
         for i in range(0, len(X)):
             vector = extractFunctionsFromSplines(X[i][0], X[i][1],X[i][2],X[i][3],X[i][4],X[i][5],X[i][6])
+            #XSplineVector.append(np.append(X[i], vector))
             XSplineVector.append(vector)
 
         XSplineVector = np.array(XSplineVector)
