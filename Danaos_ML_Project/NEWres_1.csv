@@ -1,3 +1,2 @@
-Trerror,clusters,error,models,partitioners,var
-2.2334911823272705,4,2.24214768409729,TensorFlowW1,TensorFlowCl,9121.383366395896
-6.007523793600933,4,6.083845947048986,PavlosInterpolation,TensorFlowCl,9121.383366395896
+clusters,var,error,Trerror,partitioners,models
+4,9121.383366395896,2.1568262577056885,2.1739249229431152,TensorFlowCl,TensorFlowW1
