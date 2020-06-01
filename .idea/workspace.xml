@@ -3,14 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="9e10e853-69bc-4a18-9c9f-e2f3d9527f23" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/NEWres_1.csv" beforeDir="false" afterPath="$PROJECT_DIR$/Danaos_ML_Project/NEWres_1.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/dataModeling.py" beforeDir="false" afterPath="$PROJECT_DIR$/Danaos_ML_Project/dataModeling.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/dataPartitioning.py" beforeDir="false" afterPath="$PROJECT_DIR$/Danaos_ML_Project/dataPartitioning.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/errorEpochCLusters.csv" beforeDir="false" afterPath="$PROJECT_DIR$/Danaos_ML_Project/errorEpochCLusters.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/model_0_.csv" beforeDir="false" afterPath="$PROJECT_DIR$/Danaos_ML_Project/model_0_.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/model_1_.csv" beforeDir="false" afterPath="$PROJECT_DIR$/Danaos_ML_Project/model_1_.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/model_Gen_.csv" beforeDir="false" afterPath="$PROJECT_DIR$/Danaos_ML_Project/model_Gen_.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/runPipeline1.py" beforeDir="false" afterPath="$PROJECT_DIR$/Danaos_ML_Project/runPipeline1.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
