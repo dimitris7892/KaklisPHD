@@ -1513,7 +1513,7 @@ class TensorFlowW1(BasePartitionModeler):
         #models=[]
 
 
-        NNmodels.append(model2)
+        NNmodels.append(estimator)
         self._models = NNmodels
 
         # Return list of models

@@ -128,7 +128,7 @@ def main():
                if modeler.__class__.__name__=='TriInterpolantModeler' or modeler.__class__.__name__ == 'TensorFlow':
                  partK =[1]
                else:
-                 partK=[2]
+                 partK=K
            else:
                partK=[1]
            error = {"errors": [ ]}
