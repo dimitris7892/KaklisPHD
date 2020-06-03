@@ -183,8 +183,6 @@ class TensorFlowCl(DefaultPartitioner):
 
         def custom_loss(y_true,y_pred):
 
-            # Create a loss function that adds the MSE loss to the mean of all squared activations of a specific layer
-
             return tf.keras.losses.mean_squared_error(y_true,y_pred) + tf.keras.losses.categorical_crossentropy(y_true,y_pred) +\
                     tf.keras.losses.kullback_leibler_divergence(y_true, y_pred)
 
