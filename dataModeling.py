@@ -1493,7 +1493,7 @@ class TensorFlowW1(BasePartitionModeler):
                     #modelId=idx
 
                 #estimatorCl.fit(partitionsX[idx], np.array(partitionsY[idx]),epochs=100)  # validation_split=0.33
-
+                input_img = keras.layers.Input(shape=(2,), name='input')
                 x = input_img
 
                 x = estimatorCl.layers[2](x)
