@@ -1493,20 +1493,20 @@ class TensorFlowW1(BasePartitionModeler):
                     #modelId=idx
 
                 #estimatorCl.fit(partitionsX[idx], np.array(partitionsY[idx]),epochs=100)  # validation_split=0.33
-                input_img = keras.layers.Input(shape=(2,), name='input')
-                x = input_img
+                #input_img = keras.layers.Input(shape=(2,), name='input')
+                #x = input_img
 
-                x = estimatorCl.layers[2](x)
+                #x = estimatorCl.layers[2](x)
 
-                modelCl = keras.models.Model(inputs=input_img, outputs=x)
+                #modelCl = keras.models.Model(inputs=input_img, outputs=x)
                 # model2 = keras.models.Model(inputs=estimator.layers[2].input, outputs=estimator.layers[-1].output)
 
-                modelCl.compile(optimizer=keras.optimizers.Adam(), loss='mse')
-                #modelCl.fit(partitionsX[idx], np.array(partitionsY[idx]), epochs=100)
+                #estimatorCl.compile(optimizer=keras.optimizers.Adam(), loss='mse')
+                estimatorCl.fit(partitionsX[idx], np.array(partitionsY[idx]), epochs=100)
 
-                Clscore = modelCl.evaluate(np.array(partitionsX[idx]), np.array(partitionsY[idx]), verbose=1)
+                Clscore = estimatorCl.evaluate(np.array(partitionsX[idx]), np.array(partitionsY[idx]), verbose=0)
                 scores.append(Clscore)
-                NNmodels.append(modelCl)
+                NNmodels.append(estimatorCl)
 
                 #self._partitionsPerModel[ estimator ] = partitionsX[idx]
         # Update private models
