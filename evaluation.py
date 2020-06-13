@@ -286,11 +286,11 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
                 W1 = b[ 0 ]
                 W2 = b[ 1 ]
                 W3 = 1 - np.sum(b)
-
+                #################3##########
                 if W1>0 and W2>0 and W3>0:
 
-                    flg  = True
-                    plt.plot(candidatePoint[0], candidatePoint[1], 'o', markersize=8)
+                    flg  = True######
+                    ##plt.plot(candidatePoint[0], candidatePoint[1], 'o', markersize=8)####
 
                     rpm1 = dataYnew[ triNew.vertices[ k ] ][ 0 ]
                     rpm2 = dataYnew[ triNew.vertices[ k ] ][ 1 ]
@@ -298,6 +298,7 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
 
                     flgR=False
                     flgV=False
+                    ##@#ff
                     ##efaptomena trigwna panw sto trigwno sto opoio anikei to Point estimate
                     tri1 =np.array(triNew.vertices[
                     [ i for i, x in enumerate(list(triNew.vertices[ :, 0 ] == triNew.vertices[ k, 0 ] )) if x ] ])
@@ -1394,5 +1395,4 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
 
         #formula = 'error ~ C(clusters) + C(var) + C(error)'
         ##model =  ols(formula, df).fit()
-        #aov_table = statsmodels.stats.anova.anova_lm(model, typ=2)
-        #print(aov_table)
+        #aov_tab
