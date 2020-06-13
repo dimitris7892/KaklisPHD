@@ -1745,13 +1745,13 @@ class TensorFlowW1(BasePartitionModeler):
         #plt.legend()
         #plt.show()
         x=0
-        # Return list of models
+        #Return list of models
         with open('./errorEpochCLusters.csv', mode='w') as data:
             data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-            data_writer.writerow(['cluster','trError','acc', 'epoch','stdX','stdY','stdSTW','stdWS','nErr','nStdWs','nStdSTW','nValErr','nSTW_WS'])
+            data_writer.writerow(['cluster','clusterSize','trError','acc', 'epoch','stdX','stdY','stdSTW','stdWS','nErr','nStdWs','nStdSTW','nValErr','nSTW_WS'])
             for i in range(0,len(clScores)):
 
-                data_writer.writerow([clusters[i], clustersTrScores[i] ,clScores[i],minEpochs[i],minXVars[i],minYVars[i],stdWS[i],stdSTW[i],normalizedErr[i],normalizedSTDws[i],normalizedSTDstw[i],normalizedValErr[i]])
+                data_writer.writerow([clusters[i],sizeTrDt[i], clustersTrScores[i] ,clScores[i],minEpochs[i],minXVars[i],minYVars[i],stdWS[i],stdSTW[i],normalizedErr[i],normalizedSTDws[i],normalizedSTDstw[i],normalizedValErr[i]])
 
         return estimator, history, scores, numpy.empty, vectorWeights  # , estimator , DeepCLpartitionsX
 

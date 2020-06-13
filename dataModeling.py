@@ -1454,8 +1454,8 @@ class TensorFlowW1(BasePartitionModeler):
         #model2 =keras.models.Model(inputs=estimator.input, outputs=estimator.layers[-2].output)
         #model2.compile(optimizer=keras.optimizers.Adam(), loss= keras.losses.KLD)
         #model2.fit(X,Y,epochs=10)
-        labels =np.unique(np.argmax(estimator.predict(X),axis=1))
-        print(labels)
+        #labels =np.unique(np.argmax(estimator.predict(X),axis=1))
+        #print(labels)
         NNmodels=[]
         scores=[]
 

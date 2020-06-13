@@ -11,6 +11,7 @@ import sys
 import plotResults as plotRes
 import itertools
 import pandas as pd
+import Danaos_ML_Project.ExtractNeuralReport  as NNrep
 from sklearn.model_selection import train_test_split
 import random
 from sklearn.decomposition import PCA
@@ -27,6 +28,7 @@ def main():
     # Init parameters based on command line
 
 
+    NNrep.BaseReportExtraction.BuildPdfReport(NNrep.BaseReportExtraction,'MILLENIA','METEORA')
 
     end, endU, history, future,sFile, start, startU , algs , cls = initParameters()
     # Load data
@@ -61,8 +63,8 @@ def main():
     #DANreader.readLarosDAta(datetime.datetime(2018,1,1),datetime.datetime(2019,1,1))
 
     #DANreader.GenericParserForDataExtraction('LAROS','MARMARAS','MT_DELTA_MARIA')
-    #DANreader.GenericParserForDataExtraction('LEMAG', 'MILLENIA', 'FUTURA',driver='ORACLE',server='10.2.5.80',sid='OR11',usr='millenia',password='millenia',
-                                             #rawData=[],telegrams=True,companyTelegrams=False,pathOfRawData='C:/Users/dkaklis/Desktop/danaos')
+    DANreader.GenericParserForDataExtraction('LEMAG', 'MILLENIA', 'FANTASIA',driver='ORACLE',server='10.2.5.80',sid='OR11',usr='millenia',password='millenia',
+                                             rawData=[],telegrams=True,companyTelegrams=False,pathOfRawData='C:/Users/dkaklis/Desktop/danaos')
 
     #DANreader.GenericParserForDataExtraction('LEMAG', 'OCEAN_GOLD', 'PENELOPE',driver='ORACLE',server='10.2.5.80',sid='OR11',usr='oceangold',password='oceangold',
         #rawData=True,telegrams=True,companyTelegrams=True,seperator='\t',pathOfRawData='C:/Users/dkaklis/Desktop/danaos')
@@ -113,6 +115,7 @@ def main():
     #random.seed(1)
     stdInU=[]
 
+
     #dataV = pd.read_csv('/home/dimitris/Desktop/errorSTW25.csv', delimiter=',')
     #dataV =np.array(dataV.values.astype(float))
     #minV =np.min(dataV[:,0])
@@ -136,89 +139,8 @@ def main():
     #####################################################################################################
     #####################################################################################################
 
-    dataSetN = []
-    dataSetP = []
-    dataSetError=[]
-    dataSetTrue=[]
-    for infile in sorted(glob.glob('./TRAINerrorPercFOC6_0.csv')):
-        data = pd.read_csv(infile, sep=',', decimal='.', skiprows=1)
-        dataSetTrue.append(data.values[:, 1])  # subsets=[]
-        dataSetError.append(data.values[:, 2])  # subsets=[]
 
-
-        print(str(infile))  # for i in range(1,5):
-    #dataSetError = np.concatenate(dataSetError)
-    dataSetTrue = np.concatenate(dataSetTrue)
-    dataSetError = np.concatenate(dataSetError)
-
-    dtTPreds = []
-
-    for i in range(0, len(dataSetError)):
-        dtTPreds.append(float(dataSetError[i].split('[')[2].split(']')[0]))
-
-    dataSetError = np.array(dtTPreds)
-
-    dataSetN =   np.array(np.append(dataSetTrue.reshape(-1,1), np.asmatrix([dataSetError]).T, axis=1)).astype(float)
-
-    for infile in sorted(glob.glob('./TRAINerrorPercFOCPavlos0.csv')):
-        data = pd.read_csv(infile, sep=',', decimal='.', skiprows=1)
-        dataSetP.append(data.values)
-        print(str(infile))
-    dataSetP = np.concatenate(dataSetP)
-    maxSpeed = int(np.ceil(np.max(dataSetP[:,1])))
-    minSpeed = int(np.ceil(np.min(dataSetP[:, 1])))
-
-    i = 3
-    rangesN = []
-    percsN = []
-    sizeN = []
-    while i <= maxSpeed:
-
-        lenRange = len(np.array([k for k in dataSetN if k[0] >= i and k[0] <= i + 5]))
-        if lenRange > 0:
-            rangeSTWErrN = np.mean(np.array([k for k in dataSetN if k[0] >= i and k[0] <= i +5])[:, 1])
-        percRange = rangeSTWErrN if lenRange > 0 else 0
-        rangesN.append(i)
-        percsN.append(percRange)
-        sizeN.append(lenRange)
-        i = i + 5
-
-    i = 3
-    rangesP = []
-    percsP = []
-    sizeP = []
-
-    while i <= maxSpeed:
-
-        lenRange = len(np.array([k for k in dataSetP if k[1] >= i and k[1] <= i + 5]))
-        if lenRange > 0:
-            rangeSTWErrP = np.mean(np.array([k for k in dataSetP if k[1] >= i and k[1] <= i + 5])[:, 2])
-        percRange = rangeSTWErrP if lenRange > 0 else 0
-        rangesP.append(i)
-        percsP.append(percRange)
-        sizeP.append(lenRange)
-        i = i +5
-    # indSubsets = []
-
-    # unseensY = []
-    sizeN = [k / 10 for k in sizeN]
-    axes = plt.gca()
-    # axes.set_xlim([minSpeed, maxSpeed])
-    # axes.set_ylim([0, 40])
-    plt.step(rangesN, percsN, color='blue', label='Neural')
-    plt.plot(rangesN, percsN, 'o--', color='grey', alpha=0.4)
-    plt.scatter(rangesN, percsN, s=sizeN, alpha=0.4)
-
-    plt.step(rangesP, percsP, color='orange', label='Interpolation')
-    plt.plot(rangesP, percsP, 'o--', color='grey', alpha=0.4)
-    #plt.xticks(np.array(np.linspace(1, maxSpeed, maxSpeed)))
-    # plt.yticks(np.array(np.linspace(1, 40, 10)))
-    plt.xlabel("FOC")
-    plt.ylabel("Mean Percentage Error")
-    plt.title("Mean Percentage Error on train data (80 * 10^3) obs.")
-    # plt.scatter(ranges, percs, s=size, c="blue", alpha=0.4, linewidth=4)    #k = n * i + 10
-    plt.legend()
-    #plt.show()
+    x=0
     #############################################################################################################
     #############################################################################################################
 
@@ -298,12 +220,12 @@ def main():
     #unseenX = data[:, 0:7][90000:].astype(float)
     #unseenY = data[:, 7][90000:].astype(float)
 
-    X_train, X_test, y_train, y_test = train_test_split(data[:,0:7], data[:,7], test_size=0.2,
+    X_train, X_test, y_train, y_test = train_test_split(trData[:,0:7], trData[:,7], test_size=0.2,
                                                         random_state=42)
 
     #dataTrain = np.array(np.append(X_train, np.asmatrix([y_train.reshape(-1)]).T, axis=1))
-    #DANreader.GenericParserForDataExtraction('LEMAG', 'MARMARAS', 'MT_DELTA_MARIA',driver='ORACLE',server='10.2.5.80',sid='OR11',usr='oceangold',password='oceangold',
-    #rawData=True,telegrams=False,companyTelegrams=False,seperator='\t',pathOfRawData='C:/Users/dkaklis/Desktop/danaos' ,comparisonTest=True,dataTrain = dataTrain )
+    #DANreader.GenericParserForDataExtraction('LEMAG', 'MILLENIA', 'METEORA',driver='ORACLE',server='10.2.5.80',sid='OR11',usr='millenia',password='millenia',
+    #rawData=False,telegrams=True,companyTelegrams=False,seperator='\t',pathOfRawData='C:/Users/dkaklis/Desktop/danaos' ,comparisonTest=False,dataTrain = None )
 
 
 
