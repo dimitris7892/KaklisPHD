@@ -14,7 +14,7 @@ import csv
 import locale
 #locale.setlocale(locale.LC_NUMERIC, "en_DK.UTF-8")
 import datetime
-#import cx_Oracle
+import cx_Oracle
 from dateutil.rrule import rrule, DAILY, MINUTELY
 from sympy.solvers import solve
 from sympy import Symbol
@@ -638,7 +638,7 @@ class BaseSeriesReader:
 
         ####STATISTICS TAB
         ##SPEED CELLS
-        velocitiesTlg = np.array([k for k in tlgDataset])[:,12]
+        velocitiesTlg = np.array([k for k in tlgDataset if float(k[12])<22])[:,12]
         velocitiesTlg = np.nan_to_num(velocitiesTlg.astype(float))
         velocitiesTlg =velocitiesTlg[velocitiesTlg>0]
         velocitiesTlgAmount = velocitiesTlg.__len__()
@@ -948,10 +948,10 @@ class BaseSeriesReader:
 
 
 
-        fig.savefig('./Figures/'+company+'_'+vessel+'_1.jpg', dpi=96)
+        fig.savefig('./Figures/'+company+'_'+vessel+'_1.png', dpi=96)
         #plt.clf()
 
-        img = Image('./Figures/'+company+'_'+vessel+'_1.jpg')
+        img = Image('./Figures/'+company+'_'+vessel+'_1.png')
 
         workbook._sheets[4].add_image(img, 'F'+str(id-2))
         #workbook._sheets[4].insert_image('G'+str(id+30), './Danaos_ML_Project/Figures/'+company+'_'+vessel+'.png', {'x_scale': 0.5, 'y_scale': 0.5})
@@ -1162,11 +1162,11 @@ class BaseSeriesReader:
                             label='       '+str(int(np.floor(z[0]))) + ' obs.')
             plt.legend( borderpad=4,scatterpoints=1, frameon=True, labelspacing=6, title='# of obs')
 
-            img = Image('./Danaos_ML_Project/Figures/' + company + '_' + vessel + '_2.jpg')
+            img = Image('./Danaos_ML_Project/Figures/' + company + '_' + vessel + '_2.png')
 
             fig = matplotlib.pyplot.gcf()
             fig.set_size_inches(17.5, 9.5)
-            fig.savefig('./Danaos_ML_Project/Figures/' + company + '_' + vessel + '_2.jpg', dpi=96)
+            fig.savefig('./Danaos_ML_Project/Figures/' + company + '_' + vessel + '_2.png', dpi=96)
             plt.clf()
 
 
@@ -1329,7 +1329,7 @@ class BaseSeriesReader:
                     for row in cursor_myserver.fetchall():
                             vessel_code = row[0]
                     #else: vessel_code = vCode
-                    vessel_code='502'
+                    #vessel_code='502'
                     cursor_myserver.execute(
                         'SELECT  TELEGRAM_DATE , TELEGRAM_TYPE,BALAST_FLAG,LATITUDE_DEGREES , LATITUDE_SECONDS ,LONGITUDE_DEGREES , LONGITUDE_SECONDS ,vessel_course,(DRAFT_AFT + DRAFT_FORE)/2 as DRAFT , ENGINE_RPM , WIND_DIRECTION , WIND_FORCE  ,AVERAGE_SPEED ,hours_slc,minutes_slc, (( NVL(ME_HSFO_CONS,0)+ NVL(ME_LSFO_CONS,0)+ NVL(ME_HSDO_CONS,0 ) + NVL(ME_LSDO_CONS,0)))   as ME_CONS_24h , (DRAFT_AFT-DRAFT_FORE) AS TRIM  FROM TELEGRAMS where vessel_code = '"'" + vessel_code + "'" 'AND (telegram_type='"'N'"' or telegram_type='"'A'"' ) ')
 
@@ -2119,7 +2119,7 @@ class BaseSeriesReader:
 
         ################################################################################################################
 
-        #workbook = self.calculateExcelStatistics(workbook,dtNew,velocities,draft,trim,velocitiesTlg , rawData,company,vessel,tlgDataset)
+        workbook = self.calculateExcelStatistics(workbook,dtNew,velocities,draft,trim,velocitiesTlg , rawData,company,vessel,tlgDataset)
         ##delete ladden outliers
         #np.delete(ladenDt, [i for (i, v) in enumerate(ladenDt[:, 8]) if v < (
             #np.mean(ladenDt[:, 8]) - np.std(ladenDt[:, 8])) or v > np.mean(

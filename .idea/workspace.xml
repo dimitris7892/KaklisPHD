@@ -2,12 +2,38 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="9e10e853-69bc-4a18-9c9f-e2f3d9527f23" name="Default" comment="">
+      <change afterPath="$PROJECT_DIR$/Danaos_ML_Project/ExtractNeuralReport.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Danaos_ML_Project/TRAINerrorPercFOC7_0.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Danaos_ML_Project/TRAINerrorPercFOCPavlos0.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Danaos_ML_Project/data/MILLENIA/METEORA/NeuralEvaluationData/errorEpochCLusters.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/NEWres_1.csv" beforeDir="false" afterPath="$PROJECT_DIR$/Danaos_ML_Project/NEWres_1.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/data/MILLENIA/DOMINIA/mappedData.csv" beforeDir="false" afterPath="$PROJECT_DIR$/Danaos_ML_Project/data/MILLENIA/DOMINIA/mappedData.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/data/MILLENIA/FANTASIA/mappedData.csv" beforeDir="false" afterPath="$PROJECT_DIR$/Danaos_ML_Project/data/MILLENIA/FANTASIA/mappedData.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/data/MILLENIA/METEORA/ListOfCons.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/data/MILLENIA/METEORA/ListOfDrafts.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/data/MILLENIA/METEORA/ListOfSpeeds.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/data/MILLENIA/METEORA/TELEGRAMS/METEORA.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/data/MILLENIA/METEORA/mappedData.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/dataModeling.py" beforeDir="false" afterPath="$PROJECT_DIR$/Danaos_ML_Project/dataModeling.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/dataReading.py" beforeDir="false" afterPath="$PROJECT_DIR$/Danaos_ML_Project/dataReading.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/errorEpochCLusters.csv" beforeDir="false" afterPath="$PROJECT_DIR$/Danaos_ML_Project/errorEpochCLusters.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/model_2_.csv" beforeDir="false" afterPath="$PROJECT_DIR$/Danaos_ML_Project/model_2_.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/model_3_.csv" beforeDir="false" afterPath="$PROJECT_DIR$/Danaos_ML_Project/model_3_.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/runPipeline1.py" beforeDir="false" afterPath="$PROJECT_DIR$/Danaos_ML_Project/runPipeline1.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/dataModeling.py" beforeDir="false" afterPath="$PROJECT_DIR$/dataModeling.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -19,7 +45,7 @@
   </component>
   <component name="PropertiesComponent">
     <property name="full.screen.before.presentation.mode" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/Danaos_ML_Project" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/Danaos_ML_Project/data/MILLENIA/METEORA/NeuralEvaluationData" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
     <property name="two.files.diff.last.used.file" value="$PROJECT_DIR$/estimatorCl_1.h5" />
   </component>
@@ -32,11 +58,11 @@
       <recent name="C:\Users\dkaklis\Desktop\KaklisPHD\data\OCEAN_GOLD" />
     </key>
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\dkaklis\Desktop\KaklisPHD\Danaos_ML_Project\data\MILLENIA\METEORA\NeuralEvaluationData" />
       <recent name="C:\Users\dkaklis\Desktop\KaklisPHD\Danaos_ML_Project" />
       <recent name="C:\Users\dkaklis\Desktop\KaklisPHD" />
       <recent name="C:\Users\dkaklis\Desktop\KaklisPHD\data\MILLENIA" />
       <recent name="C:\Users\dkaklis\Desktop\KaklisPHD\data\MARMARAS" />
-      <recent name="C:\Users\dkaklis\Desktop\KaklisPHD\data\LAROS" />
     </key>
   </component>
   <component name="RunManager" selected="Python.runPipeline1 (1)">
@@ -191,99 +217,99 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="690" y="266" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1591003570873" />
-    <state x="885" y="237" key="#xdebugger.evaluate" timestamp="1591009333329">
+    <state x="885" y="237" key="#xdebugger.evaluate" timestamp="1591348712484">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="715" y="222" key="#xdebugger.evaluate/0.0.1920.1040/1920.0.1920.1080@0.0.1920.1040" timestamp="1590411530247" />
-    <state x="885" y="237" key="#xdebugger.evaluate/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1591009333329" />
-    <state width="1898" height="225" key="GridCell.Tab.0.bottom" timestamp="1591018180579">
+    <state x="885" y="237" key="#xdebugger.evaluate/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1591348712484" />
+    <state width="1898" height="225" key="GridCell.Tab.0.bottom" timestamp="1591365700963">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state width="1898" height="225" key="GridCell.Tab.0.bottom/-1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1590486405344" />
     <state width="1898" height="225" key="GridCell.Tab.0.bottom/0.0.1920.1040/1920.0.1920.1080@0.0.1920.1040" timestamp="1590482788109" />
-    <state width="1898" height="225" key="GridCell.Tab.0.bottom/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1591018180579" />
-    <state width="1898" height="225" key="GridCell.Tab.0.center" timestamp="1591018180579">
+    <state width="1898" height="225" key="GridCell.Tab.0.bottom/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1591365700963" />
+    <state width="1898" height="225" key="GridCell.Tab.0.center" timestamp="1591365700963">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state width="1898" height="225" key="GridCell.Tab.0.center/-1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1590486405344" />
     <state width="1898" height="225" key="GridCell.Tab.0.center/0.0.1920.1040/1920.0.1920.1080@0.0.1920.1040" timestamp="1590482788109" />
-    <state width="1898" height="225" key="GridCell.Tab.0.center/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1591018180579" />
-    <state width="1898" height="225" key="GridCell.Tab.0.left" timestamp="1591018180579">
+    <state width="1898" height="225" key="GridCell.Tab.0.center/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1591365700963" />
+    <state width="1898" height="225" key="GridCell.Tab.0.left" timestamp="1591365700963">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state width="1898" height="225" key="GridCell.Tab.0.left/-1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1590486405344" />
     <state width="1898" height="225" key="GridCell.Tab.0.left/0.0.1920.1040/1920.0.1920.1080@0.0.1920.1040" timestamp="1590482788109" />
-    <state width="1898" height="225" key="GridCell.Tab.0.left/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1591018180579" />
-    <state width="1898" height="225" key="GridCell.Tab.0.right" timestamp="1591018180579">
+    <state width="1898" height="225" key="GridCell.Tab.0.left/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1591365700963" />
+    <state width="1898" height="225" key="GridCell.Tab.0.right" timestamp="1591365700963">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state width="1898" height="225" key="GridCell.Tab.0.right/-1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1590486405344" />
     <state width="1898" height="225" key="GridCell.Tab.0.right/0.0.1920.1040/1920.0.1920.1080@0.0.1920.1040" timestamp="1590482788109" />
-    <state width="1898" height="225" key="GridCell.Tab.0.right/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1591018180579" />
-    <state width="1898" height="176" key="GridCell.Tab.1.bottom" timestamp="1591009313001">
+    <state width="1898" height="225" key="GridCell.Tab.0.right/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1591365700963" />
+    <state width="1898" height="186" key="GridCell.Tab.1.bottom" timestamp="1591365655631">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state width="1898" height="176" key="GridCell.Tab.1.bottom/0.0.1920.1040/1920.0.1920.1080@0.0.1920.1040" timestamp="1590480545382" />
-    <state width="1898" height="176" key="GridCell.Tab.1.bottom/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1591009313001" />
-    <state width="1898" height="176" key="GridCell.Tab.1.center" timestamp="1591009313001">
+    <state width="1898" height="186" key="GridCell.Tab.1.bottom/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1591365655631" />
+    <state width="1898" height="186" key="GridCell.Tab.1.center" timestamp="1591365655631">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state width="1898" height="176" key="GridCell.Tab.1.center/0.0.1920.1040/1920.0.1920.1080@0.0.1920.1040" timestamp="1590480545382" />
-    <state width="1898" height="176" key="GridCell.Tab.1.center/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1591009313001" />
-    <state width="1898" height="176" key="GridCell.Tab.1.left" timestamp="1591009313001">
+    <state width="1898" height="186" key="GridCell.Tab.1.center/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1591365655631" />
+    <state width="1898" height="186" key="GridCell.Tab.1.left" timestamp="1591365655631">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state width="1898" height="176" key="GridCell.Tab.1.left/0.0.1920.1040/1920.0.1920.1080@0.0.1920.1040" timestamp="1590480545382" />
-    <state width="1898" height="176" key="GridCell.Tab.1.left/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1591009313001" />
-    <state width="1898" height="176" key="GridCell.Tab.1.right" timestamp="1591009313001">
+    <state width="1898" height="186" key="GridCell.Tab.1.left/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1591365655631" />
+    <state width="1898" height="186" key="GridCell.Tab.1.right" timestamp="1591365655631">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state width="1898" height="176" key="GridCell.Tab.1.right/0.0.1920.1040/1920.0.1920.1080@0.0.1920.1040" timestamp="1590480545382" />
-    <state width="1898" height="176" key="GridCell.Tab.1.right/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1591009313001" />
-    <state x="1156" y="134" width="752" height="906" key="GridCell.Tab.2.bottom" timestamp="1591009260122">
+    <state width="1898" height="186" key="GridCell.Tab.1.right/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1591365655631" />
+    <state x="1156" y="134" width="752" height="906" key="GridCell.Tab.2.bottom" timestamp="1591365649095">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="921" y="127" width="752" height="906" key="GridCell.Tab.2.bottom/0.0.1920.1040/1920.0.1920.1080@0.0.1920.1040" timestamp="1590480489632" />
-    <state x="1156" y="134" width="752" height="906" key="GridCell.Tab.2.bottom/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1591009260122" />
-    <state x="1156" y="134" width="752" height="906" key="GridCell.Tab.2.center" timestamp="1591009260122">
+    <state x="1156" y="134" width="752" height="906" key="GridCell.Tab.2.bottom/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1591365649095" />
+    <state x="1156" y="134" width="752" height="906" key="GridCell.Tab.2.center" timestamp="1591365649095">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="921" y="127" width="752" height="906" key="GridCell.Tab.2.center/0.0.1920.1040/1920.0.1920.1080@0.0.1920.1040" timestamp="1590480489632" />
-    <state x="1156" y="134" width="752" height="906" key="GridCell.Tab.2.center/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1591009260122" />
-    <state x="1156" y="134" width="752" height="906" key="GridCell.Tab.2.left" timestamp="1591009260126">
+    <state x="1156" y="134" width="752" height="906" key="GridCell.Tab.2.center/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1591365649095" />
+    <state x="1156" y="134" width="752" height="906" key="GridCell.Tab.2.left" timestamp="1591365655631">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="921" y="127" width="752" height="906" key="GridCell.Tab.2.left/0.0.1920.1040/1920.0.1920.1080@0.0.1920.1040" timestamp="1590480545382" />
-    <state x="1156" y="134" width="752" height="906" key="GridCell.Tab.2.left/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1591009260126" />
-    <state x="1156" y="134" width="752" height="906" key="GridCell.Tab.2.right" timestamp="1591009260122">
+    <state x="1156" y="134" width="752" height="906" key="GridCell.Tab.2.left/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1591365655631" />
+    <state x="1156" y="134" width="752" height="906" key="GridCell.Tab.2.right" timestamp="1591365649095">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="921" y="127" width="752" height="906" key="GridCell.Tab.2.right/0.0.1920.1040/1920.0.1920.1080@0.0.1920.1040" timestamp="1590480489632" />
-    <state x="1156" y="134" width="752" height="906" key="GridCell.Tab.2.right/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1591009260122" />
-    <state x="1156" y="134" width="752" height="906" key="GridCell.Tab.3.bottom" timestamp="1591009260104">
+    <state x="1156" y="134" width="752" height="906" key="GridCell.Tab.2.right/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1591365649095" />
+    <state x="1156" y="134" width="752" height="906" key="GridCell.Tab.3.bottom" timestamp="1591365649075">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="921" y="127" width="752" height="906" key="GridCell.Tab.3.bottom/0.0.1920.1040/1920.0.1920.1080@0.0.1920.1040" timestamp="1590480489601" />
-    <state x="1156" y="134" width="752" height="906" key="GridCell.Tab.3.bottom/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1591009260104" />
-    <state x="1156" y="134" width="752" height="906" key="GridCell.Tab.3.center" timestamp="1591009260104">
+    <state x="1156" y="134" width="752" height="906" key="GridCell.Tab.3.bottom/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1591365649075" />
+    <state x="1156" y="134" width="752" height="906" key="GridCell.Tab.3.center" timestamp="1591365649075">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="921" y="127" width="752" height="906" key="GridCell.Tab.3.center/0.0.1920.1040/1920.0.1920.1080@0.0.1920.1040" timestamp="1590480489601" />
-    <state x="1156" y="134" width="752" height="906" key="GridCell.Tab.3.center/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1591009260104" />
-    <state x="1156" y="134" width="752" height="906" key="GridCell.Tab.3.left" timestamp="1591009260104">
+    <state x="1156" y="134" width="752" height="906" key="GridCell.Tab.3.center/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1591365649075" />
+    <state x="1156" y="134" width="752" height="906" key="GridCell.Tab.3.left" timestamp="1591365649075">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="921" y="127" width="752" height="906" key="GridCell.Tab.3.left/0.0.1920.1040/1920.0.1920.1080@0.0.1920.1040" timestamp="1590480489601" />
-    <state x="1156" y="134" width="752" height="906" key="GridCell.Tab.3.left/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1591009260104" />
-    <state x="1156" y="134" width="752" height="906" key="GridCell.Tab.3.right" timestamp="1591009260104">
+    <state x="1156" y="134" width="752" height="906" key="GridCell.Tab.3.left/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1591365649075" />
+    <state x="1156" y="134" width="752" height="906" key="GridCell.Tab.3.right" timestamp="1591365649075">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="921" y="127" width="752" height="906" key="GridCell.Tab.3.right/0.0.1920.1040/1920.0.1920.1080@0.0.1920.1040" timestamp="1590480489601" />
-    <state x="1156" y="134" width="752" height="906" key="GridCell.Tab.3.right/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1591009260104" />
-    <state x="461" y="151" key="SettingsEditor" timestamp="1590504069127">
+    <state x="1156" y="134" width="752" height="906" key="GridCell.Tab.3.right/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1591365649075" />
+    <state x="461" y="151" key="SettingsEditor" timestamp="1591363812105">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="461" y="151" key="SettingsEditor/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1590504069127" />
+    <state x="461" y="151" key="SettingsEditor/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1591363812105" />
     <state width="970" height="550" key="XDebugger.FullValuePopup" timestamp="1591009076682">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
@@ -292,72 +318,72 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="115" y="92" width="1713" height="856" key="com.intellij.history.integration.ui.views.FileHistoryDialog/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1591003516231" />
-    <state x="921" y="127" width="768" height="944" key="dock-window-1" timestamp="1590412364556">
+    <state x="1156" y="134" width="768" height="944" key="dock-window-1" timestamp="1591193566222">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="921" y="127" width="768" height="944" key="dock-window-1/0.0.1920.1040/1920.0.1920.1080@0.0.1920.1040" timestamp="1590412364556" />
-    <state x="921" y="127" width="768" height="944" key="dock-window-1/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1590407479170" />
-    <state x="1168" y="134" width="768" height="944" key="dock-window-10" timestamp="1590740437664">
+    <state x="1156" y="134" width="768" height="944" key="dock-window-1/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1591193566222" />
+    <state x="1156" y="134" width="768" height="944" key="dock-window-10" timestamp="1591262087059">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="1168" y="134" width="768" height="944" key="dock-window-10/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1590740437664" />
-    <state x="1168" y="134" width="768" height="944" key="dock-window-11" timestamp="1590740437664">
+    <state x="1156" y="134" width="768" height="944" key="dock-window-10/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1591262087059" />
+    <state x="1156" y="134" width="768" height="944" key="dock-window-11" timestamp="1591347455334">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="1168" y="134" width="768" height="944" key="dock-window-11/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1590740437664" />
-    <state x="1168" y="134" width="768" height="944" key="dock-window-12" timestamp="1590740892693">
+    <state x="1156" y="134" width="768" height="944" key="dock-window-11/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1591347455334" />
+    <state x="1156" y="134" width="768" height="944" key="dock-window-12" timestamp="1591347811650">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="1168" y="134" width="768" height="944" key="dock-window-12/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1590740892693" />
-    <state x="1168" y="134" width="768" height="944" key="dock-window-13" timestamp="1590740892693">
+    <state x="1156" y="134" width="768" height="944" key="dock-window-12/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1591347811650" />
+    <state x="1156" y="134" width="768" height="944" key="dock-window-13" timestamp="1591348138240">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="1168" y="134" width="768" height="944" key="dock-window-13/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1590740892693" />
-    <state x="1168" y="134" width="768" height="944" key="dock-window-14" timestamp="1590740892693">
+    <state x="1156" y="134" width="768" height="944" key="dock-window-13/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1591348138240" />
+    <state x="1156" y="134" width="768" height="944" key="dock-window-14" timestamp="1591348468569">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="1168" y="134" width="768" height="944" key="dock-window-14/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1590740892693" />
-    <state x="1168" y="134" width="768" height="944" key="dock-window-15" timestamp="1590740892693">
+    <state x="1156" y="134" width="768" height="944" key="dock-window-14/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1591348468569" />
+    <state x="1156" y="134" width="768" height="944" key="dock-window-15" timestamp="1591363351418">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="1168" y="134" width="768" height="944" key="dock-window-15/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1590740892693" />
-    <state x="1168" y="134" width="768" height="944" key="dock-window-16" timestamp="1590740892693">
+    <state x="1156" y="134" width="768" height="944" key="dock-window-15/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1591363351418" />
+    <state x="1156" y="134" width="768" height="944" key="dock-window-16" timestamp="1591363351418">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="1168" y="134" width="768" height="944" key="dock-window-16/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1590740892693" />
-    <state x="1168" y="134" width="768" height="944" key="dock-window-17" timestamp="1590740892693">
+    <state x="1156" y="134" width="768" height="944" key="dock-window-16/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1591363351418" />
+    <state x="1156" y="134" width="768" height="944" key="dock-window-17" timestamp="1591363351418">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="1168" y="134" width="768" height="944" key="dock-window-17/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1590740892693" />
-    <state x="1168" y="134" width="768" height="944" key="dock-window-18" timestamp="1590741483202">
+    <state x="1156" y="134" width="768" height="944" key="dock-window-17/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1591363351418" />
+    <state x="1156" y="134" width="768" height="944" key="dock-window-18" timestamp="1591364397883">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="1168" y="134" width="768" height="944" key="dock-window-18/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1590741483202" />
-    <state x="1168" y="134" width="768" height="944" key="dock-window-19" timestamp="1590741483202">
+    <state x="1156" y="134" width="768" height="944" key="dock-window-18/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1591364397883" />
+    <state x="1156" y="134" width="768" height="944" key="dock-window-19" timestamp="1591364397883">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="1168" y="134" width="768" height="944" key="dock-window-19/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1590741483202" />
-    <state x="921" y="127" width="768" height="944" key="dock-window-2" timestamp="1590480505926">
+    <state x="1156" y="134" width="768" height="944" key="dock-window-19/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1591364397883" />
+    <state x="1156" y="134" width="768" height="944" key="dock-window-2" timestamp="1591196679674">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="921" y="127" width="768" height="944" key="dock-window-2/0.0.1920.1040/1920.0.1920.1080@0.0.1920.1040" timestamp="1590480505926" />
-    <state x="921" y="127" width="768" height="944" key="dock-window-2/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1590407479170" />
-    <state x="1168" y="134" width="768" height="944" key="dock-window-20" timestamp="1590741483202">
+    <state x="1156" y="134" width="768" height="944" key="dock-window-2/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1591196679674" />
+    <state x="1156" y="134" width="768" height="944" key="dock-window-20" timestamp="1591364397883">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="1168" y="134" width="768" height="944" key="dock-window-20/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1590741483202" />
-    <state x="1168" y="134" width="768" height="944" key="dock-window-21" timestamp="1590741934316">
+    <state x="1156" y="134" width="768" height="944" key="dock-window-20/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1591364397883" />
+    <state x="1156" y="134" width="768" height="944" key="dock-window-21" timestamp="1591364397883">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="1168" y="134" width="768" height="944" key="dock-window-21/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1590741934316" />
-    <state x="1168" y="134" width="768" height="944" key="dock-window-22" timestamp="1590741934316">
+    <state x="1156" y="134" width="768" height="944" key="dock-window-21/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1591364397883" />
+    <state x="1156" y="134" width="768" height="944" key="dock-window-22" timestamp="1591364397883">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="1168" y="134" width="768" height="944" key="dock-window-22/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1590741934316" />
-    <state x="1168" y="134" width="768" height="944" key="dock-window-23" timestamp="1590741934316">
+    <state x="1156" y="134" width="768" height="944" key="dock-window-22/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1591364397883" />
+    <state x="1156" y="134" width="768" height="944" key="dock-window-23" timestamp="1591365708371">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="1168" y="134" width="768" height="944" key="dock-window-23/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1590741934316" />
+    <state x="1156" y="134" width="768" height="944" key="dock-window-23/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1591365708371" />
     <state x="1168" y="134" width="768" height="944" key="dock-window-24" timestamp="1590742598973">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
@@ -382,10 +408,10 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="1168" y="134" width="768" height="944" key="dock-window-29/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1590743055976" />
-    <state x="921" y="127" width="768" height="944" key="dock-window-3" timestamp="1590491595237">
+    <state x="1156" y="134" width="768" height="944" key="dock-window-3" timestamp="1591197388149">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="921" y="127" width="768" height="944" key="dock-window-3/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1590491595237" />
+    <state x="1156" y="134" width="768" height="944" key="dock-window-3/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1591197388149" />
     <state x="1168" y="134" width="768" height="944" key="dock-window-30" timestamp="1590743055976">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
@@ -426,10 +452,10 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="1168" y="134" width="768" height="944" key="dock-window-39/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1590746587254" />
-    <state x="1208" y="1005" width="768" height="944" key="dock-window-4" timestamp="1590491595237">
+    <state x="1156" y="134" width="768" height="944" key="dock-window-4" timestamp="1591197691263">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="1208" y="1005" width="768" height="944" key="dock-window-4/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1590491595237" />
+    <state x="1156" y="134" width="768" height="944" key="dock-window-4/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1591197691263" />
     <state x="1168" y="134" width="768" height="944" key="dock-window-40" timestamp="1590746587254">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
@@ -470,10 +496,10 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="1168" y="134" width="768" height="944" key="dock-window-49/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1590765743665" />
-    <state x="1168" y="134" width="768" height="944" key="dock-window-5" timestamp="1590491595237">
+    <state x="1156" y="134" width="768" height="944" key="dock-window-5" timestamp="1591198507302">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="1168" y="134" width="768" height="944" key="dock-window-5/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1590491595237" />
+    <state x="1156" y="134" width="768" height="944" key="dock-window-5/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1591198507302" />
     <state x="1168" y="134" width="768" height="944" key="dock-window-50" timestamp="1590765743665">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
@@ -514,10 +540,10 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="1168" y="134" width="768" height="944" key="dock-window-59/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1591004838068" />
-    <state x="1168" y="134" width="768" height="944" key="dock-window-6" timestamp="1590491595237">
+    <state x="1156" y="134" width="768" height="944" key="dock-window-6" timestamp="1591198507302">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="1168" y="134" width="768" height="944" key="dock-window-6/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1590491595237" />
+    <state x="1156" y="134" width="768" height="944" key="dock-window-6/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1591198507302" />
     <state x="1168" y="134" width="768" height="944" key="dock-window-60" timestamp="1591004838068">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
@@ -558,10 +584,10 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="1156" y="134" width="768" height="944" key="dock-window-69/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1591007359541" />
-    <state x="1168" y="134" width="768" height="944" key="dock-window-7" timestamp="1590500493292">
+    <state x="1156" y="134" width="768" height="944" key="dock-window-7" timestamp="1591199926013">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="1168" y="134" width="768" height="944" key="dock-window-7/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1590500493292" />
+    <state x="1156" y="134" width="768" height="944" key="dock-window-7/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1591199926013" />
     <state x="1156" y="134" width="768" height="944" key="dock-window-70" timestamp="1591007359541">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
@@ -582,14 +608,14 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="1156" y="134" width="768" height="944" key="dock-window-74/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1591009639056" />
-    <state x="1168" y="134" width="768" height="944" key="dock-window-8" timestamp="1590740437664">
+    <state x="1156" y="134" width="768" height="944" key="dock-window-8" timestamp="1591200317928">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="1168" y="134" width="768" height="944" key="dock-window-8/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1590740437664" />
-    <state x="1168" y="134" width="768" height="944" key="dock-window-9" timestamp="1590740437664">
+    <state x="1156" y="134" width="768" height="944" key="dock-window-8/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1591200317928" />
+    <state x="1156" y="134" width="768" height="944" key="dock-window-9" timestamp="1591200670140">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="1168" y="134" width="768" height="944" key="dock-window-9/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1590740437664" />
+    <state x="1156" y="134" width="768" height="944" key="dock-window-9/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1591200670140" />
     <state x="623" y="225" width="672" height="678" key="search.everywhere.popup" timestamp="1590761806665">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
@@ -660,11 +686,6 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/Danaos_ML_Project/dataReading.py</url>
-          <line>4350</line>
-          <option name="timeStamp" value="1278" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/Danaos_ML_Project/dataReading.py</url>
           <line>1880</line>
           <option name="timeStamp" value="1334" />
         </line-breakpoint>
@@ -682,11 +703,6 @@
           <url>file://$PROJECT_DIR$/Danaos_ML_Project/dataReading.py</url>
           <line>1978</line>
           <option name="timeStamp" value="1407" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/Danaos_ML_Project/dataReading.py</url>
-          <line>1334</line>
-          <option name="timeStamp" value="1409" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/dataPartitioning.py</url>
@@ -712,6 +728,41 @@
           <url>file://$PROJECT_DIR$/Danaos_ML_Project/dataPartitioning.py</url>
           <line>174</line>
           <option name="timeStamp" value="1427" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/Danaos_ML_Project/dataReading.py</url>
+          <line>1332</line>
+          <option name="timeStamp" value="1437" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/Danaos_ML_Project/dataReading.py</url>
+          <line>941</line>
+          <option name="timeStamp" value="1439" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/Danaos_ML_Project/dataReading.py</url>
+          <line>919</line>
+          <option name="timeStamp" value="1440" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/Danaos_ML_Project/dataReading.py</url>
+          <line>701</line>
+          <option name="timeStamp" value="1441" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/Danaos_ML_Project/dataReading.py</url>
+          <line>790</line>
+          <option name="timeStamp" value="1442" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/Danaos_ML_Project/dataReading.py</url>
+          <line>712</line>
+          <option name="timeStamp" value="1443" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/Danaos_ML_Project/ExtractNeuralReport.py</url>
+          <line>155</line>
+          <option name="timeStamp" value="1445" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
