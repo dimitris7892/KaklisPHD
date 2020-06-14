@@ -12,7 +12,7 @@ import tensorflow as tf
 from tensorflow import keras
 from scipy import spatial,random
 import colorsys
-from keras import losses
+#from keras import losses
 #from sklearn.model_selection import KFold
 import sys
 sys.setrecursionlimit(1000000)
@@ -49,23 +49,7 @@ class DefaultPartitioner:
         plt.title("K-means with " + str(nClusters) + " clusters")
         plt.show()
 
-#class CrossValidationPartioner(DefaultPartitioner):
 
-    #def NfoldValidation(self,dataX,dataY,dataW=None,folds=None,showPLot=False):
-        #kf = KFold(n_splits=folds)
-        #trainXList=[]
-        #trainYList=[]
-        #testXList = []
-        #testYList = []
-        #for train, test in kf.split(dataX):
-            #train_X, test_X = dataX[ train ], dataX[ test ]
-            #train_y, test_y = dataY[ train ], dataY[ train ]
-            #trainXList.append(train_X)
-            #trainYList.append(train_y)
-            #testXList.append(test_X)
-            #testYList.append(test_y)
-
-        #return trainXList , trainYList  ,list(range(0,folds)), None,None,testXList , testYList
 
 class TensorFlowCl(DefaultPartitioner):
 
@@ -120,9 +104,14 @@ class TensorFlowCl(DefaultPartitioner):
             model.add(keras.layers.Dense(genModelKnots - 1, ))
 
             # Compile model
-            model.compile(loss=losses.mean_squared_error, optimizer=keras.optimizers.Adam())
+            model.compile(loss=custom_loss, optimizer=keras.optimizers.Adam())
             ###print(model.summary())
             return model
+
+        def custom_loss(y_true,y_pred):
+
+            return tf.keras.losses.mean_squared_error(y_true,y_pred) + tf.keras.losses.categorical_crossentropy(y_true,y_pred) +\
+                    tf.keras.losses.kullback_leibler_divergence(y_true, y_pred)
 
 
 
@@ -1142,17 +1131,4 @@ class DelaunayTriPartitioner:
                 vDataSimple.append(trains_x_list[i][k])
 
           vDataSimple=np.array(vDataSimple)
-          #plt.plot(vDataSimple[ 0:, 0 ], vDataSimple[ 0:, 1 ], 'o', markersize=8)
-
-          #plt.show()
-          print ("\n"+ str(cutoffPoint))
-          print (len(trains_x_list))
-
-          return trains_x_list,trains_y_list, list(range(0, len(trains_x_list))),dataX,dataY , tri
-
-
-
-
-
-
-
+          #plt.plot(vDataSimple[ 0:, 0               
