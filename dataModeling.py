@@ -16,7 +16,7 @@ from sklearn.pipeline import Pipeline
 #from sklearn.model_selection import RandomizedSearchCV
 from basis_expansions1 import NaturalCubicSpline
 from sklearn.preprocessing import StandardScaler
-from gekko import GEKKO
+#from gekko import GEKKO
 import  matplotlib.pyplot as plt
 from scipy.interpolate import BivariateSpline
 import tensorflow as tf
@@ -2363,7 +2363,7 @@ class TensorFlowW(BasePartitionModeler):
                 elif  i == layer_id1:
                     x = new_layer1(x)
 
-                else:
+                else:########
                     #if i == len(layers) - 1:
                         #x = keras.layers.Dense(1)(x)
                     #else:
@@ -2772,4 +2772,4 @@ class SplineRegressionModeler(BasePartitionModeler):
         plt.plot(xData, genericModel.predict(xData), 'b-')
         plt.show()
         x=1
-        return
+       

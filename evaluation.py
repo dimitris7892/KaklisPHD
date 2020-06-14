@@ -120,12 +120,12 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
         #triData=np.vstack((trainX[:,0],trainY))
         #triData=np.array(triData).reshape(-1,2)
         listX=[]
-        if len(trainX) > 1:
-            dataXnew = dataX
-            dataYnew = dataY
-        else:
-            dataXnew = trainX[ 0 ]
-            dataYnew = trainY[ 0 ]
+        #if len(trainX) > 1:
+        #dataXnew = dataX
+        #dataYnew = dataY
+        #else:
+        dataXnew = trainX
+        dataYnew = trainY
 
         #########
         dataXnew3d=[]
@@ -473,11 +473,11 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
                             nGammas.append(np.array([ 2 * W23_1 * W23_2, 2 * W23_1 * W23_3, 2 * W23_2 * W23_3 ]))
                             nGammas.append(np.array([ 2 * W31_1 * W31_2, 2 * W31_1 * W31_3, 2 * W31_2 * W31_3 ]))
 
-                            ki = np.array([ V1, V2,
-                                            V3 ])
-                            t5 = plt.Polygon(ki, fill=False, color='blue', linewidth=3)
-                            edgesInitial.append(ki)
-                            plt.gca().add_patch(t5)
+                            #ki = np.array([ V1, V2,
+                                            #V3 ])
+                            #t5 = plt.Polygon(ki, fill=False, color='blue', linewidth=3)
+                            #edgesInitial.append(ki)
+                            #plt.gca().add_patch(t5)
                             #neighboringTri =triNew.vertices[ triNew.find_simplex(trainX[index])]
                             rpms=[]
                             for s in neighboringTri:
@@ -541,23 +541,23 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
                                 ki = np.array([ V1n, V2n,
                                 V3n ])
                                 flagEdge=False
-                                for t in edgesInitial[0]:
-                                    if (t==ki[0]).all() and (t==ki[1]).all() and (t==ki[2]).all():
-                                        flagEdge = True
+                                #for t in edgesInitial[0]:
+                                    #if (t==ki[0]).all() and (t==ki[1]).all() and (t==ki[2]).all():
+                                        #flagEdge = True
                                 #if flagEdge==False:
-                                t5 = plt.Polygon(ki, fill=False, color='yellow', linewidth=3)
-                                plt.gca().add_patch(t5)
-                            ki = np.array([V1, V2,
-                                               V3])
+                                #t5 = plt.Polygon(ki, fill=False, color='yellow', linewidth=3)
+                                #plt.gca().add_patch(t5)
+                            #ki = np.array([V1, V2,
+                                               #V3])
 
                                 #if np.linalg.norm(V1n-V2n) > 2:
-                            t5 = plt.Polygon(ki, fill=False, color='blue', linewidth=3)
-                            plt.rc('text', usetex=True)
-                            edgesInitial.append(ki)
-                            plt.gca().add_patch(t5)
-                            plt.xlabel(r"$V$")
-                            plt.ylabel(r"$\bar{V_N}$")
-                            plt.show()
+                            #t5 = plt.Polygon(ki, fill=False, color='blue', linewidth=3)
+                            #plt.rc('text', usetex=True)
+                            #edgesInitial.append(ki)
+                            #plt.gca().add_patch(t5)
+                            #plt.xlabel(r"$V$")
+                            #plt.ylabel(r"$\bar{V_N}$")
+                            #plt.show()
                             f=1
                             ####solve least squares opt. problem
                             # nRPms : y [1xn matrix]
