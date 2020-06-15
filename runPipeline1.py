@@ -3,7 +3,7 @@ import dataReading as dRead
 import  Danaos_ML_Project.dataReading as DANdRead
 import featureCalculation as fCalc
 import dataReadingD as DANRead
-import dataPartitioning as dPart
+import dataPartitioning1 as dPart
 import dataModeling as dModel
 import evaluation as eval
 import plotResults as plotRes
@@ -121,6 +121,8 @@ def main():
       data1 = pd.read_csv(sFile, skiprows=skip_idxx)
       for modeler in modelers:
         for partitioner in partitioners:
+           if modeler.__class__.__name__ == 'TriInterpolantModeler' or modeler.__class__.__name__ == 'TensorFlow':
+                partK = [1]
            if partitioner.__class__.__name__=='DelaunayTriPartitioner':
                  partK=np.linspace(0.7,1,4)#[0.5]
                  #np.linspace(0.2,1,11)
@@ -176,14 +178,17 @@ def main():
                 NUM_OF_CLUSTERS =k# TODO: Read from command line
                 NUM_OF_FOLDS=6
                 #if modeler!='TRI':
-                if modeler.__class__.__name__ != 'TensorFlowWD':
-                    partitionsX, partitionsY, partitionLabels, partitionRepresentatives, partitioningModel  , centroids  = partitioner.clustering(X, Y, W ,NUM_OF_CLUSTERS, True,k)
+                if modeler.__class__.__name__ != 'TriInterpolantModeler':
+                    if modeler.__class__.__name__ != 'TensorFlowWD':
+                        partitionsX, partitionsY, partitionLabels, partitionRepresentatives, partitioningModel  , centroids  = partitioner.clustering(X, Y, W ,NUM_OF_CLUSTERS, True,k)
+                    else:
+                       #partitionLabels=23
+
+                        partitionsX, partitionsY, partitionLabels, partitionRepresentatives, partitioningModel, tri  = partitioner.clustering(
+
+                            seriesX, targetY, None, NUM_OF_CLUSTERS, True, k)
                 else:
-                   #partitionLabels=23
-
-                    partitionsX, partitionsY, partitionLabels, partitionRepresentatives, partitioningModel, tri  = partitioner.clustering(
-
-                        seriesX, targetY, None, NUM_OF_CLUSTERS, True, k)
+                    partitionsX, partitionsY, partitionLabels,partitionRepresentatives,partitioningModel  , centroids= X,Y,[1],None,None,None
 
                     #partitionsXDB6, partitionsYDB6, partitionLabels, partitionRepresentatives, partitioningModel, tri = partitioner.clustering(
                         #drftB6, targetY, None, 25, True, k)
@@ -332,7 +337,7 @@ def initParameters():
     end = 17000
     startU = 30000
     endU = 31000
-    algs=['SR']
+    algs=['TRI']
     # ['SR','LR','RF','NN','NNW','TRI']
 
 
