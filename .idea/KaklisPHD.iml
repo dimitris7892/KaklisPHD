@@ -5,7 +5,4 @@
     <orderEntry type="jdk" jdkName="Python 3.6.6 (C:\Users\dkaklis\AppData\Local\Programs\Python\Python36\python.exe)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
-  <component name="TestRunnerService">
-    <option name="PROJECT_TEST_RUNNER" value="Unittests" />
-  </component>
 </module>
