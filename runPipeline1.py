@@ -1,23 +1,13 @@
 import dataReading as dRead
-#from Danaos_ML_Project import dataReading as DANdRead ##   NEWWWW
-import  Danaos_ML_Project.dataReading as DANdRead
 import featureCalculation as fCalc
-import dataReadingD as DANRead
-import dataPartitioning1 as dPart
+import dataPartitioning as dPart
 import dataModeling as dModel
 import evaluation as eval
-import plotResults as plotRes
 import numpy as np
 from math import sqrt
 import sys
-import plotResults as plres
-import itertools
 import pandas as pd
 import random
-from sklearn.decomposition import PCA
-import datetime
-import csv
-import tensorflow as tf
 
 def main():
     # Init parameters based on command line

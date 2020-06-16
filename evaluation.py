@@ -824,7 +824,7 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
     def extractFunctionsFromSplines(self,x0, x1,modelId):
         piecewiseFunc = []
         #self.count = self.count + 1
-        csvModels=['./model_'+str(modelId)+'_.csv']
+        csvModels=['./trainedModels/model_'+str(modelId)+'_.csv']
         for csvM in csvModels:
             #if csvM != './model_Gen_.csv':
                 #continue
@@ -1384,7 +1384,7 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
         #print(self.kw_dunn(groups,[(0,1),(0,2)]))
 
         #dataf = pd.DataFrame.from_dict(df, orient='index')
-        df.to_csv('./NEWres_1.csv', index=False)
+        df.to_csv('./experimentalResults/NEWres_1.csv', index=False)
         #df.melt(var_name='groups', value_name='values')
         df=pd.melt(df,var_name='groups', value_name='values')
         print(df)
