@@ -1130,5 +1130,11 @@ class DelaunayTriPartitioner:
               for k in range(0,len(trains_x_list[i])):
                 vDataSimple.append(trains_x_list[i][k])
 
-          vDataSimple=np.array(vDataSimple)
-          #plt.plot(vDataSimple[ 0:, 0               
+          vDataSimple = np.array(vDataSimple)
+          # plt.plot(vDataSimple[ 0:, 0 ], vDataSimple[ 0:, 1 ], 'o', markersize=8)
+
+          # plt.show()
+          print("\n" + str(cutoffPoint))
+          print(len(trains_x_list))
+
+          return trains_x_list, trains_y_list, list(range(0, len(trains_x_list))), dataX, dataY, tri

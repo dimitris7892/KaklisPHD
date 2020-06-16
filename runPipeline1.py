@@ -114,7 +114,7 @@ def main():
            if modeler.__class__.__name__ == 'TriInterpolantModeler' or modeler.__class__.__name__ == 'TensorFlow':
                 partK = [1]
            if partitioner.__class__.__name__=='DelaunayTriPartitioner':
-                 partK=np.linspace(0.7,1,4)#[0.5]
+                 partK=np.linspace(0.3,1,10)#[0.5]
                  #np.linspace(0.2,1,11)
                      #[0.6]
            elif partitioner.__class__.__name__=='KMeansPartitioner':
@@ -327,12 +327,12 @@ def initParameters():
     end = 17000
     startU = 30000
     endU = 31000
-    algs=['TRI']
+    algs=['SR']
     # ['SR','LR','RF','NN','NNW','TRI']
 
 
         #['SR','LR','RF','NN','NNW','TRI']
-    cls=['NNCL']
+    cls=['DC']
     #['SR','LR','RF','NN'] algs
     #['KM','DC'] clusterers / cls
 
