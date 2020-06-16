@@ -1,23 +1,13 @@
 import dataReading as dRead
-#from Danaos_ML_Project import dataReading as DANdRead ##   NEWWWW
-import  Danaos_ML_Project.dataReading as DANdRead
 import featureCalculation as fCalc
-import dataReadingD as DANRead
-import dataPartitioning1 as dPart
+import dataPartitioning as dPart
 import dataModeling as dModel
 import evaluation as eval
-import plotResults as plotRes
 import numpy as np
 from math import sqrt
 import sys
-import plotResults as plres
-import itertools
 import pandas as pd
 import random
-from sklearn.decomposition import PCA
-import datetime
-import csv
-import tensorflow as tf
 
 def main():
     # Init parameters based on command line
@@ -124,7 +114,12 @@ def main():
            if modeler.__class__.__name__ == 'TriInterpolantModeler' or modeler.__class__.__name__ == 'TensorFlow':
                 partK = [1]
            if partitioner.__class__.__name__=='DelaunayTriPartitioner':
+<<<<<<< HEAD
                  partK=np.linspace(0.2,1,9)
+=======
+                 partK=np.linspace(0.3,1,10)#[0.5]
+                 #np.linspace(0.2,1,11)
+>>>>>>> e897013646e615a9dfd78843043a20e0a144df6e
                      #[0.6]
            elif partitioner.__class__.__name__=='KMeansPartitioner':
                if modeler.__class__.__name__=='TriInterpolantModeler' or modeler.__class__.__name__ == 'TensorFlow':
@@ -336,12 +331,12 @@ def initParameters():
     end = 17000
     startU = 30000
     endU = 31000
-    algs=['TRI']
+    algs=['SR']
     # ['SR','LR','RF','NN','NNW','TRI']
 
 
         #['SR','LR','RF','NN','NNW','TRI']
-    cls=['NNCL']
+    cls=['DC']
     #['SR','LR','RF','NN'] algs
     #['KM','DC'] clusterers / cls
 
