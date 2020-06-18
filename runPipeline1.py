@@ -86,7 +86,7 @@ def main():
         subsetsB.append(targetB)
         var.append(np.var(seriesX))
 
-        if len(subsetsX)>=1:
+        if len(subsetsX)>=5:
             break
     #subsetsX=[subsetsX[0]]
     #subsetsY=[subsetsY[0]]
@@ -98,7 +98,7 @@ def main():
     histTr=[]
     counter=0
 
-    K = range(1,2)
+    K = range(1,21)
     print("Number of Statistically ind. subsets for training: " + str(len(subsetsX)))
     subsetsX=[subsetsX[0:5]] if len(subsetsX) > 5 else subsetsX
     subsetsY = [ subsetsY[ 0:5 ] ] if len(subsetsY) > 5 else subsetsY
@@ -114,12 +114,10 @@ def main():
            if modeler.__class__.__name__ == 'TriInterpolantModeler' or modeler.__class__.__name__ == 'TensorFlow':
                 partK = [1]
            if partitioner.__class__.__name__=='DelaunayTriPartitioner':
-<<<<<<< HEAD
-                 partK=np.linspace(0.2,1,9)
-=======
+
                  partK=np.linspace(0.3,1,10)#[0.5]
                  #np.linspace(0.2,1,11)
->>>>>>> e897013646e615a9dfd78843043a20e0a144df6e
+
                      #[0.6]
            elif partitioner.__class__.__name__=='KMeansPartitioner':
                if modeler.__class__.__name__=='TriInterpolantModeler' or modeler.__class__.__name__ == 'TensorFlow':
