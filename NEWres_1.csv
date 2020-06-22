@@ -1,2 +1,2 @@
 clusters,var,error,Trerror,partitioners,models
-3,49.51682634011101,2.945974740932643,8.191428889084973,TensorFlowCl,SplineRegressionModeler
+2,49.51682634011101,1.7517436742782593,3.5784003734588623,TensorFlowCl,TensorFlowW

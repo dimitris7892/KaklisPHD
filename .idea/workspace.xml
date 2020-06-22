@@ -2,17 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="9e10e853-69bc-4a18-9c9f-e2f3d9527f23" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/KaklisPHD.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/KaklisPHD.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/data/MILLENIA/DOMINIA/TELEGRAMS/DOMINIA.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/data/MILLENIA/DOMINIA/mappedData.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/data/MILLENIA/FANTASIA/TELEGRAMS/FANTASIA.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/data/MILLENIA/FANTASIA/mappedData.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/dataReading.py" beforeDir="false" afterPath="$PROJECT_DIR$/Danaos_ML_Project/dataReading.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/model_2_.csv" beforeDir="false" afterPath="$PROJECT_DIR$/Danaos_ML_Project/model_2_.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/model_3_.csv" beforeDir="false" afterPath="$PROJECT_DIR$/Danaos_ML_Project/model_3_.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/runPipeline1.py" beforeDir="false" afterPath="$PROJECT_DIR$/Danaos_ML_Project/runPipeline1.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/NEWres_1.csv" beforeDir="false" afterPath="$PROJECT_DIR$/NEWres_1.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dataPartitioning.py" beforeDir="false" afterPath="$PROJECT_DIR$/dataPartitioning.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/gRPC/grpc/examples/android/helloworld/.gitignore" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/gRPC/grpc/examples/android/helloworld/README.md" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/gRPC/grpc/examples/android/helloworld/app/.gitignore" beforeDir="false" />
@@ -187,6 +179,7 @@
       <change beforePath="$PROJECT_DIR$/gRPC/grpc/examples/php/route_guide/route_guide_proto_gen.sh" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/gRPC/grpc/examples/php/route_guide/run_route_guide_client.sh" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/gRPC/grpc/examples/php/run_greeter_client.sh" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gRPC/grpc/examples/python/helloworld/greeter_server.py" beforeDir="false" afterPath="$PROJECT_DIR$/gRPC/grpc/examples/python/helloworld/greeter_server.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/gRPC/grpc/examples/ruby/.gitignore" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/gRPC/grpc/examples/ruby/Gemfile" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/gRPC/grpc/examples/ruby/README.md" beforeDir="false" />
@@ -213,47 +206,8 @@
       <change beforePath="$PROJECT_DIR$/gRPC/grpc/examples/ruby/without_protobuf/echo_client.rb" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/gRPC/grpc/examples/ruby/without_protobuf/echo_server.rb" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/gRPC/grpc/examples/ruby/without_protobuf/echo_services_noprotobuf.rb" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/model_0_.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/model_10_.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/model_11_.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/model_12_.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/model_13_.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/model_14_.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/model_15_.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/model_16_.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/model_17_.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/model_18_.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/model_19_.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/model_1_.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/model_20_.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/model_21_.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/model_22_.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/model_23_.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/model_24_.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/model_25_.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/model_26_.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/model_27_.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/model_28_.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/model_29_.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/model_2_.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/model_30_.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/model_31_.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/model_32_.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/model_33_.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/model_34_.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/model_35_.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/model_36_.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/model_37_.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/model_38_.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/model_39_.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/model_3_.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/model_40_.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/model_4_.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/model_5_.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/model_6_.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/model_7_.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/model_8_.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/model_9_.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/model_Gen_.csv" beforeDir="false" afterPath="$PROJECT_DIR$/model_Gen_.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/runPipeline1.py" beforeDir="false" afterPath="$PROJECT_DIR$/runPipeline1.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -283,13 +237,6 @@
     <property name="two.files.diff.last.used.file" value="$PROJECT_DIR$/estimatorCl_1.h5" />
   </component>
   <component name="RecentsManager">
-    <key name="CopyFile.RECENT_KEYS">
-      <recent name="C:\Users\dkaklis\Desktop\KaklisPHD\Danaos_ML_Project\data\MILLENIA\METEORA\NeuralEvaluationData" />
-      <recent name="C:\Users\dkaklis\Desktop\KaklisPHD\Danaos_ML_Project" />
-      <recent name="C:\Users\dkaklis\Desktop\KaklisPHD" />
-      <recent name="C:\Users\dkaklis\Desktop\KaklisPHD\data\MILLENIA" />
-      <recent name="C:\Users\dkaklis\Desktop\KaklisPHD\data\MARMARAS" />
-    </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\dkaklis\Desktop\KaklisPHD\data\GOLDENPORT" />
       <recent name="C:\Users\dkaklis\Desktop\KaklisPHD\data\MARMARAS" />
@@ -297,8 +244,15 @@
       <recent name="C:\Users\dkaklis\Desktop\KaklisPHD\Neurals_pvlos" />
       <recent name="C:\Users\dkaklis\Desktop\KaklisPHD\data\OCEAN_GOLD" />
     </key>
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\dkaklis\Desktop\KaklisPHD\Danaos_ML_Project\data\MILLENIA\METEORA\NeuralEvaluationData" />
+      <recent name="C:\Users\dkaklis\Desktop\KaklisPHD\Danaos_ML_Project" />
+      <recent name="C:\Users\dkaklis\Desktop\KaklisPHD" />
+      <recent name="C:\Users\dkaklis\Desktop\KaklisPHD\data\MILLENIA" />
+      <recent name="C:\Users\dkaklis\Desktop\KaklisPHD\data\MARMARAS" />
+    </key>
   </component>
-  <component name="RunManager" selected="Python.runPipeline1 (1)">
+  <component name="RunManager" selected="Python.runPipeline1">
     <configuration name="Danaos_Prediction_Module" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="KaklisPHD" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -413,8 +367,8 @@
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.runPipeline1 (1)" />
         <item itemvalue="Python.runPipeline1" />
+        <item itemvalue="Python.runPipeline1 (1)" />
         <item itemvalue="Python.runPipelineD" />
         <item itemvalue="Python.Danaos_Prediction_Module" />
       </list>
@@ -459,30 +413,30 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="1220" y="408" key="FileChooserDialogImpl/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1591950471268" />
-    <state width="1898" height="225" key="GridCell.Tab.0.bottom" timestamp="1592209669053">
+    <state width="1898" height="225" key="GridCell.Tab.0.bottom" timestamp="1592826432475">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state width="1898" height="225" key="GridCell.Tab.0.bottom/-1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1590486405344" />
     <state width="1898" height="225" key="GridCell.Tab.0.bottom/0.0.1920.1040/1920.0.1920.1080@0.0.1920.1040" timestamp="1590482788109" />
-    <state width="1898" height="225" key="GridCell.Tab.0.bottom/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1592209669053" />
-    <state width="1898" height="225" key="GridCell.Tab.0.center" timestamp="1592209669052">
+    <state width="1898" height="225" key="GridCell.Tab.0.bottom/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1592826432475" />
+    <state width="1898" height="225" key="GridCell.Tab.0.center" timestamp="1592826432474">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state width="1898" height="225" key="GridCell.Tab.0.center/-1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1590486405344" />
     <state width="1898" height="225" key="GridCell.Tab.0.center/0.0.1920.1040/1920.0.1920.1080@0.0.1920.1040" timestamp="1590482788109" />
-    <state width="1898" height="225" key="GridCell.Tab.0.center/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1592209669052" />
-    <state width="1898" height="225" key="GridCell.Tab.0.left" timestamp="1592209669052">
+    <state width="1898" height="225" key="GridCell.Tab.0.center/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1592826432474" />
+    <state width="1898" height="225" key="GridCell.Tab.0.left" timestamp="1592826432474">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state width="1898" height="225" key="GridCell.Tab.0.left/-1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1590486405344" />
     <state width="1898" height="225" key="GridCell.Tab.0.left/0.0.1920.1040/1920.0.1920.1080@0.0.1920.1040" timestamp="1590482788109" />
-    <state width="1898" height="225" key="GridCell.Tab.0.left/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1592209669052" />
-    <state width="1898" height="225" key="GridCell.Tab.0.right" timestamp="1592209669053">
+    <state width="1898" height="225" key="GridCell.Tab.0.left/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1592826432474" />
+    <state width="1898" height="225" key="GridCell.Tab.0.right" timestamp="1592826432474">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state width="1898" height="225" key="GridCell.Tab.0.right/-1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1590486405344" />
     <state width="1898" height="225" key="GridCell.Tab.0.right/0.0.1920.1040/1920.0.1920.1080@0.0.1920.1040" timestamp="1590482788109" />
-    <state width="1898" height="225" key="GridCell.Tab.0.right/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1592209669053" />
+    <state width="1898" height="225" key="GridCell.Tab.0.right/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1592826432474" />
     <state width="1898" height="186" key="GridCell.Tab.1.bottom" timestamp="1591967819508">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
@@ -938,7 +892,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/dataPartitioning.py</url>
-          <line>175</line>
+          <line>163</line>
           <option name="timeStamp" value="1412" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
@@ -990,6 +944,11 @@
           <url>file://$PROJECT_DIR$/Danaos_ML_Project/dataReading.py</url>
           <line>4285</line>
           <option name="timeStamp" value="1489" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/gRPC/grpc/examples/python/helloworld/greeter_server.py</url>
+          <line>28</line>
+          <option name="timeStamp" value="1490" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
