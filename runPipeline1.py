@@ -1,23 +1,13 @@
 import dataReading as dRead
-#from Danaos_ML_Project import dataReading as DANdRead ##   NEWWWW
-import  Danaos_ML_Project.dataReading as DANdRead
 import featureCalculation as fCalc
-import dataReadingD as DANRead
-import dataPartitioning1 as dPart
+import dataPartitioning as dPart
 import dataModeling as dModel
 import evaluation as eval
-import plotResults as plotRes
 import numpy as np
 from math import sqrt
 import sys
-import plotResults as plres
-import itertools
 import pandas as pd
 import random
-from sklearn.decomposition import PCA
-import datetime
-import csv
-import tensorflow as tf
 
 def main():
     # Init parameters based on command line
@@ -108,7 +98,7 @@ def main():
     histTr=[]
     counter=0
 
-    K = range(1,25)
+    K = range(1,2)
     print("Number of Statistically ind. subsets for training: " + str(len(subsetsX)))
     subsetsX=[subsetsX[0:5]] if len(subsetsX) > 5 else subsetsX
     subsetsY = [ subsetsY[ 0:5 ] ] if len(subsetsY) > 5 else subsetsY
@@ -121,10 +111,15 @@ def main():
       data1 = pd.read_csv(sFile, skiprows=skip_idxx)
       for modeler in modelers:
         for partitioner in partitioners:
+           if modeler.__class__.__name__ == 'TriInterpolantModeler' and partitioner.__class__.__name__=='DelaunayTriPartitioner':
+                break
            if modeler.__class__.__name__ == 'TriInterpolantModeler' or modeler.__class__.__name__ == 'TensorFlow':
                 partK = [1]
+                partitioner.__class__.__name__ ="None"
            if partitioner.__class__.__name__=='DelaunayTriPartitioner':
+
                  partK=np.linspace(0.3,1,8)#[0.5]
+
                  #np.linspace(0.2,1,11)
                      #[0.6]
            elif partitioner.__class__.__name__=='KMeansPartitioner':
@@ -312,8 +307,10 @@ def main():
                 #meanVTr.append(np.mean(s ubsetX))
                 #meanBTr.append(np.mean(X[:,2]))
                 errors.append(meanError)
-                trErrors.append(meanErrorTr)
-
+                if modeler.__class__.__name__ == 'TriInterpolantModeler':
+                    trErrors.append(None)
+                else:
+                    trErrors.append(meanErrorTr)
                 err={}
                 err["model"] =modeler.__class__.__name__
                 err["error"] = meanError
@@ -324,6 +321,7 @@ def main():
                     break
                 if partitioner.__class__.__name__ == 'DelaunayTriPartitioner' and numOfclusters==1:
                     break
+
 
 
     eval.MeanAbsoluteErrorEvaluation.ANOVAtest(eval.MeanAbsoluteErrorEvaluation(), clusters, varTr,trErrors ,errors,models,part)
@@ -337,12 +335,13 @@ def initParameters():
     end = 17000
     startU = 30000
     endU = 31000
+
     algs=['NNW']
     # ['SR','LR','RF','NN','NNW','TRI']
 
 
         #['SR','LR','RF','NN','NNW','TRI']
-    cls=['NNCL']
+    cls=['KM','DC','NNCL']
     #['SR','LR','RF','NN'] algs
     #['KM','DC'] clusterers / cls
 
