@@ -16,7 +16,6 @@ from sklearn.pipeline import Pipeline
 #from sklearn.model_selection import RandomizedSearchCV
 from basis_expansions1 import NaturalCubicSpline
 from sklearn.preprocessing import StandardScaler
-#from gekko import GEKKO
 import  matplotlib.pyplot as plt
 from scipy.interpolate import BivariateSpline
 import tensorflow as tf
@@ -687,8 +686,8 @@ class TensorFlowCA(BasePartitionModeler):
         for models in sModel:
             modelSummary = str(models.summary()).split("\n")[4:]
 
-            with open('./model_Gen_.csv', mode='w') as data:
-                csvModels.append('./model_Gen_.csv')
+            with open('./trainedModels/model_Gen_.csv', mode='w') as data:
+                csvModels.append('./trainedModels/model_Gen_.csv')
                 data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
                 data_writer.writerow(
                     ['Basis', 'Coeff'])
@@ -736,8 +735,8 @@ class TensorFlowCA(BasePartitionModeler):
         for models in srModels:
             modelSummary = str(models.summary()).split("\n")[4:]
             basisM = []
-            with open('./model_' + str(modelCount) + '_.csv', mode='w') as data:
-                csvModels.append('./model_' + str(modelCount) + '_.csv')
+            with open('./trainedModels/model_' + str(modelCount) + '_.csv', mode='w') as data:
+                csvModels.append('./trainedModels/model_' + str(modelCount) + '_.csv')
                 data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
                 data_writer.writerow(
                     ['Basis', 'Coeff'])
@@ -961,8 +960,8 @@ class TensorFlowW1(BasePartitionModeler):
         for models in sModel:
             modelSummary = str(models.summary()).split("\n")[ 4: ]
 
-            with open('./model_Gen_.csv', mode='w') as data:
-                csvModels.append('./model_Gen_.csv')
+            with open('./trainedModels/model_Gen_.csv', mode='w') as data:
+                csvModels.append('./trainedModels/model_Gen_.csv')
                 data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
                 data_writer.writerow(
                     [ 'Basis', 'Coeff' ])
@@ -1000,8 +999,8 @@ class TensorFlowW1(BasePartitionModeler):
         for models in srModels:
             modelSummary = str(models.summary()).split("\n")[4:]
             basisM = [ ]
-            with open('./model_'+str(modelCount)+'_.csv', mode='w') as data:
-                csvModels.append('./model_'+str(modelCount)+'_.csv')
+            with open('./trainedModels/model_'+str(modelCount)+'_.csv', mode='w') as data:
+                csvModels.append('./trainedModels/model_'+str(modelCount)+'_.csv')
                 data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
                 data_writer.writerow(
                 ['Basis', 'Coeff'])
@@ -1028,7 +1027,7 @@ class TensorFlowW1(BasePartitionModeler):
             piecewiseFunc = [ ]
             self.count = self.count + 1
             for csvM in csvModels:
-                if csvM!='./model_'+str(self.modelId)+'_.csv':
+                if csvM!='./trainedModels/model_'+str(self.modelId)+'_.csv':
                     continue
                 #id = csvM.split("_")[ 1 ]
                 #piecewiseFunc = [ ]
@@ -1844,8 +1843,8 @@ class TensorFlowW(BasePartitionModeler):
         for models in sModel:
             modelSummary = str(models.summary()).split("\n")[ 4: ]
 
-            with open('./model_Gen_.csv', mode='w') as data:
-                csvModels.append('./model_Gen_.csv')
+            with open('./trainedModels/model_Gen_.csv', mode='w') as data:
+                csvModels.append('./trainedModels/model_Gen_.csv')
                 data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
                 data_writer.writerow(
                     [ 'Basis', 'Coeff' ])
@@ -1889,8 +1888,8 @@ class TensorFlowW(BasePartitionModeler):
         for models in srModels:
             modelSummary = str(models.summary()).split("\n")[4:]
             basisM = [ ]
-            with open('./model_'+str(modelCount)+'_.csv', mode='w') as data:
-                csvModels.append('./model_'+str(modelCount)+'_.csv')
+            with open('./trainedModels/model_'+str(modelCount)+'_.csv', mode='w') as data:
+                csvModels.append('./trainedModels/model_'+str(modelCount)+'_.csv')
                 data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
                 data_writer.writerow(
                 ['Basis', 'Coeff'])
@@ -1917,7 +1916,7 @@ class TensorFlowW(BasePartitionModeler):
             piecewiseFunc = [ ]
             self.count = self.count + 1
             for csvM in csvModels:
-                if csvM!='./model_'+str(self.modelId)+'_.csv':
+                if csvM!='./trainedModels/model_'+str(self.modelId)+'_.csv':
                     continue
                 #id = csvM.split("_")[ 1 ]
                 #piecewiseFunc = [ ]
