@@ -100,7 +100,7 @@ class TensorFlowCl(DefaultPartitioner):
             while neurons < genModelKnots -1:
                 model.add(keras.layers.Dense(neurons, ))
                 neurons = neurons+1
-            model.add(keras.layers.Dense(genModelKnots - 1, ))
+            model.add(keras.layers.Dense(genModelKnots , ))
 
             # Compile model
             model.compile(loss=custom_loss, optimizer=keras.optimizers.Adam())
@@ -559,9 +559,11 @@ class TensorFlowCl(DefaultPartitioner):
 
         for i in range(0, len(X)):
             vector = extractFunctionsFromSplines(X[i][0], X[i][1])
-            XSplineVector.append(vector)
+            XSplineVector.append(np.append(Y[i], XSplineVector))
 
+        #XSplineVector.append(np.append(Y.reshape(-1,1), XSplineVector))
         XSplineVector = np.array(XSplineVector)
+
         #weights0 = np.mean(XSplineVector, axis=0)
         # weights1 = self.intercepts
         #weights1 = estimator.layers[0].get_weights()[0][1]
@@ -570,7 +572,7 @@ class TensorFlowCl(DefaultPartitioner):
 
         # estimator.layers[0].set_weights([weights, np.array([0] * (genModelKnots-1))])
 
-        estimator.fit(XSplineVector, Y, epochs=20,verbose=0)
+        estimator.fit(X, XSplineVector, epochs=50,verbose=0)
 
         self.flagGen = True
         from scipy.special import softmax
@@ -612,7 +614,7 @@ class TensorFlowCl(DefaultPartitioner):
             partitionLabels.append(curLbl)
 
 
-        return partitionsX, partitionsY, partitionLabels , dataX , dataY,None
+        return partitionsX, partitionsY, partitionLabels , dataX , dataY,None , estimator
 
     def getFitnessOfModelForPoint(self, model, point):
         return 1.0 / (1.0 + np.linalg.norm(np.mean(self._partitionsPerModel[model]) - point))

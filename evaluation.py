@@ -1203,7 +1203,7 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
 
         return piecewiseFunc
 
-    def evaluateKerasNN1(self, unseenX, unseenY, modeler,output,xs,genericModel,partitionsX , scores):
+    def evaluateKerasNN1(self, unseenX, unseenY, modeler,output,xs,genericModel,partitionsX , scores,CLmodeler):
         lErrors = []
         from scipy.special import softmax
 
@@ -1215,13 +1215,19 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
         for iCnt in range(np.shape(unseenX)[0]):
             pPoint =unseenX[iCnt]
             pPoint= pPoint.reshape(-1,unseenX.shape[1])
-
+            XSplineVector=[]
             trueVal = unseenY[iCnt]
+
+            #vector = self.extractFunctionsFromSplines(pPoint[0], pPoint[1], 'Gen')
+            #XSplineVector = np.append(pPoint, vector)
+            #XSplineVector = XSplineVector.reshape(-1, XSplineVector.shape[0])
+            #predLabel = abs(CLmodeler.predict(XSplineVector))[0]
 
             ind, fit = modeler.getBestPartitionForPoint(pPoint, partitionsX)
 
-            fits = modeler.getFitForEachPartitionForPoint(pPoint, partitionsX)
+            #fits = modeler.getFitForEachPartitionForPoint(pPoint, partitionsX)
 
+            #ind = predLabel
             # prediction = modeler._models[len(modeler._models)-1].predict(pPoint)
 
             #fits = softmax(fits)
