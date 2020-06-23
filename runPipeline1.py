@@ -162,7 +162,7 @@ def main():
                 ##IF MODEL != OF ANALYTICAL METHOD IMPLEMENT CLUSTERING
                 if modeler.__class__.__name__ != 'TriInterpolantModeler':
                     if modeler.__class__.__name__ != 'TensorFlowWD':
-                        partitionsX, partitionsY, partitionLabels, partitionRepresentatives, partitioningModel  , centroids , CLmodeler = partitioner.clustering(X, Y, W ,NUM_OF_CLUSTERS, True,k)
+                        partitionsX, partitionsY, partitionLabels, partitionRepresentatives, partitioningModel  , centroids  = partitioner.clustering(X, Y, W ,NUM_OF_CLUSTERS, True,k)
                     else:
 
                         partitionsX, partitionsY, partitionLabels, partitionRepresentatives, partitioningModel, tri  = partitioner.clustering(
@@ -222,7 +222,7 @@ def main():
                            _, meanErrorTr, sdError = eval.MeanAbsoluteErrorEvaluation.evaluateKerasNN1(
                                eval.MeanAbsoluteErrorEvaluation(), X,
                                Y,
-                               modeler, output, None,genericModel,partitionsX,None,CLmodeler)
+                               modeler, output, None,genericModel,partitionsX,None)
 
                     print ("Mean absolute error on training data: %4.2f (+/- %4.2f standard error)" % (
                         meanErrorTr, sdError / sqrt(unseenFeaturesY.shape[ 0 ])))
@@ -244,7 +244,7 @@ def main():
                     _, meanError, sdError = eval.MeanAbsoluteErrorEvaluation.evaluateKerasNN1(
                         eval.MeanAbsoluteErrorEvaluation(), unseenFeaturesX,
                         unseenFeaturesY,
-                        modeler, output, None, None, partitionsX, genericModel,CLmodeler)
+                        modeler, output, None, None, partitionsX, genericModel)
                 else:
                     if flagEvalTri == False:
                         Errors, meanError, sdError = eval.MeanAbsoluteErrorEvaluation.evaluateTriInterpolant(
