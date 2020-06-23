@@ -1,27 +1,12 @@
 import numpy as np
-import dataModeling as dt
 import tensorflow as tf
-import sklearn.ensemble as skl
-#import statsmodels.api
-#from statsmodels.formula.api import ols
+from sklearn.cluster import DBSCAN
 import pandas as pd
-#import scikit_posthocs as sp
 from scipy import stats
-from scipy.interpolate import BPoly as Bernstein
-from itertools import combinations
-from statsmodels.stats.multitest import multipletests
-import warnings
 import math
-from scipy import spatial
-import pyearth as sp
 from scipy.spatial import Delaunay, ConvexHull
-import matplotlib.pyplot as plt
 import csv
 import pyearth as sp
-import sklearn.svm as svr
-#import latex
-from matplotlib import rc
-
 
 
 class Evaluation:
@@ -115,23 +100,18 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
     def intersect(self,A, B, C, D):
         return self.ccw(A, C, D) != self.ccw(B, C, D) and self.ccw(A, B, C) != self.ccw(A, B, D)
 
+
     def evaluateTriInterpolant(self, unseenX, unseenY,trainX,trainY,dataX,dataY, tri,modeler):
+        '''EVALUATION AND IMPLEMENTATION OF TRIANGULATION BASED INTERPOLATION
+        '''
+
         lErrors = [ ]
-        #triData=np.vstack((trainX[:,0],trainY))
-        #triData=np.array(triData).reshape(-1,2)
-        listX=[]
-        #if len(trainX) > 1:
-        #dataXnew = dataX
-        #dataYnew = dataY
-        #else:
+
         dataXnew = trainX
         dataYnew = trainY
 
         #########
-        dataXnew3d=[]
-        #for i in range(0,len(dataXnew)):
-            #dataXnew3d.append([dataXnew[i][0],dataXnew[i][1]*dataYnew[i]])
-        #dataXnew=dataXnew3d
+
         triNew = Delaunay(dataXnew, qhull_options='Q14' )
 
         ##############preprocessing scheme
@@ -144,7 +124,8 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
         delIndexes=[]
         delSimplices=[]
         flagedVertices=[]
-
+        '''DELETE ALL TRIANGLES WITH CORRESPONDING VARIANCE OF RPM of their points belonging in their adjacency list BIGGER  THAN A PREDEFINED TRESHOLD = > MORE stable triangulation'''
+        '''????'''
         for i in range(0, len(dataXnew)):
             simplex = triNew.find_simplex(dataXnew[ i ])
             # for k in range(0, len(triNew.vertices)):
@@ -170,7 +151,7 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
                 flagedVertices.append(int(simplex))
                 count += 1
                 # triNew.vertices=np.delete(triNew.vertices,k,axis=0)
-                from sklearn.cluster import DBSCAN
+
 
                 _dataInit = np.array([ rpm1, rpm2, rpm3 ]).reshape(-1, 1)
 
@@ -196,22 +177,14 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
                             delIndexes.append(i)
         ##################################3
         dataXnew = np.delete(dataXnew,delIndexes,axis=0)
-        #triNew.vertices=np.delete(triNew.vertices,delSimplices,axis=0)
         dataYnew = np.delete(dataYnew, delIndexes)
-        percentageOfBigvar = (len(triNew.vertices) - float(count)) / float(len(triNew.vertices)) * 100
-        #print("Mean variance of DT triangles: " +str(np.mean(np.array(rpmVarPerTri))))
-        #Qj Qm Qv Q2 Q15 d G PD0:1.0 Qg
+        '''END OF PRE - PROCESSING STEP'''
 
-        #zx = range(0, len(dataXnew[ :, 0 ]))
 
         #vertices = self.plotly_trisurf(dataXnew[ :, 0 ], zx, dataXnew[ :, 1 ], triNew.simplices)
-
         #self.plotly_trisurf(dataX[ tri.vertices[ 0 ] ][ :, 0 ], zx[ 0:3 ], dataX[ tri.vertices[ 0 ] ][ :, 1 ],
          #tri.simplices)
-
         #plt.plot(unseenX[ 0:, 0 ], unseenX[ 0:, 1 ], 'o', markersize=8,color='blue')
-
-
         #for v in vertices:
             #k = np.array([ [ v[ 0 ][ 0 ], v[ 0 ][ 2 ] ], [ v[ 1 ][ 0 ], v[ 1 ][ 2 ] ], [ v[ 2 ][ 0 ], v[ 2 ][ 2 ] ] ])
             #t = plt.Polygon(k, fill=False,color='red',linewidth=3)
@@ -255,14 +228,12 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
             #plt.gca().add_patch(t)
             #plt.show()
 
-        x=9
+
         errorsTue=[]
         errorsFalse=[]
         countTrue = 0
         countFalse = 0
-        ##########
-        ########
-        ###################
+
         for iu in range(0,len(unseenX)):
 
             flg = False
@@ -273,20 +244,18 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
 
 
             for k in range(0 ,len(triNew.vertices)):
-                #simplicesIndexes
-                #ki=triNew.find_simplex(ki)
+
                 V1 = dataXnew[triNew.vertices[k]][0]
                 V2 = dataXnew[triNew.vertices[k]][1]
                 V3 = dataXnew[triNew.vertices[k]][2]
 
 
-                #plt.show()
-                x=1
                 b = triNew.transform[ k, :2 ].dot(candidatePoint - triNew.transform[ k, 2 ])
                 W1 = b[ 0 ]
                 W2 = b[ 1 ]
                 W3 = 1 - np.sum(b)
                 #################3##########
+                '''if point inside triangle'''
                 if W1>0 and W2>0 and W3>0:
 
                     flg  = True######
@@ -298,11 +267,10 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
 
                     flgR=False
                     flgV=False
-                    ##@#ff
+
                     ##efaptomena trigwna panw sto trigwno sto opoio anikei to Point estimate
                     tri1 =np.array(triNew.vertices[
                     [ i for i, x in enumerate(list(triNew.vertices[ :, 0 ] == triNew.vertices[ k, 0 ] )) if x ] ])
-                    #tri1 = np.delete(tri1,triNew.vertices[k])
 
                     tri11=[]
                     k_set = set(triNew.vertices[k])
@@ -382,8 +350,6 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
                     v23 = vs[1][0]
                     v31 =  vs[2][0]
 
-                    x=0
-
                     ##barycenters (W12,W23,W13) of neighboring triangles and solutions of linear 3x3 sustem in order to find gammas.
                     try:
 
@@ -454,135 +420,6 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
                         neighboringTri = triNew.vertices[
                             triNew.find_simplex(dataXnew[np.concatenate(np.array(neighboringVertices1)) ]) ]
                         edgesInitial=[]
-                        if (W1 > 0 and W2 > 0 and W3 > 0):
-
-                            nRpms = [ ]
-                            nGammas = [ ]
-                            rpm31 = rpm31 if rpm31 != 0 else (rpm1 + rpm2 + rpm3 + rpm23 + rpm12) / 5
-
-                            B1 = (math.pow(W12_1, 2) * rpm1 + math.pow(W12_2, 2) * rpm2 + math.pow(W12_3, 2) * rpm3)
-                            nRpms.append(rpm12[0] - B1)
-
-                            B1 = (math.pow(W23_1, 2) * rpm1 + math.pow(W23_2, 2) * rpm2 + math.pow(W23_3, 2) * rpm3)
-                            nRpms.append(rpm23[0] - B1)
-
-                            B1 = (math.pow(W31_1, 2) * rpm1 + math.pow(W31_2, 2) * rpm2 + math.pow(W31_3, 2) * rpm3)
-                            nRpms.append(rpm31[0] - B1)
-
-                            nGammas.append(np.array([ 2 * W12_1 * W12_2, 2 * W12_1 * W12_3, 2 * W12_2 * W12_3 ]))
-                            nGammas.append(np.array([ 2 * W23_1 * W23_2, 2 * W23_1 * W23_3, 2 * W23_2 * W23_3 ]))
-                            nGammas.append(np.array([ 2 * W31_1 * W31_2, 2 * W31_1 * W31_3, 2 * W31_2 * W31_3 ]))
-
-                            #ki = np.array([ V1, V2,
-                                            #V3 ])
-                            #t5 = plt.Polygon(ki, fill=False, color='blue', linewidth=3)
-                            #edgesInitial.append(ki)
-                            #plt.gca().add_patch(t5)
-                            #neighboringTri =triNew.vertices[ triNew.find_simplex(trainX[index])]
-                            rpms=[]
-                            for s in neighboringTri:
-                                V1n = dataXnew[ s ][ 0 ]
-                                V2n = dataXnew[ s ][ 1 ]
-                                V3n = dataXnew[ s ][ 2 ]
-
-                                rpm1n = dataYnew[ s ][ 0 ]
-                                rpm2n = dataYnew[ s ][ 1 ]
-                                rpm3n = dataYnew[ s ][ 2 ]
-
-                                rpms.append([rpm1n,rpm2n,rpm3n])
-                                ###barycentric coords of neighboring points in relation to initial triangle
-                                eq1 = np.array([ [ (V1[ 0 ] - V3[ 0 ]), (V2[ 0 ] - V3[ 0 ]) ],
-                                                     [ (V1[ 1 ] - V3[ 1 ]), (V2[ 1 ] - V3[ 1 ]) ] ])
-
-                                eq2 = np.array([ V1n[ 0 ] - V3[ 0 ], V1n[ 1 ] - V3[ 1 ] ])
-                                solutions = np.linalg.solve(eq1, eq2)
-
-                                W1n = solutions[ 0 ]
-                                W2n = solutions[ 1 ]
-                                W3n = 1 - solutions[ 0 ] - solutions[ 1 ]
-
-
-                                B1 = (math.pow(W1n, 2) * rpm1 + math.pow(W2n, 2) * rpm2 + math.pow(W3n, 2) * rpm3)
-                                nRpms.append(rpm1n - B1)
-
-                                nGammas.append(np.array([ 2 * W1n * W2n, 2 * W1n * W3n, 2 * W2n * W3n ]))
-                                ####################################
-
-                                eq1 = np.array([ [ (V1[ 0 ] - V3[ 0 ]), (V2[ 0 ] - V3[ 0 ]) ],
-                                                     [ (V1[ 1 ] - V3[ 1 ]), (V2[ 1 ] - V3[ 1 ]) ] ])
-
-                                eq2 = np.array([ V2n[ 0 ] - V3[ 0 ], V2n[ 1 ] - V3[ 1 ] ])
-                                solutions = np.linalg.solve(eq1, eq2)
-
-                                W1n = solutions[ 0 ]
-                                W2n = solutions[ 1 ]
-                                W3n = 1 - solutions[ 0 ] - solutions[ 1 ]
-
-                                B1 = (math.pow(W1n, 2) * rpm1 + math.pow(W2n, 2) * rpm2 + math.pow(W3n, 2) * rpm3)
-                                nRpms.append(rpm2n - B1)
-
-                                nGammas.append(np.array([ 2 * W1n * W2n, 2 * W1n * W3n, 2 * W2n * W3n ]))
-                                ##################################################
-
-                                eq1 = np.array([ [ (V1[ 0 ] - V3[ 0 ]), (V2[ 0 ] - V3[ 0 ]) ],
-                                                     [ (V1[ 1 ] - V3[ 1 ]), (V2[ 1 ] - V3[ 1 ]) ] ])
-
-                                eq2 = np.array([ V3n[ 0 ] - V3[ 0 ], V3n[ 1 ] - V3[ 1 ] ])
-                                solutions = np.linalg.solve(eq1, eq2)
-
-                                W1n = solutions[ 0 ]
-                                W2n = solutions[ 1 ]
-                                W3n = 1 - solutions[ 0 ] - solutions[ 1 ]
-
-                                B1 = (math.pow(W1n, 2) * rpm1 + math.pow(W2n, 2) * rpm2 + math.pow(W3n, 2) * rpm3)
-                                nRpms.append(rpm3n - B1)
-                                nGammas.append(np.array([ 2 * W1n * W2n, 2 * W1n * W3n, 2 * W2n * W3n ]))
-
-                                ki = np.array([ V1n, V2n,
-                                V3n ])
-                                flagEdge=False
-                                #for t in edgesInitial[0]:
-                                    #if (t==ki[0]).all() and (t==ki[1]).all() and (t==ki[2]).all():
-                                        #flagEdge = True
-                                #if flagEdge==False:
-                                #t5 = plt.Polygon(ki, fill=False, color='yellow', linewidth=3)
-                                #plt.gca().add_patch(t5)
-                            #ki = np.array([V1, V2,
-                                               #V3])
-
-                                #if np.linalg.norm(V1n-V2n) > 2:
-                            #t5 = plt.Polygon(ki, fill=False, color='blue', linewidth=3)
-                            #plt.rc('text', usetex=True)
-                            #edgesInitial.append(ki)
-                            #plt.gca().add_patch(t5)
-                            #plt.xlabel(r"$V$")
-                            #plt.ylabel(r"$\bar{V_N}$")
-                            #plt.show()
-                            f=1
-                            ####solve least squares opt. problem
-                            # nRPms : y [1xn matrix]
-                            # nGammas : x [3xn matrix]
-
-                            nGammas = np.array(nGammas)
-                            nRpms = np.array(nRpms)
-                            from sklearn.linear_model import LinearRegression
-                            lr = LinearRegression()
-                            sr = sp.Earth()
-                            #rf=skl.RandomForestRegressor()
-                            #svm=svr.SVR(kernel='linear')
-                            #svmApprxs=svm.fit(nGammas.reshape(-1, 3), nRpms.reshape(-1, 1))
-                            #rfApprxs=rf.fit(nGammas.reshape(-1, 3), nRpms.reshape(-1, 1))
-                            splApprx = sr.fit(nGammas.reshape(-1, 3), nRpms.reshape(-1, 1))
-                            leastSqApprx = lr.fit(nGammas.reshape(-1, 3), nRpms.reshape(-1, 1))
-                            XpredN = ((math.pow(W2, 2) * rpm2 + math.pow(W1, 2) * rpm1 + math.pow(W3, 2) * rpm3) +
-                                      2 * W1 * W2 * leastSqApprx.coef_[ 0 ][ 0 ] +
-                                      2 * W2 * W3 * leastSqApprx.coef_[ 0 ][ 1 ] +
-                                      2 * W1 * W3 * leastSqApprx.coef_[ 0 ][ 2 ])
-
-
-                            x = 1
-                            if abs(XpredN - trueVal) > 5:
-                                x=1
 
 
 
@@ -608,8 +445,8 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
                             #Xpred=XpredN
                             #Xpred=modeler.getBestModelForPoint(candidatePoint.reshape(-1, 2)).predict(
                                 #candidatePoint.reshape(-1, 2))
-                            x=1
-                            Xpred=XpredN
+
+                            #Xpred=XpredN
 
 
                             #Xpred = (modeler.getBestModelForPoint(candidatePoint.reshape(-1,2)).predict(candidatePoint.reshape(-1,2))\
@@ -617,16 +454,7 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
                             #Xpred=(math.pow(W2, 2) * rpm2 + math.pow(W1, 2) * rpm1 + math.pow(W3, 2) * rpm3) + \
                                         #2 * W1 * W2 *rpm12 + 2 * W2 * W3 * rpm23 + 2 * W1 * W3 * rpm31
                             ################
-                        elif W1==0 or W2==0 or W3==0:
-                                #abs((np.mean([rpm1,rpm2,rpm3])-np.mean([rpm12,rpm23,rpm31])))>15 \
-                                #or abs((np.mean([ rpm1, rpm2, rpm3 ]) - np.mean([ rpm12, rpm23, rpm31 ]))) ==0\
 
-
-                                Xpred =   ((math.pow(W2, 2) * rpm2 + math.pow(W1, 2) * rpm1 + math.pow(W3, 2) * rpm3) + \
-                                    2 * W1 * W2 * rpm12 + 2 * W2 * W3 * rpm23 + 2 * W1 * W3 * rpm31)
-                                Xpred = [ W2 * rpm2 + W1 * rpm1 + W3 * rpm3 ]
-                                Xpred = XpredN
-                                # +(rpm1+rpm2+rpm3)/3)/2
                         #####   EKTIMISI MONO ME TETRAGWNIKOUS OROUS??
                         else:
                                 eq1 = np.array([ [ 2 * W12_1 * W12_2, 2 * W12_2 * W12_3, 2 * W12_1 * W12_3 ],
@@ -665,6 +493,12 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
                         flgExc = True
 
                     break
+            '''if point doesn't belong to any triangle of the triangulated space  
+                find the triangle that is closer to the point by taking 
+                the mean Euclidean dist of all points in adjanceny
+                list of each triangle from candidate point.
+                When closest triangle to the candidate point is found work the same way as above.
+            '''
             if flg == False:
                 distList = [ ]
                 preds=[]
@@ -1203,7 +1037,7 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
 
         return piecewiseFunc
 
-    def evaluateKerasNN1(self, unseenX, unseenY, modeler,output,xs,genericModel,partitionsX , scores,CLmodeler):
+    def evaluateKerasNN1(self, unseenX, unseenY, modeler,output,xs,genericModel,partitionsX , scores):
         lErrors = []
         from scipy.special import softmax
 
