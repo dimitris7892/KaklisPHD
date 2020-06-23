@@ -614,7 +614,7 @@ class TensorFlowCl(DefaultPartitioner):
             partitionLabels.append(curLbl)
 
 
-        return partitionsX, partitionsY, partitionLabels , dataX , dataY,None , estimator
+        return partitionsX, partitionsY, partitionLabels , dataX , dataY,None
 
     def getFitnessOfModelForPoint(self, model, point):
         return 1.0 / (1.0 + np.linalg.norm(np.mean(self._partitionsPerModel[model]) - point))
