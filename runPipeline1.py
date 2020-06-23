@@ -83,7 +83,7 @@ def main():
         subsetsB.append(targetB)
         var.append(np.var(seriesX))
 
-        if len(subsetsX)>=5:
+        if len(subsetsX)>=1:
             break
 
     rangeSubs = k
@@ -114,7 +114,7 @@ def main():
                 partitioner.__class__.__name__ ="None"
            if partitioner.__class__.__name__=='DelaunayTriPartitioner':
 
-                 partK=np.linspace(0.3,1,8)#[0.5]
+                 partK=np.linspace(0.4,1,20)#[0.5]
 
            elif partitioner.__class__.__name__=='KMeansPartitioner':
                if modeler.__class__.__name__=='TriInterpolantModeler' or modeler.__class__.__name__ == 'TensorFlow':
@@ -303,12 +303,12 @@ def initParameters():
     startU = 30000
     endU = 31000
 
-    algs=['NNW']
+    algs=['SR']
     # ['SR','LR','RF','NN','NNW','TRI']
 
 
         #['SR','LR','RF','NN','NNW','TRI']
-    cls=['NNCL']
+    cls=['DC']
     #['SR','LR','RF','NN'] algs
     #['KM','DC'] clusterers / cls
 
