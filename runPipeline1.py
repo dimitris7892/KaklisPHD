@@ -12,8 +12,6 @@ import random
 def main():
     # Init parameters based on command line
 
-
-
     end, endU, history, future,sFile, start, startU , algs , cls = initParameters()
     # Load data
     if len(sys.argv) >1:
@@ -76,7 +74,6 @@ def main():
         # The row indices to skip - make sure 0 is not included to keep the header!
         skip_idx = random.sample(range(1, num_linesx), num_linesx-size)
         # Read the data
-
                            #skiprows=skip_idx)
         seriesX, targetY, targetW,targetB = reader.readStatDifferentSubsets(data, subsetsX, subsetsY,k, 4000)
         if seriesX == [ ] and targetY == [ ] : continue
@@ -88,8 +85,7 @@ def main():
 
         if len(subsetsX)>=5:
             break
-    #subsetsX=[subsetsX[0]]
-    #subsetsY=[subsetsY[0]]
+
     rangeSubs = k
     stdInU = [ ]
     varTr=[]
@@ -120,8 +116,6 @@ def main():
 
                  partK=np.linspace(0.3,1,8)#[0.5]
 
-                 #np.linspace(0.2,1,11)
-                     #[0.6]
            elif partitioner.__class__.__name__=='KMeansPartitioner':
                if modeler.__class__.__name__=='TriInterpolantModeler' or modeler.__class__.__name__ == 'TensorFlow':
                  partK =[1]
@@ -144,15 +138,11 @@ def main():
 
                 ####################################LAROS DATA STATISTICAL TESTS
                 if modeler.__class__.__name__ == 'TensorFlowWD':
-                    #reader.insertDataAtDb()
-                    #reader.readNewDataset()
+
                     reader.readExtractNewDataset('MILLENIA')
-                    #data = pd.read_csv('./MT_DELTA_MARIA_data_1.csv')
-                    #reader.readLarosDataFromCsvNewExtractExcels(data)
                     seriesX, targetY,unseenFeaturesX, unseenFeaturesY  , drftB6 , drftS6 , drftTargetB6 , drftTargetS6, partitionsX, partitionsY,partitionLabels = reader.readLarosDataFromCsvNew(data)
                 #################
 
-                #seriesX, targetY ,targetW= reader.readStatDifferentSubsets(data,subsetsX,subsetsY,2880)
                 if modeler.__class__.__name__ != 'TensorFlowWD':
                     seriesX, targetY, targetW,targetB = subsetX,subsetY,subsetsW[0],subsetsB[0]
                 counter=+1
@@ -166,18 +156,14 @@ def main():
                     X, Y , W = featureExtractor.extractFeatures(modeler,seriesX, targetY,targetW,targetB,history)
                     print("Extracting features from training set... Done.")
 
-                #partitionsX, partitionsY , partitionLabels=X,Y,W
-                #if modeler.__class__.__name__!='TensorFlow':
-                # Partition data
                 print("Partitioning training set...")
                 NUM_OF_CLUSTERS =k# TODO: Read from command line
-                NUM_OF_FOLDS=6
-                #if modeler!='TRI':
+
+                ##IF MODEL != OF ANALYTICAL METHOD IMPLEMENT CLUSTERING
                 if modeler.__class__.__name__ != 'TriInterpolantModeler':
                     if modeler.__class__.__name__ != 'TensorFlowWD':
-                        partitionsX, partitionsY, partitionLabels, partitionRepresentatives, partitioningModel  , centroids  = partitioner.clustering(X, Y, W ,NUM_OF_CLUSTERS, True,k)
+                        partitionsX, partitionsY, partitionLabels, partitionRepresentatives, partitioningModel  , centroids , CLmodeler = partitioner.clustering(X, Y, W ,NUM_OF_CLUSTERS, True,k)
                     else:
-                       #partitionLabels=23
 
                         partitionsX, partitionsY, partitionLabels, partitionRepresentatives, partitioningModel, tri  = partitioner.clustering(
 
@@ -185,36 +171,22 @@ def main():
                 else:
                     partitionsX, partitionsY, partitionLabels,partitionRepresentatives,partitioningModel  , centroids= X,Y,[1],None,None,None
 
-                    #partitionsXDB6, partitionsYDB6, partitionLabels, partitionRepresentatives, partitioningModel, tri = partitioner.clustering(
-                        #drftB6, targetY, None, 25, True, k)
-
-                    #partitionsXDBS6, partitionsYDS6, partitionLabels, partitionRepresentatives, partitioningModel, tri = partitioner.clustering(
-                        #drftS6, targetY, None, 25, True, k)
 
                 print("Partitioning training set... Done.")
                 # For each partition create model
                 print("Creating models per partition...")
 
-                #if modeler.__class__.__name__ == 'TensorFlowWD':
-                    #X = np.array(np.concatenate(partitionsX))
-                    #Y = np.array(np.concatenate(partitionsY))
-                #skip_idx1 = random.sample(range(num_linesx, num_lines), (num_lines-num_linesx) - 1000)
 
-                #modeler.plotRegressionLine(partitionsX, partitionsY, partitionLabels,genericModel,modelMap)
-                # ...and keep them in a dict, connecting label to model
-                #modelMap, xs, output, genericModel =None,None,None,None
                 unseenX=[]
                 unseenY=[]
                 if modeler.__class__.__name__!= 'TriInterpolantModeler' :
-                            #and modeler.__class__.__name__ != 'TensorFlow':
+
                     modelMap, history,scores, output,genericModel = modeler.createModelsFor(partitionsX, partitionsY, partitionLabels,None,X,Y)
-                            #, genericModel , partitionsXDC
-                    #if modeler.__class__.__name__ != 'TensorFlow':
-                        #modelMap = dict(zip(partitionLabels, modelMap))
+
                     print("Creating models per partition... Done")
 
-                    # Get unseen data
-                    print("Reading unseen data...")
+                # Get unseen data
+                print("Reading unseen data...")
                 if modeler.__class__.__name__ != 'TensorFlowWD':
 
                     unseenX,unseenY , unseenW,unseenB = dRead.UnseenSeriesReader.readRandomSeriesDataFromFile(dRead.UnseenSeriesReader(),data1)
@@ -240,7 +212,6 @@ def main():
                                                                                           Y,
                                                                                           modeler, genericModel)
 
-
                     elif modeler.__class__.__name__ == 'TensorFlow' or modeler.__class__.__name__ == 'TensorFlowW' or modeler.__class__.__name__ == 'TensorFlowWD':
                         _,meanErrorTr, sdError = eval.MeanAbsoluteErrorEvaluation.evaluateKerasNN(
                             eval.MeanAbsoluteErrorEvaluation(), X,
@@ -251,7 +222,7 @@ def main():
                            _, meanErrorTr, sdError = eval.MeanAbsoluteErrorEvaluation.evaluateKerasNN1(
                                eval.MeanAbsoluteErrorEvaluation(), X,
                                Y,
-                               modeler, output, None,genericModel,partitionsX,None)
+                               modeler, output, None,genericModel,partitionsX,None,CLmodeler)
 
                     print ("Mean absolute error on training data: %4.2f (+/- %4.2f standard error)" % (
                         meanErrorTr, sdError / sqrt(unseenFeaturesY.shape[ 0 ])))
@@ -273,7 +244,7 @@ def main():
                     _, meanError, sdError = eval.MeanAbsoluteErrorEvaluation.evaluateKerasNN1(
                         eval.MeanAbsoluteErrorEvaluation(), unseenFeaturesX,
                         unseenFeaturesY,
-                        modeler, output, None, None, partitionsX, genericModel)
+                        modeler, output, None, None, partitionsX, genericModel,CLmodeler)
                 else:
                     if flagEvalTri == False:
                         Errors, meanError, sdError = eval.MeanAbsoluteErrorEvaluation.evaluateTriInterpolant(
@@ -289,9 +260,6 @@ def main():
 
                 print("Standard Deviation of training Data: %4.2f" % (np.std(X)))
                 print("Standard Deviation of unseen Data: %4.2f" % (np.std(unseenX)))
-                #varExpl=np.sum(np.square(subsetX-unseenX)) / np.square(np.sum(subsetX)-np.sum(unseenX))*100
-                #print("Percentage of variance in Training data explained in Unseen Dataset: %4.2f" % (
-                        #(varExpl)) + " %")
                 # # Evaluate performance
                 numOfclusters= len(partitionsX)
                 #pltRes = plotRes()
@@ -304,8 +272,7 @@ def main():
                 else:
                     models.append('Analytical method')
                 part.append(partitioner.__class__.__name__)
-                #meanVTr.append(np.mean(s ubsetX))
-                #meanBTr.append(np.mean(X[:,2]))
+
                 errors.append(meanError)
                 if modeler.__class__.__name__ == 'TriInterpolantModeler':
                     trErrors.append(None)
@@ -358,11 +325,4 @@ def initParameters():
 # # ENTRY POINT
 if __name__ == "__main__":
     main()
-#     v=np.round(np.random.rand(10, 3), 1)
-#     v=np.append(v,v[1:3], axis=0)
-#     r= np.dot(np.sum(v, axis=1), np.diag(np.random.rand(v.shape[0])))
-#     print("Input:\n%s"%(str(np.append(v, np.reshape(r, (v.shape[0],1)), axis=1))))
-#
-#     clusterer = dPart.BoundedProximityClusterer()
-#     print(clusterer.clustering(v, r, showPlot=False))
-#
+
