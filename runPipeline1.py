@@ -117,7 +117,9 @@ def main():
                 partK = [1]
                 partitioner.__class__.__name__ ="None"
            if partitioner.__class__.__name__=='DelaunayTriPartitioner':
-                 partK=np.linspace(0.7,1,2)#[0.5]
+
+                 partK=np.linspace(0.3,1,8)#[0.5]
+
                  #np.linspace(0.2,1,11)
                      #[0.6]
            elif partitioner.__class__.__name__=='KMeansPartitioner':
@@ -333,12 +335,13 @@ def initParameters():
     end = 17000
     startU = 30000
     endU = 31000
-    algs=['TRI']
 
+    algs=['NNW']
+    # ['SR','LR','RF','NN','NNW','TRI']
 
 
         #['SR','LR','RF','NN','NNW','TRI']
-    cls=['KM','DC','NNCL']
+    cls=['NNCL']
     #['SR','LR','RF','NN'] algs
     #['KM','DC'] clusterers / cls
 
