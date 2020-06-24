@@ -303,12 +303,12 @@ def initParameters():
     startU = 30000
     endU = 31000
 
-    algs=['SR']
+    algs=['NNW1']
     # ['SR','LR','RF','NN','NNW','TRI']
 
 
         #['SR','LR','RF','NN','NNW','TRI']
-    cls=['DC']
+    cls=['NNCL']
     #['SR','LR','RF','NN'] algs
     #['KM','DC'] clusterers / cls
 
