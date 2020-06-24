@@ -99,8 +99,8 @@ class TensorFlowCl(DefaultPartitioner):
 
             while neurons < genModelKnots -1:
                 model.add(keras.layers.Dense(neurons, ))
-                neurons = neurons+1
-            model.add(keras.layers.Dense(genModelKnots - 1, ))
+                neurons = neurons+2
+            model.add(keras.layers.Dense(genModelKnots -1 , ))
 
             # Compile model
             model.compile(loss=custom_loss, optimizer=keras.optimizers.Adam())
@@ -559,9 +559,11 @@ class TensorFlowCl(DefaultPartitioner):
 
         for i in range(0, len(X)):
             vector = extractFunctionsFromSplines(X[i][0], X[i][1])
-            XSplineVector.append(vector)
+            XSplineVector.append(np.append(X[i], vector))
 
+        #XSplineVector.append(np.append(Y.reshape(-1,1), XSplineVector))
         XSplineVector = np.array(XSplineVector)
+
         #weights0 = np.mean(XSplineVector, axis=0)
         # weights1 = self.intercepts
         #weights1 = estimator.layers[0].get_weights()[0][1]
@@ -570,7 +572,7 @@ class TensorFlowCl(DefaultPartitioner):
 
         # estimator.layers[0].set_weights([weights, np.array([0] * (genModelKnots-1))])
 
-        estimator.fit(XSplineVector, Y, epochs=20,verbose=0)
+        estimator.fit(XSplineVector, Y, epochs=50,verbose=0)
 
         self.flagGen = True
         from scipy.special import softmax
@@ -591,9 +593,9 @@ class TensorFlowCl(DefaultPartitioner):
         # model2 =keras.models.Model(inputs=estimator.input, outputs=estimator.layers[-2].output)
         # model2.compile(optimizer=keras.optimizers.Adam(), loss= keras.losses.KLD)
         # model2.fit(X,Y,epochs=10)
-        labels = np.unique(np.argmax(estimator.predict(X), axis=1))
+        labels = np.unique(np.argmax(estimator.predict(XSplineVector), axis=1))
         print(labels)
-        labels = np.argmax(estimator.predict(X), axis=1)
+        labels = np.argmax(estimator.predict(XSplineVector), axis=1)
 
         NNmodels = []
         scores = []
