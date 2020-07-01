@@ -6,6 +6,7 @@ import math
 import pyearth as sp
 import matplotlib
 from sklearn.cluster import KMeans
+from matplotlib.lines import Line2D
 from decimal import Decimal
 import random
 from numpy import inf
@@ -882,9 +883,9 @@ class BaseSeriesReader:
         ########################################################################
         ##FOC PER MILE / SPEED RANGES / BEAUFORTS GRAPHS
         focPerMile = np.array([k for k in tlgDataset if float(k[20]) > 0 ])[:, 20].astype(float)
-        hoursSlc =  np.sum(np.array([k for k in tlgDataset if float(k[20]) > 0 ])[:, 13].astype(float))
-        minsSlc = np.sum(np.array([k for k in tlgDataset if float(k[20]) > 0])[:, 14].astype(float))
-        steamTimeSum = hoursSlc + minsSlc/60
+        steamTimeSum =  np.sum(np.array([k for k in tlgDataset if float(k[20]) > 0 ])[:, 13].astype(float) + np.array([k for k in tlgDataset if float(k[20]) > 0])[:, 14].astype(float)/60)
+        #minsSlc = np.sum()
+        #steamTimeSum = hoursSlc + minsSlc/60
         rowsAmount = 92
         focAmount = focPerMile.__len__()
         minFOC = int(np.floor(np.min(focPerMile)))
@@ -912,7 +913,7 @@ class BaseSeriesReader:
             workbook._sheets[4]['A' + str(k + id)].font = Font(bold=True, name='Calibri', size='10.5')
             workbook._sheets[4]['A' + str(k + id)].fill = PatternFill(fgColor='dae3f3', fill_type="solid")
             workbook._sheets[4]['A' + str(k + id)].border = thin_border'''
-            focArray = np.array([k for k in tlgDataset if float(k[20]) >= i and float(k[20]) <= i + 0.05])
+            focArray = np.array([k for k in tlgDataset if float(k[20]) >= i and float(k[20]) <= i + 0.1])
             if focArray.__len__() > 0:
                 hoursSlc.append(focArray[:,13])
                 minSlc.append(focArray[:, 14])
@@ -933,12 +934,14 @@ class BaseSeriesReader:
             workbook._sheets[4]['D' + str(k + id)].border = thin_border'''
 
             if focArray.__len__() > 0:
-                focsPLot.append(np.round(steamTimeRange / steamTimeSum,1))
-                speedsPlot.append(np.round((np.min(np.nan_to_num(focArray[:, 12].astype(float)))), 2))
+                focsPLot.append(np.round(steamTimeRange / steamTimeSum,4))
+                #focsPLot.append(focArray.__len__())
+                speedsPlot.append(np.round((np.mean(np.nan_to_num(focArray[:, 12].astype(float)))), 2))
                 ranges.append(i)
-            i += 0.05
+            i += 0.1
             k += 1
 
+        plt.clf()
         xi = np.array(speedsPlot)
         yi = np.array(ranges)
         zi = np.array(focsPLot)
@@ -947,9 +950,9 @@ class BaseSeriesReader:
         xp = np.linspace(min(xi), max(xi), 100)
         plt.plot([], [], '.', xp, p2(xp))
 
-        plt.scatter(xi, yi, s=zi, c="red", alpha=0.4, linewidth=4)
+        plt.scatter(xi, yi, s=zi*2000, c="red", alpha=0.4, linewidth=4)
         plt.xticks(np.arange(np.floor(min(xi)) - 1, np.ceil(max(xi)) + 1, 1))
-        plt.yticks(np.arange(np.floor(min(yi)), np.ceil(max(yi)) + 1, 5))
+        #plt.yticks(np.arange(np.floor(min(yi)), np.ceil(max(yi)) + 1, 5))
         plt.xlabel("Speed (knots)")
         plt.ylabel("FOC (per / Mile)")
         plt.title("Density plot", loc="center")
@@ -964,18 +967,259 @@ class BaseSeriesReader:
         ziSorted = np.sort(centroids, axis=0)
 
         for z in ziSorted:
-            plt.scatter([], [], c='r', alpha=0.5, s=np.floor(z[0]),
-                        label=str(int(np.floor(z[0]))) + ' obs.')
+            plt.scatter([], [], c='r', alpha=0.5, s=z[0] * 700 ,
+                        label=str(np.round(z[0],3)) + ' Hours')
         plt.legend(scatterpoints=1, frameon=True, labelspacing=2, title=' Hours')
 
         fig.savefig('./Figures/' + company + '_' + vessel + '_3.png', dpi=96)
-        # plt.clf()
+
 
         img = Image('./Figures/' + company + '_' + vessel + '_3.png')
 
-        workbook._sheets[5].add_image(img, 'F' + str(id - 2))
+        workbook._sheets[6].add_image(img, 'F' + str(12))
+        x=0
+
+        ##########################FOC PER WIND RANGES / WIND ANGLE
+        foc = np.array([k for k in tlgDataset if float(k[15]) > 0 and float(k[15]) < 40])[:, 15].astype(float)
 
 
+        focAmount = foc.__len__()
+        minFOC = int(np.floor(np.min(foc)))
+        maxFOC = int(np.ceil(np.max(foc)))
+
+        focsAppGen = []
+        meanSpeedsGen = []
+        stdSpeedsGen = []
+        rangesGen = []
+        focsPLotGen = []
+        speedsPlotGen = []
+
+        focsApp = []
+        meanSpeeds = []
+        stdSpeeds = []
+        ranges = []
+        focsPLot = []
+        speedsPlot = []
+
+        focsApp1 = []
+        meanSpeeds1 = []
+        stdSpeeds1 = []
+        ranges1 = []
+        focsPLot1 = []
+        speedsPlot1 = []
+
+        focsApp2 = []
+        meanSpeeds2 = []
+        stdSpeeds2 = []
+        ranges2 = []
+        focsPLot2 = []
+        speedsPlot2 = []
+
+        focsApp3 = []
+        meanSpeeds3 = []
+        stdSpeeds3 = []
+        ranges3 = []
+        focsPLot3 = []
+        speedsPlot3 = []
+
+        focsApp4 = []
+        meanSpeeds4 = []
+        stdSpeeds4 = []
+        ranges4 = []
+        focsPLot4 = []
+        speedsPlot4 = []
+
+
+        k = 0
+        i = minFOC if minFOC > 0 else 1
+        id = 171 - trimDeletedRows
+        workbook._sheets[4].row_dimensions[id - 2].height = 35
+
+        workbook._sheets[4].merge_cells('C' + str(id - 2) + ':' + 'D' + str(id - 2))
+        workbook._sheets[4]['C' + str(id - 2)].alignment = Alignment(horizontal='center')
+        while i < maxFOC:
+            # workbook._sheets[4].insert_rows(k+27)
+            '''workbook._sheets[4]['A' + str(k + id)] = ' (' + str(i) + '-' + str(i + 0.5) + ')'
+            workbook._sheets[4]['A' + str(k + id)].alignment = Alignment(horizontal='center')
+
+            workbook._sheets[4]['A' + str(k + id)].font = Font(bold=True, name='Calibri', size='10.5')
+            workbook._sheets[4]['A' + str(k + id)].fill = PatternFill(fgColor='dae3f3', fill_type="solid")
+            workbook._sheets[4]['A' + str(k + id)].border = thin_border'''
+            focArrayGen = np.array([k for k in tlgDataset if
+                                 float(k[15]) >= i and float(k[15]) <= i + 0.5 and float(k[11]) >= 1 and float(
+                                     k[11]) <= 3])
+
+            focArray = np.array([k for k in focArrayGen if float(k[15]) >= i and float(k[15]) <= i + 0.5 and float(k[11])>=1 and float(k[11])<=3 and
+                                 float(k[10])>=0 and float(k[10])<=22.5])
+
+            focArray1 = np.array([k for k in focArrayGen if
+                                 float(k[15]) >= i and float(k[15]) <= i + 0.5 and float(k[11]) >= 1 and float(
+                                     k[11]) <= 3 and
+                                 float(k[10]) >= 22.5 and float(k[10]) <= 67.5])
+
+            focArray2 = np.array([k for k in focArrayGen if
+                                  float(k[15]) >= i and float(k[15]) <= i + 0.5 and float(k[11]) >= 1 and float(
+                                      k[11]) <= 3 and
+                                  float(k[10]) >= 67.5 and float(k[10]) <= 112.5])
+
+            focArray3 = np.array([k for k in focArrayGen if
+                                    float(k[15]) >= i and float(k[15]) <= i + 0.5 and float(k[11]) >= 1 and float(
+                                        k[11]) <= 3 and float(k[10]) >= 112.5 and float(k[10]) <= 157.5])
+
+            focArray4 = np.array([k for k in focArrayGen if
+                                    float(k[15]) >= i and float(k[15]) <= i + 0.5 and float(k[11]) >= 1 and float(
+                                        k[11]) <= 3 and float(k[10]) >= 157.5 and float(k[10]) <= 180])
+
+
+            focsApp.append(str(np.round(focArray.__len__() / focAmount * 100, 2)) + '%')
+            meanSpeeds.append(np.round((np.mean(np.nan_to_num(focArray[:, 12].astype(float)))),
+                                       2) if focArray.__len__() > 0 else 'N/A')
+            stdSpeeds.append(np.round((np.std(np.nan_to_num(focArray[:, 12].astype(float)))),
+                                      2) if focArray.__len__() > 0 else 'N/A')
+
+            '''workbook._sheets[4]['C' + str(k + id)].font = Font(bold=True, name='Calibri', size='10.5')
+            workbook._sheets[4]['C' + str(k + id)].fill = PatternFill(fgColor='dae3f3', fill_type="solid")
+            workbook._sheets[4]['C' + str(k + id)].border = thin_border
+
+            workbook._sheets[4]['D' + str(k + id)].font = Font(bold=True, name='Calibri', size='10.5')
+            workbook._sheets[4]['D' + str(k + id)].fill = PatternFill(fgColor='dae3f3', fill_type="solid")
+            workbook._sheets[4]['D' + str(k + id)].border = thin_border'''
+            if focArrayGen.__len__() > 0:
+                focsPLotGen.append(focArrayGen.__len__())
+                speedsPlotGen.append(np.round((np.mean(np.nan_to_num(focArrayGen[:, 12].astype(float)))), 2))
+                rangesGen.append(np.round((np.mean(np.nan_to_num(focArrayGen[:, 15].astype(float)))), 2))
+
+            if focArray.__len__() > 0:
+                focsPLot.append(focArray.__len__())
+                speedsPlot.append(np.round((np.mean(np.nan_to_num(focArray[:, 12].astype(float)))), 2))
+                ranges.append(np.round((np.mean(np.nan_to_num(focArray[:, 15].astype(float)))), 2))
+
+            if focArray1.__len__() > 0:
+                focsPLot1.append(focArray1.__len__())
+                speedsPlot1.append(np.round((np.mean(np.nan_to_num(focArray1[:, 12].astype(float)))), 2))
+                ranges1.append(np.round((np.mean(np.nan_to_num(focArray1[:, 15].astype(float)))), 2))
+
+            if focArray2.__len__() > 0:
+                focsPLot2.append(focArray2.__len__())
+                speedsPlot2.append(np.round((np.mean(np.nan_to_num(focArray2[:, 12].astype(float)))), 2))
+                ranges2.append(np.round((np.mean(np.nan_to_num(focArray2[:, 15].astype(float)))), 2))
+
+            if focArray3.__len__() > 0:
+                focsPLot3.append(focArray3.__len__())
+                speedsPlot3.append(np.round((np.mean(np.nan_to_num(focArray3[:, 12].astype(float)))), 2))
+                ranges3.append(np.round((np.mean(np.nan_to_num(focArray3[:, 15].astype(float)))), 2))
+
+            if focArray4.__len__() > 0:
+                focsPLot4.append(focArray4.__len__())
+                speedsPlot4.append(np.round((np.mean(np.nan_to_num(focArray4[:, 12].astype(float)))), 2))
+                ranges4.append(np.round((np.mean(np.nan_to_num(focArray4[:, 15].astype(float)))), 2))
+
+            i += 0.5
+            k += 1
+
+        plt.clf()
+        xiGen = np.array(speedsPlotGen)
+        yiGen = np.array(rangesGen)
+        ziGen = np.array(focsPLotGen)
+        # Change color with c and alpha
+        #p2Gen = np.poly1d(np.polyfit(xiGen, yiGen, 2))
+        #xpGen = np.linspace(min(xiGen), max(xiGen), 100)
+        #plt.plot([], [], '.', xpGen, p2(xpGen), color='red')
+
+        plt.scatter(xiGen, yiGen, s=ziGen , c="red", alpha=0.4, linewidth=4)
+        #########################################################
+        xi = np.array(speedsPlot)
+        yi = np.array(ranges)
+        zi = np.array(focsPLot)
+        # Change color with c and alpha
+        p2 = np.poly1d(np.polyfit(xi, yi, 2))
+        xp = np.linspace(min(xi), max(xi), 100)
+        line1=plt.plot([], [], '.', xp, p2(xp),color='red')
+
+        #plt.scatter(xi, yi, s=zi, c="red", alpha=0.4, linewidth=4)
+        #plt.xticks(np.arange(np.floor(min(xi)) - 1, np.ceil(max(xi)) + 1, 1))
+        #plt.yticks(np.arange(np.floor(min(yi)), np.ceil(max(yi)) + 1, 5))
+        #####################################################################
+        xi1 = np.array(speedsPlot1)
+        yi1 = np.array(ranges1)
+        zi1 = np.array(focsPLot1)
+        # Change color with c and alpha
+        p21 = np.poly1d(np.polyfit(xi1, yi1, 2))
+        xp1 = np.linspace(min(xi1), max(xi1), 100)
+        line2=plt.plot([], [], '.', xp1, p21(xp1),color='green')
+
+        #plt.scatter(xi1, yi1, s=zi1, c="green", alpha=0.4, linewidth=4)
+        #plt.xticks(np.arange(np.floor(min(xi1)) - 1, np.ceil(max(xi1)) + 1, 1))
+        #plt.yticks(np.arange(np.floor(min(yi1)), np.ceil(max(yi1)) + 1, 5))
+        ###################################################################################################################
+        #####################################################################
+        xi2 = np.array(speedsPlot2)
+        yi2 = np.array(ranges2)
+        zi2 = np.array(focsPLot2)
+        # Change color with c and alpha
+        p22 = np.poly1d(np.polyfit(xi2, yi2, 2))
+        xp2 = np.linspace(min(xi2), max(xi2), 100)
+        plt.plot([], [], '.', xp2, p22(xp2),color='blue')
+        ###################################################################################################################
+        xi3 = np.array(speedsPlot3)
+        yi3 = np.array(ranges3)
+        zi3 = np.array(focsPLot3)
+        # Change color with c and alpha
+        p23 = np.poly1d(np.polyfit(xi3, yi3, 2))
+        xp3 = np.linspace(min(xi3), max(xi3), 100)
+        plt.plot([], [], '.', xp3, p23(xp3), color='orange')
+        ###################################################################################################################
+        xi4 = np.array(speedsPlot3)
+        yi4 = np.array(ranges3)
+        zi4 = np.array(focsPLot3)
+        # Change color with c and alpha
+        p24 = np.poly1d(np.polyfit(xi4, yi4, 2))
+        xp4 = np.linspace(min(xi4), max(xi4), 100)
+        plt.plot([], [], '.', xp4, p24(xp4), color='purple')
+        #plt.scatter(xi2, yi2, s=zi2, c="blue", alpha=0.4, linewidth=4)
+        #plt.xticks(np.arange(np.floor(min(xi2)) - 1, np.ceil(max(xi2)) + 1, 1))
+        plt.yticks(np.arange(minFOC, maxFOC+ 1, 5))
+        ###################################################################################################################
+
+        ############################################
+        ############################################
+        ############################################
+        plt.xlabel("Speed (knots)")
+        plt.ylabel("FOC (MT / day) ")
+        plt.title("Density plot for Wind Speed (1 - 3) Beauforts", loc="center")
+        fig = matplotlib.pyplot.gcf()
+        fig.set_size_inches(17.5, 9.5)
+
+        dataModel = KMeans(n_clusters=3)
+        ziGen = ziGen.reshape(-1, 1)
+        dataModel.fit(ziGen)
+        # Extract centroid values
+        centroids = dataModel.cluster_centers_
+        ziSorted = np.sort(centroids, axis=0)
+
+        for z in ziSorted:
+            plt.scatter([], [], c='r', alpha=0.5, s=np.floor(z[0]),
+                        label=str(int(np.floor(z[0]))) + ' obs.')
+        legend1= plt.legend(scatterpoints=1, frameon=True, labelspacing=2, title='# of obs',loc='upper right')
+
+        custom_lines = [Line2D([0], [0], color='red', lw=4),
+                        Line2D([0], [0], color='green', lw=4),
+                        Line2D([0], [0], color='blue', lw=4),
+                        Line2D([0], [0], color='orange', lw=4),
+                        Line2D([0], [0], color='purple', lw=4)]
+
+        plt.legend(custom_lines,['(0 - 22.5)', '(22.5 - 67.5)', '(67.5 - 112.5)','(112.5 - 157.5)','(157.5 - 180)'],title='Wind Dir',loc='upper left')
+
+        plt.gca().add_artist(legend1)
+
+        fig.savefig('./Figures/' + company + '_' + vessel + '_4.png', dpi=96)
+
+
+
+        # plt.clf()
+
+        img = Image('./Figures/' + company + '_' + vessel + '_4.png')
+        x=0
         if rawData:
             ##############START OF RAW TAB ####################################################################
             ##############START OF RAW TAB ####################################################################
@@ -1167,7 +1411,7 @@ class BaseSeriesReader:
                                        pathOfRawData=None,comparisonTest=None,dataTrain=None):
 
         boolTlg = telegrams
-        pathExcel = 'C:/Users/dkaklis/Desktop/template.xlsx'
+        pathExcel ='/home/dimitris/Desktop/template.xlsx'# 'C:/Users/dkaklis/Desktop/template.xlsx'
         #'/home/dimitris/Desktop/template.xlsx'
         ##public vars
 
@@ -1321,7 +1565,7 @@ class BaseSeriesReader:
                         ' , WIND_FORCE  ,AVERAGE_SPEED ,hours_slc,minutes_slc, (( NVL(ME_HSFO_CONS,0)+ NVL(ME_LSFO_CONS,0)+ NVL(ME_HSDO_CONS,0 ) + NVL(ME_LSDO_CONS,0)))   as ME_CONS_24h ,'
                         ' (DRAFT_AFT-DRAFT_FORE) AS TRIM ,'
                         'ROUND( ((( NVL(ME_HSFO_CONS,0)+ NVL(ME_LSFO_CONS,0)+ NVL(ME_HSDO_CONS,0 ) + NVL(ME_LSDO_CONS,0))))  / decode(MILES_SLC,0,1,MILES_SLC),2) as ME_FOC_PER_MILE   '
-                        'FROM TELEGRAMS where vessel_code = '"'" + vessel_code + "'" 'AND (telegram_type='"'N'"' or telegram_type='"'A'"' )  ')
+                        'FROM TELEGRAMS where vessel_code = '"'" + vessel_code + "'" 'AND (telegram_type='"'N'"' or telegram_type='"'A'"' ) and miles_slc > 0 ')
                     #and    telegram_date < TO_DATE('"'04/10/2019'"', '"'DD/MM/YY'"') AND telegram_date >= TO_DATE('"'04/06/2019'"', '"'DD/MM/YY'"') ')
 
                     with open('./data/'+company+'/'+vessel+'/TELEGRAMS/'+vessel+'.csv', mode='w') as data:
@@ -2149,7 +2393,7 @@ class BaseSeriesReader:
         blVelocities.append(vel2Mean)
         blVelocities.append(vel3Mean)
 
-        vel0Min = 3
+        '''vel0Min = 3
         vel1Min = 12.5
         vel2Min =12.5
         vel3Min = 13.5
@@ -2157,7 +2401,7 @@ class BaseSeriesReader:
         vel0Max = 12
         vel1Max = 13
         vel2Max = 13.5
-        vel3Max = 18
+        vel3Max = 18'''
 
         workbook._sheets[2]['B6'] = str(vel0Mean) + '  ('+str(vel0Min)+' - '+str(vel0Max)+')'
         workbook._sheets[2]['B16'] = str(vel1Mean) + '  ('+str(vel1Min)+' - '+str(vel1Max)+')'
@@ -2180,7 +2424,7 @@ class BaseSeriesReader:
                                         k[5] >= vel0Min and k[5] <= vel0Max and k[8] > 10])[:, 8]
 
         steamTimeGen = np.array([k for k in ballastDt if
-                                        k[5] >= vel0Min and k[5] <= vel0Max and k[8] > 10])[:, 12]
+                                        k[5] >= vel0Min and k[5] <= vel0Max and k[8] > 10])[:,12]
 
         weighted_avgFocCentral = np.average(FocCentral, weights=steamTimeGen)
 
@@ -2192,11 +2436,11 @@ class BaseSeriesReader:
         for i in range(0, len(wind) - 1):
             arrayFoc = np.array([k for k in ballastDt if
                                  k[4] >= 0 and k[4] <= 1 and k[5] >= vel0Min and k[5] <= vel0Max and k[3] >= wind[i] and
-                                 k[3] <= wind[i + 1] and k[8] > 5])
+                                 k[3] <= wind[i + 1] and k[8] > 10])
 
             steamTime = np.array([k for k in ballastDt if
                                  k[4] >= 0 and k[4] <= 1 and k[5] >= vel0Min and k[5] <= vel0Max and k[3] >= wind[i] and
-                                 k[3] <= wind[i + 1] and k[8] >5])
+                                 k[3] <= wind[i + 1] and k[8] >10])
 
 
 
@@ -2234,7 +2478,7 @@ class BaseSeriesReader:
             steamTime = np.array([k for k in ballastDt if
                                   k[4] >= 2 and k[4] <= 3 and k[5] >= vel0Min and k[5] <= vel0Max and k[3] >= wind[
                                       i] and
-                                  k[3] <= wind[i + 1] and k[8] > 10])[:, 12]
+                                  k[3] <= wind[i + 1] and k[8] > 5])
 
             tlgarrayFoc = arrayFoc[:, 9] if arrayFoc.__len__() > minAccThres else []
             tlgarrayFoc = np.array([k for k in tlgarrayFoc if k > 13])
@@ -2248,7 +2492,7 @@ class BaseSeriesReader:
                     tlgarrayFoc) + centralMean) / 3 if arrayFoc.__len__() > minAccThres else 0
                 numberOfApp10_3.append(arrayFoc.__len__() + tlgarrayFoc.__len__() + centralArray.__len__())
             else:
-                weighted_avgFocArray = np.average(arrayFoc[:, 8], weights=steamTime)
+                weighted_avgFocArray =  np.average(arrayFoc[:, 8], weights=steamTime[:,12]) if arrayFoc.__len__() > minAccThres else 0
                 meanFoc = (weighted_avgFocArray + centralMean) / 2 if arrayFoc.__len__() > minAccThres else centralMean
                 numberOfApp10_3.append(arrayFoc.__len__() + centralArray.__len__())
             ballastDt10_3.append(round(meanFoc, 2))
@@ -2268,7 +2512,7 @@ class BaseSeriesReader:
             steamTime = np.array([k for k in ballastDt if
                                   k[4] >= 4 and k[4] <= 5 and k[5] >= vel0Min and k[5] <= vel0Max and k[3] >= wind[
                                       i] and
-                                  k[3] <= wind[i + 1] and k[8] > 10])[:, 12]
+                                  k[3] <= wind[i + 1] and k[8] > 5])
 
             tlgarrayFoc = arrayFoc[:, 9] if arrayFoc.__len__() > minAccThres else []
             tlgarrayFoc = np.array([k for k in tlgarrayFoc if k > 13])
@@ -2282,7 +2526,7 @@ class BaseSeriesReader:
                     tlgarrayFoc) + centralMean) / 3 if arrayFoc.__len__() > minAccThres else 0
                 numberOfApp10_5.append(arrayFoc.__len__() + tlgarrayFoc.__len__() + centralArray.__len__())
             else:
-                weighted_avgFocArray = np.average(arrayFoc[:, 8], weights=steamTime)
+                weighted_avgFocArray =  np.average(arrayFoc[:, 8], weights=steamTime[:,12]) if arrayFoc.__len__() > minAccThres else 0
                 meanFoc = (weighted_avgFocArray + centralMean) / 2 if arrayFoc.__len__() > minAccThres else centralMean
                 numberOfApp10_5.append(arrayFoc.__len__() + centralArray.__len__())
             ballastDt10_5.append(round(meanFoc, 2))
@@ -2301,7 +2545,7 @@ class BaseSeriesReader:
             steamTime = np.array([k for k in ballastDt if
                                   k[4] >= 6 and k[5] >= vel0Min and k[5] <= vel0Max and k[3] >= wind[
                                       i] and
-                                  k[3] <= wind[i + 1] and k[8] > 10])[:, 12]
+                                  k[3] <= wind[i + 1] and k[8] > 5])
 
             tlgarrayFoc = arrayFoc[:, 9] if arrayFoc.__len__() > minAccThres else []
             tlgarrayFoc = np.array([k for k in tlgarrayFoc if k > 13])
@@ -2314,7 +2558,7 @@ class BaseSeriesReader:
                     tlgarrayFoc) + centralMean) / 3 if arrayFoc.__len__() > minAccThres else 0
                 numberOfApp10_8.append(arrayFoc.__len__() + tlgarrayFoc.__len__() + centralArray.__len__())
             else:
-                weighted_avgFocArray = np.average(arrayFoc[:, 8], weights=steamTime)
+                weighted_avgFocArray =  np.average(arrayFoc[:, 8], weights=steamTime[:,12]) if arrayFoc.__len__() > minAccThres else 0
                 meanFoc = (weighted_avgFocArray + centralMean) / 2 if arrayFoc.__len__() > minAccThres else 0
                 numberOfApp10_8.append(arrayFoc.__len__() + centralArray.__len__())
             ballastDt10_8.append(round(meanFoc, 2))
@@ -2337,12 +2581,12 @@ class BaseSeriesReader:
             arrayFoc = np.array([k for k in ballastDt if
                                  k[4] >= 0 and k[4] <= 1 and k[5] > vel1Min and k[5] <= vel1Max and k[3] >= wind[
                                      i] and k[
-                                     3] <= wind[i + 1] and k[8] > 10])
+                                     3] <= wind[i + 1] and k[8] > 5])
 
             steamTime = np.array([k for k in ballastDt if
-                                  k[4] >= 0 and k[4] <= 1 and k[5] >= vel0Min and k[5] <= vel0Max and k[3] >= wind[
+                                  k[4] >= 0 and k[4] <= 1 and k[5] >= vel1Min and k[5] <= vel1Max and k[3] >= wind[
                                       i] and
-                                  k[3] <= wind[i + 1] and k[8] > 10])[:, 12]
+                                  k[3] <= wind[i + 1] and k[8] > 5])
 
             tlgarrayFoc = arrayFoc[:, 9] if arrayFoc.__len__() > minAccThres else []
             tlgarrayFoc = np.array([k for k in tlgarrayFoc if k > 5])
@@ -2355,7 +2599,7 @@ class BaseSeriesReader:
                     tlgarrayFoc) + centralMean) / 3 if arrayFoc.__len__() > minAccThres else 0
                 numberOfApp11_0.append(arrayFoc.__len__() + tlgarrayFoc.__len__() + centralArray.__len__())
             else:
-                weighted_avgFocArray = np.average(arrayFoc[:, 8], weights=steamTime)
+                weighted_avgFocArray =  np.average(arrayFoc[:, 8], weights=steamTime[:,12]) if arrayFoc.__len__() > minAccThres else 0
                 meanFoc = (weighted_avgFocArray + centralMean) / 2 if arrayFoc.__len__() > minAccThres else centralMean
                 numberOfApp11_0.append(arrayFoc.__len__() + centralArray.__len__())
             ballastDt11_0.append(round(meanFoc, 2))
@@ -2373,9 +2617,9 @@ class BaseSeriesReader:
                                      3] <= wind[i + 1] and k[8] > 10])
 
             steamTime = np.array([k for k in ballastDt if
-                                  k[4] >= 2 and k[4] <=3 and k[5] >= vel0Min and k[5] <= vel0Max and k[3] >= wind[
+                                  k[4] >= 2 and k[4] <=3 and k[5] >= vel1Min and k[5] <= vel1Max and k[3] >= wind[
                                       i] and
-                                  k[3] <= wind[i + 1] and k[8] > 10])[:, 12]
+                                  k[3] <= wind[i + 1] and k[8] > 10])
 
             tlgarrayFoc = arrayFoc[:, 9] if arrayFoc.__len__() > minAccThres else []
             tlgarrayFoc = np.array([k for k in tlgarrayFoc if k > 5])
@@ -2388,7 +2632,7 @@ class BaseSeriesReader:
                     tlgarrayFoc) + centralMean) / 3 if arrayFoc.__len__() > minAccThres else 0
                 numberOfApp11_3.append(arrayFoc.__len__() + tlgarrayFoc.__len__() + centralArray.__len__())
             else:
-                weighted_avgFocArray = np.average(arrayFoc[:, 8], weights=steamTime)
+                weighted_avgFocArray =  np.average(arrayFoc[:, 8], weights=steamTime[:,12]) if arrayFoc.__len__() > minAccThres else 0
                 meanFoc = (weighted_avgFocArray + centralMean) / 2 if arrayFoc.__len__() > minAccThres else centralMean
                 numberOfApp11_3.append(arrayFoc.__len__() + centralArray.__len__())
             ballastDt11_3.append(round(meanFoc, 2))
@@ -2408,7 +2652,7 @@ class BaseSeriesReader:
             steamTime = np.array([k for k in ballastDt if
                                   k[4] >= 4 and k[4] <= 5 and k[5] >= vel1Min and k[5] <= vel1Max and k[3] >= wind[
                                       i] and
-                                  k[3] <= wind[i + 1] and k[8] > 10])[:, 12]
+                                  k[3] <= wind[i + 1] and k[8] > 10])
 
             tlgarrayFoc = arrayFoc[:, 9] if arrayFoc.__len__() > minAccThres else []
             tlgarrayFoc = np.array([k for k in tlgarrayFoc if k > 5])
@@ -2421,7 +2665,7 @@ class BaseSeriesReader:
                     tlgarrayFoc) + centralMean) / 3 if arrayFoc.__len__() > minAccThres else 0
                 numberOfApp11_5.append(arrayFoc.__len__() + tlgarrayFoc.__len__() + centralArray.__len__())
             else:
-                weighted_avgFocArray = np.average(arrayFoc[:, 8], weights=steamTime)
+                weighted_avgFocArray =  np.average(arrayFoc[:, 8], weights=steamTime[:,12]) if arrayFoc.__len__() > minAccThres else 0
                 meanFoc = (weighted_avgFocArray + centralMean) / 2 if arrayFoc.__len__() > minAccThres else centralMean
                 numberOfApp11_5.append(arrayFoc.__len__() + centralArray.__len__())
             ballastDt11_5.append(round(meanFoc, 2))
@@ -2440,7 +2684,7 @@ class BaseSeriesReader:
             steamTime = np.array([k for k in ballastDt if
                                   k[4] >= 6 and k[5] >= vel1Min and k[5] <= vel1Max and k[3] >= wind[
                                       i] and
-                                  k[3] <= wind[i + 1] and k[8] > 10])[:, 12]
+                                  k[3] <= wind[i + 1] and k[8] > 10])
 
             tlgarrayFoc = arrayFoc[:, 9] if arrayFoc.__len__() > minAccThres else []
             tlgarrayFoc = np.array([k for k in tlgarrayFoc if k > 5])
@@ -2454,7 +2698,7 @@ class BaseSeriesReader:
                     tlgarrayFoc) + centralMean) / 3 if arrayFoc.__len__() > minAccThres else 0
                 numberOfApp11_8.append(arrayFoc.__len__() + tlgarrayFoc.__len__() + centralArray.__len__())
             else:
-                weighted_avgFocArray = np.average(arrayFoc[:, 8], weights=steamTime)
+                weighted_avgFocArray =  np.average(arrayFoc[:, 8], weights=steamTime[:,12]) if arrayFoc.__len__() > minAccThres else 0
                 meanFoc = (weighted_avgFocArray + centralMean) / 2 if arrayFoc.__len__() > minAccThres else 0
                 numberOfApp11_8.append(arrayFoc.__len__() + centralArray.__len__())
             ballastDt11_8.append(round(meanFoc, 2))
@@ -2481,7 +2725,7 @@ class BaseSeriesReader:
             steamTime = np.array([k for k in ballastDt if
                                   k[4] >= 0 and k[4] <= 1 and k[5] > vel2Min and k[5] <= vel2Max and k[3] >= wind[
                                       i] and
-                                  k[3] <= wind[i + 1] and k[8] > 10])[:, 12]
+                                  k[3] <= wind[i + 1] and k[8] > 10])
 
             tlgarrayFoc = arrayFoc[:, 9] if arrayFoc.__len__() > minAccThres else []
             tlgarrayFoc = np.array([k for k in tlgarrayFoc if k > 5])
@@ -2494,7 +2738,7 @@ class BaseSeriesReader:
                     tlgarrayFoc) + centralMean) / 3 if arrayFoc.__len__() > minAccThres else 0
                 numberOfApp12_0.append(arrayFoc.__len__() + tlgarrayFoc.__len__() + centralArray.__len__())
             else:
-                weighted_avgFocArray = np.average(arrayFoc[:, 8], weights=steamTime)
+                weighted_avgFocArray =  np.average(arrayFoc[:, 8], weights=steamTime[:,12]) if arrayFoc.__len__() > minAccThres else 0
                 meanFoc = (weighted_avgFocArray + centralMean) / 2 if arrayFoc.__len__() > minAccThres else 0
                 numberOfApp12_0.append(arrayFoc.__len__() + centralArray.__len__())
             ballastDt12_0.append(round(meanFoc, 2))
@@ -2514,7 +2758,7 @@ class BaseSeriesReader:
             steamTime = np.array([k for k in ballastDt if
                                   k[4] >= 2 and k[4] <= 3 and k[5] > vel2Min and k[5] <= vel2Max and k[3] >= wind[
                                       i] and
-                                  k[3] <= wind[i + 1] and k[8] > 10])[:, 12]
+                                  k[3] <= wind[i + 1] and k[8] > 10])
 
             tlgarrayFoc = arrayFoc[:, 9] if arrayFoc.__len__() > minAccThres else []
             tlgarrayFoc = np.array([k for k in tlgarrayFoc if k > 5])
@@ -2527,7 +2771,7 @@ class BaseSeriesReader:
                     tlgarrayFoc) + centralMean) / 3 if arrayFoc.__len__() > minAccThres else 0
                 numberOfApp12_3.append(arrayFoc.__len__() + tlgarrayFoc.__len__() + centralArray.__len__())
             else:
-                weighted_avgFocArray = np.average(arrayFoc[:, 8], weights=steamTime)
+                weighted_avgFocArray =  np.average(arrayFoc[:, 8], weights=steamTime[:,12]) if arrayFoc.__len__() > minAccThres else 0
                 meanFoc = (weighted_avgFocArray + centralMean) / 2 if arrayFoc.__len__() > minAccThres else 0
                 numberOfApp12_3.append(arrayFoc.__len__() + centralArray.__len__())
             ballastDt12_3.append(round(meanFoc, 2))
@@ -2547,7 +2791,7 @@ class BaseSeriesReader:
             steamTime = np.array([k for k in ballastDt if
                                   k[4] >= 4 and k[4] <= 5 and k[5] > vel2Min and k[5] <= vel2Max and k[3] >= wind[
                                       i] and
-                                  k[3] <= wind[i + 1] and k[8] > 10])[:, 12]
+                                  k[3] <= wind[i + 1] and k[8] > 10])
 
             tlgarrayFoc = arrayFoc[:, 9] if arrayFoc.__len__() > minAccThres else []
             tlgarrayFoc = np.array([k for k in tlgarrayFoc if k > 5])
@@ -2560,7 +2804,7 @@ class BaseSeriesReader:
                     tlgarrayFoc) + centralMean) / 3 if arrayFoc.__len__() > minAccThres else 0
                 numberOfApp12_5.append(arrayFoc.__len__() + tlgarrayFoc.__len__() + centralArray.__len__())
             else:
-                weighted_avgFocArray = np.average(arrayFoc[:, 8], weights=steamTime)
+                weighted_avgFocArray =  np.average(arrayFoc[:, 8], weights=steamTime[:,12]) if arrayFoc.__len__() > minAccThres else 0
                 meanFoc = (weighted_avgFocArray + centralMean) / 2 if arrayFoc.__len__() > minAccThres else 0
                 numberOfApp12_5.append(arrayFoc.__len__() + tlgarrayFoc.__len__() + centralArray.__len__())
             ballastDt12_5.append(round(meanFoc, 2))
@@ -2579,7 +2823,7 @@ class BaseSeriesReader:
             steamTime = np.array([k for k in ballastDt if
                                   k[4] >= 6 and k[5] > vel2Min and k[5] <= vel2Max and k[3] >= wind[
                                       i] and
-                                  k[3] <= wind[i + 1] and k[8] > 10])[:, 12]
+                                  k[3] <= wind[i + 1] and k[8] > 10])
 
             tlgarrayFoc = arrayFoc[:, 9] if arrayFoc.__len__() > minAccThres else []
             tlgarrayFoc = np.array([k for k in tlgarrayFoc if k > 5])
@@ -2592,7 +2836,7 @@ class BaseSeriesReader:
                     tlgarrayFoc) + centralMean) / 3 if arrayFoc.__len__() > minAccThres else 0
                 numberOfApp12_8.append(arrayFoc.__len__() + tlgarrayFoc.__len__() + centralArray.__len__())
             else:
-                weighted_avgFocArray = np.average(arrayFoc[:, 8], weights=steamTime)
+                weighted_avgFocArray =  np.average(arrayFoc[:, 8], weights=steamTime[:,12]) if arrayFoc.__len__() > minAccThres else 0
                 meanFoc = (weighted_avgFocArray + centralMean) / 2 if arrayFoc.__len__() > minAccThres else 0
                 numberOfApp12_8.append(arrayFoc.__len__() + centralArray.__len__())
             ballastDt12_8.append(round(meanFoc, 2))
@@ -2628,7 +2872,7 @@ class BaseSeriesReader:
             steamTime = np.array([k for k in ballastDt if
                                   k[4] >= 0 and k[4] <= 1 and k[5] > vel3Min and k[5] <= vel3Max and k[3] >= wind[
                                       i] and
-                                  k[3] <= wind[i + 1] and k[8] > 10])[:, 12]
+                                  k[3] <= wind[i + 1] and k[8] > 10])
 
             tlgarrayFoc = arrayFoc[:, 9] if arrayFoc.__len__() > minAccThres else []
             tlgarrayFoc = np.array([k for k in tlgarrayFoc if k > 5])
@@ -2641,7 +2885,7 @@ class BaseSeriesReader:
                     tlgarrayFoc) + centralMean) / 3 if arrayFoc.__len__() > minAccThres else 0
                 numberOfApp13_0.append(arrayFoc.__len__() + tlgarrayFoc.__len__() + centralArray.__len__())
             else:
-                weighted_avgFocArray = np.average(arrayFoc[:, 8], weights=steamTime)
+                weighted_avgFocArray =  np.average(arrayFoc[:, 8], weights=steamTime[:,12]) if arrayFoc.__len__() > minAccThres else 0
                 meanFoc = (weighted_avgFocArray + centralMean) / 2 if arrayFoc.__len__() > minAccThres else 0
                 numberOfApp13_0.append(arrayFoc.__len__() + centralArray.__len__())
             ballastDt13_0.append(round(meanFoc, 2))
@@ -2661,7 +2905,7 @@ class BaseSeriesReader:
             steamTime = np.array([k for k in ballastDt if
                                   k[4] >= 2 and k[4] <= 3 and k[5] > vel3Min and k[5] <= vel3Max and k[3] >= wind[
                                       i] and
-                                  k[3] <= wind[i + 1] and k[8] > 10])[:, 12]
+                                  k[3] <= wind[i + 1] and k[8] > 10])
 
             tlgarrayFoc = arrayFoc[:, 9] if arrayFoc.__len__() > minAccThres else []
             tlgarrayFoc = np.array([k for k in tlgarrayFoc if k > 5])
@@ -2674,7 +2918,7 @@ class BaseSeriesReader:
                     tlgarrayFoc) + centralMean) / 3 if arrayFoc.__len__() > minAccThres else 0
                 numberOfApp13_3.append(arrayFoc.__len__() + tlgarrayFoc.__len__() + centralArray.__len__())
             else:
-                weighted_avgFocArray = np.average(arrayFoc[:, 8], weights=steamTime)
+                weighted_avgFocArray =  np.average(arrayFoc[:, 8], weights=steamTime[:,12]) if arrayFoc.__len__() > minAccThres else 0
                 meanFoc = (weighted_avgFocArray + centralMean) / 2 if arrayFoc.__len__() > minAccThres else 0
                 numberOfApp13_3.append(arrayFoc.__len__() + centralArray.__len__())
             ballastDt13_3.append(round(meanFoc, 2))
@@ -2694,7 +2938,7 @@ class BaseSeriesReader:
             steamTime = np.array([k for k in ballastDt if
                                   k[4] >= 4 and k[4] <= 5 and k[5] > vel3Min and k[5] <= vel3Max and k[3] >= wind[
                                       i] and
-                                  k[3] <= wind[i + 1] and k[8] > 10])[:, 12]
+                                  k[3] <= wind[i + 1] and k[8] > 10])
 
             tlgarrayFoc = arrayFoc[:, 9] if arrayFoc.__len__() > minAccThres else []
             tlgarrayFoc = np.array([k for k in tlgarrayFoc if k > 5])
@@ -2707,7 +2951,7 @@ class BaseSeriesReader:
                     tlgarrayFoc) + centralMean) / 3 if arrayFoc.__len__() > minAccThres else 0
                 numberOfApp13_5.append(arrayFoc.__len__() + tlgarrayFoc.__len__() + centralArray.__len__())
             else:
-                weighted_avgFocArray = np.average(arrayFoc[:, 8], weights=steamTime)
+                weighted_avgFocArray =  np.average(arrayFoc[:, 8], weights=steamTime[:,12]) if arrayFoc.__len__() > minAccThres else 0
                 meanFoc = (weighted_avgFocArray + centralMean) / 2 if arrayFoc.__len__() > minAccThres else 0
                 numberOfApp13_5.append(arrayFoc.__len__() + centralArray.__len__())
             ballastDt13_5.append(round(meanFoc, 2))
@@ -2727,7 +2971,7 @@ class BaseSeriesReader:
             steamTime = np.array([k for k in ballastDt if
                                   k[4] >= 6 and k[5] > vel3Min and k[5] <= vel3Max and k[3] >= wind[
                                       i] and
-                                  k[3] <= wind[i + 1] and k[8] > 10])[:, 12]
+                                  k[3] <= wind[i + 1] and k[8] > 10])
 
             tlgarrayFoc = arrayFoc[:, 9] if arrayFoc.__len__() > minAccThres else []
             tlgarrayFoc = np.array(
@@ -2740,7 +2984,7 @@ class BaseSeriesReader:
                     tlgarrayFoc) + centralMean) / 3 if arrayFoc.__len__() > minAccThres else 0
                 numberOfApp13_8.append(arrayFoc.__len__() + tlgarrayFoc.__len__() + centralArray.__len__())
             else:
-                weighted_avgFocArray = np.average(arrayFoc[:, 8], weights=steamTime)
+                weighted_avgFocArray =  np.average(arrayFoc[:, 8], weights=steamTime[:,12]) if arrayFoc.__len__() > minAccThres else 0
                 meanFoc = (weighted_avgFocArray + centralMean) / 2 if arrayFoc.__len__() > minAccThres else 0
                 numberOfApp13_8.append(arrayFoc.__len__() + centralArray.__len__())
             ballastDt13_8.append(round(meanFoc, 2))
@@ -3524,7 +3768,7 @@ class BaseSeriesReader:
             steamTime = np.array([k for k in ladenDt if
                                   k[4] >= 0 and k[4] <= 1 and k[5] >= vel0Min and k[5] <= vel0Max and k[3] >= wind[
                                       i] and
-                                  k[3] <= wind[i + 1] and k[8] > 10])[:, 12]
+                                  k[3] <= wind[i + 1] and k[8] > 10])
 
             tlgarrayFoc = arrayFoc[:, 9] if arrayFoc.__len__() > minAccThres else []
             tlgarrayFoc = np.array([k for k in tlgarrayFoc if k >= 3])
@@ -3538,7 +3782,7 @@ class BaseSeriesReader:
                     tlgarrayFoc) + centralMean) / 3 if arrayFoc.__len__() > minAccThres else 0
                 numberOfApp10_0.append(arrayFoc.__len__() + tlgarrayFoc.__len__() + centralArray.__len__())
             else:
-                weighted_avgFocArray = np.average(arrayFoc[:, 8], weights=steamTime)
+                weighted_avgFocArray =  np.average(arrayFoc[:, 8], weights=steamTime[:,12]) if arrayFoc.__len__() > minAccThres else 0
                 meanFoc = (weighted_avgFocArray + centralMean) / 2 if arrayFoc.__len__() > minAccThres else centralMean
                 numberOfApp10_0.append(arrayFoc.__len__() + centralArray.__len__())
             ladenDt10_0.append(round(meanFoc, 2))
@@ -3558,7 +3802,7 @@ class BaseSeriesReader:
             steamTime = np.array([k for k in ladenDt if
                                   k[4] >= 2 and k[4] <= 3 and k[5] >= vel0Min and k[5] <= vel0Max and k[3] >= wind[
                                       i] and
-                                  k[3] <= wind[i + 1] and k[8] > 10])[:, 12]
+                                  k[3] <= wind[i + 1] and k[8] > 10])
 
             tlgarrayFoc = arrayFoc[:, 9] if arrayFoc.__len__() > minAccThres else []
             tlgarrayFoc = np.array([k for k in tlgarrayFoc if k > 13])
@@ -3571,7 +3815,7 @@ class BaseSeriesReader:
                     tlgarrayFoc) + centralMean) / 3 if arrayFoc.__len__() > minAccThres else 0
                 numberOfApp10_3.append(arrayFoc.__len__() + tlgarrayFoc.__len__() + centralArray.__len__())
             else:
-                weighted_avgFocArray = np.average(arrayFoc[:, 8], weights=steamTime)
+                weighted_avgFocArray =  np.average(arrayFoc[:, 8], weights=steamTime[:,12]) if arrayFoc.__len__() > minAccThres else 0
                 meanFoc = (weighted_avgFocArray + centralMean) / 2 if arrayFoc.__len__() > minAccThres else 0
                 numberOfApp10_3.append(arrayFoc.__len__() + centralArray.__len__())
             ladenDt10_3.append(round(meanFoc, 2))
@@ -3591,7 +3835,7 @@ class BaseSeriesReader:
             steamTime = np.array([k for k in ladenDt if
                                   k[4] >= 4 and k[4] <= 5 and k[5] >= vel0Min and k[5] <= vel0Max and k[3] >= wind[
                                       i] and
-                                  k[3] <= wind[i + 1] and k[8] > 10])[:, 12]
+                                  k[3] <= wind[i + 1] and k[8] > 10])
 
             tlgarrayFoc = arrayFoc[:, 9] if arrayFoc.__len__() > minAccThres else []
             tlgarrayFoc = np.array([k for k in tlgarrayFoc if k > 13])
@@ -3604,7 +3848,7 @@ class BaseSeriesReader:
                     tlgarrayFoc) + centralMean) / 3 if arrayFoc.__len__() > minAccThres else 0
                 numberOfApp10_5.append(arrayFoc.__len__() + tlgarrayFoc.__len__() + centralArray.__len__())
             else:
-                weighted_avgFocArray = np.average(arrayFoc[:, 8], weights=steamTime)
+                weighted_avgFocArray =  np.average(arrayFoc[:, 8], weights=steamTime[:,12]) if arrayFoc.__len__() > minAccThres else 0
                 meanFoc = (weighted_avgFocArray + centralMean) / 2 if arrayFoc.__len__() > minAccThres else 0
                 numberOfApp10_5.append(arrayFoc.__len__() + centralArray.__len__())
             ladenDt10_5.append(round(meanFoc, 2))
@@ -3623,7 +3867,7 @@ class BaseSeriesReader:
             steamTime = np.array([k for k in ladenDt if
                                   k[4] >= 6 and k[5] >= vel0Min and k[5] <= vel0Max  and k[3] >= wind[
                                       i] and
-                                  k[3] <= wind[i + 1] and k[8] > 10])[:, 12]
+                                  k[3] <= wind[i + 1] and k[8] > 10])
             tlgarrayFoc = arrayFoc[:, 9] if arrayFoc.__len__() > minAccThres else []
             tlgarrayFoc = np.array([k for k in tlgarrayFoc if k > 13])
             tlgarrayFoc = np.array(
@@ -3635,7 +3879,7 @@ class BaseSeriesReader:
                     tlgarrayFoc) + centralMean) / 3 if arrayFoc.__len__() > minAccThres else 0
                 numberOfApp10_8.append(arrayFoc.__len__() + tlgarrayFoc.__len__() + centralArray.__len__())
             else:
-                weighted_avgFocArray = np.average(arrayFoc[:, 8], weights=steamTime)
+                weighted_avgFocArray =  np.average(arrayFoc[:, 8], weights=steamTime[:,12]) if arrayFoc.__len__() > minAccThres else 0
                 meanFoc = (weighted_avgFocArray + centralMean) / 2 if arrayFoc.__len__() > minAccThres else 0
                 numberOfApp10_8.append(arrayFoc.__len__() + centralArray.__len__())
             ladenDt10_8.append(round(meanFoc, 2))
@@ -3662,7 +3906,7 @@ class BaseSeriesReader:
             steamTime = np.array([k for k in ladenDt if
                                   k[4] >= 0 and k[4] <= 1 and k[5] > vel1Min and k[5] <= vel1Max and k[3] >= wind[
                                       i] and
-                                  k[3] <= wind[i + 1] and k[8] > 10])[:, 12]
+                                  k[3] <= wind[i + 1] and k[8] > 10])
 
             tlgarrayFoc = arrayFoc[:, 9] if arrayFoc.__len__() > minAccThres else []
             tlgarrayFoc = np.array([k for k in tlgarrayFoc if k > 5])
@@ -3675,7 +3919,7 @@ class BaseSeriesReader:
                     tlgarrayFoc) + centralMean) / 3 if arrayFoc.__len__() > minAccThres else 0
                 numberOfApp11_0.append(arrayFoc.__len__() + tlgarrayFoc.__len__() + centralArray.__len__())
             else:
-                weighted_avgFocArray = np.average(arrayFoc[:, 8], weights=steamTime)
+                weighted_avgFocArray =  np.average(arrayFoc[:, 8], weights=steamTime[:,12]) if arrayFoc.__len__() > minAccThres else 0
                 meanFoc = (weighted_avgFocArray + centralMean) / 2 if arrayFoc.__len__() > minAccThres else 0
                 numberOfApp11_0.append(arrayFoc.__len__() + centralArray.__len__())
             ladenDt11_0.append(round(meanFoc, 2))
@@ -3695,7 +3939,7 @@ class BaseSeriesReader:
             steamTime = np.array([k for k in ladenDt if
                                   k[4] >= 2 and k[4] <= 3 and k[5] > vel1Min and k[5] <= vel1Max and k[3] >= wind[
                                       i] and
-                                  k[3] <= wind[i + 1] and k[8] > 10])[:, 12]
+                                  k[3] <= wind[i + 1] and k[8] > 10])
 
             tlgarrayFoc = arrayFoc[:, 9] if arrayFoc.__len__() > minAccThres else []
             tlgarrayFoc = np.array([k for k in tlgarrayFoc if k > 5])
@@ -3708,7 +3952,7 @@ class BaseSeriesReader:
                     tlgarrayFoc) + centralMean) / 3 if arrayFoc.__len__() > minAccThres else 0
                 numberOfApp11_3.append(arrayFoc.__len__() + tlgarrayFoc.__len__() + centralArray.__len__())
             else:
-                weighted_avgFocArray = np.average(arrayFoc[:, 8], weights=steamTime)
+                weighted_avgFocArray =  np.average(arrayFoc[:, 8], weights=steamTime[:,12]) if arrayFoc.__len__() > minAccThres else 0
                 meanFoc = (weighted_avgFocArray + centralMean) / 2 if arrayFoc.__len__() > minAccThres else 0
                 numberOfApp11_3.append(arrayFoc.__len__() + centralArray.__len__())
             ladenDt11_3.append(round(meanFoc, 2))
@@ -3728,7 +3972,7 @@ class BaseSeriesReader:
             steamTime = np.array([k for k in ladenDt if
                                   k[4] >= 4 and k[4] <= 5 and k[5] > vel1Min and k[5] <= vel1Max and k[3] >= wind[
                                       i] and
-                                  k[3] <= wind[i + 1] and k[8] > 10])[:, 12]
+                                  k[3] <= wind[i + 1] and k[8] > 10])
 
             tlgarrayFoc = arrayFoc[:, 9] if arrayFoc.__len__() > minAccThres else []
             tlgarrayFoc = np.array([k for k in tlgarrayFoc if k > 5])
@@ -3741,7 +3985,7 @@ class BaseSeriesReader:
                     tlgarrayFoc) + centralMean) / 3 if arrayFoc.__len__() > minAccThres else 0
                 numberOfApp11_5.append(arrayFoc.__len__() + tlgarrayFoc.__len__() + centralArray.__len__())
             else:
-                weighted_avgFocArray = np.average(arrayFoc[:, 8], weights=steamTime)
+                weighted_avgFocArray =  np.average(arrayFoc[:, 8], weights=steamTime[:,12]) if arrayFoc.__len__() > minAccThres else 0
                 meanFoc = (weighted_avgFocArray + centralMean) / 2 if arrayFoc.__len__() > minAccThres else 0
                 numberOfApp11_5.append(arrayFoc.__len__() + centralArray.__len__())
             ladenDt11_5.append(round(meanFoc, 2))
@@ -3760,7 +4004,7 @@ class BaseSeriesReader:
             steamTime = np.array([k for k in ladenDt if
                                   k[4] >= 6 and k[5] > vel1Min and k[5] <= vel1Max and k[3] >= wind[i] and k[3] >= wind[
                                       i] and
-                                  k[3] <= wind[i + 1] and k[8] > 10])[:, 12]
+                                  k[3] <= wind[i + 1] and k[8] > 10])
 
             tlgarrayFoc = arrayFoc[:, 9] if arrayFoc.__len__() > minAccThres else []
             tlgarrayFoc = np.array([k for k in tlgarrayFoc if k > 5])
@@ -3773,7 +4017,7 @@ class BaseSeriesReader:
                     tlgarrayFoc) + centralMean) / 3 if arrayFoc.__len__() > minAccThres else 0
                 numberOfApp11_8.append(arrayFoc.__len__() + tlgarrayFoc.__len__() + centralArray.__len__())
             else:
-                weighted_avgFocArray = np.average(arrayFoc[:, 8], weights=steamTime)
+                weighted_avgFocArray =  np.average(arrayFoc[:, 8], weights=steamTime[:,12]) if arrayFoc.__len__() > minAccThres else 0
                 meanFoc = (weighted_avgFocArray + centralMean) / 2 if arrayFoc.__len__() > minAccThres else 0
                 numberOfApp11_8.append(arrayFoc.__len__() + centralArray.__len__())
             ladenDt11_8.append(round(meanFoc, 2))
@@ -3801,7 +4045,7 @@ class BaseSeriesReader:
             steamTime = np.array([k for k in ladenDt if
                                   k[4] >= 0 and k[4] <= 1 and k[5] > vel2Min and k[5] <= vel2Max and k[3] >= wind[i] and k[3] >= wind[
                                       i] and
-                                  k[3] <= wind[i + 1] and k[8] > 10])[:, 12]
+                                  k[3] <= wind[i + 1] and k[8] > 10])
 
             tlgarrayFoc = arrayFoc[:, 9] if arrayFoc.__len__() > minAccThres else []
             tlgarrayFoc = np.array([k for k in tlgarrayFoc if k > 5])
@@ -3814,7 +4058,7 @@ class BaseSeriesReader:
                     tlgarrayFoc) + centralMean) / 3 if arrayFoc.__len__() > minAccThres else 0
                 numberOfApp12_0.append(arrayFoc.__len__() + tlgarrayFoc.__len__() + centralArray.__len__())
             else:
-                weighted_avgFocArray = np.average(arrayFoc[:, 8], weights=steamTime)
+                weighted_avgFocArray =  np.average(arrayFoc[:, 8], weights=steamTime[:,12]) if arrayFoc.__len__() > minAccThres else 0
                 meanFoc = (weighted_avgFocArray + centralMean) / 2 if arrayFoc.__len__() > minAccThres else 0
                 numberOfApp12_0.append(arrayFoc.__len__() + centralArray.__len__())
             ladenDt12_0.append(round(meanFoc, 2))
@@ -3835,7 +4079,7 @@ class BaseSeriesReader:
                                   k[4] >= 2 and k[4] <= 3 and k[5] > vel2Min and k[5] <= vel2Max and k[3] >= wind[i] and
                                   k[3] >= wind[
                                       i] and
-                                  k[3] <= wind[i + 1] and k[8] > 10])[:, 12]
+                                  k[3] <= wind[i + 1] and k[8] > 10])
 
             tlgarrayFoc = arrayFoc[:, 9] if arrayFoc.__len__() > minAccThres else []
             tlgarrayFoc = np.array([k for k in tlgarrayFoc if k > 5])
@@ -3848,7 +4092,7 @@ class BaseSeriesReader:
                     tlgarrayFoc) + centralMean) / 3 if arrayFoc.__len__() > minAccThres else 0
                 numberOfApp12_3.append(arrayFoc.__len__() + tlgarrayFoc.__len__() + centralArray.__len__())
             else:
-                weighted_avgFocArray = np.average(arrayFoc[:, 8], weights=steamTime)
+                weighted_avgFocArray =  np.average(arrayFoc[:, 8], weights=steamTime[:,12]) if arrayFoc.__len__() > minAccThres else 0
                 meanFoc = (weighted_avgFocArray + centralMean) / 2 if arrayFoc.__len__() > minAccThres else 0
                 numberOfApp12_3.append(arrayFoc.__len__() + centralArray.__len__())
             ladenDt12_3.append(round(meanFoc, 2))
@@ -3869,7 +4113,7 @@ class BaseSeriesReader:
                                   k[4] >= 4 and k[4] <= 5 and k[5] > vel2Min and k[5] <= vel2Max and k[3] >= wind[i] and
                                   k[3] >= wind[
                                       i] and
-                                  k[3] <= wind[i + 1] and k[8] > 10])[:, 12]
+                                  k[3] <= wind[i + 1] and k[8] > 10])
 
             tlgarrayFoc = arrayFoc[:, 9] if arrayFoc.__len__() > minAccThres else []
             tlgarrayFoc = np.array([k for k in tlgarrayFoc if k > 5])
@@ -3882,7 +4126,7 @@ class BaseSeriesReader:
                     tlgarrayFoc) + centralMean) / 3 if arrayFoc.__len__() > minAccThres else 0
                 numberOfApp12_5.append(arrayFoc.__len__() + tlgarrayFoc.__len__() + centralArray.__len__())
             else:
-                weighted_avgFocArray = np.average(arrayFoc[:, 8], weights=steamTime)
+                weighted_avgFocArray =  np.average(arrayFoc[:, 8], weights=steamTime[:,12]) if arrayFoc.__len__() > minAccThres else 0
                 meanFoc = (weighted_avgFocArray + centralMean) / 2 if arrayFoc.__len__() > minAccThres else 0
                 numberOfApp12_5.append(arrayFoc.__len__() + centralArray.__len__())
             ladenDt12_5.append(round(meanFoc, 2))
@@ -3901,7 +4145,7 @@ class BaseSeriesReader:
                                   k[4] >= 6 and k[5] > vel2Min and k[5] <= vel2Max and k[3] >= wind[i] and
                                   k[3] >= wind[
                                       i] and
-                                  k[3] <= wind[i + 1] and k[8] > 10])[:, 12]
+                                  k[3] <= wind[i + 1] and k[8] > 10])
 
 
             tlgarrayFoc = arrayFoc[:, 9] if arrayFoc.__len__() > minAccThres else []
@@ -3915,7 +4159,7 @@ class BaseSeriesReader:
                     tlgarrayFoc) + centralMean) / 3 if arrayFoc.__len__() > minAccThres else 0
                 numberOfApp12_8.append(arrayFoc.__len__() + tlgarrayFoc.__len__() + centralArray.__len__())
             else:
-                weighted_avgFocArray = np.average(arrayFoc[:, 8], weights=steamTime)
+                weighted_avgFocArray =  np.average(arrayFoc[:, 8], weights=steamTime[:,12]) if arrayFoc.__len__() > minAccThres else 0
                 meanFoc = (weighted_avgFocArray + centralMean) / 2 if arrayFoc.__len__() > minAccThres else 0
                 numberOfApp12_8.append(arrayFoc.__len__() + centralArray.__len__())
             ladenDt12_8.append(round(meanFoc, 2))
@@ -3953,7 +4197,7 @@ class BaseSeriesReader:
                                   k[4] >= 0 and k[4] <= 1 and k[5] > vel3Min and k[5] <= vel3Max and k[3] >= wind[i] and
                                   k[3] >= wind[
                                       i] and
-                                  k[3] <= wind[i + 1] and k[8] > 10])[:, 12]
+                                  k[3] <= wind[i + 1] and k[8] > 10])
 
             tlgarrayFoc = arrayFoc[:, 9] if arrayFoc.__len__() > minAccThres else []
             tlgarrayFoc = np.array([k for k in tlgarrayFoc if k > 5])
@@ -3966,7 +4210,7 @@ class BaseSeriesReader:
                     tlgarrayFoc) + centralMean) / 3 if arrayFoc.__len__() > minAccThres else 0
                 numberOfApp13_0.append(arrayFoc.__len__() + tlgarrayFoc.__len__() + centralArray.__len__())
             else:
-                weighted_avgFocArray = np.average(arrayFoc[:, 8], weights=steamTime)
+                weighted_avgFocArray =  np.average(arrayFoc[:, 8], weights=steamTime[:,12]) if arrayFoc.__len__() > minAccThres else 0
                 meanFoc = (weighted_avgFocArray + centralMean) / 2 if arrayFoc.__len__() > minAccThres else 0
                 numberOfApp13_0.append(arrayFoc.__len__() + centralArray.__len__())
             ladenDt13_0.append(round(meanFoc, 2))
@@ -3987,7 +4231,7 @@ class BaseSeriesReader:
                                   k[4] >= 2 and k[4] <= 3 and k[5] > vel3Min and k[5] <= vel3Max and k[3] >= wind[i] and
                                   k[3] >= wind[
                                       i] and
-                                  k[3] <= wind[i + 1] and k[8] > 10])[:, 12]
+                                  k[3] <= wind[i + 1] and k[8] > 10])
 
             tlgarrayFoc = arrayFoc[:, 9] if arrayFoc.__len__() > minAccThres else []
             tlgarrayFoc = np.array([k for k in tlgarrayFoc if k > 5])
@@ -4000,7 +4244,7 @@ class BaseSeriesReader:
                     tlgarrayFoc) + centralMean) / 3 if arrayFoc.__len__() > minAccThres else 0
                 numberOfApp13_3.append(arrayFoc.__len__() + tlgarrayFoc.__len__() + centralArray.__len__())
             else:
-                weighted_avgFocArray = np.average(arrayFoc[:, 8], weights=steamTime)
+                weighted_avgFocArray =  np.average(arrayFoc[:, 8], weights=steamTime[:,12]) if arrayFoc.__len__() > minAccThres else 0
                 meanFoc = (weighted_avgFocArray + centralMean) / 2 if arrayFoc.__len__() > minAccThres else 0
                 numberOfApp13_3.append(arrayFoc.__len__() + centralArray.__len__())
             ladenDt13_3.append(round(meanFoc, 2))
@@ -4021,7 +4265,7 @@ class BaseSeriesReader:
                                   k[4] >= 4 and k[4] <= 5 and k[5] > vel3Min and k[5] <= vel3Max and k[3] >= wind[i] and
                                   k[3] >= wind[
                                       i] and
-                                  k[3] <= wind[i + 1] and k[8] > 10])[:, 12]
+                                  k[3] <= wind[i + 1] and k[8] > 10])
 
             tlgarrayFoc = arrayFoc[:, 9] if arrayFoc.__len__() > minAccThres else []
             tlgarrayFoc = np.array([k for k in tlgarrayFoc if k > 5])
@@ -4034,7 +4278,7 @@ class BaseSeriesReader:
                     tlgarrayFoc) + centralMean) / 3 if arrayFoc.__len__() > minAccThres else 0
                 numberOfApp13_5.append(arrayFoc.__len__() + tlgarrayFoc.__len__() + centralArray.__len__())
             else:
-                weighted_avgFocArray = np.average(arrayFoc[:, 8], weights=steamTime)
+                weighted_avgFocArray =  np.average(arrayFoc[:, 8], weights=steamTime[:,12]) if arrayFoc.__len__() > minAccThres else 0
                 meanFoc = (weighted_avgFocArray + centralMean) / 2 if arrayFoc.__len__() > minAccThres else 0
                 numberOfApp13_5.append(arrayFoc.__len__() + centralArray.__len__())
             ladenDt13_5.append(round(meanFoc, 2))
@@ -4054,7 +4298,7 @@ class BaseSeriesReader:
                                   k[4] >= 6 and k[5] > vel3Min and k[5] <= vel3Max and k[3] >= wind[i] and
                                   k[3] >= wind[
                                       i] and
-                                  k[3] <= wind[i + 1] and k[8] > 10])[:, 12]
+                                  k[3] <= wind[i + 1] and k[8] > 10])
 
             tlgarrayFoc = arrayFoc[:, 9] if arrayFoc.__len__() > minAccThres else []
             tlgarrayFoc = np.array(
@@ -4067,7 +4311,7 @@ class BaseSeriesReader:
                     tlgarrayFoc) + centralMean) / 3 if arrayFoc.__len__() > minAccThres else 0
                 numberOfApp13_8.append(arrayFoc.__len__() + tlgarrayFoc.__len__() + centralArray.__len__())
             else:
-                weighted_avgFocArray = np.average(arrayFoc[:, 8], weights=steamTime)
+                weighted_avgFocArray =  np.average(arrayFoc[:, 8], weights=steamTime[:,12]) if arrayFoc.__len__() > minAccThres else 0
                 meanFoc = (weighted_avgFocArray + centralMean) / 2 if arrayFoc.__len__() > minAccThres else 0
                 numberOfApp13_8.append(arrayFoc.__len__() + centralArray.__len__())
             ladenDt13_8.append(round(meanFoc, 2))
