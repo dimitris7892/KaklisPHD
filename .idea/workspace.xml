@@ -2,19 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="9e10e853-69bc-4a18-9c9f-e2f3d9527f23" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/TRAINerrorPercFOC7_0.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/TRAINerrorPercFOCPavlos0.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/dataReading.py" beforeDir="false" afterPath="$PROJECT_DIR$/Danaos_ML_Project/dataReading.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/errorEpochCLusters.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/errorPercFOC15.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/errorPercFOC22.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/errorPercFOC3.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/errorPercFOCPavlos1.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/errorSTWPavlos1.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/model_2_.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/model_3_.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/runPipeline1.py" beforeDir="false" afterPath="$PROJECT_DIR$/Danaos_ML_Project/runPipeline1.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/gRPC/grpc/examples/android/helloworld/.gitignore" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/gRPC/grpc/examples/android/helloworld/README.md" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/gRPC/grpc/examples/android/helloworld/app/.gitignore" beforeDir="false" />
