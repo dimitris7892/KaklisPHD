@@ -2213,7 +2213,8 @@ class BaseSeriesReader:
                     tlgarrayFoc) + centralMean) / 3 if arrayFoc.__len__() > minAccThres else 0
                 numberOfApp10_0.append(arrayFoc.__len__() + tlgarrayFoc.__len__() + centralArray.__len__())
             else:
-                weighted_avgFocArray = np.average(arrayFoc[:, 8], weights=steamTime[:,12]) if arrayFoc.__len__() > minAccThres else 0
+                weighted_avgFocArray = np.average(arrayFoc[:, 8], weights=steamTime[:,12
+                                                                          ]) if arrayFoc.__len__() > minAccThres else 0
                 meanFoc = (weighted_avgFocArray + centralMean) / 2 if arrayFoc.__len__() > minAccThres else centralMean
                 numberOfApp10_0.append(arrayFoc.__len__() + centralArray.__len__())
             ballastDt10_0.append(round(meanFoc, 2))
