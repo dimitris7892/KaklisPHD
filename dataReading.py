@@ -84,12 +84,12 @@ class BaseSeriesReader:
     def readRandomSeriesDataFromFile(self, data,k=None):
         # Load file
         if self.__class__.__name__ == 'UnseenSeriesReader':
-            dt = data.values[ 0:, 2:23 ][ 81000:82000 ]
+            dt = data.values[ 0:, 2:23 ][ 81000:81200 ]
             #dt = data.sample(n=2880).values[ :90000:, 3:23 ]
             #dt = data.values[ 0:, 2:23 ]
         else:
 
-            dt = data.values[ 0:, 2:23 ][k*20000:(k*20000 + 20000)]
+            dt = data.values[ 0:, 2:23 ][k*200:(k*200 + 200)]
             #[0:5000]
             #dt=np.array(random.sample(dt,20000))
             #dt = data.values[0:,2:23]
