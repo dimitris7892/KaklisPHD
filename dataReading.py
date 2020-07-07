@@ -89,7 +89,11 @@ class BaseSeriesReader:
             #dt = data.values[ 0:, 2:23 ]
         else:
 
+<<<<<<< HEAD
             dt = data.values[ 0:, 2:23 ][k*200:(k*200 + 200)]
+=======
+            dt = data.values[ 0:, 2:23 ][k*1000:(k*100 + 100)]
+>>>>>>> 640a7c336ff843f475805d60425409dfb589bff2
             #[0:5000]
             #dt=np.array(random.sample(dt,20000))
             #dt = data.values[0:,2:23]
