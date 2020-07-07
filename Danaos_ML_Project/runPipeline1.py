@@ -63,7 +63,7 @@ def main():
     #DANreader.readLarosDAta(datetime.datetime(2018,1,1),datetime.datetime(2019,1,1))
 
     #DANreader.GenericParserForDataExtraction('LAROS','MARMARAS','MT_DELTA_MARIA')
-    DANreader.GenericParserForDataExtraction('LEMAG', 'MILLENIA', 'DOMINIA',driver='ORACLE',server='10.2.5.80',sid='OR11',usr='millenia',password='millenia',
+    DANreader.GenericParserForDataExtraction('LEMAG', 'MILLENIA', 'MAGNIFICA',driver='ORACLE',server='10.2.5.80',sid='OR11',usr='millenia',password='millenia',
                                              rawData=[],telegrams=True,companyTelegrams=False,pathOfRawData='C:/Users/dkaklis/Desktop/danaos')
 
     #DANreader.GenericParserForDataExtraction('LEMAG', 'OCEAN_GOLD', 'PENELOPE',driver='ORACLE',server='10.2.5.80',sid='OR11',usr='oceangold',password='oceangold',
@@ -182,6 +182,36 @@ def main():
     k=0
     kInit =0
     n=20000
+    #subsets=[]
+    #for i in range(1,5):
+        #subsetsX.append(trData[(k+kInit):(n+k+kInit),0:7])
+        #subsetsY.append(trData[(k+kInit):(n+k+kInit), 7])
+        #k=n*i#+1000
+
+    #subsetsX.append(trData[0:20000, 0:7])
+    #subsetsY.append(trData[0:20000, 7])
+
+    #subsetsX.append(trData[20000:40000, 0:7])
+    #subsetsY.append(trData[20000:40000, 7])
+
+    #subsetsX.append(trData[50000:70000, 0:7])
+    #subsetsY.append(trData[50000:70000, 7])
+
+    #subsetsX.append(trData[70000:90000, 0:7])
+    #subsetsY.append(trData[70000:90000, 7])
+    #indSubsets = []
+    #for i in range(0,len(subsets)):
+       #X = DANreader.readStatDifferentSubsets(subsets[i],subsets,i)
+       #indSubsets.append(X)
+    #n = 1000
+    #kInit=90000
+    #k=0
+    #unseensX=[]
+    #unseensY = []
+    #for i in range(1,6):
+        #unseensX.append(data[(k+kInit):(n+k+kInit) , 0:7])
+        #unseensY.append(data[(k+kInit):(n+k+kInit), 7])
+        #k = n * i + 10
 
 
     #subsetsX.append(data[:,0:7][0:1000].astype(float))

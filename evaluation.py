@@ -1220,7 +1220,7 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
 
 
         #data=[error,np.var(unseenX),clusters]
-        print(stats.kruskal(error,clusters,var,models,partitioners))
+        #print(stats.kruskal(error,clusters,var,models,partitioners))
         #print(self.kw_dunn(groups,[(0,1),(0,2)]))
 
         #dataf = pd.DataFrame.from_dict(df, orient='index')
