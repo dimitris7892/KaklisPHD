@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 Trerror,clusters,error,models,partitioners,var
 10.102890058689558,1,152.44457928848442,SplineRegressionModeler,KMeansPartitioner,13.268501944375
 13.25113845625907,2,110.02535492005804,SplineRegressionModeler,KMeansPartitioner,13.268501944375
@@ -24,3 +25,7 @@ Trerror,clusters,error,models,partitioners,var
 17.35116195678711,6,18.461339950561523,TensorFlowCA,DelaunayTriPartitioner,13.268501944375
 20.065269470214844,2,41.18669509887695,TensorFlowCA,TensorFlowCl,13.268501944375
 ,92,24.608325890870546,Analytical method,None,13.268501944375
+=======
+clusters,var,error,Trerror,partitioners,models
+65,7.018998347499999,22.557235688226015,,None,Analytical method
+>>>>>>> 640a7c336ff843f475805d60425409dfb589bff2
