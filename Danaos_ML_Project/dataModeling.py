@@ -406,7 +406,7 @@ class TensorFlowW2(BasePartitionModeler):
         for models in sModel:
             modelSummary = str(models.summary()).split("\n")[4:]
 
-            with open('./model_Gen_.csv', mode='w') as data:
+            with open('./trainedModels/model_Gen_.csv', mode='w') as data:
                 csvModels.append('./model_Gen_.csv')
                 data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
                 data_writer.writerow(
@@ -471,7 +471,7 @@ class TensorFlowW2(BasePartitionModeler):
             piecewiseFunc = []
             self.count = self.count + 1
             for csvM in csvModels:
-                if csvM != './model_' + str(self.modelId) + '_.csv':
+                if csvM != './trainedModels/model_' + str(self.modelId) + '_.csv':
                     continue
                 # id = csvM.split("_")[ 1 ]
                 # piecewiseFunc = [ ]
@@ -1081,8 +1081,8 @@ class TensorFlowW1(BasePartitionModeler):
         for models in sModel:
             modelSummary = str(models.summary()).split("\n")[4:]
 
-            with open('./model_Gen_.csv', mode='w') as data:
-                csvModels.append('./model_Gen_.csv')
+            with open('./trainedModels/model_Gen_.csv', mode='w') as data:
+                csvModels.append('./trainedModels/model_Gen_.csv')
                 data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
                 data_writer.writerow(
                     ['Basis', 'Coeff'])
@@ -1117,8 +1117,8 @@ class TensorFlowW1(BasePartitionModeler):
         for models in srModels:
             modelSummary = str(models.summary()).split("\n")[4:]
             basisM = []
-            with open('./model_' + str(modelCount) + '_.csv', mode='w') as data:
-                csvModels.append('./model_' + str(modelCount) + '_.csv')
+            with open('./trainedModels/model_' + str(modelCount) + '_.csv', mode='w') as data:
+                csvModels.append('./trainedModels/model_' + str(modelCount) + '_.csv')
                 data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
                 data_writer.writerow(
                     ['Basis', 'Coeff'])
@@ -1146,7 +1146,7 @@ class TensorFlowW1(BasePartitionModeler):
             piecewiseFunc = []
             self.count = self.count + 1
             for csvM in csvModels:
-                if csvM != './model_' + str(self.modelId) + '_.csv':
+                if csvM != './trainedModels/model_' + str(self.modelId) + '_.csv':
                     continue
                 # id = csvM.split("_")[ 1 ]
                 # piecewiseFunc = [ ]
@@ -1660,7 +1660,7 @@ class TensorFlowW1(BasePartitionModeler):
                         #clustersScore.append(history.history['val_loss'][i - 1])
                     except:
                         x=0
-
+                estimatorCl.save('./DeployedModels/estimatorCl_'+str(idx)+'.h5')
                 #varXCl.append(np.var(partitionsX[idx]))
                 #varYCl.append(np.var(partitionsY[idx]))
 
@@ -1705,7 +1705,7 @@ class TensorFlowW1(BasePartitionModeler):
         print("GENERAL MODEL  ")
         es = EarlyStopping(monitor='val_loss', mode='min', verbose=0)
         history = estimator.fit(XSplineVectorGen, Y, epochs=50, validation_split=0.33,verbose=0)
-
+        estimator.save('./DeployedModels/estimatorCl_Gen.h5')
 
         #print("CORRELATION COEFF ERR AND STW: " +str(pearsonr(stdSTW,clustersTrScores)))
         #print("CORRELATION COEFF WS AND STW: " + str(pearsonr(stdSTW, stdWS)))

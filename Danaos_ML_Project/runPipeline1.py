@@ -63,8 +63,8 @@ def main():
     #DANreader.readLarosDAta(datetime.datetime(2018,1,1),datetime.datetime(2019,1,1))
 
     #DANreader.GenericParserForDataExtraction('LAROS','MARMARAS','MT_DELTA_MARIA')
-    DANreader.GenericParserForDataExtraction('LEMAG', 'MILLENIA', 'MAGNIFICA',driver='ORACLE',server='10.2.5.80',sid='OR11',usr='millenia',password='millenia',
-                                             rawData=[],telegrams=True,companyTelegrams=False,pathOfRawData='C:/Users/dkaklis/Desktop/danaos')
+    #DANreader.GenericParserForDataExtraction('LEMAG', 'MILLENIA', 'MAGNIFICA',driver='ORACLE',server='10.2.5.80',sid='OR11',usr='millenia',password='millenia',
+                                            # rawData=[],telegrams=True,companyTelegrams=False,pathOfRawData='C:/Users/dkaklis/Desktop/danaos')
 
     #DANreader.GenericParserForDataExtraction('LEMAG', 'OCEAN_GOLD', 'PENELOPE',driver='ORACLE',server='10.2.5.80',sid='OR11',usr='oceangold',password='oceangold',
         #rawData=True,telegrams=True,companyTelegrams=True,seperator='\t',pathOfRawData='C:/Users/dkaklis/Desktop/danaos')
@@ -178,7 +178,7 @@ def main():
     data = data.drop(["wind_speed", "wind_dir"], axis=1)
     data = data.values
 
-    trData = data[0:30000]
+    trData = data[0:5000]
     k=0
     kInit =0
     n=20000
@@ -294,7 +294,25 @@ def main():
 
                 print("Partitioning training set... Done.")
                 # For each partition create model
+                for i in range(0,len(partitionsX)):
+                    with open('./DeployedModels/cluster_' + str(i) + '_.csv', mode='w') as data:
+                        data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+                        for k in range(0,len(partitionsX[i])):
+
+
+                                data_writer.writerow(
+                                    [partitionsX[i][k][0], partitionsX[i][0][1],partitionsX[i][k][2],partitionsX[i][k][3],partitionsX[i][k][4],partitionsX[i][k][5],partitionsX[i][k][6]])
+
+                    with open('./DeployedModels/cluster_foc' + str(i) + '_.csv', mode='w') as data:
+                        data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+                        for z in range(0, len(partitionsY[i])):
+
+                            data_writer.writerow(
+                                [partitionsY[i][z]])
+
+
                 print("Creating models per partition...")
+
 
                 #if modeler.__class__.__name__ == 'TensorFlowWD':
                     #X = np.array(np.concatenate(partitionsX))

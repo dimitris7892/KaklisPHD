@@ -2,19 +2,14 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="9e10e853-69bc-4a18-9c9f-e2f3d9527f23" name="Default" comment="">
-      <change afterPath="$PROJECT_DIR$/Danaos_ML_Project/generateProfile.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/Figures/MILLENIA_DOMINIA_1.png" beforeDir="false" afterPath="$PROJECT_DIR$/Danaos_ML_Project/Figures/MILLENIA_DOMINIA_1.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/Figures/MILLENIA_DOMINIA_3.png" beforeDir="false" afterPath="$PROJECT_DIR$/Danaos_ML_Project/Figures/MILLENIA_DOMINIA_3.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/Figures/MILLENIA_DOMINIA_4.png" beforeDir="false" afterPath="$PROJECT_DIR$/Danaos_ML_Project/Figures/MILLENIA_DOMINIA_4.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/data/MILLENIA/DOMINIA/ListOfCons.csv" beforeDir="false" afterPath="$PROJECT_DIR$/Danaos_ML_Project/data/MILLENIA/DOMINIA/ListOfCons.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/data/MILLENIA/DOMINIA/ListOfDrafts.csv" beforeDir="false" afterPath="$PROJECT_DIR$/Danaos_ML_Project/data/MILLENIA/DOMINIA/ListOfDrafts.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/data/MILLENIA/DOMINIA/ListOfSpeeds.csv" beforeDir="false" afterPath="$PROJECT_DIR$/Danaos_ML_Project/data/MILLENIA/DOMINIA/ListOfSpeeds.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/data/MILLENIA/DOMINIA/TELEGRAMS/DOMINIA.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/data/MILLENIA/DOMINIA/mappedData.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/dataReading.py" beforeDir="false" afterPath="$PROJECT_DIR$/Danaos_ML_Project/dataReading.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/NEWres_1.csv" beforeDir="false" afterPath="$PROJECT_DIR$/Danaos_ML_Project/NEWres_1.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/dataModeling.py" beforeDir="false" afterPath="$PROJECT_DIR$/Danaos_ML_Project/dataModeling.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/evaluation.py" beforeDir="false" afterPath="$PROJECT_DIR$/Danaos_ML_Project/evaluation.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/model_Gen_.csv" beforeDir="false" afterPath="$PROJECT_DIR$/Danaos_ML_Project/model_Gen_.csv" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Danaos_ML_Project/runPipeline1.py" beforeDir="false" afterPath="$PROJECT_DIR$/Danaos_ML_Project/runPipeline1.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dataModeling.py" beforeDir="false" afterPath="$PROJECT_DIR$/dataModeling.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/gRPC/grpc/examples/android/helloworld/.gitignore" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/gRPC/grpc/examples/android/helloworld/README.md" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/gRPC/grpc/examples/android/helloworld/app/.gitignore" beforeDir="false" />
@@ -190,6 +185,8 @@
       <change beforePath="$PROJECT_DIR$/gRPC/grpc/examples/php/route_guide/run_route_guide_client.sh" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/gRPC/grpc/examples/php/run_greeter_client.sh" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/gRPC/grpc/examples/python/helloworld/greeter_server.py" beforeDir="false" afterPath="$PROJECT_DIR$/gRPC/grpc/examples/python/helloworld/greeter_server.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gRPC/grpc/examples/python/helloworld/helloworld_pb2_grpc.py" beforeDir="false" afterPath="$PROJECT_DIR$/gRPC/grpc/examples/python/helloworld/helloworld_pb2_grpc.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gRPC/grpc/examples/python/route_guide/route_guide_server.py" beforeDir="false" afterPath="$PROJECT_DIR$/gRPC/grpc/examples/python/route_guide/route_guide_server.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/gRPC/grpc/examples/ruby/.gitignore" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/gRPC/grpc/examples/ruby/Gemfile" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/gRPC/grpc/examples/ruby/README.md" beforeDir="false" />
@@ -240,19 +237,12 @@
   </component>
   <component name="PropertiesComponent">
     <property name="full.screen.before.presentation.mode" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/Danaos_ML_Project/data/MILLENIA/METEORA/NeuralEvaluationData" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/Danaos_ML_Project" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
     <property name="settings.editor.splitter.proportion" value="0.2107943" />
     <property name="two.files.diff.last.used.file" value="$PROJECT_DIR$/estimatorCl_1.h5" />
   </component>
   <component name="RecentsManager">
-    <key name="CopyFile.RECENT_KEYS">
-      <recent name="C:\Users\dkaklis\Desktop\KaklisPHD\Danaos_ML_Project\data\MILLENIA\METEORA\NeuralEvaluationData" />
-      <recent name="C:\Users\dkaklis\Desktop\KaklisPHD\Danaos_ML_Project" />
-      <recent name="C:\Users\dkaklis\Desktop\KaklisPHD" />
-      <recent name="C:\Users\dkaklis\Desktop\KaklisPHD\data\MILLENIA" />
-      <recent name="C:\Users\dkaklis\Desktop\KaklisPHD\data\MARMARAS" />
-    </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\dkaklis\Desktop\KaklisPHD\data\GOLDENPORT" />
       <recent name="C:\Users\dkaklis\Desktop\KaklisPHD\data\MARMARAS" />
@@ -260,29 +250,15 @@
       <recent name="C:\Users\dkaklis\Desktop\KaklisPHD\Neurals_pvlos" />
       <recent name="C:\Users\dkaklis\Desktop\KaklisPHD\data\OCEAN_GOLD" />
     </key>
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\dkaklis\Desktop\KaklisPHD\Danaos_ML_Project" />
+      <recent name="C:\Users\dkaklis\Desktop\KaklisPHD\Danaos_ML_Project\data\MILLENIA\METEORA\NeuralEvaluationData" />
+      <recent name="C:\Users\dkaklis\Desktop\KaklisPHD" />
+      <recent name="C:\Users\dkaklis\Desktop\KaklisPHD\data\MILLENIA" />
+      <recent name="C:\Users\dkaklis\Desktop\KaklisPHD\data\MARMARAS" />
+    </key>
   </component>
-  <component name="RunManager" selected="Python.runPipeline1 (1)">
-    <configuration name="Danaos_Prediction_Module" type="PythonConfigurationType" factoryName="Python" temporary="true">
-      <module name="KaklisPHD" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="C:\Users\dkaklis\Desktop\KaklisPHD\Neurals_pvlos\Danaos_Prediction_Module.py" />
-      <option name="PARAMETERS" value="p_eng_foc_paulos.h5 p_eng_foc_paulos_my_scaler_x p_eng_foc_paulos_my_scaler_y ShipData.csv" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
+  <component name="RunManager" selected="Python.greeter_server">
     <configuration name="Unnamed" type="PythonConfigurationType" factoryName="Python">
       <module name="KaklisPHD" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -296,6 +272,69 @@
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <option name="SCRIPT_NAME" value="" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="greeter_server" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="KaklisPHD" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/gRPC/grpc/examples/python/helloworld" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/gRPC/grpc/examples/python/helloworld/greeter_server.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="helloworld_pb2_grpc" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="KaklisPHD" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/gRPC/grpc/examples/python/helloworld" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/gRPC/grpc/examples/python/helloworld/helloworld_pb2_grpc.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="route_guide_server" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="KaklisPHD" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/gRPC/grpc/examples/python/route_guide" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/gRPC/grpc/examples/python/route_guide/route_guide_server.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -346,40 +385,21 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="runPipelineD" type="PythonConfigurationType" factoryName="Python" temporary="true">
-      <module name="KaklisPHD" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/runPipelineD.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
     <list>
       <item itemvalue="Python.Unnamed" />
-      <item itemvalue="Python.Danaos_Prediction_Module" />
       <item itemvalue="Python.runPipeline1" />
-      <item itemvalue="Python.runPipelineD" />
       <item itemvalue="Python.runPipeline1 (1)" />
+      <item itemvalue="Python.greeter_server" />
+      <item itemvalue="Python.route_guide_server" />
+      <item itemvalue="Python.helloworld_pb2_grpc" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.greeter_server" />
+        <item itemvalue="Python.helloworld_pb2_grpc" />
+        <item itemvalue="Python.route_guide_server" />
         <item itemvalue="Python.runPipeline1 (1)" />
         <item itemvalue="Python.runPipeline1" />
-        <item itemvalue="Python.runPipelineD" />
-        <item itemvalue="Python.Danaos_Prediction_Module" />
       </list>
     </recent_temporary>
   </component>
@@ -414,79 +434,83 @@
     </state>
     <state x="690" y="266" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.0.1920.1040/1920.0.1920.1080@0.0.1920.1040" timestamp="1593085489654" />
     <state x="690" y="266" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1591003570873" />
-    <state x="952" y="358" key="#xdebugger.evaluate" timestamp="1593703699980">
+    <state x="916" y="444" key="#xdebugger.evaluate" timestamp="1594296334708">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="715" y="222" key="#xdebugger.evaluate/0.0.1920.1040/1920.0.1920.1080@0.0.1920.1040" timestamp="1593086940389" />
-    <state x="952" y="358" key="#xdebugger.evaluate/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1593703699980" />
+    <state x="916" y="444" key="#xdebugger.evaluate/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1594296334708" />
+    <state width="640" height="466" key="DebuggerActiveHint" timestamp="1594200655267">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="640" height="466" key="DebuggerActiveHint/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1594200655267" />
     <state x="1220" y="408" key="FileChooserDialogImpl" timestamp="1591950471268">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="1220" y="408" key="FileChooserDialogImpl/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1591950471268" />
-    <state width="1898" height="225" key="GridCell.Tab.0.bottom" timestamp="1593703789510">
+    <state width="1898" height="225" key="GridCell.Tab.0.bottom" timestamp="1594630578539">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state width="1898" height="225" key="GridCell.Tab.0.bottom/-1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1590486405344" />
     <state width="1898" height="225" key="GridCell.Tab.0.bottom/0.0.1920.1040/1920.0.1920.1080@0.0.1920.1040" timestamp="1593098254133" />
-    <state width="1898" height="225" key="GridCell.Tab.0.bottom/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1593703789510" />
-    <state width="1898" height="225" key="GridCell.Tab.0.center" timestamp="1593703789510">
+    <state width="1898" height="225" key="GridCell.Tab.0.bottom/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1594630578539" />
+    <state width="1898" height="225" key="GridCell.Tab.0.center" timestamp="1594630578539">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state width="1898" height="225" key="GridCell.Tab.0.center/-1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1590486405344" />
     <state width="1898" height="225" key="GridCell.Tab.0.center/0.0.1920.1040/1920.0.1920.1080@0.0.1920.1040" timestamp="1593098254123" />
-    <state width="1898" height="225" key="GridCell.Tab.0.center/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1593703789510" />
-    <state width="1898" height="225" key="GridCell.Tab.0.left" timestamp="1593703789510">
+    <state width="1898" height="225" key="GridCell.Tab.0.center/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1594630578539" />
+    <state width="1898" height="225" key="GridCell.Tab.0.left" timestamp="1594630578539">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state width="1898" height="225" key="GridCell.Tab.0.left/-1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1590486405344" />
     <state width="1898" height="225" key="GridCell.Tab.0.left/0.0.1920.1040/1920.0.1920.1080@0.0.1920.1040" timestamp="1593098254123" />
-    <state width="1898" height="225" key="GridCell.Tab.0.left/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1593703789510" />
-    <state width="1898" height="225" key="GridCell.Tab.0.right" timestamp="1593703789510">
+    <state width="1898" height="225" key="GridCell.Tab.0.left/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1594630578539" />
+    <state width="1898" height="225" key="GridCell.Tab.0.right" timestamp="1594630578539">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state width="1898" height="225" key="GridCell.Tab.0.right/-1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1590486405344" />
     <state width="1898" height="225" key="GridCell.Tab.0.right/0.0.1920.1040/1920.0.1920.1080@0.0.1920.1040" timestamp="1593098254123" />
-    <state width="1898" height="225" key="GridCell.Tab.0.right/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1593703789510" />
-    <state width="1898" height="186" key="GridCell.Tab.1.bottom" timestamp="1593703783580">
+    <state width="1898" height="225" key="GridCell.Tab.0.right/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1594630578539" />
+    <state width="1898" height="311" key="GridCell.Tab.1.bottom" timestamp="1594628908050">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state width="1898" height="186" key="GridCell.Tab.1.bottom/0.0.1920.1040/1920.0.1920.1080@0.0.1920.1040" timestamp="1593087010696" />
-    <state width="1898" height="186" key="GridCell.Tab.1.bottom/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1593703783580" />
-    <state width="1898" height="186" key="GridCell.Tab.1.center" timestamp="1593703783580">
+    <state width="1898" height="311" key="GridCell.Tab.1.bottom/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1594628908050" />
+    <state width="1898" height="311" key="GridCell.Tab.1.center" timestamp="1594628908050">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state width="1898" height="186" key="GridCell.Tab.1.center/0.0.1920.1040/1920.0.1920.1080@0.0.1920.1040" timestamp="1593087010696" />
-    <state width="1898" height="186" key="GridCell.Tab.1.center/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1593703783580" />
-    <state width="1898" height="186" key="GridCell.Tab.1.left" timestamp="1593703783580">
+    <state width="1898" height="311" key="GridCell.Tab.1.center/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1594628908050" />
+    <state width="1898" height="311" key="GridCell.Tab.1.left" timestamp="1594628908050">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state width="1898" height="186" key="GridCell.Tab.1.left/0.0.1920.1040/1920.0.1920.1080@0.0.1920.1040" timestamp="1593087010696" />
-    <state width="1898" height="186" key="GridCell.Tab.1.left/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1593703783580" />
-    <state width="1898" height="186" key="GridCell.Tab.1.right" timestamp="1593703783580">
+    <state width="1898" height="311" key="GridCell.Tab.1.left/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1594628908050" />
+    <state width="1898" height="311" key="GridCell.Tab.1.right" timestamp="1594628908050">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state width="1898" height="186" key="GridCell.Tab.1.right/0.0.1920.1040/1920.0.1920.1080@0.0.1920.1040" timestamp="1593087010696" />
-    <state width="1898" height="186" key="GridCell.Tab.1.right/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1593703783580" />
-    <state x="1156" y="134" width="1898" height="186" key="GridCell.Tab.2.bottom" timestamp="1593703783580">
+    <state width="1898" height="311" key="GridCell.Tab.1.right/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1594628908050" />
+    <state x="1156" y="134" width="1898" height="311" key="GridCell.Tab.2.bottom" timestamp="1594628908050">
       <screen x="1920" y="0" width="1920" height="1040" />
     </state>
     <state x="921" y="127" width="752" height="906" key="GridCell.Tab.2.bottom/0.0.1920.1040/1920.0.1920.1080@0.0.1920.1040" timestamp="1593086834221" />
-    <state x="1156" y="134" width="1898" height="186" key="GridCell.Tab.2.bottom/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1593703783580" />
-    <state x="1156" y="134" width="1898" height="186" key="GridCell.Tab.2.center" timestamp="1593703783580">
+    <state x="1156" y="134" width="1898" height="311" key="GridCell.Tab.2.bottom/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1594628908050" />
+    <state x="1156" y="134" width="1898" height="311" key="GridCell.Tab.2.center" timestamp="1594628908050">
       <screen x="1920" y="0" width="1920" height="1040" />
     </state>
     <state x="921" y="127" width="752" height="906" key="GridCell.Tab.2.center/0.0.1920.1040/1920.0.1920.1080@0.0.1920.1040" timestamp="1593086834221" />
-    <state x="1156" y="134" width="1898" height="186" key="GridCell.Tab.2.center/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1593703783580" />
-    <state x="1156" y="134" width="1898" height="186" key="GridCell.Tab.2.left" timestamp="1593703783580">
+    <state x="1156" y="134" width="1898" height="311" key="GridCell.Tab.2.center/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1594628908050" />
+    <state x="1156" y="134" width="1898" height="311" key="GridCell.Tab.2.left" timestamp="1594628908050">
       <screen x="1920" y="0" width="1920" height="1040" />
     </state>
     <state x="921" y="127" width="752" height="906" key="GridCell.Tab.2.left/0.0.1920.1040/1920.0.1920.1080@0.0.1920.1040" timestamp="1593087010696" />
-    <state x="1156" y="134" width="1898" height="186" key="GridCell.Tab.2.left/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1593703783580" />
-    <state x="1156" y="134" width="1898" height="186" key="GridCell.Tab.2.right" timestamp="1593703783580">
+    <state x="1156" y="134" width="1898" height="311" key="GridCell.Tab.2.left/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1594628908050" />
+    <state x="1156" y="134" width="1898" height="311" key="GridCell.Tab.2.right" timestamp="1594628908050">
       <screen x="1920" y="0" width="1920" height="1040" />
     </state>
     <state x="921" y="127" width="752" height="906" key="GridCell.Tab.2.right/0.0.1920.1040/1920.0.1920.1080@0.0.1920.1040" timestamp="1593086834221" />
-    <state x="1156" y="134" width="1898" height="186" key="GridCell.Tab.2.right/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1593703783580" />
+    <state x="1156" y="134" width="1898" height="311" key="GridCell.Tab.2.right/1920.0.1920.1040/0.0.1920.1040@0.0.1920.1040" timestamp="1594628908050" />
     <state x="1156" y="134" width="1898" height="186" key="GridCell.Tab.3.bottom" timestamp="1593519034427">
       <screen x="1920" y="0" width="1920" height="1040" />
     </state>
@@ -901,21 +925,6 @@
           <option name="timeStamp" value="1413" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/Danaos_ML_Project/dataPartitioning.py</url>
-          <line>707</line>
-          <option name="timeStamp" value="1425" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/Danaos_ML_Project/dataPartitioning.py</url>
-          <line>169</line>
-          <option name="timeStamp" value="1426" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/Danaos_ML_Project/dataPartitioning.py</url>
-          <line>174</line>
-          <option name="timeStamp" value="1427" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/Danaos_ML_Project/ExtractNeuralReport.py</url>
           <line>155</line>
           <option name="timeStamp" value="1445" />
@@ -954,6 +963,46 @@
           <url>file://$PROJECT_DIR$/Danaos_ML_Project/dataReading.py</url>
           <line>2093</line>
           <option name="timeStamp" value="1563" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/Danaos_ML_Project/evaluation.py</url>
+          <line>272</line>
+          <option name="timeStamp" value="1569" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/evaluation.py</url>
+          <line>1052</line>
+          <option name="timeStamp" value="1570" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/evaluation.py</url>
+          <line>1111</line>
+          <option name="timeStamp" value="1571" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/gRPC/grpc/examples/python/route_guide/route_guide_server.py</url>
+          <line>61</line>
+          <option name="timeStamp" value="1595" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/gRPC/grpc/examples/python/route_guide/route_guide_server.py</url>
+          <line>104</line>
+          <option name="timeStamp" value="1600" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/gRPC/grpc/examples/python/route_guide/route_guide_server.py</url>
+          <line>97</line>
+          <option name="timeStamp" value="1602" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/gRPC/grpc/examples/python/helloworld/greeter_server.py</url>
+          <line>527</line>
+          <option name="timeStamp" value="1615" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/gRPC/grpc/examples/python/helloworld/greeter_server.py</url>
+          <line>507</line>
+          <option name="timeStamp" value="1616" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
