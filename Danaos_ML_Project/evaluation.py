@@ -333,9 +333,9 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
 
     def extractFunctionsFromSplines(self,x0, x1, x2, x3, x4, x5, x6,modelId):
         piecewiseFunc = []
-        csvModels=['./model_'+str(modelId)+'_.csv']
+        csvModels=['./trainedModels/model_'+str(modelId)+'_.csv']
         for csvM in csvModels:
-            if csvM != './model_' + str(modelId) + '_.csv':
+            if csvM != './trainedModels/model_' + str(modelId) + '_.csv':
                 continue
             # id = csvM.split("_")[ 1 ]
             # piecewiseFunc = [ ]
