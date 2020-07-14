@@ -1891,8 +1891,7 @@ class TensorFlowW(BasePartitionModeler):
             with open('./trainedModels/model_'+str(modelCount)+'_.csv', mode='w') as data:
                 csvModels.append('./trainedModels/model_'+str(modelCount)+'_.csv')
                 data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-                data_writer.writerow(
-                ['Basis', 'Coeff'])
+                data_writer.writerow(['Basis', 'Coeff'])
                 for row in modelSummary:
                     row=np.delete(np.array(row.split(" ")), [i for i, x in enumerate(row.split(" ")) if x == ""])
                     try:
@@ -2411,6 +2410,7 @@ class TensorFlowW(BasePartitionModeler):
                 scores.append(Clscore)
                 #NNmodels.append([estimatorCl,'CL'])
                 NNmodels.append(estimatorCl)
+                #estimatorCl.save('./DeployedModels/estimatorCl_'+idx+'.h5')
                 #except:
                     #scores.append(score)
                     #NNmodels.append([estimator,'GEN'])
@@ -2429,6 +2429,7 @@ class TensorFlowW(BasePartitionModeler):
 
 
         NNmodels.append(estimator)
+        #estimator.save('./DeployedModels/estimatorCl_Gen.h5')
         self._models = NNmodels
 
         # Return list of models
