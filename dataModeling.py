@@ -641,7 +641,7 @@ class TensorFlowCA(BasePartitionModeler):
             model.add(keras.layers.Dense(5, ))
             model.add(keras.layers.Dense(1, ))
 
-            print(model.summary())
+            #print(model.summary())
 
             # model.add(keras.layers.Activation('linear'))  # activation=custom_activation
             # Compile model
