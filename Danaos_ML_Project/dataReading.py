@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 from scipy.stats import ks_2samp,chisquare,chi2_contingency
 import math
-#from pyproj import Proj, transform
+from pyproj import Proj, transform
 import pyearth as sp
 import matplotlib
 from sklearn.cluster import KMeans
@@ -12,7 +12,7 @@ from decimal import Decimal
 import random
 from numpy import inf
 #from coordinates.converter import CoordinateConverter, WGS84, L_Est97
-#import pyodbc
+import pyodbc
 import csv
 import locale
 #locale.setlocale(locale.LC_NUMERIC, "en_DK.UTF-8")
@@ -24,20 +24,20 @@ from sympy import Symbol
 from pathlib import Path
 import itertools
 from sympy import cos, sin , tan , exp , sqrt , E
-#from openpyxl import load_workbook
+from openpyxl import load_workbook
 import glob, os
 from pathlib import Path
-#from openpyxl.styles.colors import YELLOW
-#from openpyxl.styles import Font
-#from openpyxl.styles.borders import Border, Side
+from openpyxl.styles.colors import YELLOW
+from openpyxl.styles import Font
+from openpyxl.styles.borders import Border, Side
 import shutil
-#from openpyxl.styles import PatternFill
-#from openpyxl.styles import Alignment
+from openpyxl.styles import PatternFill
+from openpyxl.styles import Alignment
 import matplotlib.pyplot as plt
-#import seaborn as sns
-#from openpyxl.drawing.image import Image
+import seaborn as sns
+from openpyxl.drawing.image import Image
 from scipy.stats import ttest_ind_from_stats
-
+import  generateProfile as genProf
 
 #DANAOS_TELEGRAMS_SQL =SELECT  TELEGRAM_DATE , TELEGRAM_TYPE,BALAST_FLAG,LATITUDE_DEGREES , LATITUDE_SECONDS ,LONGITUDE_DEGREES , LONGITUDE_SECONDS ,vessel_course,(DRAFT_AFT + DRAFT_FORE)/2 as DRAFT , ENGINE_RPM , WIND_DIRECTION , WIND_FORCE  ,AVERAGE_SPEED ,hours_slc,minutes_slc, (( NVL(ME_HSFO_CONS,0)+ NVL(ME_LSFO_CONS,0)+ NVL(ME_HSDO_CONS,0 ) + NVL(ME_LSDO_CONS,0)))   as ME_CONS_24h  FROM TELEGRAMS where vessel_code ='486' AND TELEGRAM_TYPE='D' or telegram_type='N';
 
@@ -1901,48 +1901,7 @@ class BaseSeriesReader:
         ##public vars
 
         if systemType=='LEMAG':
-            if 1==2:
-                companyTlgs = pd.read_excel('./data/' + company + '/' + vessel + '/Penelope TrackReport.xls')
-                companyTlgs = companyTlgs.values
 
-                tlgs = pd.read_csv('./data/' + company + '/' + vessel + '/TELEGRAMS/' + vessel + '.csv', sep=';')
-                telegrams = tlgs.values
-                drafts=[]
-                trims=[]
-                speeds=[]
-                focs=[]
-                dates=[]
-                for i in range(0,len(companyTlgs)):
-                    cmpTlgDate = companyTlgs[i,1]
-                    day = cmpTlgDate.split(" ")[0].split(".")[0]
-                    month = cmpTlgDate.split(" ")[0].split(".")[1]
-                    year = cmpTlgDate.split(" ")[0].split(".")[2]
-                    cmpTlgDateNew = year+'-'+month+"-"+day
-                    filteredRows = [row for row in telegrams if row[0].split(" ")[0]==cmpTlgDateNew]
-                    speeds.append(float(companyTlgs[i,6].split('kn.')[0]) if companyTlgs[i,6].split('kn.')[0]!='Unknown' and float(companyTlgs[i,6].split('kn.')[0])<30 else 0)
-                    drafts.append( float(filteredRows[0].reshape(1,-1)[:,8][0]) if filteredRows.__len__()>0 else 0)
-                    trims.append(float(filteredRows[0].reshape(1,-1)[:,16][0]) if filteredRows.__len__()>0 else 0)
-                    focs.append(float(filteredRows[0].reshape(1,-1)[:,15][0]) if filteredRows.__len__()>0 else 0)
-                    dates.append(cmpTlgDateNew)
-
-
-                drafts = np.nan_to_num(drafts).reshape(-1)
-                focs = np.nan_to_num(focs).reshape(-1)
-                speeds= np.nan_to_num(speeds).reshape(-1)
-                dates = np.array(dates).reshape(-1,1)
-                otherColumns = np.array([0] * len(speeds)).reshape(-1)
-                trims = np.array(trims).reshape(-1)
-                newDataSetTLG = np.array(
-                    np.append(dates, np.asmatrix(
-                        [otherColumns, otherColumns, otherColumns, otherColumns, otherColumns, otherColumns, otherColumns, drafts
-                         , otherColumns, otherColumns,otherColumns, speeds,
-                         otherColumns, otherColumns, focs, trims]).T, axis=1))
-                with open('./data/' + company +'/'+vessel+'/TELEGRAMS/'+vessel+'TLGmappedData.csv', mode='w') as data:
-                    data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-                    for i in range(0, len(newDataSetTLG)):
-                        data_writer.writerow(
-                            [newDataSetTLG[i][0], newDataSetTLG[i][1], newDataSetTLG[i][2], 0, 0, 0, 0, 0, newDataSetTLG[i][8], 0 ,newDataSetTLG[i][10],
-                             newDataSetTLG[i][11], newDataSetTLG[i][12], 0, 0, newDataSetTLG[i][15], newDataSetTLG[i][16]])
 
             if comparisonTest: ##run experiments with train/test split
                 dataSet = dataTrain
@@ -2021,7 +1980,9 @@ class BaseSeriesReader:
             #if rawData == False and boolTlg == True:
                 #tlgDataset = telegrams
             tlgDataset=[]
-            self.fillExcelProfCons(company,vessel, pathExcel,newDataSet,rawData,tlgDataset,newDataSetBDD,newDataSetADD)
+            genExcel = genProf.BaseProfileGenerator()
+            genExcel.fillExcelProfCons(company,vessel, pathExcel,newDataSet,rawData,tlgDataset,newDataSetBDD,newDataSetADD)
+            #self.fillExcelProfCons(company,vessel, pathExcel,newDataSet,rawData,tlgDataset,newDataSetBDD,newDataSetADD)
             return
 
         if systemType=='TELEGRAMS':
