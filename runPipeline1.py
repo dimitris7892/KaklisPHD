@@ -90,6 +90,7 @@ def main():
     stdInU = [ ]
     varTr=[]
     models=[]
+
     part=[]
     histTr=[]
     counter=0
