@@ -778,7 +778,7 @@ class KMeansPartitioner(DefaultPartitioner):
             # Keep partition label to ascertain same order of results
             partitionLabels.append(curLbl)
 
-        k = len(partitionsX)
+        '''k = len(partitionsX)
         i=0
         if k > 1:
             indxForMerging=[]
@@ -818,7 +818,7 @@ class KMeansPartitioner(DefaultPartitioner):
         #partitionsY = []
         #partitionLabels = []
         ##ballast
-        print("NEW Number of clusters AFTER DELETING clusters with insufficient size: %d" % (len(partitionsX)))
+        #print("NEW Number of clusters AFTER DELETING clusters with insufficient size: %d" % (len(partitionsX)))'''
         # Show plot, if requested
         #if (showPlot):
             #self.showClusterPlot(dataUpdatedX, labels, nClusters)

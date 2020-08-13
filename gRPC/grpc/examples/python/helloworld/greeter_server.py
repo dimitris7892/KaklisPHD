@@ -24,7 +24,7 @@ import tensorflow as tf
 import helloworld_pb2
 import helloworld_pb2_grpc
 import sys , time , datetime
-
+import time
 
 class Greeter(helloworld_pb2_grpc.GreeterServicer):
 
@@ -524,6 +524,8 @@ class Greeter(helloworld_pb2_grpc.GreeterServicer):
 
   def GivePrediction(self, request, context):
 
+        start_time = time.time()
+
         valClient  = request.name
         print(datetime.datetime.now().time())
         val = str(valClient).split("[")[1].split("]")
@@ -533,10 +535,15 @@ class Greeter(helloworld_pb2_grpc.GreeterServicer):
 
         ind, fit = self.getBestPartitionForPoint(pPoint, self.partitionsX)
 
+        print("--- %s seconds --- CLASSIFY POINT IN CLUSTER" % (time.time() - start_time))
+
+        start_time = time.time()
+
         vector = self.extractFunctionsFromSplines(pPoint[0], pPoint[1], pPoint[2], pPoint[3], pPoint[4],
                                                   pPoint[5], pPoint[6], ind)
         XSplineVector = np.append(pPoint, vector)
         XSplineVector = XSplineVector.reshape(-1, XSplineVector.shape[0])
+        print("--- %s seconds --- BUILD ENRICHED VECTOR" % (time.time() - start_time))
 
         if self.CountServer ==0 :
           vector = self.extractFunctionsFromSplines(pPoint[0], pPoint[1], pPoint[2], pPoint[3], pPoint[4],
@@ -544,10 +551,14 @@ class Greeter(helloworld_pb2_grpc.GreeterServicer):
           XSplineGenVector = np.append(pPoint, vector)
           self.XSplineGenVector = XSplineGenVector.reshape(-1, XSplineGenVector.shape[0])
 
+        start_time = time.time()
         currModeler = self.deployedModels[ind]
         currModelerGen = self.currModelerGen
+        import tensorflow as tf
 
         prediction = (abs(currModeler.predict(XSplineVector)) + currModelerGen.predict(self.XSplineGenVector)) / 2
+
+        print("--- %s seconds --- PREDICTION" % (time.time() - start_time))
 
         self.CountServer =+1
         return helloworld_pb2.HelloReply(message=str(round(prediction[0][0],3)))

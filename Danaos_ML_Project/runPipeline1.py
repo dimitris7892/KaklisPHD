@@ -178,7 +178,7 @@ def main():
     data = data.drop(["wind_speed", "wind_dir"], axis=1)
     data = data.values
 
-    trData = data[0:5000]
+    trData = data[0:20000]
     k=0
     kInit =0
     n=20000
@@ -218,9 +218,41 @@ def main():
     #subsetsY.append(data[:, 7][0:1000].astype(float))
     #unseenX = data[:, 0:7][90000:].astype(float)
     #unseenY = data[:, 7][90000:].astype(float)
+    ##MOVING ANVERAGE
+    for i in range(0,len(trData)):
+        trData[i] = np.mean(trData[i:i+10],axis=0)
+    ######end moving average
+    dataErrorFoc = pd.read_csv('C:/Users/dkaklis/Desktop/TESTerrorPercFOC3_0.csv', delimiter=',',skiprows=1)
+    dataErrorFocMA = pd.read_csv('C:/Users/dkaklis/Desktop/TESTerrorPercFOC2_0MA.csv', delimiter=',',skiprows=1)
+    dataErr = dataErrorFoc.values
+    dataErrMA = dataErrorFocMA.values
+
+    errMean =[]
+    errMeanMA = []
+    focMean = []
+    i=0
+    while i <2000:
+        errMean.append(np.mean(dataErr[i:i+20,0]))
+        errMeanMA.append(np.mean(dataErrMA[i:i + 20,0]))
+        focMean.append(np.mean(dataErrMA[i:i + 20, 1]))
+        i=i+20
+
+    errMean = np.array(errMean)
+    errMeanMA = np.array(errMeanMA)
+    focMean = np.array(focMean)
+
+    plt.plot(np.linspace(0,100,100),errMean,'-',c='green',label='FOC Predictions')
+    plt.plot(np.linspace(0,100,100), errMeanMA,'-',c='blue',label='FOC Predictions with moving avg')
+    plt.plot(np.linspace(0,100,100), focMean,'-',c='red',label='Actual FOC')
+    plt.ylabel('FOC')
+
+    plt.legend()
+    plt.show()
+
 
     X_train, X_test, y_train, y_test = train_test_split(trData[:,0:7], trData[:,7], test_size=0.2,
                                                         random_state=42)
+
 
     #dataTrain = np.array(np.append(X_train, np.asmatrix([y_train.reshape(-1)]).T, axis=1))
     #DANreader.GenericParserForDataExtraction('LEMAG', 'MILLENIA', 'METEORA',driver='ORACLE',server='10.2.5.80',sid='OR11',usr='millenia',password='millenia',
@@ -261,7 +293,7 @@ def main():
                elif modeler.__class__.__name__=='TriInterpolantModeler' or modeler.__class__.__name__ == 'TensorFlow':
                  partK =[1]
                else:
-                 partK=[7]
+                 partK=[15]
            else:
                partK=[1]
            error = {"errors": []}
