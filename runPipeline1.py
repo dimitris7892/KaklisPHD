@@ -6,6 +6,7 @@ import evaluation as eval
 import numpy as np
 from math import sqrt
 import sys
+import plotResults as plRes
 import pandas as pd
 import random
 
@@ -35,6 +36,8 @@ def main():
     subsetsY = []
     subsetsB=[]
     reader = dRead.BaseSeriesReader()
+    #plResutls = plRes.ErrorGraphs.ErrorGraphsForPartioners(plRes)
+
 
 
     ####
@@ -83,7 +86,7 @@ def main():
         subsetsB.append(targetB)
         var.append(np.var(seriesX))
 
-        if len(subsetsX)>=5:
+        if len(subsetsX)>=1:
             break
 
     rangeSubs = k
@@ -94,7 +97,7 @@ def main():
     histTr=[]
     counter=0
 
-    K = range(1,3)
+    K = range(1,20)
     print("Number of Statistically ind. subsets for training: " + str(len(subsetsX)))
     subsetsX=[subsetsX[0:5]] if len(subsetsX) > 5 else subsetsX
     subsetsY = [ subsetsY[ 0:5 ] ] if len(subsetsY) > 5 else subsetsY
@@ -157,6 +160,7 @@ def main():
                     print("Extracting features from training set... Done.")
 
                 print("Partitioning training set...")
+                #modeler(X,Y)
                 NUM_OF_CLUSTERS =k# TODO: Read from command line
 
                 ##IF MODEL != OF ANALYTICAL METHOD IMPLEMENT CLUSTERING
@@ -303,12 +307,12 @@ def initParameters():
     startU = 30000
     endU = 31000
 
-    algs=['TRI']
+    algs=['NNW1']
     # ['SR','LR','RF','NN','NNW','TRI']
 
 
         #['SR','LR','RF','NN','NNW','TRI']
-    cls=['KM','DC','NNCL']
+    cls=['KM']
     #['SR','LR','RF','NN'] algs
     #['KM','DC'] clusterers / cls
 
