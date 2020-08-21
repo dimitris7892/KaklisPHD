@@ -20,7 +20,33 @@ class ErrorGraphs:
         if show : plt.show()
         x=1
 
-    def ErrorGraphsForPartioners(self, errors, K, trSize, show, modeler,clustering):
+    def ErrorGraphsForPartioners(self):
+        import pandas as pd
+        import csv
+        errors= {'data':[]}
+        data = pd.read_csv('/home/dimitris/Desktop/models_perf.csv', delimiter=',')
+        for row in data.values:
+
+                    if row[0]=='Trerror':continue
+                    error={}
+                    error['model']=row[3]
+                    error['error']=row[2]
+                    error['cluster']=row[1]
+                    errors['data'].append(error)
+
+        models=['TensorFlowW1','SplineRegressionModeler','LinearRegressionModeler','RandomForestModeler','TensorFlowW',
+                'TensorFlowCA']
+        with open('/home/dimitris/Desktop/meanErrorThroughClusters.csv', mode='w') as data:
+            data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+            data_writer.writerow(['models', 'clusterrs', 'error'])
+            for m in models:
+                for cl in range(1,21):
+
+                    meanError= np.mean([m['error'] for m in [k for k in errors['data'] if k['model']==m and k['cluster']==cl]])
+                    data_writer.writerow([m,cl, meanError])
+
+
+
 
         plt.plot(K, errors, 'k-',label=str(trSize)+ ' Instances')
         plt.legend(loc='upper right', shadow=True)
