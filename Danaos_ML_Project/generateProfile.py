@@ -39,7 +39,7 @@ from openpyxl.drawing.image import Image
 
 class BaseProfileGenerator:
 
-    def fillExcelProfCons(self ,company ,vessel ,pathToexcel ,dataSet ,rawData, tlgDataset, dataSetBDD, dataSetADD):
+    def fillExcelProfCons(self, company, vessel, pathToexcel, dataSet, rawData, tlgDataset, dataSetBDD, dataSetADD):
         ##FEATURE SET EXACT POSITION OF COLUMNS NEEDED IN ORDER TO PRODUCE EXCEL
         # 2nd place BALLAST FLAG
         # 8th place DRAFT
@@ -93,10 +93,13 @@ class BaseProfileGenerator:
         if rawData == []:
             tlgDataset = dtNew
             tlgDatasetBDD = dtNewBDD
+            tlgDatasetADD = dtNewADD
             velocitiesTlg = (
                 np.array((np.array([k for k in dtNew if float(k[18]) > 0 and float(k[18]) < 35])[:, 12])).astype(float))
             velocitiesTlgBDD = (
                 np.array((np.array([k for k in dtNewBDD if float(k[18]) > 0])[:, 12])).astype(float))
+            velocitiesTlgADD = (
+                np.array((np.array([k for k in dtNewADD if float(k[18]) > 0])[:, 12])).astype(float))
         else:
             velocitiesTlg = (
                 np.array((np.array([k for k in dtNew if float(k[18]) > 0 and float(k[18]) < 35])[:, 18])).astype(
@@ -201,12 +204,12 @@ class BaseProfileGenerator:
 
         ################################################################################################################
 
-        workbook = self.calculateExcelStatistics(workbook, dtNew, velocities, draft, trim, velocitiesTlg, rawData, company,
-                                                 vessel, tlgDataset, 'all')
+        workbook = self.calculateExcelStatistics(workbook, dtNew, velocities, draft, trim, velocitiesTlg, rawData,
+                                                 company, vessel, tlgDataset, 'all')
         workbook = self.calculateExcelStatistics(workbook, dtNewBDD, velocities, draft, trim, velocitiesTlgBDD, rawData,
                                                  company, vessel, tlgDatasetBDD, 'bdd')
         workbook = self.calculateExcelStatistics(workbook, dtNewADD, velocities, draft, trim, velocitiesTlgBDD, rawData,
-                                                 company, vessel, tlgDatasetBDD, 'Add')
+                                                 company, vessel, tlgDatasetADD, 'Add')
         ##delete ladden outliers
         # np.delete(ladenDt, [i for (i, v) in enumerate(ladenDt[:, 8]) if v < (
         # np.mean(ladenDt[:, 8]) - np.std(ladenDt[:, 8])) or v > np.mean(
@@ -240,11 +243,13 @@ class BaseProfileGenerator:
         vel1Min = 12.5
         vel2Min =12.5
         vel3Min = 13.5
-    
+
         vel0Max = 12
         vel1Max = 13
         vel2Max = 13.5
         vel3Max = 18'''
+        # vel0Min = 6
+        # vel0Max = 9
 
         workbook._sheets[2]['B6'] = str(vel0Mean) + '  (' + str(vel0Min) + ' - ' + str(vel0Max) + ')'
         workbook._sheets[2]['B16'] = str(vel1Mean) + '  (' + str(vel1Min) + ' - ' + str(vel1Max) + ')'
@@ -281,7 +286,8 @@ class BaseProfileGenerator:
                                  k[3] <= wind[i + 1] and k[8] > 10])
 
             steamTime = np.array([k for k in ballastDt if
-                                  k[4] >= 0 and k[4] <= 1 and k[5] >= vel0Min and k[5] <= vel0Max and k[3] >= wind[i] and
+                                  k[4] >= 0 and k[4] <= 1 and k[5] >= vel0Min and k[5] <= vel0Max and k[3] >= wind[
+                                      i] and
                                   k[3] <= wind[i + 1] and k[8] > 10])
 
             tlgarrayFoc = arrayFoc[:, 9] if arrayFoc.__len__() > minAccThres else []
@@ -291,7 +297,8 @@ class BaseProfileGenerator:
             tlgarrayFoc = np.array([k for k in ballastDt if k[5] >= vel0Min and k[5] <= vel0Max and k[8] > 10])
 
             if tlgarrayFoc.__len__() > lenConditionTlg:
-                tlgarrayFoc = np.array([k for k in ballastDt if k[5] >= vel0Min and k[5] <= vel0Max and k[8] > 10])[:, 9]
+                tlgarrayFoc = np.array([k for k in ballastDt if k[5] >= vel0Min and k[5] <= vel0Max and k[8] > 10])[:,
+                              9]
                 meanFoc = (np.mean(arrayFoc[:, 8]) + np.mean(
                     tlgarrayFoc) + centralMean) / 3 if arrayFoc.__len__() > minAccThres else 0
                 numberOfApp10_0.append(arrayFoc.__len__() + tlgarrayFoc.__len__() + centralArray.__len__())
@@ -1141,6 +1148,8 @@ class BaseProfileGenerator:
             ballastDt13_0 = np.array(ballastDt13_3) - 1
         #####################################################################################################################
         #####################################################################################################################
+
+        #####################################################################################################################
         for i in range(0, len(ballastDt10_0)):
 
             if (ballastDt10_0[i] >= ballastDt11_0[i]) and ballastDt11_0[i] > 0:
@@ -1407,7 +1416,138 @@ class BaseProfileGenerator:
             ballastDt10_5[2] = ballastDt10_5[3] + 1 if ballastDt10_5[2] <= ballastDt10_5[3] else ballastDt10_5[2]
             workbook._sheets[2]['D' + str(i)] = round(ballastDt10_5[i - 9], 2)
 
-            ##TREAT outliers / missing values for ballastt values
+        ##############################################################################################################################
+        ##FIX SIDE  / AGAINST
+        if (ballastDt10_0[0] <= ballastDt10_0[2]):
+            while (ballastDt10_0[0] <= ballastDt10_0[2]):
+                ballastDt10_0[0] = ballastDt10_0[0] + 0.1 * ballastDt10_0[0]
+
+        if (ballastDt10_0[1] <= ballastDt10_0[3]):
+            while (ballastDt10_0[1] <= ballastDt10_0[3]):
+                ballastDt10_0[1] = ballastDt10_0[1] + 0.1 * ballastDt10_0[1]
+
+        if (ballastDt10_3[0] <= ballastDt10_3[2]):
+            while (ballastDt10_3[0] <= ballastDt10_3[2]):
+                ballastDt10_3[0] = ballastDt10_3[0] + 0.1 * ballastDt10_3[0]
+
+        if (ballastDt10_3[1] <= ballastDt10_3[3]):
+            while (ballastDt10_3[1] <= ballastDt10_3[3]):
+                ballastDt10_3[1] = ballastDt10_3[1] + 0.1 * ballastDt10_3[1]
+
+        if (ballastDt10_5[0] <= ballastDt10_5[2]):
+            while (ballastDt10_5[0] <= ballastDt10_5[2]):
+                ballastDt10_5[0] = ballastDt10_5[0] + 0.1 * ballastDt10_5[0]
+
+        if (ballastDt10_5[1] <= ballastDt10_5[3]):
+            while (ballastDt10_5[1] <= ballastDt10_5[3]):
+                ballastDt10_5[1] = ballastDt10_5[1] + 0.1 * ballastDt10_5[1]
+
+        if (ballastDt10_8[0] <= ballastDt10_8[2]):
+            while (ballastDt10_8[0] <= ballastDt10_8[2]):
+                ballastDt10_8[0] = ballastDt10_8[0] + 0.1 * ballastDt10_8[0]
+
+        if (ballastDt10_8[1] <= ballastDt10_8[3]):
+            while (ballastDt10_8[1] <= ballastDt10_8[3]):
+                ballastDt10_8[1] = ballastDt10_8[1] + 0.1 * ballastDt10_8[1]
+
+        if (ballastDt11_0[0] <= ballastDt11_0[2]):
+            while (ballastDt11_0[0] <= ballastDt11_0[2]):
+                ballastDt11_0[0] = ballastDt11_0[0] + 0.1 * ballastDt11_0[0]
+
+        if (ballastDt11_0[1] <= ballastDt11_0[3]):
+            while (ballastDt11_0[1] <= ballastDt11_0[3]):
+                ballastDt11_0[1] = ballastDt11_0[1] + 0.1 * ballastDt11_0[1]
+
+        if (ballastDt11_3[0] <= ballastDt11_3[2]):
+            while (ballastDt11_3[0] <= ballastDt11_3[2]):
+                ballastDt11_3[0] = ballastDt11_3[0] + 0.1 * ballastDt11_3[0]
+
+        if (ballastDt11_3[1] <= ballastDt11_3[3]):
+            while (ballastDt11_3[1] <= ballastDt11_3[3]):
+                ballastDt11_3[1] = ballastDt11_3[1] + 0.1 * ballastDt11_3[1]
+
+        if (ballastDt11_5[0] <= ballastDt11_5[2]):
+            while (ballastDt11_5[0] <= ballastDt11_5[2]):
+                ballastDt11_5[0] = ballastDt11_5[0] + 0.1 * ballastDt11_5[0]
+
+        if (ballastDt11_5[1] <= ballastDt11_5[3]):
+            while (ballastDt11_5[1] <= ballastDt11_5[3]):
+                ballastDt11_5[1] = ballastDt11_5[1] + 0.1 * ballastDt11_5[1]
+
+        if (ballastDt11_8[0] <= ballastDt11_8[2]):
+            while (ballastDt11_8[0] <= ballastDt11_8[2]):
+                ballastDt11_8[0] = ballastDt11_8[0] + 0.1 * ballastDt11_8[0]
+
+        if (ballastDt11_8[1] <= ballastDt11_8[3]):
+            while (ballastDt11_8[1] <= ballastDt11_8[3]):
+                ballastDt11_8[1] = ballastDt11_8[1] + 0.1 * ballastDt11_8[1]
+
+        if (ballastDt12_0[0] <= ballastDt12_0[2]):
+            while (ballastDt12_0[0] <= ballastDt12_0[2]):
+                ballastDt12_0[0] = ballastDt12_0[0] + 0.1 * ballastDt12_0[0]
+
+        if (ballastDt12_0[1] <= ballastDt12_0[3]):
+            while (ballastDt12_0[1] <= ballastDt12_0[3]):
+                ballastDt12_0[1] = ballastDt12_0[1] + 0.1 * ballastDt12_0[1]
+
+        if (ballastDt12_3[0] <= ballastDt12_3[2]):
+            while (ballastDt12_3[0] <= ballastDt12_3[2]):
+                ballastDt12_3[0] = ballastDt12_3[0] + 0.1 * ballastDt12_3[0]
+
+        if (ballastDt12_3[1] <= ballastDt12_3[3]):
+            while (ballastDt12_3[1] <= ballastDt12_3[3]):
+                ballastDt12_3[1] = ballastDt12_3[1] + 0.1 * ballastDt12_3[1]
+
+        if (ballastDt12_5[0] <= ballastDt12_5[2]):
+            while (ballastDt12_5[0] <= ballastDt12_5[2]):
+                ballastDt12_5[0] = ballastDt12_5[0] + 0.1 * ballastDt12_5[0]
+
+        if (ballastDt12_5[1] <= ballastDt12_5[3]):
+            while (ballastDt12_5[1] <= ballastDt12_5[3]):
+                ballastDt12_5[1] = ballastDt12_5[1] + 0.1 * ballastDt12_5[1]
+
+        if (ballastDt12_8[0] <= ballastDt12_8[2]):
+            while (ballastDt12_8[0] <= ballastDt12_8[2]):
+                ballastDt12_8[0] = ballastDt12_8[0] + 0.1 * ballastDt12_8[0]
+
+        if (ballastDt12_8[1] <= ballastDt12_8[3]):
+            while (ballastDt12_8[1] <= ballastDt12_8[3]):
+                ballastDt12_8[1] = ballastDt12_8[1] + 0.1 * ballastDt12_8[1]
+
+        if (ballastDt13_0[0] <= ballastDt13_0[2]):
+            while (ballastDt13_0[0] <= ballastDt13_0[2]):
+                ballastDt13_0[0] = ballastDt13_0[0] + 0.1 * ballastDt13_0[0]
+
+        if (ballastDt13_0[1] <= ballastDt13_0[3]):
+            while (ballastDt13_0[1] <= ballastDt13_0[3]):
+                ballastDt13_0[1] = ballastDt13_0[1] + 0.1 * ballastDt13_0[1]
+
+        if (ballastDt13_3[0] <= ballastDt13_3[2]):
+            while (ballastDt13_3[0] <= ballastDt13_3[2]):
+                ballastDt13_3[0] = ballastDt13_3[0] + 0.1 * ballastDt13_3[0]
+
+        if (ballastDt13_3[1] <= ballastDt13_3[3]):
+            while (ballastDt13_3[1] <= ballastDt13_3[3]):
+                ballastDt13_3[1] = ballastDt13_3[1] + 0.1 * ballastDt13_3[1]
+
+        if (ballastDt13_5[0] <= ballastDt13_5[2]):
+            while (ballastDt13_5[0] <= ballastDt13_5[2]):
+                ballastDt13_5[0] = ballastDt13_5[0] + 0.1 * ballastDt13_5[0]
+
+        if (ballastDt13_5[1] <= ballastDt13_5[3]):
+            while (ballastDt13_5[1] <= ballastDt13_5[3]):
+                ballastDt13_5[1] = ballastDt13_5[1] + 0.1 * ballastDt13_5[1]
+
+        if (ballastDt13_8[0] <= ballastDt13_8[2]):
+            while (ballastDt13_8[0] <= ballastDt13_8[2]):
+                ballastDt13_8[0] = ballastDt13_8[0] + 0.1 * ballastDt13_8[0]
+
+        if (ballastDt13_8[1] <= ballastDt13_8[3]):
+            while (ballastDt13_8[1] <= ballastDt13_8[3]):
+                ballastDt13_8[1] = ballastDt13_8[1] + 0.1 * ballastDt13_8[1]
+        ##FIX SIDE  / AGAINST##FIX SIDE  / AGAINST##FIX SIDE  / AGAINST##FIX SIDE  / AGAINST##FIX SIDE  / AGAINST##FIX SIDE  / AGAINST
+
+        ##TREAT outliers / missing values for ballastt values
         if (np.array(ballastDt10_8) == 0).all():
             ballastDt10_8 = np.array(ballastDt10_5) + 2 if (np.array(ballastDt10_5) != 0).any() else np.array(
                 ballastDt10_3) + 3
@@ -1589,10 +1729,15 @@ class BaseProfileGenerator:
         # vel2Max = 13.5
         # vel3Max = 15
 
-        workbook._sheets[1]['B6'] = vel0Mean
+        '''workbook._sheets[1]['B6'] = vel0Mean
         workbook._sheets[1]['B16'] = vel1Mean
         workbook._sheets[1]['B26'] = vel2Mean
-        workbook._sheets[1]['B36'] = vel3Mean
+        workbook._sheets[1]['B36'] = vel3Mean'''
+
+        workbook._sheets[1]['B6'] = str(vel0Mean) + '  (' + str(vel0Min) + ' - ' + str(vel0Max) + ')'
+        workbook._sheets[1]['B16'] = str(vel1Mean) + '  (' + str(vel1Min) + ' - ' + str(vel1Max) + ')'
+        workbook._sheets[1]['B26'] = str(vel2Mean) + '  (' + str(vel2Min) + ' - ' + str(vel2Max) + ')'
+        workbook._sheets[1]['B36'] = str(vel3Mean) + '  (' + str(vel3Min) + ' - ' + str(vel3Max) + ')'
 
         ##END OF VESSEL BASIC INFO
         speeds = list(itertools.chain(blVelocities, ldVelocities))
@@ -1907,8 +2052,8 @@ class BaseProfileGenerator:
                                      3] <= wind[i + 1] and k[8] > 10])
 
             steamTime = np.array([k for k in ladenDt if
-                                  k[4] >= 0 and k[4] <= 1 and k[5] > vel2Min and k[5] <= vel2Max and k[3] >= wind[i] and k[
-                                      3] >= wind[
+                                  k[4] >= 0 and k[4] <= 1 and k[5] > vel2Min and k[5] <= vel2Max and k[3] >= wind[i] and
+                                  k[3] >= wind[
                                       i] and
                                   k[3] <= wind[i + 1] and k[8] > 10])
 
@@ -2209,12 +2354,12 @@ class BaseProfileGenerator:
             if length > 0:
                 if ladenDt10_0[i] == 0:
                     ##find items !=0
-                    ladenDt10_0[i] = np.array(
-                        np.sum([numberOfApp10_0[i] * values[i] for i in range(0, len(values)) if values[i] > 0])) / np.sum(
+                    ladenDt10_0[i] = np.array(np.sum(
+                        [numberOfApp10_0[i] * values[i] for i in range(0, len(values)) if values[i] > 0])) / np.sum(
                         numberOfApp10_0)
                 elif np.isnan(ladenDt10_0[i]):
-                    ladenDt10_0[i] = np.array(
-                        np.sum([numberOfApp10_0[i] * values[i] for i in range(0, len(values)) if values[i] > 0])) / np.sum(
+                    ladenDt10_0[i] = np.array(np.sum(
+                        [numberOfApp10_0[i] * values[i] for i in range(0, len(values)) if values[i] > 0])) / np.sum(
                         numberOfApp10_0)
 
         values = [k for k in ladenDt11_0 if k != 0]
@@ -2225,11 +2370,13 @@ class BaseProfileGenerator:
                 if ladenDt11_0[i] == 0:
                     ##find items !=0
                     ladenDt11_0[i] = np.array(
-                        np.sum([numberOfApp11_0[i] * values[i] for i in range(0, len(values)) if values[i] > 0])) / np.sum(
+                        np.sum(
+                            [numberOfApp11_0[i] * values[i] for i in range(0, len(values)) if values[i] > 0])) / np.sum(
                         numberOfApp11_0)
                 elif np.isnan(ladenDt11_0[i]):
                     ladenDt11_0[i] = np.array(
-                        np.sum([numberOfApp11_0[i] * values[i] for i in range(0, len(values)) if values[i] > 0])) / np.sum(
+                        np.sum(
+                            [numberOfApp11_0[i] * values[i] for i in range(0, len(values)) if values[i] > 0])) / np.sum(
                         numberOfApp11_0)
 
         values = [k for k in ladenDt12_0 if k != 0]
@@ -2284,7 +2431,7 @@ class BaseProfileGenerator:
                     ladenDt11_3[i] = np.array(
                         np.sum([numberOfApp11_3[i] * values[i] for i in range(0, len(values))])) / np.sum(
                         numberOfApp11_3)
-                elif np.isnan(ladenDt10_3[i]):
+                elif np.isnan(ladenDt11_3[i]):
                     ladenDt11_3[i] = np.array(
                         np.sum([numberOfApp11_3[i] * values[i] for i in range(0, len(values))])) / np.sum(
                         numberOfApp11_3)
@@ -2297,8 +2444,8 @@ class BaseProfileGenerator:
                 if ladenDt12_3[i] == 0:
                     ladenDt12_3[i] = np.array(
                         np.sum([numberOfApp12_3[i] * values[i] for i in range(0, len(values))])) / np.sum(
-                        numberOfApp11_3)
-                elif np.isnan(ladenDt10_3[i]):
+                        numberOfApp12_3)
+                elif np.isnan(ladenDt12_3[i]):
                     ladenDt11_3[i] = np.array(
                         np.sum([numberOfApp12_3[i] * values[i] for i in range(0, len(values))])) / np.sum(
                         numberOfApp12_3)
@@ -2541,6 +2688,7 @@ class BaseProfileGenerator:
                     ladenDt13_0[i] = ladenDt13_0[i] + 0.1 * ladenDt13_0[i]
 
         #####################################################################################################################
+
         for i in range(0, len(ladenDt10_3)):
 
             if (ladenDt10_0[i] >= ladenDt10_3[i]):
@@ -2727,6 +2875,135 @@ class BaseProfileGenerator:
                     else:
                         ladenDt13_8[i] = ladenDt13_8[i] + 0.1 * ladenDt13_8[i]
         # 1!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!#1!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        ### fix side /against LADEN
+        if (ladenDt10_0[0] <= ladenDt10_0[2]):
+            while (ladenDt10_0[0] <= ladenDt10_0[2]):
+                ladenDt10_0[0] = ladenDt10_0[0] + 0.1 * ladenDt10_0[0]
+
+        if (ladenDt10_0[1] <= ladenDt10_0[3]):
+            while (ladenDt10_0[1] <= ladenDt10_0[3]):
+                ladenDt10_0[1] = ladenDt10_0[1] + 0.1 * ladenDt10_0[1]
+
+        if (ladenDt10_3[0] <= ladenDt10_3[2]):
+            while (ladenDt10_3[0] <= ladenDt10_3[2]):
+                ladenDt10_3[0] = ladenDt10_3[0] + 0.1 * ladenDt10_3[0]
+
+        if (ladenDt10_3[1] <= ladenDt10_3[3]):
+            while (ladenDt10_3[1] <= ladenDt10_3[3]):
+                ladenDt10_3[1] = ladenDt10_3[1] + 0.1 * ladenDt10_3[1]
+
+        if (ladenDt10_5[0] <= ladenDt10_5[2]):
+            while (ladenDt10_5[0] <= ladenDt10_5[2]):
+                ladenDt10_5[0] = ladenDt10_5[0] + 0.1 * ladenDt10_5[0]
+
+        if (ladenDt10_5[1] <= ladenDt10_5[3]):
+            while (ladenDt10_5[1] <= ladenDt10_5[3]):
+                ladenDt10_5[1] = ladenDt10_5[1] + 0.1 * ladenDt10_5[1]
+
+        if (ladenDt10_8[0] <= ladenDt10_8[2]):
+            while (ladenDt10_8[0] <= ladenDt10_8[2]):
+                ladenDt10_8[0] = ladenDt10_8[0] + 0.1 * ladenDt10_8[0]
+
+        if (ladenDt10_8[1] <= ladenDt10_8[3]):
+            while (ladenDt10_8[1] <= ladenDt10_8[3]):
+                ladenDt10_8[1] = ladenDt10_8[1] + 0.1 * ladenDt10_8[1]
+
+        if (ladenDt11_0[0] <= ladenDt11_0[2]):
+            while (ladenDt11_0[0] <= ladenDt11_0[2]):
+                ladenDt11_0[0] = ladenDt11_0[0] + 0.1 * ladenDt11_0[0]
+
+        if (ladenDt11_0[1] <= ladenDt11_0[3]):
+            while (ladenDt11_0[1] <= ladenDt11_0[3]):
+                ladenDt11_0[1] = ladenDt11_0[1] + 0.1 * ladenDt11_0[1]
+
+        if (ladenDt11_3[0] <= ladenDt11_3[2]):
+            while (ladenDt11_3[0] <= ladenDt11_3[2]):
+                ladenDt11_3[0] = ladenDt11_3[0] + 0.1 * ladenDt11_3[0]
+
+        if (ladenDt11_3[1] <= ladenDt11_3[3]):
+            while (ladenDt11_3[1] <= ladenDt11_3[3]):
+                ladenDt11_3[1] = ladenDt11_3[1] + 0.1 * ladenDt11_3[1]
+
+        if (ladenDt11_5[0] <= ladenDt11_5[2]):
+            while (ladenDt11_5[0] <= ladenDt11_5[2]):
+                ladenDt11_5[0] = ladenDt11_5[0] + 0.1 * ladenDt11_5[0]
+
+        if (ladenDt11_5[1] <= ladenDt11_5[3]):
+            while (ladenDt11_5[1] <= ladenDt11_5[3]):
+                ladenDt11_5[1] = ladenDt11_5[1] + 0.1 * ladenDt11_5[1]
+
+        if (ladenDt11_8[0] <= ladenDt11_8[2]):
+            while (ladenDt11_8[0] <= ladenDt11_8[2]):
+                ladenDt11_8[0] = ladenDt11_8[0] + 0.1 * ladenDt11_8[0]
+
+        if (ladenDt11_8[1] <= ladenDt11_8[3]):
+            while (ladenDt11_8[1] <= ladenDt11_8[3]):
+                ladenDt11_8[1] = ladenDt11_8[1] + 0.1 * ladenDt11_8[1]
+
+        if (ladenDt12_0[0] <= ladenDt12_0[2]):
+            while (ladenDt12_0[0] <= ladenDt12_0[2]):
+                ladenDt12_0[0] = ladenDt12_0[0] + 0.1 * ladenDt12_0[0]
+
+        if (ladenDt12_0[1] <= ladenDt12_0[3]):
+            while (ladenDt12_0[1] <= ladenDt12_0[3]):
+                ladenDt12_0[1] = ladenDt12_0[1] + 0.1 * ladenDt12_0[1]
+
+        if (ladenDt12_3[0] <= ladenDt12_3[2]):
+            while (ladenDt12_3[0] <= ladenDt12_3[2]):
+                ladenDt12_3[0] = ladenDt12_3[0] + 0.1 * ladenDt12_3[0]
+
+        if (ladenDt12_3[1] <= ladenDt12_3[3]):
+            while (ladenDt12_3[1] <= ladenDt12_3[3]):
+                ladenDt12_3[1] = ladenDt12_3[1] + 0.1 * ladenDt12_3[1]
+
+        if (ladenDt12_5[0] <= ladenDt12_5[2]):
+            while (ladenDt12_5[0] <= ladenDt12_5[2]):
+                ladenDt12_5[0] = ladenDt12_5[0] + 0.1 * ladenDt12_5[0]
+
+        if (ladenDt12_5[1] <= ladenDt12_5[3]):
+            while (ladenDt12_5[1] <= ladenDt12_5[3]):
+                ladenDt12_5[1] = ladenDt12_5[1] + 0.1 * ladenDt12_5[1]
+
+        if (ladenDt12_8[0] <= ladenDt12_8[2]):
+            while (ladenDt12_8[0] <= ladenDt12_8[2]):
+                ladenDt12_8[0] = ladenDt12_8[0] + 0.1 * ladenDt12_8[0]
+
+        if (ladenDt12_8[1] <= ladenDt12_8[3]):
+            while (ladenDt12_8[1] <= ladenDt12_8[3]):
+                ladenDt12_8[1] = ladenDt12_8[1] + 0.1 * ladenDt12_8[1]
+
+        if (ladenDt13_0[0] <= ladenDt13_0[2]):
+            while (ladenDt13_0[0] <= ladenDt13_0[2]):
+                ladenDt13_0[0] = ladenDt13_0[0] + 0.1 * ladenDt13_0[0]
+
+        if (ladenDt13_0[1] <= ladenDt13_0[3]):
+            while (ladenDt13_0[1] <= ladenDt13_0[3]):
+                ladenDt13_0[1] = ladenDt13_0[1] + 0.1 * ladenDt13_0[1]
+
+        if (ladenDt13_3[0] <= ladenDt13_3[2]):
+            while (ladenDt13_3[0] <= ladenDt13_3[2]):
+                ladenDt13_3[0] = ladenDt13_3[0] + 0.1 * ladenDt13_3[0]
+
+        if (ladenDt13_3[1] <= ladenDt13_3[3]):
+            while (ladenDt13_3[1] <= ladenDt13_3[3]):
+                ladenDt13_3[1] = ladenDt13_3[1] + 0.1 * ladenDt13_3[1]
+
+        if (ladenDt13_5[0] <= ladenDt13_5[2]):
+            while (ladenDt13_5[0] <= ladenDt13_5[2]):
+                ladenDt13_5[0] = ladenDt13_5[0] + 0.1 * ladenDt13_5[0]
+
+        if (ladenDt13_5[1] <= ladenDt13_5[3]):
+            while (ladenDt13_5[1] <= ladenDt13_5[3]):
+                ladenDt13_5[1] = ladenDt13_5[1] + 0.1 * ladenDt13_5[1]
+
+        if (ladenDt13_8[0] <= ladenDt13_8[2]):
+            while (ladenDt13_8[0] <= ladenDt13_8[2]):
+                ladenDt13_8[0] = ladenDt13_8[0] + 0.1 * ladenDt13_8[0]
+
+        if (ladenDt13_8[1] <= ladenDt13_8[3]):
+            while (ladenDt13_8[1] <= ladenDt13_8[3]):
+                ladenDt13_8[1] = ladenDt13_8[1] + 0.1 * ladenDt13_8[1]
+        ##################################################END AGAINST SIDE#################################
         if (np.array(ladenDt10_0) == 0).all():
             ladenDt10_0 = np.array(ladenDt10_3) - 1 if (np.array(ladenDt10_0) != 3).all() else np.array(ladenDt10_5) - 2
         for i in range(9, 14):

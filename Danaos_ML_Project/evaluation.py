@@ -226,7 +226,7 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
                     ['FOC', 'PERC'])
                 for i in range(0, len(errorFoc)):
                     data_writer.writerow(
-                        [preds[i], foc[i], errorFoc[i]])
+                        [preds[i][0][0], foc[i], errorFoc[i][0][0]])
 
             with open('./TRAINerrorSTW' + str(len(partitionsX)) + '_' + str(subsetInd) + '.csv', mode='w') as data:
                 data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
@@ -242,7 +242,7 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
                     ['FOC', 'PERC'])
                 for i in range(0, len(errorFoc)):
                     data_writer.writerow(
-                        [preds[i], foc[i], errorFoc[i]])
+                        [preds[i][0][0], foc[i], errorFoc[i][0][0]])
 
             with open('./TESTerrorSTW' + str(len(partitionsX)) + '_' + str(subsetInd) + '.csv', mode='w') as data:
                 data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
