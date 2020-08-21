@@ -1488,7 +1488,7 @@ class TensorFlowW1(BasePartitionModeler):
                 weights = np.array(
                     np.append(weights0.reshape(-1, 1), np.asmatrix(weights0).reshape(-1, 1), axis=1).reshape(2, -1))
 
-                estimatorCl.layers[ 0 ].set_weights([ weights, np.array([0]*(numOfNeurons-1))])
+                #estimatorCl.layers[ 0 ].set_weights([ weights, np.array([0]*(numOfNeurons-1))])
                     #modelId=idx
 
                 #estimatorCl.fit(partitionsX[idx], np.array(partitionsY[idx]),epochs=100)  # validation_split=0.33
