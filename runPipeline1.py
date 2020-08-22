@@ -83,7 +83,7 @@ def main():
         subsetsB.append(targetB)
         var.append(np.var(seriesX))
 
-        if len(subsetsX)>=1:
+        if len(subsetsX)>=5:
             break
 
     rangeSubs = k
@@ -121,7 +121,7 @@ def main():
                if modeler.__class__.__name__=='TriInterpolantModeler' or modeler.__class__.__name__ == 'TensorFlow':
                  partK =[1]
                else:
-                 partK=K
+                 partK=[1]
            else:
                partK=[1]
            error = {"errors": [ ]}
@@ -304,12 +304,12 @@ def initParameters():
     startU = 30000
     endU = 31000
 
-    algs=['SR']
+    algs=['NNWCA']
     # ['SR','LR','RF','NN','NNW','TRI']
 
 
         #['SR','LR','RF','NN','NNW','TRI']
-    cls=['NNCL']
+    cls=['KM']
     #['SR','LR','RF','NN'] algs
     #['KM','DC'] clusterers / cls
 
