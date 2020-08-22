@@ -83,7 +83,7 @@ def main():
         subsetsB.append(targetB)
         var.append(np.var(seriesX))
 
-        if len(subsetsX)>=5:
+        if len(subsetsX)>=1:
             break
 
     rangeSubs = k
@@ -304,12 +304,12 @@ def initParameters():
     startU = 30000
     endU = 31000
 
-    algs=['TRI']
+    algs=['SR']
     # ['SR','LR','RF','NN','NNW','TRI']
 
 
         #['SR','LR','RF','NN','NNW','TRI']
-    cls=['KM','DC','NNCL']
+    cls=['NNCL']
     #['SR','LR','RF','NN'] algs
     #['KM','DC'] clusterers / cls
 
