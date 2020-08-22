@@ -598,7 +598,7 @@ class TensorFlowCl(DefaultPartitioner):
             print(labels)
             labels = np.argmax(estimator.predict(XSplineVector), axis=1)
         except:
-            return dataX, dataY, [1], dataX, dataY, None
+            return [dataX], [dataY], [0], dataX, dataY, None
         NNmodels = []
         scores = []
 

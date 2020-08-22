@@ -637,7 +637,10 @@ class TensorFlowCA(BasePartitionModeler):
             model = keras.models.Sequential()
 
             model.add(keras.layers.Dense(len(partition_labels), input_shape=(2,)))
-            model.add(keras.layers.Activation(custom_activation2))
+            try:
+                model.add(keras.layers.Activation(custom_activation2))
+            except:
+                x=0
             model.add(keras.layers.Dense(5, ))
             model.add(keras.layers.Dense(1, ))
 
