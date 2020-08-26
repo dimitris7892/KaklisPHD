@@ -6,7 +6,7 @@ import itertools
 import math
 import numpy as np
 import pyearth as sp
-from tensorflow.keras import *
+#from tensorflow.keras import *
 from scipy.spatial import Delaunay,ConvexHull
 import tensorflow as tf
 from tensorflow import keras
