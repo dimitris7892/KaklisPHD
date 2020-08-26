@@ -18,6 +18,7 @@ from sklearn.decomposition import PCA
 from pylab import *
 import datetime
 import  matplotlib.pyplot as plt
+from sklearn import svm
 import csv
 import tensorflow as tf
 from matplotlib import rc
@@ -176,12 +177,19 @@ def main():
     # k = n * i + 10
     data = pd.read_csv(sFile, delimiter=';')
     data = data.drop(["wind_speed", "wind_dir"], axis=1)
-    data = data.values
+    data = data[data['stw']>1].values
 
     trData = data[0:20000]
+
+    clf = svm.SVR()
+    #clf.fit(trData[:,0:7], trData[:,7])
+
     k=0
     kInit =0
     n=20000
+
+
+    x=0
     #subsets=[]
     #for i in range(1,5):
         #subsetsX.append(trData[(k+kInit):(n+k+kInit),0:7])
@@ -222,32 +230,7 @@ def main():
     for i in range(0,len(trData)):
         trData[i] = np.mean(trData[i:i+10],axis=0)
     ######end moving average
-    dataErrorFoc = pd.read_csv('C:/Users/dkaklis/Desktop/TESTerrorPercFOC3_0.csv', delimiter=',',skiprows=1)
-    dataErrorFocMA = pd.read_csv('C:/Users/dkaklis/Desktop/TESTerrorPercFOC2_0MA.csv', delimiter=',',skiprows=1)
-    dataErr = dataErrorFoc.values
-    dataErrMA = dataErrorFocMA.values
 
-    errMean =[]
-    errMeanMA = []
-    focMean = []
-    i=0
-    while i <2000:
-        errMean.append(np.mean(dataErr[i:i+20,0]))
-        errMeanMA.append(np.mean(dataErrMA[i:i + 20,0]))
-        focMean.append(np.mean(dataErrMA[i:i + 20, 1]))
-        i=i+20
-
-    errMean = np.array(errMean)
-    errMeanMA = np.array(errMeanMA)
-    focMean = np.array(focMean)
-
-    plt.plot(np.linspace(0,100,100),errMean,'-',c='green',label='FOC Predictions')
-    plt.plot(np.linspace(0,100,100), errMeanMA,'-',c='blue',label='FOC Predictions with moving avg')
-    plt.plot(np.linspace(0,100,100), focMean,'-',c='red',label='Actual FOC')
-    plt.ylabel('FOC')
-
-    plt.legend()
-    plt.show()
 
 
     X_train, X_test, y_train, y_test = train_test_split(trData[:,0:7], trData[:,7], test_size=0.2,
@@ -293,7 +276,7 @@ def main():
                elif modeler.__class__.__name__=='TriInterpolantModeler' or modeler.__class__.__name__ == 'TensorFlow':
                  partK =[1]
                else:
-                 partK=[15]
+                 partK=[4]
            else:
                partK=[1]
            error = {"errors": []}

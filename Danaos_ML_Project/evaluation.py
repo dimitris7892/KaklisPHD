@@ -252,6 +252,12 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
                     data_writer.writerow(
                         [errorStwArr[i][0], errorStwArr[i][1]])
 
+            dataErrorFoc = pd.read_csv('./TESTerrorPercFOC' + str(len(partitionsX)) + '_' + str(subsetInd) +'.csv', delimiter=',', skiprows=1)
+            percError = dataErrorFoc.values
+
+            meanPercError = np.mean(percError[:, 2])
+            meanAcc = 100 - meanPercError
+            print("Mean acc: " + str(np.round(meanAcc, 2)) + "% on test set of " + str(np.shape(unseenX)) + " observations")
         #plt.scatter(errorStwArr[:,0],errorStwArr[:,1])
         #plt.ylim(0, 2)
         #plt.title('Model loss with ' + str(1) + ' cluster(s)')
