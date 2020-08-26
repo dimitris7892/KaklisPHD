@@ -24,7 +24,7 @@ from sympy import cos, sin , tan , exp , sqrt , E
 from openpyxl import load_workbook
 import glob, os
 from pathlib import Path
-from openpyxl.styles.colors import YELLOW
+#from openpyxl.styles.colors import YELLOW
 from openpyxl.styles import Font
 from openpyxl.styles.borders import Border, Side
 import shutil

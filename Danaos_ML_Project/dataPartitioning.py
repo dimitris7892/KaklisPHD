@@ -141,6 +141,10 @@ class TensorFlowCl(DefaultPartitioner):
     def clustering(self, dataX, dataY=None, dataW=None, nClusters=None, showPlot=False, random_state=1000):
 
         models = []
+        #trnslatedDatax = np.array(
+            #np.append(dataX[:, 0].reshape(-1, 1), np.asmatrix([dataX[:, 1], dataX[:, 2], dataX[:, 3], dataX[:, 4]]).T,
+                      #axis=1))
+        #dataUpdatedX = np.append(trnslatedDatax, np.asmatrix([dataY]).T, axis=1)
         X=dataX
         Y=dataY
         # partitionsX=np.array(partitionsX[0])
@@ -163,7 +167,7 @@ class TensorFlowCl(DefaultPartitioner):
             neurons=6
             model = keras.models.Sequential()
 
-            model.add(keras.layers.Dense(20, input_shape=(7,)))
+            model.add(keras.layers.Dense(7, input_shape=(7,)))
             #model.add(keras.layers.Dense(15, ))
             #model.add(keras.layers.Dense(10, ))
             #model.add(keras.layers.Dense(5, ))
@@ -899,13 +903,13 @@ class KMeansPartitionerWS_WA(DefaultPartitioner):
         #dataUpdatedX=np.
         #dataUpdatedX = [dataX, dataY]
         try:
-            dataModel = clusteringModel.fit(np.nan_to_num(trnslatedDatax))
+            dataModel = clusteringModel.fit(np.nan_to_num(dataUpdatedX))
         except:
             print ("Error in clustering")
         self._dataModel = dataModel
         # Get the cluster labels
         #labels = dataModel.labels_
-        labels = dataModel.predict(trnslatedDatax)
+        labels = dataModel.predict(dataUpdatedX)
         #labels = dataModel.labels_
         # Extract centroid values
         centroids = self.getCentroids()

@@ -180,8 +180,14 @@ def main():
     data = data[data['stw']>1].values
 
     trData = data[0:20000]
+    HISTORY_SIZE = 10
+    #stws =[]
+    #for i in range(HISTORY_SIZE,len(trData)):
+        #MeanStwPrevSteps = np.mean(trData[ i - HISTORY_SIZE:i , 0 ])
+        #stws.append(MeanStwPrevSteps)
+    #trData = np.array(np.append(trData[HISTORY_SIZE:], np.asmatrix([stws]).T, axis=1))
 
-    clf = svm.SVR()
+    #clf = svm.SVR()
     #clf.fit(trData[:,0:7], trData[:,7])
 
     k=0
@@ -276,7 +282,7 @@ def main():
                elif modeler.__class__.__name__=='TriInterpolantModeler' or modeler.__class__.__name__ == 'TensorFlow':
                  partK =[1]
                else:
-                 partK=[4]
+                 partK=[2]
            else:
                partK=[1]
            error = {"errors": []}
@@ -479,7 +485,7 @@ def initParameters():
 
 
         #['SR','LR','RF','NN','NNW','TRI']
-    cls=['NNCL']
+    cls=['KMWSWA']
     #['SR','LR','RF','NN'] algs
     #['KM','DC'] clusterers / cls
 

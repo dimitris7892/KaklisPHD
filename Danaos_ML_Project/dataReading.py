@@ -17,7 +17,7 @@ import csv
 import locale
 #locale.setlocale(locale.LC_NUMERIC, "en_DK.UTF-8")
 import datetime
-import cx_Oracle
+#import cx_Oracle
 from dateutil.rrule import rrule, DAILY, MINUTELY
 from sympy.solvers import solve
 from sympy import Symbol
@@ -27,7 +27,7 @@ from sympy import cos, sin , tan , exp , sqrt , E
 from openpyxl import load_workbook
 import glob, os
 from pathlib import Path
-from openpyxl.styles.colors import YELLOW
+#from openpyxl.styles.colors import YELLOW
 from openpyxl.styles import Font
 from openpyxl.styles.borders import Border, Side
 import shutil
@@ -37,7 +37,7 @@ import matplotlib.pyplot as plt
 #import seaborn as sns
 from openpyxl.drawing.image import Image
 from scipy.stats import ttest_ind_from_stats
-import  generateProfile as genProf
+#import  generateProfile as genProf
 
 #DANAOS_TELEGRAMS_SQL =SELECT  TELEGRAM_DATE , TELEGRAM_TYPE,BALAST_FLAG,LATITUDE_DEGREES , LATITUDE_SECONDS ,LONGITUDE_DEGREES , LONGITUDE_SECONDS ,vessel_course,(DRAFT_AFT + DRAFT_FORE)/2 as DRAFT , ENGINE_RPM , WIND_DIRECTION , WIND_FORCE  ,AVERAGE_SPEED ,hours_slc,minutes_slc, (( NVL(ME_HSFO_CONS,0)+ NVL(ME_LSFO_CONS,0)+ NVL(ME_HSDO_CONS,0 ) + NVL(ME_LSDO_CONS,0)))   as ME_CONS_24h  FROM TELEGRAMS where vessel_code ='486' AND TELEGRAM_TYPE='D' or telegram_type='N';
 
