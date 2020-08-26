@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
 from math import sqrt
+import pandas as pd
 
 class ErrorGraphs:
 
@@ -154,3 +155,32 @@ class ErrorGraphs:
         plt.gca().add_artist(legend2)
         plt.show()
         x=0
+
+    def PlotTrueVsPredLine(self,):
+
+        dataErrorFoc = pd.read_csv('C:/Users/dkaklis/Desktop/TESTerrorPercFOC3_0.csv', delimiter=',', skiprows=1)
+        dataErrorFocMA = pd.read_csv('C:/Users/dkaklis/Desktop/TESTerrorPercFOC2_0MA.csv', delimiter=',', skiprows=1)
+        dataErr = dataErrorFoc.values
+        dataErrMA = dataErrorFocMA.values
+
+        errMean = []
+        errMeanMA = []
+        focMean = []
+        i = 0
+        while i < 2000:
+            errMean.append(np.mean(dataErr[i:i + 20, 0]))
+            errMeanMA.append(np.mean(dataErrMA[i:i + 20, 0]))
+            focMean.append(np.mean(dataErrMA[i:i + 20, 1]))
+            i = i + 20
+
+        errMean = np.array(errMean)
+        errMeanMA = np.array(errMeanMA)
+        focMean = np.array(focMean)
+
+        plt.plot(np.linspace(0, 100, 100), errMean, '-', c='green', label='FOC Predictions')
+        plt.plot(np.linspace(0, 100, 100), errMeanMA, '-', c='blue', label='FOC Predictions with moving avg')
+        plt.plot(np.linspace(0, 100, 100), focMean, '-', c='red', label='Actual FOC')
+        plt.ylabel('FOC')
+
+        plt.legend()
+        plt.show()

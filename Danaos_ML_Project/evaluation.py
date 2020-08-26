@@ -2,7 +2,7 @@ import numpy as np
 import dataModeling as dt
 import tensorflow as tf
 import sklearn.ensemble as skl
-import statsmodels.api
+#import statsmodels.api
 #from statsmodels.formula.api import ols
 import pandas as pd
 #import scikit_posthocs as sp
@@ -226,7 +226,7 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
                     ['FOC', 'PERC'])
                 for i in range(0, len(errorFoc)):
                     data_writer.writerow(
-                        [preds[i], foc[i], errorFoc[i]])
+                        [preds[i][0][0], foc[i], errorFoc[i][0][0]])
 
             with open('./TRAINerrorSTW' + str(len(partitionsX)) + '_' + str(subsetInd) + '.csv', mode='w') as data:
                 data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
@@ -242,7 +242,7 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
                     ['FOC', 'PERC'])
                 for i in range(0, len(errorFoc)):
                     data_writer.writerow(
-                        [preds[i], foc[i], errorFoc[i]])
+                        [preds[i][0][0], foc[i], errorFoc[i][0][0]])
 
             with open('./TESTerrorSTW' + str(len(partitionsX)) + '_' + str(subsetInd) + '.csv', mode='w') as data:
                 data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
@@ -252,6 +252,12 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
                     data_writer.writerow(
                         [errorStwArr[i][0], errorStwArr[i][1]])
 
+            dataErrorFoc = pd.read_csv('./TESTerrorPercFOC' + str(len(partitionsX)) + '_' + str(subsetInd) +'.csv', delimiter=',', skiprows=1)
+            percError = dataErrorFoc.values
+
+            meanPercError = np.mean(percError[:, 2])
+            meanAcc = 100 - meanPercError
+            print("Mean acc: " + str(np.round(meanAcc, 2)) + "% on test set of " + str(np.shape(unseenX)) + " observations")
         #plt.scatter(errorStwArr[:,0],errorStwArr[:,1])
         #plt.ylim(0, 2)
         #plt.title('Model loss with ' + str(1) + ' cluster(s)')
@@ -333,9 +339,9 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
 
     def extractFunctionsFromSplines(self,x0, x1, x2, x3, x4, x5, x6,modelId):
         piecewiseFunc = []
-        csvModels=['./model_'+str(modelId)+'_.csv']
+        csvModels=['./trainedModels/model_'+str(modelId)+'_.csv']
         for csvM in csvModels:
-            if csvM != './model_' + str(modelId) + '_.csv':
+            if csvM != './trainedModels/model_' + str(modelId) + '_.csv':
                 continue
             # id = csvM.split("_")[ 1 ]
             # piecewiseFunc = [ ]

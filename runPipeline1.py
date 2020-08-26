@@ -67,7 +67,7 @@ def main():
     data = pd.read_csv(sFile)
     meanBTr=[]
     meanVTr=[]
-    random.seed(1)
+    #random.seed(1)
     subsetsW=[]
     data = pd.read_csv(sFile)
     for k in range(0,200):
@@ -83,13 +83,14 @@ def main():
         subsetsB.append(targetB)
         var.append(np.var(seriesX))
 
-        if len(subsetsX)>=1:
+        if len(subsetsX)>=5:
             break
 
     rangeSubs = k
     stdInU = [ ]
     varTr=[]
     models=[]
+
     part=[]
     histTr=[]
     counter=0
@@ -114,13 +115,13 @@ def main():
                 partitioner.__class__.__name__ ="None"
            if partitioner.__class__.__name__=='DelaunayTriPartitioner':
 
-                 partK=np.linspace(0.4,1,20)#[0.5]
+                 partK=np.linspace(0.3,1,12)#[0.5]
 
            elif partitioner.__class__.__name__=='KMeansPartitioner':
                if modeler.__class__.__name__=='TriInterpolantModeler' or modeler.__class__.__name__ == 'TensorFlow':
                  partK =[1]
                else:
-                 partK=K
+                 partK=[1]
            else:
                partK=[1]
            error = {"errors": [ ]}
@@ -303,12 +304,12 @@ def initParameters():
     startU = 30000
     endU = 31000
 
-    algs=['NNW1']
+    algs=['NNWCA']
     # ['SR','LR','RF','NN','NNW','TRI']
 
 
         #['SR','LR','RF','NN','NNW','TRI']
-    cls=['NNCL']
+    cls=['KM']
     #['SR','LR','RF','NN'] algs
     #['KM','DC'] clusterers / cls
 

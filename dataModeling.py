@@ -637,11 +637,14 @@ class TensorFlowCA(BasePartitionModeler):
             model = keras.models.Sequential()
 
             model.add(keras.layers.Dense(len(partition_labels), input_shape=(2,)))
-            model.add(keras.layers.Activation(custom_activation2))
+            try:
+                model.add(keras.layers.Activation(custom_activation2))
+            except:
+                x=0
             model.add(keras.layers.Dense(5, ))
             model.add(keras.layers.Dense(1, ))
 
-            print(model.summary())
+            #print(model.summary())
 
             # model.add(keras.layers.Activation('linear'))  # activation=custom_activation
             # Compile model
@@ -812,7 +815,7 @@ class TensorFlowCA(BasePartitionModeler):
 
         #estimatorGen = baseline_model1()
 
-        #estimatorGen.fit(X, Y, epochs=100, validation_split=0.33, verbose=1)
+        #estimatorGen.fit(X, Y, epochs=100, validation_split=0.33, verbose=0)
 
         for idx, pCurLbl in enumerate(partition_labels):
 
@@ -856,7 +859,7 @@ class TensorFlowCA(BasePartitionModeler):
             estimatorCl.fit(np.array(partitionsX[idx]), np.array(partitionsY[idx]), epochs=100,
                             validation_split=0.33)  # validation_split=0.33
 
-            score = estimatorCl.evaluate(np.array(partitionsX[idx]), np.array(partitionsY[idx]), verbose=1)
+            score = estimatorCl.evaluate(np.array(partitionsX[idx]), np.array(partitionsY[idx]), verbose=0)
             print("%s: %.2f%%" % ("acc: ", score))
             scores.append(score)
             NNmodels.append(estimatorCl)
@@ -1432,7 +1435,7 @@ class TensorFlowW1(BasePartitionModeler):
 
         estimator.layers[0].set_weights([weights, np.array([0] * (genModelKnots-1))])
 
-        estimator.fit(X, Y, epochs=10)
+        estimator.fit(X, Y, epochs=100,verbose=0)
 
         self.flagGen = True
         from scipy.special import softmax
@@ -1488,7 +1491,7 @@ class TensorFlowW1(BasePartitionModeler):
                 weights = np.array(
                     np.append(weights0.reshape(-1, 1), np.asmatrix(weights0).reshape(-1, 1), axis=1).reshape(2, -1))
 
-                estimatorCl.layers[ 0 ].set_weights([ weights, np.array([0]*(numOfNeurons-1))])
+                #estimatorCl.layers[ 0 ].set_weights([ weights, np.array([0]*(numOfNeurons-1))])
                     #modelId=idx
 
                 #estimatorCl.fit(partitionsX[idx], np.array(partitionsY[idx]),epochs=100)  # validation_split=0.33
@@ -1891,8 +1894,7 @@ class TensorFlowW(BasePartitionModeler):
             with open('./trainedModels/model_'+str(modelCount)+'_.csv', mode='w') as data:
                 csvModels.append('./trainedModels/model_'+str(modelCount)+'_.csv')
                 data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-                data_writer.writerow(
-                ['Basis', 'Coeff'])
+                data_writer.writerow(['Basis', 'Coeff'])
                 for row in modelSummary:
                     row=np.delete(np.array(row.split(" ")), [i for i, x in enumerate(row.split(" ")) if x == ""])
                     try:
@@ -2317,8 +2319,8 @@ class TensorFlowW(BasePartitionModeler):
         XSplineVector = np.array(XSplineVector)
 
         #try:
-        estimator.fit(XSplineVector, Y, epochs=100, validation_split=0.33)
-        score = estimator.evaluate(np.array(XSplineVector),Y, verbose=1)
+        estimator.fit(XSplineVector, Y, epochs=100, validation_split=0.33,verbose=0)
+        #score = estimator.evaluate(np.array(XSplineVector),Y, verbose=0)
         #except:
 
 
@@ -2407,10 +2409,11 @@ class TensorFlowW(BasePartitionModeler):
 
                 estimatorCl.fit(np.array(XSplineClusterVector),np.array(partitionsY[idx]),epochs=100)#validation_split=0.33
 
-                Clscore = estimatorCl.evaluate(np.array(XSplineClusterVector), np.array(partitionsY[idx]), verbose=1)
+                Clscore = estimatorCl.evaluate(np.array(XSplineClusterVector), np.array(partitionsY[idx]), verbose=0)
                 scores.append(Clscore)
                 #NNmodels.append([estimatorCl,'CL'])
                 NNmodels.append(estimatorCl)
+                #estimatorCl.save('./DeployedModels/estimatorCl_'+idx+'.h5')
                 #except:
                     #scores.append(score)
                     #NNmodels.append([estimator,'GEN'])
@@ -2429,6 +2432,7 @@ class TensorFlowW(BasePartitionModeler):
 
 
         NNmodels.append(estimator)
+        #estimator.save('./DeployedModels/estimatorCl_Gen.h5')
         self._models = NNmodels
 
         # Return list of models
