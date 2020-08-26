@@ -18,6 +18,7 @@ from sklearn.decomposition import PCA
 from pylab import *
 import datetime
 import  matplotlib.pyplot as plt
+from sklearn import svm
 import csv
 import tensorflow as tf
 from matplotlib import rc
@@ -63,8 +64,8 @@ def main():
     #DANreader.readLarosDAta(datetime.datetime(2018,1,1),datetime.datetime(2019,1,1))
 
     #DANreader.GenericParserForDataExtraction('LAROS','MARMARAS','MT_DELTA_MARIA')
-    DANreader.GenericParserForDataExtraction('LEMAG', 'MILLENIA', 'METEORA',driver='ORACLE',server='10.2.5.80',sid='OR11',usr='millenia',password='millenia',
-                                             rawData=[],telegrams=True,companyTelegrams=False,pathOfRawData='C:/Users/dkaklis/Desktop/danaos')
+    #DANreader.GenericParserForDataExtraction('LEMAG', 'MILLENIA', 'MAGNIFICA',driver='ORACLE',server='10.2.5.80',sid='OR11',usr='millenia',password='millenia',
+                                            # rawData=[],telegrams=True,companyTelegrams=False,pathOfRawData='C:/Users/dkaklis/Desktop/danaos')
 
     #DANreader.GenericParserForDataExtraction('LEMAG', 'OCEAN_GOLD', 'PENELOPE',driver='ORACLE',server='10.2.5.80',sid='OR11',usr='oceangold',password='oceangold',
         #rawData=True,telegrams=True,companyTelegrams=True,seperator='\t',pathOfRawData='C:/Users/dkaklis/Desktop/danaos')
@@ -140,7 +141,6 @@ def main():
     #####################################################################################################
 
 
-    x=0
     #############################################################################################################
     #############################################################################################################
 
@@ -177,21 +177,65 @@ def main():
     # k = n * i + 10
     data = pd.read_csv(sFile, delimiter=';')
     data = data.drop(["wind_speed", "wind_dir"], axis=1)
-    data = data.values
+    data = data[data['stw']>1].values
 
-    trData = data[0:30000]
+    trData = data[0:20000]
+
+    clf = svm.SVR()
+    #clf.fit(trData[:,0:7], trData[:,7])
+
     k=0
     kInit =0
     n=20000
+
+
+    x=0
+    #subsets=[]
+    #for i in range(1,5):
+        #subsetsX.append(trData[(k+kInit):(n+k+kInit),0:7])
+        #subsetsY.append(trData[(k+kInit):(n+k+kInit), 7])
+        #k=n*i#+1000
+
+    #subsetsX.append(trData[0:20000, 0:7])
+    #subsetsY.append(trData[0:20000, 7])
+
+    #subsetsX.append(trData[20000:40000, 0:7])
+    #subsetsY.append(trData[20000:40000, 7])
+
+    #subsetsX.append(trData[50000:70000, 0:7])
+    #subsetsY.append(trData[50000:70000, 7])
+
+    #subsetsX.append(trData[70000:90000, 0:7])
+    #subsetsY.append(trData[70000:90000, 7])
+    #indSubsets = []
+    #for i in range(0,len(subsets)):
+       #X = DANreader.readStatDifferentSubsets(subsets[i],subsets,i)
+       #indSubsets.append(X)
+    #n = 1000
+    #kInit=90000
+    #k=0
+    #unseensX=[]
+    #unseensY = []
+    #for i in range(1,6):
+        #unseensX.append(data[(k+kInit):(n+k+kInit) , 0:7])
+        #unseensY.append(data[(k+kInit):(n+k+kInit), 7])
+        #k = n * i + 10
 
 
     #subsetsX.append(data[:,0:7][0:1000].astype(float))
     #subsetsY.append(data[:, 7][0:1000].astype(float))
     #unseenX = data[:, 0:7][90000:].astype(float)
     #unseenY = data[:, 7][90000:].astype(float)
+    ##MOVING ANVERAGE
+    for i in range(0,len(trData)):
+        trData[i] = np.mean(trData[i:i+10],axis=0)
+    ######end moving average
+
+
 
     X_train, X_test, y_train, y_test = train_test_split(trData[:,0:7], trData[:,7], test_size=0.2,
                                                         random_state=42)
+
 
     #dataTrain = np.array(np.append(X_train, np.asmatrix([y_train.reshape(-1)]).T, axis=1))
     #DANreader.GenericParserForDataExtraction('LEMAG', 'MILLENIA', 'METEORA',driver='ORACLE',server='10.2.5.80',sid='OR11',usr='millenia',password='millenia',
@@ -232,7 +276,7 @@ def main():
                elif modeler.__class__.__name__=='TriInterpolantModeler' or modeler.__class__.__name__ == 'TensorFlow':
                  partK =[1]
                else:
-                 partK=[7]
+                 partK=[4]
            else:
                partK=[1]
            error = {"errors": []}
@@ -295,7 +339,25 @@ def main():
 
                 print("Partitioning training set... Done.")
                 # For each partition create model
+                for i in range(0,len(partitionsX)):
+                    with open('./DeployedModels/cluster_' + str(i) + '_.csv', mode='w') as data:
+                        data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+                        for k in range(0,len(partitionsX[i])):
+
+
+                                data_writer.writerow(
+                                    [partitionsX[i][k][0], partitionsX[i][0][1],partitionsX[i][k][2],partitionsX[i][k][3],partitionsX[i][k][4],partitionsX[i][k][5],partitionsX[i][k][6]])
+
+                    with open('./DeployedModels/cluster_foc' + str(i) + '_.csv', mode='w') as data:
+                        data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+                        for z in range(0, len(partitionsY[i])):
+
+                            data_writer.writerow(
+                                [partitionsY[i][z]])
+
+
                 print("Creating models per partition...")
+
 
                 #if modeler.__class__.__name__ == 'TensorFlowWD':
                     #X = np.array(np.concatenate(partitionsX))

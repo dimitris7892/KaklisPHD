@@ -593,10 +593,12 @@ class TensorFlowCl(DefaultPartitioner):
         # model2 =keras.models.Model(inputs=estimator.input, outputs=estimator.layers[-2].output)
         # model2.compile(optimizer=keras.optimizers.Adam(), loss= keras.losses.KLD)
         # model2.fit(X,Y,epochs=10)
-        labels = np.unique(np.argmax(estimator.predict(XSplineVector), axis=1))
-        print(labels)
-        labels = np.argmax(estimator.predict(XSplineVector), axis=1)
-
+        try:
+            labels = np.unique(np.argmax(estimator.predict(XSplineVector), axis=1))
+            print(labels)
+            labels = np.argmax(estimator.predict(XSplineVector), axis=1)
+        except:
+            return [dataX], [dataY], [0], dataX, dataY, None
         NNmodels = []
         scores = []
 
