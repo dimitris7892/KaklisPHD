@@ -996,7 +996,7 @@ class TensorFlowW1(BasePartitionModeler):
         else:
             return mBest, dBestFit
 
-    def createModelsFor(self, partitionsX, partitionsY, partition_labels, tri, X, Y):
+    def createModelsFor(self, partitionsX, partitionsY, partition_labels, tri, X, Y):#,numOfLayers,numOfNeurons):
 
         models = []
         # partitionsX=np.array(partitionsX[0])

@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 from scipy.stats import ks_2samp,chisquare,chi2_contingency
 import math
-from pyproj import Proj, transform
+#from pyproj import Proj, transform
 import pyearth as sp
 import matplotlib
 from sklearn.cluster import KMeans
@@ -34,7 +34,7 @@ import shutil
 from openpyxl.styles import PatternFill
 from openpyxl.styles import Alignment
 import matplotlib.pyplot as plt
-import seaborn as sns
+#import seaborn as sns
 from openpyxl.drawing.image import Image
 from scipy.stats import ttest_ind_from_stats
 import  generateProfile as genProf

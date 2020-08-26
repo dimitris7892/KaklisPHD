@@ -163,28 +163,30 @@ class TensorFlowCl(DefaultPartitioner):
             neurons=6
             model = keras.models.Sequential()
 
-            model.add(keras.layers.Dense(7, input_shape=(7,)))
+            model.add(keras.layers.Dense(20, input_shape=(7,)))
+            #model.add(keras.layers.Dense(15, ))
+            #model.add(keras.layers.Dense(10, ))
+            #model.add(keras.layers.Dense(5, ))
+            #while neurons >=2 :
+                #model.add(keras.layers.Dense(neurons , ))
+                #neurons = neurons-1
 
-            while neurons >=2 :
-                model.add(keras.layers.Dense(neurons , ))
-                neurons = neurons-1
-
-            neurons = 3
-            while neurons <genModelKnots - 1 :
-                model.add(keras.layers.Dense(neurons , ))
-                neurons = neurons+1
-            model.add(keras.layers.Dense(genModelKnots - 1, ))
+            #neurons = 3
+            #while neurons <genModelKnots - 1 :
+                #model.add(keras.layers.Dense(neurons , ))
+                #neurons = neurons+1
+            model.add(keras.layers.Dense(genModelKnots -1 , ))
 
             # Compile model
-            model.compile(loss=custom_loss
-                          , optimizer=keras.optimizers.Adam())
+            model.compile(loss=custom_loss , optimizer=keras.optimizers.Adam())
             ###print(model.summary())
             return model
 
         def custom_loss(y_true,y_pred):
 
-            return tf.keras.losses.mean_squared_error(y_true,y_pred) + tf.keras.losses.categorical_crossentropy(y_true,y_pred) +\
-                    tf.keras.losses.kullback_leibler_divergence(y_true, y_pred)
+            #return tf.keras.losses.mean_squared_error(y_true,y_pred) + \
+                   return tf.keras.losses.mean_squared_error(y_true,y_pred) #+ tf.keras.losses.categorical_crossentropy(y_true,y_pred) +\
+                    #tf.keras.losses.kullback_leibler_divergence(y_true, y_pred)
 
 
 
