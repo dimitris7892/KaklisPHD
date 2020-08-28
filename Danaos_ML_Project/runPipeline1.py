@@ -20,6 +20,7 @@ import datetime
 import  matplotlib.pyplot as plt
 from sklearn import svm
 import csv
+import Danaos_ML_Project.plotResults as pltRes
 import tensorflow as tf
 from matplotlib import rc
 #import latex
@@ -57,6 +58,9 @@ def main():
 
     DANreader = DANdRead.BaseSeriesReader()
 
+    plRes = pltRes.ErrorGraphs()
+
+    #plRes.PlotTrueVsPredLine()
 
 
     #DANreader.GenericParserForDataExtraction('LAROS', 'MARMARAS', 'MT_DELTA_MARIA')
@@ -175,11 +179,14 @@ def main():
     #     # unseensX.append(data[(k+kInit):(n+k+kInit) , 0:7])
     #     # unseensY.append(data[(k+kInit):(n+k+kInit), 7])
     # k = n * i + 10
+    errorPerc = pd.read_csv('C:/Users/dkaklis/Desktop/TESTerrorPercFOC4_0.csv', delimiter=',')
+    #errorPerc = errorPerc.drop(["wind_speed", "wind_dir"], axis=1)
+
     data = pd.read_csv(sFile, delimiter=';')
     data = data.drop(["wind_speed", "wind_dir"], axis=1)
-    data = data[data['stw']>1].values
+    data = data[data['stw']>7].values
 
-    trData = data[0:20000]
+    trData = data[0:30000]
     HISTORY_SIZE = 10
     #stws =[]
     #for i in range(HISTORY_SIZE,len(trData)):
@@ -282,7 +289,7 @@ def main():
                elif modeler.__class__.__name__=='TriInterpolantModeler' or modeler.__class__.__name__ == 'TensorFlow':
                  partK =[1]
                else:
-                 partK=[2]
+                 partK=[4]
            else:
                partK=[1]
            error = {"errors": []}

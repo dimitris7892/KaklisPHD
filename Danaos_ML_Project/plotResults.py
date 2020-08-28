@@ -3,7 +3,8 @@ from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
 from math import sqrt
 import pandas as pd
-
+import matplotlib
+matplotlib.use('TkAgg')
 class ErrorGraphs:
 
     def ErrorGraphswithKandTrlen(self,errors,K,trSize,show,modeler):
@@ -158,29 +159,97 @@ class ErrorGraphs:
 
     def PlotTrueVsPredLine(self,):
 
-        dataErrorFoc = pd.read_csv('C:/Users/dkaklis/Desktop/TESTerrorPercFOC3_0.csv', delimiter=',', skiprows=1)
-        dataErrorFocMA = pd.read_csv('C:/Users/dkaklis/Desktop/TESTerrorPercFOC2_0MA.csv', delimiter=',', skiprows=1)
+        dataErrorFoc = pd.read_csv('C:/Users/dkaklis/Desktop/TESTerrorPercFOC7_0.csv', delimiter=',', skiprows=1)
+        #dataErrorFocMA = pd.read_csv('C:/Users/dkaklis/Desktop/TESTerrorPercFOC2_0MA.csv', delimiter=',', skiprows=1)
         dataErr = dataErrorFoc.values
-        dataErrMA = dataErrorFocMA.values
-
+        #dataErrMA = dataErrorFocMA.values
         errMean = []
         errMeanMA = []
         focMean = []
         i = 0
         while i < 2000:
             errMean.append(np.mean(dataErr[i:i + 20, 0]))
-            errMeanMA.append(np.mean(dataErrMA[i:i + 20, 0]))
-            focMean.append(np.mean(dataErrMA[i:i + 20, 1]))
+            #errMeanMA.append(np.mean(dataErrMA[i:i + 20, 0]))
+            focMean.append(np.mean(dataErr[i:i + 20, 1]))
+
+
             i = i + 20
+
+        '''errMean = []
+        errMeanMA = []
+        focMean = []
+        mae = []
+        stwMean=[]
+        draftMean=[]
+        wsMean=[]
+        #meanPercError = []
+        i = 0
+        while i < len(dataErr):
+            errMean.append(np.mean(dataErr[i:i + 20, 0]))
+            #errMeanMA.append(np.mean(dataErrMA[i:i + 20, 0]))
+            #focMean.append(np.mean(dataErr[i:i + 20, 1]))
+            meanPercError= dataErr[i, 2]
+            if meanPercError > 50:
+                stwMean.append(dataErr[i, 3])
+                draftMean.append(dataErr[i, 4])
+                wsMean.append(dataErr[i, 6])
+
+            #stwMean.append(np.mean(dataErr[i:i + 20, 3]))
+            #draftMean.append(np.mean(dataErr[i:i + 20, 4] ))
+            #wsMean.append(np.mean(dataErr[i:i + 20, 6] ))
+            mae.append(abs(np.mean(dataErr[i:i + 20, 1]) - np.mean(dataErr[i:i + 20, 0])))
+            i = i + 1
+            #i = i + 20
 
         errMean = np.array(errMean)
         errMeanMA = np.array(errMeanMA)
         focMean = np.array(focMean)
 
+        features=[]
+        values=[]
+        groups=[]
+
+        barWidth = 0.25
+        r1 = np.arange(len(stwMean))
+        r2 = [x + barWidth for x in r1]
+        r3 = [x + barWidth for x in r2]
+
+        # Make the plot
+        plt.bar(r1, stwMean, color='#7f6d5f', width=barWidth, edgecolor='white', label='stw')
+        plt.bar(r2, wsMean, color='#557f2d', width=barWidth, edgecolor='white', label='ws')
+        plt.bar(r3, draftMean, color='#2d7f5e', width=barWidth, edgecolor='white', label='draft')
+
+        # Add xticks on the middle of the group bars
+        for i in range(0,len(stwMean)):
+            groups.append( str(i))
+        plt.xlabel('group', fontweight='bold')
+        plt.xticks([r + barWidth for r in range(len(stwMean))], groups)
+
+        #for i in range(0,len(stwMean)):
+            #features.append(['stw'+str(i), 'draft'+str(i), 'ws'+str(i)])
+            #values.append([int(stwMean[i]),int(draftMean[i]),int(wsMean[i])])
+            #values = [stwMean, draftMean, wsMean]
+            #plt.bar(features, values)
+
+
+        # Create legend & Show graphic
+        plt.legend()
+        plt.figure(figsize=(3, 4))
+        plt.show()'''
+
+
+
         plt.plot(np.linspace(0, 100, 100), errMean, '-', c='green', label='FOC Predictions')
-        plt.plot(np.linspace(0, 100, 100), errMeanMA, '-', c='blue', label='FOC Predictions with moving avg')
+        #plt.scatter(np.linspace(0, 100, 100), errMean, s=stwMean,c='red', alpha=0.5)
+        #plt.scatter(np.linspace(0, 100, 100), errMean, s=draftMean, c='blue', alpha=0.5)
+
+        #plt.plot(np.linspace(0, 100, 100), errMeanMA, '-', c='blue', label='FOC Predictions with moving avg')
         plt.plot(np.linspace(0, 100, 100), focMean, '-', c='red', label='Actual FOC')
+        #plt.fill_between(np.linspace(0, 100, 100), errMean - mae, errMean + mae,color='gray', alpha=0.2)
         plt.ylabel('FOC')
 
         plt.legend()
+        plt.grid()
         plt.show()
+
+        x=0
