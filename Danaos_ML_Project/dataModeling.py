@@ -1050,11 +1050,12 @@ class TensorFlowW1(BasePartitionModeler):
             #model.add(keras.layers.Dense(20, input_shape=(7,)))
             #model.add(keras.layers.Dense(10, input_shape=(7,)))
 
-            model.add(keras.layers.Dense(genModelKnots -1,input_shape=(7+genModelKnots-1,)))
+            model.add(keras.layers.LSTM(7+genModelKnots-1,input_shape=(7+genModelKnots-1,1)))
             #model.add(keras.layers.Dense(30))
             #model.add(keras.layers.Dense(20))
             #model.add(keras.layers.Dense(genModelKnots - 3,activation='relu'))
-            model.add(keras.layers.Dense(2,))
+            model.add(keras.layers.Dense(genModelKnots -1))
+            #model.add(keras.layers.Dense(2))
 
             model.add(keras.layers.Dense(1))
 
@@ -1620,7 +1621,7 @@ class TensorFlowW1(BasePartitionModeler):
                 estimatorCl = keras.models.Sequential()
                 #estimatorCl = baseline_model()
 
-                estimatorCl.add(keras.layers.Dense(numOfNeurons - 1, input_shape=(7 + numOfNeurons - 1,)))
+                estimatorCl.add(keras.layers.LSTM(numOfNeurons - 1, input_shape=(7 + numOfNeurons - 1,1)))
                 #estimatorCl.add(keras.layers.Dense(numOfNeurons - 3, input_shape=(7 + numOfNeurons - 1,)))
                 #estimatorCl.add(keras.layers.Dropout(0.0001))
                 estimatorCl.add(keras.layers.Dense(2))
@@ -1651,6 +1652,7 @@ class TensorFlowW1(BasePartitionModeler):
                     #estimatorCl.fit(X_train,y_train, epochs=i ,verbose = 0)
                     es = EarlyStopping(monitor='val_loss', mode='min', verbose=0)
                     #val
+                    XSplineClusterVector = np.reshape(XSplineClusterVector, (XSplineClusterVector.shape[0], XSplineClusterVector.shape[1], 1))
                     history = estimatorCl.fit(XSplineClusterVector, partitionsY[idx], validation_split=0.17,epochs=i,verbose = 0,callbacks=[es])#
                     #historyTR = estimatorCl.fit(X_train, y_train, verbose=0,epochs=i)
                     #Clscore = estimatorCl.evaluate(X_test, y_test, verbose=0)
@@ -1708,6 +1710,7 @@ class TensorFlowW1(BasePartitionModeler):
         # Plot training & validation loss values
         print("GENERAL MODEL  ")
         es = EarlyStopping(monitor='val_loss', mode='min', verbose=0)
+        XSplineVectorGen = np.reshape(XSplineVectorGen, (XSplineVectorGen.shape[0], XSplineVectorGen.shape[1], 1))
         history = estimator.fit(XSplineVectorGen, Y, epochs=100, validation_split=0.33,verbose=0)
         estimator.save('./DeployedModels/estimatorCl_Gen.h5')
 

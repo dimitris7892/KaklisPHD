@@ -167,8 +167,9 @@ class TensorFlowCl(DefaultPartitioner):
             neurons=6
             model = keras.models.Sequential()
 
-            model.add(keras.layers.Dense(7, input_shape=(7,)))
-            #model.add(keras.layers.Dense(15, ))
+            model.add(keras.layers.LSTM(7 + genModelKnots - 1, input_shape=(7 + genModelKnots - 1,1)))
+            #model.add(keras.layers.LSTM(5, ))
+            #model.add(keras.layers.Dense(2, ))
             #model.add(keras.layers.Dense(10, ))
             #model.add(keras.layers.Dense(5, ))
             #while neurons >=2 :
@@ -189,8 +190,8 @@ class TensorFlowCl(DefaultPartitioner):
         def custom_loss(y_true,y_pred):
 
             #return tf.keras.losses.mean_squared_error(y_true,y_pred) + \
-                   return tf.keras.losses.mean_squared_error(y_true,y_pred) #+ tf.keras.losses.categorical_crossentropy(y_true,y_pred) +\
-                    #tf.keras.losses.kullback_leibler_divergence(y_true, y_pred)
+                   return tf.keras.losses.mean_squared_error(y_true,y_pred) + tf.keras.losses.categorical_crossentropy(y_true,y_pred) +\
+                    tf.keras.losses.kullback_leibler_divergence(y_true, y_pred)
 
 
 
@@ -661,15 +662,17 @@ class TensorFlowCl(DefaultPartitioner):
             vector = extractFunctionsFromSplines(X[i][0], X[i][1],X[i][2],X[i][3],X[i][4],X[i][5],X[i][6])
             #vector = extractFunctionsFromSplines(X[i][0], X[i][1], X[i][3])
             #XSplineVector.append(np.append(X[i], vector))
-            XSplineVector.append(vector)
+            #XSplineVector.append(vector)
+            XSplineVector.append(np.append(X[i], vector))
 
         XSplineVector = np.array(XSplineVector)
+        XSplineVector = np.reshape(XSplineVector, (XSplineVector.shape[0],  XSplineVector.shape[1],1))
 
 
         # estimator.layers[0].set_weights([weights, np.array([0] * (genModelKnots-1))])
         #dataUpdatedX = np.array(np.append(X[:, 0].reshape(-1, 1), np.asmatrix([X[:, 1],X[:, 2], X[:, 3]]).T, axis=1))
 
-        estimator.fit(X, XSplineVector, epochs=20,verbose=0)
+        estimator.fit(XSplineVector, Y, epochs=20,verbose=0)
 
         self.flagGen = True
         from scipy.special import softmax
@@ -690,9 +693,9 @@ class TensorFlowCl(DefaultPartitioner):
         # model2 =keras.models.Model(inputs=estimator.input, outputs=estimator.layers[-2].output)
         # model2.compile(optimizer=keras.optimizers.Adam(), loss= keras.losses.KLD)
         # model2.fit(X,Y,epochs=10)
-        labels = np.unique(np.argmax(estimator.predict(X), axis=1))
+        labels = np.unique(np.argmax(estimator.predict(XSplineVector), axis=1))
         print(labels)
-        labels = np.argmax(estimator.predict(X), axis=1)
+        labels = np.argmax(estimator.predict(XSplineVector), axis=1)
 
         NNmodels = []
         scores = []

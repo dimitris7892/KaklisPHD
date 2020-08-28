@@ -81,6 +81,7 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
         errorFoc=[]
         foc=[]
         preds=[]
+        candidatePoints=[]
         for iCnt in range(np.shape(unseenX)[0]):
             pPoint =unseenX[iCnt]
             pPoint= pPoint.reshape(-1,unseenX.shape[1])
@@ -165,7 +166,9 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
             #except:
                 #print("ERROR ON EVALUATION")
                 #prediction = modeler._models[len(modeler._models)-1].predict(XSplineGenVector)
+            XSplineGenVector = np.reshape(XSplineGenVector, (XSplineGenVector.shape[0], XSplineGenVector.shape[1], 1))
             Genpred = modeler._models[len(modeler._models) - 1].predict(XSplineGenVector)
+            XSplineVector = np.reshape(XSplineVector, (XSplineVector.shape[0], XSplineVector.shape[1], 1))
             CLpred = modeler._models[ind].predict(XSplineVector)
 
             '''predsCl=[]
@@ -213,6 +216,7 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
             errorStwArr.append(np.array(np.append(np.asmatrix(pPoint[0][0]).reshape(-1,1), np.asmatrix([percError[0] ]).T, axis=1)))
             errorFoc.append(percError)
             foc.append(trueVal)
+            candidatePoints.append(pPoint)
 
 
         errorStwArr = np.array(errorStwArr)
@@ -223,10 +227,10 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
             with open('./TRAINerrorPercFOC' + str(len(partitionsX)) + '_' + str(subsetInd) + '.csv', mode='w') as data:
                 data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
                 data_writer.writerow(
-                    ['FOC_pred','FOC_act' ,'PERC','CandidatePoint'])
+                    ['FOC_pred','FOC_act' ,'PERC','stw','draft','trim','sensor_wind_speed','sensor_wind_dir','comb_waves_height','comb_waves_dir'])
                 for i in range(0, len(errorFoc)):
                     data_writer.writerow(
-                        [np.round( preds[i][0][0]), np.round( foc[i]), errorFoc[i][0][0],pPoint[0][0], pPoint[0][1],pPoint[0][2],pPoint[0][3],pPoint[0][4],pPoint[0][5],pPoint[0][6]])
+                        [np.round( preds[i][0][0]), np.round( foc[i]), errorFoc[i][0][0],candidatePoints[i][0][0], candidatePoints[i][0][1],candidatePoints[i][0][2],candidatePoints[i][0][3],candidatePoints[i][0][4],candidatePoints[i][0][5],candidatePoints[i][0][6]])
 
             with open('./TRAINerrorSTW' + str(len(partitionsX)) + '_' + str(subsetInd) + '.csv', mode='w') as data:
                 data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
@@ -239,10 +243,10 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
             with open('./TESTerrorPercFOC' + str(len(partitionsX)) + '_' + str(subsetInd) + '.csv', mode='w') as data:
                 data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
                 data_writer.writerow(
-                    ['FOC_pred','FOC_act' ,'PERC','CandidatePoint'])
+                    ['FOC_pred','FOC_act' ,'PERC','stw','draft','trim','sensor_wind_speed','sensor_wind_dir','comb_waves_height','comb_waves_dir'])
                 for i in range(0, len(errorFoc)):
                     data_writer.writerow(
-                        [np.round(preds[i][0][0],2),np.round( foc[i],2), errorFoc[i][0][0],pPoint[0][0], pPoint[0][1],pPoint[0][2],pPoint[0][3],pPoint[0][4],pPoint[0][5],pPoint[0][6]])
+                        [np.round(preds[i][0][0],2),np.round(foc[i],2), errorFoc[i][0][0],candidatePoints[i][0][0], candidatePoints[i][0][1],candidatePoints[i][0][2],candidatePoints[i][0][3],candidatePoints[i][0][4],candidatePoints[i][0][5],candidatePoints[i][0][6]])
 
             with open('./TESTerrorSTW' + str(len(partitionsX)) + '_' + str(subsetInd) + '.csv', mode='w') as data:
                 data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
