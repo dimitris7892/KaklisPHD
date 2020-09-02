@@ -1055,7 +1055,7 @@ class TensorFlowW1(BasePartitionModeler):
             #model.add(keras.layers.Dense(20))
             #model.add(keras.layers.Dense(genModelKnots - 3,activation='relu'))
             model.add(keras.layers.Dense(genModelKnots -1))
-            #model.add(keras.layers.Dense(2))
+            model.add(keras.layers.Dense(2))
 
             model.add(keras.layers.Dense(1))
 
@@ -1147,7 +1147,7 @@ class TensorFlowW1(BasePartitionModeler):
 
         self.count = 0
 
-        def extractFunctionsFromSplines(x0, x1 , x2 , x3 ,x4 , x5 ,x6):
+        def extractFunctionsFromSplines(x0, x1 , x2 , x3 ,x4=None , x5=None ,x6=None):
             piecewiseFunc = []
             self.count = self.count + 1
             for csvM in csvModels:
@@ -1562,6 +1562,7 @@ class TensorFlowW1(BasePartitionModeler):
         vectorWeights = []
 
         for i in range(0, len(X)):
+            #vector = extractFunctionsFromSplines(X[i][0], X[i][1], X[i][2], X[i][3],X[i][4])
             vector = extractFunctionsFromSplines(X[i][0], X[i][1],X[i][2],X[i][3],X[i][4],X[i][5],X[i][6])
             XSplineVector.append(np.append(X[i],vector))
 

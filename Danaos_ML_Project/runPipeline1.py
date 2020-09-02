@@ -68,8 +68,8 @@ def main():
     #DANreader.readLarosDAta(datetime.datetime(2018,1,1),datetime.datetime(2019,1,1))
 
     #DANreader.GenericParserForDataExtraction('LAROS','MARMARAS','MT_DELTA_MARIA')
-    #DANreader.GenericParserForDataExtraction('LEMAG', 'MILLENIA', 'MAGNIFICA',driver='ORACLE',server='10.2.5.80',sid='OR11',usr='millenia',password='millenia',
-                                            # rawData=[],telegrams=True,companyTelegrams=False,pathOfRawData='C:/Users/dkaklis/Desktop/danaos')
+    DANreader.GenericParserForDataExtraction('LEMAG', 'MILLENIA', 'MAGNIFICA',driver='ORACLE',server='10.2.5.80',sid='OR11',usr='millenia',password='millenia',
+                                             rawData=[],telegrams=True,companyTelegrams=False,pathOfRawData='C:/Users/dkaklis/Desktop/danaos')
 
     #DANreader.GenericParserForDataExtraction('LEMAG', 'OCEAN_GOLD', 'PENELOPE',driver='ORACLE',server='10.2.5.80',sid='OR11',usr='oceangold',password='oceangold',
         #rawData=True,telegrams=True,companyTelegrams=True,seperator='\t',pathOfRawData='C:/Users/dkaklis/Desktop/danaos')
@@ -184,9 +184,59 @@ def main():
 
     data = pd.read_csv(sFile, delimiter=';')
     data = data.drop(["wind_speed", "wind_dir"], axis=1)
-    data = data[data['stw']>7].values
+    '''data = np.append(data['stw'].values.reshape(-1,1),
+                     np.asmatrix([
+                    data['apparent_wind_speed'].values,
+                    data['apparent_wind_angle'].values,
+                    data['mid_draft'].values,
+                    data['trim'].values,
+                    data['rpm'].values]).T, axis=1)'''
 
-    trData = data[0:30000]
+    #data = pd.read_csv(sFile, delimiter=';')
+    #data = data.drop(["wind_speed", "wind_dir"], axis=1)
+    #data = data[data['stw']>7].values
+    data = np.array(data).astype(float)
+    data = data[data[:,0]>7 ]
+    #data = data[data[:, 5] > 0]
+    trData = np.array(data[0:30000])
+
+    windDirection = trData[:,4]
+    waveDirection = trData[:, 6]
+    for i in range(0,len(windDirection)):
+        if windDirection[i] > 180:
+            windDirection[i] = windDirection[i] - 180
+
+    for i in range(0, len(windDirection)):
+        if windDirection[i] >=0 and windDirection[i] <=22.5:
+                windDirection[i] = 22.5
+        if windDirection[i] >22.5 and windDirection[i] <=67.5:
+                windDirection[i] = 67.5
+        if windDirection[i] > 67.5 and windDirection[i] <=112.5:
+                windDirection[i] = 112.5
+        if windDirection[i] > 112.5 and windDirection[i] <=157.5:
+                windDirection[i] = 157.5
+        if windDirection[i] > 157.5 and windDirection[i] <=180:
+                windDirection[i] = 180
+    
+
+    for i in range(0, len(waveDirection)):
+        if waveDirection[i] > 180:
+            waveDirection[i] = waveDirection[i] - 180
+
+    for i in range(0, len(waveDirection)):
+        if waveDirection[i] >=0 and waveDirection[i] <=22.5:
+                waveDirection[i] = 22.5
+        if waveDirection[i] >22.5 and waveDirection[i] <=67.5:
+                waveDirection[i] = 67.5
+        if waveDirection[i] > 67.5 and waveDirection[i] <=112.5:
+                waveDirection[i] = 112.5
+        if waveDirection[i] > 112.5 and waveDirection[i] <=157.5:
+                waveDirection[i] = 157.5
+        if waveDirection[i] > 157.5 and waveDirection[i] <=180:
+                waveDirection[i] = 180
+
+    trData[:,4] = windDirection
+    trData[:,6] = waveDirection
     HISTORY_SIZE = 10
     #stws =[]
     #for i in range(HISTORY_SIZE,len(trData)):
@@ -246,8 +296,7 @@ def main():
 
 
 
-    X_train, X_test, y_train, y_test = train_test_split(trData[:,0:7], trData[:,7], test_size=0.2,
-                                                        random_state=42)
+    X_train, X_test, y_train, y_test = train_test_split(trData[:,0:7], trData[:,7], test_size=0.2,random_state=42)
 
 
     #dataTrain = np.array(np.append(X_train, np.asmatrix([y_train.reshape(-1)]).T, axis=1))
@@ -289,7 +338,7 @@ def main():
                elif modeler.__class__.__name__=='TriInterpolantModeler' or modeler.__class__.__name__ == 'TensorFlow':
                  partK =[1]
                else:
-                 partK=[4]
+                 partK=[1]
            else:
                partK=[1]
            error = {"errors": []}
@@ -352,7 +401,7 @@ def main():
 
                 print("Partitioning training set... Done.")
                 # For each partition create model
-                for i in range(0,len(partitionsX)):
+                ''''for i in range(0,len(partitionsX)):
                     with open('./DeployedModels/cluster_' + str(i) + '_.csv', mode='w') as data:
                         data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
                         for k in range(0,len(partitionsX[i])):
@@ -366,7 +415,7 @@ def main():
                         for z in range(0, len(partitionsY[i])):
 
                             data_writer.writerow(
-                                [partitionsY[i][z]])
+                                [partitionsY[i][z]])'''
 
 
                 print("Creating models per partition...")
@@ -480,6 +529,7 @@ def main():
 
 def initParameters():
     sFile = "./neural_data/marmaras_data.csv"
+        #"./neural_data/marmaras_data.csv"
     # Get file name
     history = 20
     future=30
@@ -492,7 +542,7 @@ def initParameters():
 
 
         #['SR','LR','RF','NN','NNW','TRI']
-    cls=['KMWSWA']
+    cls=['KM']
     #['SR','LR','RF','NN'] algs
     #['KM','DC'] clusterers / cls
 
