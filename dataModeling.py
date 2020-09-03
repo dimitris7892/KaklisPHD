@@ -765,7 +765,7 @@ class TensorFlowCA(BasePartitionModeler):
 
         estimator = baseline_model()
 
-        estimator.fit(X, Y, epochs=100, validation_split=0.33)
+        estimator.fit(X, Y, epochs=100, validation_split=0.33,verbose=0)
         self.flagGen = True
 
         # validation_data=(X_test,y_test)
@@ -870,9 +870,9 @@ class TensorFlowCA(BasePartitionModeler):
                     # estimator.layers[3] = custom_activation2 if idx ==3 else estimator.layers[3]
 
                 estimatorCl.fit(np.array(partitionsX[idx]), np.array(partitionsY[idx]), epochs=100,
-                                validation_split=0.33)  # validation_split=0.33
+                                validation_split=0.33,verbose=0)  # validation_split=0.33
 
-                score = estimatorCl.evaluate(np.array(partitionsX[idx]), np.array(partitionsY[idx]), verbose=0)
+                #score = estimatorCl.evaluate(np.array(partitionsX[idx]), np.array(partitionsY[idx]), verbose=0)
                 #print("%s: %.2f%%" % ("acc: ", score))
                 #scores.append(score)
                 NNmodels.append(estimatorCl)
@@ -942,10 +942,10 @@ class TensorFlowW1(BasePartitionModeler):
             model = keras.models.Sequential()
 
 
-            model.add(keras.layers.Dense(2 + genModelKnots-1, input_shape=(2,)))
+            #model.add(keras.layers.Dense(2 + genModelKnots-1, input_shape=(2,)))
             model.add(keras.layers.Dense(genModelKnots - 1, input_shape=(2,)))
 
-            #model.add(keras.layers.Dense(2))
+            model.add(keras.layers.Dense(2))
 
             model.add(keras.layers.Dense(1))
 
@@ -1438,8 +1438,8 @@ class TensorFlowW1(BasePartitionModeler):
 
         for i in range(0,len(X)):
             vector = extractFunctionsFromSplines(X[i][0],X[i][1])
-            XSplineVector.append(np.append(X[i], vector))
-            #XSplineVector.append(vector)
+            #XSplineVector.append(np.append(X[i], vector))
+            XSplineVector.append(vector)
 
 
         XSplineVector = np.array(XSplineVector)
@@ -1448,9 +1448,9 @@ class TensorFlowW1(BasePartitionModeler):
         #weights1 = estimator.layers[0].get_weights()[0][1]
         weights = np.array(np.append(weights0.reshape(-1,1),np.asmatrix(weights0).reshape(-1,1),axis=1).reshape(2,-1))
 
-        estimator.layers[0].set_weights([weights, np.array([0] * (2 +genModelKnots-1))])
+        estimator.layers[0].set_weights([weights, np.array([0] * (genModelKnots-1))])
 
-        estimator.fit(X, Y, epochs=100,verbose=0,validation_split=0.33)
+        estimator.fit(X, Y, epochs=100,verbose=0,validation_split=0.33,)
 
         self.flagGen = True
         from scipy.special import softmax
@@ -1475,56 +1475,56 @@ class TensorFlowW1(BasePartitionModeler):
         #print(labels)
         NNmodels=[]
         scores=[]
+        if len(partition_labels)>1:
+            for idx, pCurLbl in enumerate(partition_labels):
 
-        for idx, pCurLbl in enumerate(partition_labels):
+                    self.modelId = idx
+                    self.countTimes += 1
 
-                self.modelId = idx
-                self.countTimes += 1
+                    XSplineClusterVector=[]
+                    for i in range(0, len(partitionsX[idx])):
+                        vector = extractFunctionsFromSplines(partitionsX[idx][ i ][ 0 ], partitionsX[idx][ i ][ 1 ])
+                        XSplineClusterVector.append(vector)
 
-                XSplineClusterVector=[]
-                for i in range(0, len(partitionsX[idx])):
-                    vector = extractFunctionsFromSplines(partitionsX[idx][ i ][ 0 ], partitionsX[idx][ i ][ 1 ])
-                    XSplineClusterVector.append(vector)
+                    # X =  np.append(X, np.asmatrix([dataY]).T, axis=1)
+                    XSplineClusterVector = np.array(XSplineClusterVector)
 
-                # X =  np.append(X, np.asmatrix([dataY]).T, axis=1)
-                XSplineClusterVector = np.array(XSplineClusterVector)
+                    #estimator = baseline_model()
+                    numOfNeurons = [ x for x in ClModels[ 'data' ] if x[ 'id' ] == idx ][ 0 ][ 'funcs' ]
 
-                #estimator = baseline_model()
-                numOfNeurons = [ x for x in ClModels[ 'data' ] if x[ 'id' ] == idx ][ 0 ][ 'funcs' ]
+                    estimatorCl = keras.models.Sequential()
 
-                estimatorCl = keras.models.Sequential()
+                    #estimatorCl.add(keras.layers.Dense(numOfNeurons -1 ,input_shape=(2+numOfNeurons-1,)))
+                    estimatorCl.add(keras.layers.Dense( numOfNeurons - 1, input_shape=(2 ,)))
+                    estimatorCl.add(keras.layers.Dense( numOfNeurons - 1, input_shape=(2,)))
+                    #estimatorCl.add(keras.layers.Dense(2))
+                    estimatorCl.add(keras.layers.Dense(1, ))
+                    estimatorCl.compile(loss=keras.losses.mean_squared_error, optimizer=keras.optimizers.Adam(), )                #try:
 
-                #estimatorCl.add(keras.layers.Dense(numOfNeurons -1 ,input_shape=(2+numOfNeurons-1,)))
-                estimatorCl.add(keras.layers.Dense(2 + numOfNeurons - 1, input_shape=(2 ,)))
-                estimatorCl.add(keras.layers.Dense( numOfNeurons - 1, input_shape=(2,)))
-                #estimatorCl.add(keras.layers.Dense(2))
-                estimatorCl.add(keras.layers.Dense(1, ))
-                estimatorCl.compile(loss=keras.losses.mean_squared_error, optimizer=keras.optimizers.Adam(), )                #try:
+                    weights0 = np.mean(XSplineClusterVector, axis=0)
+                    # weights1 = self.intercepts
+                    #weights1 = estimatorCl.layers[ 0 ].get_weights()[ 0 ][ 1 ]
+                    weights = np.array(
+                        np.append(weights0.reshape(-1, 1), np.asmatrix(weights0).reshape(-1, 1), axis=1).reshape(2, -1))
 
-                weights0 = np.mean(XSplineClusterVector, axis=0)
-                # weights1 = self.intercepts
-                #weights1 = estimatorCl.layers[ 0 ].get_weights()[ 0 ][ 1 ]
-                weights = np.array(
-                    np.append(weights0.reshape(-1, 1), np.asmatrix(weights0).reshape(-1, 1), axis=1).reshape(2, -1))
+                    #estimatorCl.layers[ 0 ].set_weights([ weights, np.array([0]*(numOfNeurons-1))])
+                        #modelId=idx
 
-                #estimatorCl.layers[ 0 ].set_weights([ weights, np.array([0]*(numOfNeurons-1))])
-                    #modelId=idx
+                    #estimatorCl.fit(partitionsX[idx], np.array(partitionsY[idx]),epochs=100)  # validation_split=0.33
+                    #input_img = keras.layers.Input(shape=(2,), name='input')
+                    #x = input_img
 
-                #estimatorCl.fit(partitionsX[idx], np.array(partitionsY[idx]),epochs=100)  # validation_split=0.33
-                #input_img = keras.layers.Input(shape=(2,), name='input')
-                #x = input_img
+                    #x = estimatorCl.layers[2](x)
 
-                #x = estimatorCl.layers[2](x)
+                    #modelCl = keras.models.Model(inputs=input_img, outputs=x)
+                    # model2 = keras.models.Model(inputs=estimator.layers[2].input, outputs=estimator.layers[-1].output)
 
-                #modelCl = keras.models.Model(inputs=input_img, outputs=x)
-                # model2 = keras.models.Model(inputs=estimator.layers[2].input, outputs=estimator.layers[-1].output)
+                    #estimatorCl.compile(optimizer=keras.optimizers.Adam(), loss='mse')
+                    estimatorCl.fit(partitionsX[idx], np.array(partitionsY[idx]), epochs=100)
 
-                #estimatorCl.compile(optimizer=keras.optimizers.Adam(), loss='mse')
-                estimatorCl.fit(partitionsX[idx], np.array(partitionsY[idx]), epochs=100)
-
-                Clscore = estimatorCl.evaluate(np.array(partitionsX[idx]), np.array(partitionsY[idx]), verbose=0)
-                scores.append(Clscore)
-                NNmodels.append(estimatorCl)
+                    Clscore = estimatorCl.evaluate(np.array(partitionsX[idx]), np.array(partitionsY[idx]), verbose=0)
+                    scores.append(Clscore)
+                    NNmodels.append(estimatorCl)
 
                 #self._partitionsPerModel[ estimator ] = partitionsX[idx]
         # Update private models
@@ -1574,248 +1574,6 @@ class TensorFlowW(BasePartitionModeler):
         #partition_labels = len(partitionsX)
         # Init model to partition map
         self._partitionsPerModel = {}
-        def SplinesCoef(partitionsX, partitionsY):
-
-           model= sp.Earth(use_fast=True)
-           model.fit(partitionsX,partitionsY)
-
-           return model.coef_
-
-        class ClusteringLayer(keras.layers.Layer):
-            """
-            Clustering layer converts input sample (feature) to soft label, i.e. a vector that represents the probability of the
-            sample belonging to each cluster. The probability is calculated with student's t-distribution.
-            # Example
-            ```
-                model.add(ClusteringLayer(n_clusters=10))
-            ```
-            # Arguments
-                n_clusters: number of clusters.
-                weights: list of Numpy array with shape `(n_clusters, n_features)` witch represents the initial cluster centers.
-                alpha: parameter in Student's t-distribution. Default to 1.0.
-            # Input shape
-                2D tensor with shape: `(n_samples, n_features)`.
-            # Output shape
-                2D tensor with shape: `(n_samples, n_clusters)`.
-            """
-
-            def __init__(self, n_clusters, weights=None, alpha=1.0, **kwargs):
-                if 'input_shape' not in kwargs and 'input_dim' in kwargs:
-                    kwargs[ 'input_shape' ] = (kwargs.pop('input_dim'),)
-                super(ClusteringLayer, self).__init__(**kwargs)
-                self.n_clusters = n_clusters
-                self.alpha = alpha
-                self.initial_weights = weights
-                self.input_spec = keras.layers.InputSpec(ndim=2)
-
-            def build(self, input_shape):
-                assert len(input_shape) == 2
-                input_dim = input_shape[ 1 ]
-                self.input_spec =keras.layers.InputSpec(dtype=keras.backend.floatx(), shape=(None, input_dim))
-                #self.clusters = self.add_weight(shape=(self.n_clusters, input_dim),name='clusters')
-                self.clusters = self.add_weight(shape=(self.n_clusters, 1), name='clusters')
-                if self.initial_weights is not None:
-                    self.set_weights(self.initial_weights)
-                    del self.initial_weights
-                self.built = True
-
-            def call(self, inputs, **kwargs):
-                """ student t-distribution, as same as used in t-SNE algorithm.
-                         q_ij = 1/(1+dist(x_i, u_j)^2), then normalize it.
-                Arguments:
-                    inputs: the variable containing data, shape=(n_samples, n_features)
-                Return:
-                    q: student's t-distribution, or soft labels for each sample. shape=(n_samples, n_clusters)
-                """
-                q = 1.0 / (1.0 + (keras.backend.sum(keras.backend.square(keras.backend.expand_dims(inputs, axis=1) - self.clusters), axis=2) / self.alpha))
-                q **= (self.alpha + 1.0) / 2.0
-                q = keras.backend.transpose(keras.backend.transpose(q) / keras.backend.sum(q, axis=1))
-                return q
-
-
-            def compute_output_shape(self, input_shape):
-                assert input_shape and len(input_shape) == 2
-
-                return input_shape[ 0 ], self.n_clusters
-
-
-            def get_config(self):
-                config = {'n_clusters': self.n_clusters}
-                base_config = super(ClusteringLayer, self).get_config()
-                return dict(list(base_config.items()) + list(config.items()))
-
-        class MyLayer(tf.keras.layers.Layer):
-
-
-            def __init__(self, output_dim, **kwargs):
-                self.output_dim = output_dim
-                super(MyLayer, self).__init__(**kwargs)
-
-            def build(self, input_shape):
-                # Create a trainable weight variable for this layer.
-                #self.kernel = self.add_weight(name='kernel',
-                                              #shape=(input_shape[1].value, self.output_dim),
-                                              #initializer='uniform',
-                                              #trainable=True)
-                super(MyLayer, self).build(input_shape)  # Be sure to call this at the end
-
-            def call(self, inputs,modelId={'args':self.modelId}):
-
-                x = inputs
-
-                models = {"data": [ ]}
-                intercepts = [ ]
-                for csvM in csvModels:
-                    id = csvM.split("_")[ 1 ]
-                    piecewiseFunc = [ ]
-
-                    with open(csvM) as csv_file:
-                        data = csv.reader(csv_file, delimiter=',')
-                        for row in data:
-                            # for d in row:
-                            if [ w for w in row if w == "Basis" ].__len__() > 0:
-                                continue
-                            if [ w for w in row if w == "(Intercept)" ].__len__() > 0:
-                                intercepts.append(float(row[ 1 ]))
-                                continue
-                            if row.__len__() == 0:
-                                continue
-                            d = row[ 0 ]
-                            if d.split("*").__len__() == 1:
-                                split = ""
-                                try:
-                                    split = d.split('-')[ 0 ][ 2 ]
-                                    if split != "x":
-                                        num = float(d.split('-')[ 0 ].split('h(')[ 1 ])
-                                        piecewiseFunc.append(
-                                            tf.math.multiply(tf.cast(tf.math.greater(inputs, num), tf.float32),
-                                                             float(row[ 1 ]) * (inputs - num)))
-                                        if id == modelId['args'] or id == -1:
-                                            inputs=tf.where(x >= num , float(row[ 1 ]) * (inputs - num), inputs)
-                                    else:
-                                        num = float(d.split('-')[ 1 ].split(')')[ 0 ])
-                                        piecewiseFunc.append(tf.math.multiply(tf.cast(tf.math.less(inputs, num), tf.float32),
-                                                                              float(row[ 1 ]) * (num - inputs)))
-                                        if id == modelId['args'] or id == -1:
-                                            inputs = tf.where(x >= num, float(row[ 1 ]) * (num - inputs), inputs)
-                                except:
-                                    piecewiseFunc.append(tf.math.multiply(tf.cast(x, tf.float32),
-                                                                          float(row[ 1 ]) * (inputs)))
-                                    if id == modelId['args'] or id == -1:
-                                        inputs = tf.where(x >= 0, float(row[ 1 ]) * inputs, inputs)
-                                    # continue
-
-                            else:
-                                funcs = d.split("*")
-                                nums = [ ]
-                                for r in funcs:
-                                    try:
-                                        if r.split('-')[ 0 ][ 2 ] != "x":
-                                            nums.append(float(r.split('-')[ 0 ].split('h(')[ 1 ]))
-
-                                        else:
-                                            nums.append(float(r.split('-')[ 1 ].split(')')[ 0 ]))
-                                        piecewiseFunc.append(tf.math.multiply(tf.cast(
-                                            tf.math.logical_and(tf.math.less(x, nums[ 0 ]),
-                                                                tf.math.greater(nums[ 1 ], x)), tf.float32),
-                                                                              float(row[ 1 ]) * (nums[ 0 ] - inputs) * (
-                                                                                      inputs - nums[ 1 ])))
-                                        if id==modelId['args'] or id == -1:
-                                            inputs = tf.where(x < nums[0] and x >= nums[0], float(row[ 1 ]) * (nums[ 0 ] - inputs) * (
-                                                    inputs - nums[ 1 ]), inputs)
-                                    except:
-                                        try:
-                                            if d.split('-')[ 0 ][ 2 ]=="x":
-                                                piecewiseFunc.append(tf.math.multiply(tf.cast(x, tf.float32),
-                                                                              float(row[ 1 ]) * (inputs) *(inputs - nums[0])))
-                                                if id == modelId[ 'args' ] or id == -1:
-                                                    inputs = tf.where(inputs >= nums[ 0 ] ,float(row[ 1 ]) * (inputs) * (inputs - nums[ 0 ]), x)
-
-                                            else:
-                                                piecewiseFunc.append(tf.math.multiply(tf.cast(x, tf.float32),
-                                                                                  float(row[ 1 ]) * (inputs) * (
-                                                                                          nums[ 0 ] - inputs)))
-                                                if id == modelId['args'] or id == -1:
-                                                    inputs = tf.where(x < nums[ 0 ],
-                                                                  float(row[ 1 ]) * (inputs) * ( nums[ 0 ]- inputs), inputs)
-                                        except:
-                                            piecewiseFunc.append(tf.math.multiply(tf.cast(x, tf.float32),
-                                                                                  float(row[ 1 ]) * (inputs) ))
-                                            if id == modelId['args'] or id == -1:
-                                                inputs = tf.where(x >= 0, float(row[ 1 ]) * (inputs),inputs)
-                        model = {}
-                        model[ "id" ] = id
-                        model[ "funcs" ] = piecewiseFunc
-                        models[ "data" ].append(model)
-
-                modelId = 0 if modelId['args'] == -1 else modelId['args']
-
-                # interc = tf.cast(x, tf.float32) + intercepts[self.modelId]
-                #funcs = [ x for x in models[ 'data' ] if x[ 'id' ] == str(modelId) ][ 0 ][ 'funcs' ]
-                #for f in funcs:
-                    #inputs = f
-
-                SelectedFuncs = intercepts[ modelId ] + np.sum(
-                    [ x for x in models[ 'data' ] if x[ 'id' ] == str(modelId) ][ 0 ][ 'funcs' ])
-
-                return inputs
-
-            def get_config(self):
-                config = {'sharp': float(self.sharp)}
-                base_config = super(MyLayer, self).get_config()
-                return dict(list(base_config.items()) + list(config.items()))
-
-            def compute_output_shape(self, input_shape):
-                return (input_shape[0], self.output_dim)
-
-        def getFitnessOfPoint( partitions, cluster, point):
-            return 1.0 / (1.0 + numpy.linalg.norm(np.mean(partitions[cluster]) - point))
-
-        class ClassifyLayer(tf.keras.layers.Layer):
-
-            def __init__(self, output_dim, **kwargs):
-                self.output_dim = output_dim
-                super(ClassifyLayer, self).__init__(**kwargs)
-
-            def build(self, input_shape):
-                # Create a trainable weight variable for this layer.
-                self.kernel = self.add_weight(name='kernel',
-                                              shape=(input_shape[1], self.output_dim),
-                                              initializer='uniform',
-                                              trainable=True)
-                super(ClassifyLayer, self).build(input_shape)  # Be sure to call this at the end
-
-
-
-            def call(self, inputs):
-
-                orig = inputs
-
-
-                a = tf.where(orig <= 0.0, tf.zeros_like(inputs), inputs)
-                b = tf.where(orig > 8.76,
-                                  sr.coef_[0][0] * (inputs - 8.76), inputs)
-                c = tf.where(orig < 8.76,
-                                  sr.coef_[0][1] * (8.76 - inputs), inputs)
-
-                d = tf.where(orig > 1.32,
-                                  sr.coef_[0][2] * (inputs - 1.32), inputs)
-
-                e = tf.where(tf.math.logical_and(tf.less(orig, 1.32), tf.greater(orig, 0)),
-                                  (sr.coef_[0][3] * (1.32 - inputs)), inputs)
-
-                return  keras.backend.sum(a,b,c,d,e)
-
-
-
-            def get_config(self):
-                config = {'sharp': float(self.sharp)}
-                base_config = super(MyLayer, self).get_config()
-                return dict(list(base_config.items()) + list(config.items()))
-
-            def compute_output_shape(self, input_shape):
-                return (input_shape[0], self.output_dim)
-
 
 
         def baseline_model():
@@ -1824,12 +1582,14 @@ class TensorFlowW(BasePartitionModeler):
 
 
 
-            model.add(keras.layers.Dense(2+genModelKnots-1, input_shape=(2+genModelKnots-1,)))
+            model.add(keras.layers.LSTM(2+genModelKnots-1, input_shape=(2+genModelKnots-1,1)))
 
             model.add(keras.layers.Dense(genModelKnots - 1,))
+            #model.add(keras.layers.Dense(genModelKnots - 2, ))
+            #model.add(keras.layers.Dense(genModelKnots - 3, ))
                                          #
             #model.add(keras.layers.Dense(5, ))
-            #model.add(keras.layers.Dense(2, ))
+            model.add(keras.layers.Dense(2, ))
 
             model.add(keras.layers.Dense(1,))
 
@@ -2338,6 +2098,7 @@ class TensorFlowW(BasePartitionModeler):
         XSplineVector = np.array(XSplineVector)
 
         #try:
+        XSplineVector = np.reshape(XSplineVector, (XSplineVector.shape[0], XSplineVector.shape[1], 1))
         estimator.fit(XSplineVector, Y, epochs=100, validation_split=0.33,verbose=0)
         #score = estimator.evaluate(np.array(XSplineVector),Y, verbose=0)
         #except:
@@ -2401,53 +2162,53 @@ class TensorFlowW(BasePartitionModeler):
 
         NNmodels=[]
         scores=[]
+        if len(partition_labels) > 1:
+            for idx, pCurLbl in enumerate(partition_labels):
+                    #partitionsX[ idx ]=partitionsX[idx].reshape(-1,2)
+                    self.modelId = idx
+                    self.countTimes += 1
 
-        for idx, pCurLbl in enumerate(partition_labels):
-                #partitionsX[ idx ]=partitionsX[idx].reshape(-1,2)
-                self.modelId = idx
-                self.countTimes += 1
+                    XSplineClusterVector=[]
+                    for i in range(0, len(partitionsX[idx])):
+                        vector = extractFunctionsFromSplines(partitionsX[idx][ i ][ 0 ], partitionsX[idx][ i ][ 1 ])
+                        XSplineClusterVector.append(np.append(partitionsX[idx][i], vector))
 
-                XSplineClusterVector=[]
-                for i in range(0, len(partitionsX[idx])):
-                    vector = extractFunctionsFromSplines(partitionsX[idx][ i ][ 0 ], partitionsX[idx][ i ][ 1 ])
-                    XSplineClusterVector.append(np.append(partitionsX[idx][i], vector))
+                    # X =  np.append(X, np.asmatrix([dataY]).T, axis=1)
+                    XSplineClusterVector = np.array(XSplineClusterVector)
 
-                # X =  np.append(X, np.asmatrix([dataY]).T, axis=1)
-                XSplineClusterVector = np.array(XSplineClusterVector)
+                    #estimator = baseline_model()
+                    numOfNeurons = [ x for x in ClModels[ 'data' ] if x[ 'id' ] == idx ][ 0 ][ 'funcs' ]
 
-                #estimator = baseline_model()
-                numOfNeurons = [ x for x in ClModels[ 'data' ] if x[ 'id' ] == idx ][ 0 ][ 'funcs' ]
+                    estimatorCl = keras.models.Sequential()
 
-                estimatorCl = keras.models.Sequential()
+                    estimatorCl.add(keras.layers.LSTM(2 + numOfNeurons -1 ,input_shape=(2+numOfNeurons-1,1)))
+                    estimatorCl.add(keras.layers.Dense(numOfNeurons - 1, ))
+                    #estimatorCl.add(keras.layers.Dense(2))
+                    estimatorCl.add(keras.layers.Dense(1, ))
+                    estimatorCl.compile(loss=keras.losses.mean_squared_error, optimizer=keras.optimizers.Adam(), )                #try:
+                    XSplineClusterVector = np.reshape(XSplineClusterVector, (XSplineClusterVector.shape[0], XSplineClusterVector.shape[1], 1))
+                    estimatorCl.fit(np.array(XSplineClusterVector),np.array(partitionsY[idx]),epochs=100)#validation_split=0.33
 
-                estimatorCl.add(keras.layers.Dense(2 + numOfNeurons -1 ,input_shape=(2+numOfNeurons-1,)))
-                estimatorCl.add(keras.layers.Dense(numOfNeurons - 1, ))
-                #estimatorCl.add(keras.layers.Dense(2))
-                estimatorCl.add(keras.layers.Dense(1, ))
-                estimatorCl.compile(loss=keras.losses.mean_squared_error, optimizer=keras.optimizers.Adam(), )                #try:
+                    #Clscore = estimatorCl.evaluate(np.array(XSplineClusterVector), np.array(partitionsY[idx]), verbose=0)
+                    #scores.append(Clscore)
+                    #NNmodels.append([estimatorCl,'CL'])
+                    NNmodels.append(estimatorCl)
+                    #estimatorCl.save('./DeployedModels/estimatorCl_'+idx+'.h5')
+                    #except:
+                        #scores.append(score)
+                        #NNmodels.append([estimator,'GEN'])
 
-                estimatorCl.fit(np.array(XSplineClusterVector),np.array(partitionsY[idx]),epochs=100)#validation_split=0.33
+                    #np.array(XSplineClusterVector)
 
-                Clscore = estimatorCl.evaluate(np.array(XSplineClusterVector), np.array(partitionsY[idx]), verbose=0)
-                scores.append(Clscore)
-                #NNmodels.append([estimatorCl,'CL'])
-                NNmodels.append(estimatorCl)
-                #estimatorCl.save('./DeployedModels/estimatorCl_'+idx+'.h5')
-                #except:
-                    #scores.append(score)
-                    #NNmodels.append([estimator,'GEN'])
+                    #print("%s: %.2f%%" % ("acc: ", score))
 
-                #np.array(XSplineClusterVector)
-
-                #print("%s: %.2f%%" % ("acc: ", score))
-
-                #except Exception as e:
-                    #print(str(e))
-                    #return
-                #models[pCurLbl]=estimator
-                #self._partitionsPerModel[ estimator ] = partitionsX[idx]
-        # Update private models
-        #models=[]
+                    #except Exception as e:
+                        #print(str(e))
+                        #return
+                    #models[pCurLbl]=estimator
+                    #self._partitionsPerModel[ estimator ] = partitionsX[idx]
+            # Update private models
+            #models=[]
 
 
         NNmodels.append(estimator)

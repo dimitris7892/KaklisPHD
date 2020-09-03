@@ -82,15 +82,12 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
         foc=[]
         preds=[]
         candidatePoints=[]
-<<<<<<< HEAD
+
         '''unseenDataset = np.array(np.append(unseenX,np.asmatrix([unseenY]).T,axis=1))
         np.random.shuffle(unseenDataset)
         unseenX = unseenDataset[:,0:7]
         unseenY = unseenDataset[:, 7]'''
-=======
-        #unseenDataset = np.concatenate(unseenX,unseenY)
-        #unseenX = random.shuffle(unseenX)
->>>>>>> bdf3ac40dfb296867ee131582bc57abaaaa9dcc4
+
         for iCnt in range(np.shape(unseenX)[0]):
             pPoint =unseenX[iCnt]
             pPoint= pPoint.reshape(-1,unseenX.shape[1])

@@ -863,7 +863,6 @@ class KMeansPartitioner(DefaultPartitioner):
     def getCentroids(self):
         return self._dataModel.cluster_centers_
 
-
 class KMeansPartitionerWS_WA(DefaultPartitioner):
     # Clusters data, for a given number of clusters
     def clustering(self, dataX, dataY = None, dataW=None,nClusters = None, showPlot=False, random_state=1000):
@@ -974,7 +973,6 @@ class KMeansPartitionerWS_WA(DefaultPartitioner):
 
     def getCentroids(self):
         return self._dataModel.cluster_centers_
-
 
 class KMeansPartitionerWH_WD(DefaultPartitioner):
     # Clusters data, for a given number of clusters

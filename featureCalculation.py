@@ -4,7 +4,7 @@ from sklearn.decomposition import PCA
 class BaseFeatureExtractor:
     # Get a series of tuples, where the i-th tuple contains the current sample value X_i and the average X values over the previous 30 samples before i
     def extractFeatures(self, modeler,X, Y,W,B,history):
-        HISTORY_SIZE = 35
+        HISTORY_SIZE = 10
 
         Xnew = []
         Yt=[]
@@ -15,7 +15,7 @@ class BaseFeatureExtractor:
         #(B[i-HISTORY_SIZE]-B[i])
         W=None
         for i in range(HISTORY_SIZE,len(X)):
-          if W is not None:
+          '''if W is not None:
             if W[i]>22 and W[i] < 27: ## 6 Beaufort
                 HISTORY_SIZE=history+5
             elif W[i]>28 and W[i] < 33: ## 7 Beaufort
@@ -27,7 +27,7 @@ class BaseFeatureExtractor:
             elif W[ i ] > 48 and W[ i ] < 55:  ## 10 Beaufort
                 HISTORY_SIZE =history+ 40
             elif W[ i ] > 56 and W[ i ] < 63:  ## 11 Beaufort
-                HISTORY_SIZE =history+ 50
+                HISTORY_SIZE =history+ 50'''
             #*np.mean(W[i-HISTORY_SIZE:i])
             #pcaMapping = PCA(1)
             #pcaMapping.fit(np.array(X[ i - HISTORY_SIZE:i ]).reshape(-1, X[ i - HISTORY_SIZE:i ].size))
