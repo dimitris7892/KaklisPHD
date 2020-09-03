@@ -179,7 +179,7 @@ def main():
     #     # unseensX.append(data[(k+kInit):(n+k+kInit) , 0:7])
     #     # unseensY.append(data[(k+kInit):(n+k+kInit), 7])
     # k = n * i + 10
-    errorPerc = pd.read_csv('C:/Users/dkaklis/Desktop/TESTerrorPercFOC4_0.csv', delimiter=',')
+    #errorPerc = pd.read_csv('C:/Users/dkaklis/Desktop/TESTerrorPercFOC4_0.csv', delimiter=',')
     #errorPerc = errorPerc.drop(["wind_speed", "wind_dir"], axis=1)
 
     data = pd.read_csv(sFile, delimiter=';')
@@ -240,8 +240,8 @@ def main():
     #unseenX = data[:, 0:7][90000:].astype(float)
     #unseenY = data[:, 7][90000:].astype(float)
     ##MOVING ANVERAGE
-    for i in range(0,len(trData)):
-        trData[i] = np.mean(trData[i:i+10],axis=0)
+    '''for i in range(0,len(trData)):
+        trData[i] = np.mean(trData[i:i+10],axis=0)'''
     ######end moving average
 
 
@@ -289,7 +289,7 @@ def main():
                elif modeler.__class__.__name__=='TriInterpolantModeler' or modeler.__class__.__name__ == 'TensorFlow':
                  partK =[1]
                else:
-                 partK=[4]
+                 partK=[1]
            else:
                partK=[1]
            error = {"errors": []}
@@ -318,6 +318,13 @@ def main():
                 #seriesX, targetY ,targetW= reader.readStatDifferentSubsets(data,subsetsX,subsetsY,2880)
                 if modeler.__class__.__name__ != 'TensorFlowWD':
                     seriesX, targetY, = subsetX,subsetY
+                    '''dataset = np.array(np.append(seriesX, np.asmatrix([targetY]).T, axis=1))
+
+                    for i in range(0, len(dataset)):
+                        dataset[i] = np.mean(dataset[i:i + 10], axis=0)
+
+                    seriesX = dataset[:, 0:7]
+                    targetY = dataset[:, 7]'''
                 counter=+1
 
                 print("Reading data... Done.")
@@ -399,13 +406,13 @@ def main():
                 print("Evaluating on seen data...")
                 if modeler.__class__.__name__ == 'TensorFlowW1':
                     _, meanErrorTr, sdError = eval.MeanAbsoluteErrorEvaluation.evaluateKerasNN1(
-                        eval.MeanAbsoluteErrorEvaluation(), subsetX,
-                        subsetY,
+                        eval.MeanAbsoluteErrorEvaluation(), seriesX,
+                        targetY,
                         modeler, output, None, None, partitionsX, scores,subsetInd,'train')
                 elif modeler.__class__.__name__ == 'TensorFlowW3' or modeler.__class__.__name__ == 'TensorFlowW2':
                     _, meanErrorTr, sdError = eval.MeanAbsoluteErrorEvaluation.evaluateKerasNN(
-                        eval.MeanAbsoluteErrorEvaluation(), subsetX,
-                        subsetY,
+                        eval.MeanAbsoluteErrorEvaluation(), seriesX,
+                        targetY,
                         modeler, output, None, None, partitionsX, scores,subsetInd,'train')
                 elif modeler.__class__.__name__ == 'PavlosInterpolation':
                     _, meanErrorTr, sdError = eval.MeanAbsoluteErrorEvaluation.evaluatePavlosInterpolation(
@@ -419,6 +426,7 @@ def main():
 
                 #Predict and evaluate on unseen data
                 print("Evaluating on unseen data...")
+
 
                 if modeler.__class__.__name__ == 'TensorFlowW1':
                     _, meanError, sdError = eval.MeanAbsoluteErrorEvaluation.evaluateKerasNN1(

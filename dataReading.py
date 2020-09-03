@@ -83,15 +83,16 @@ class BaseSeriesReader:
 
     def readRandomSeriesDataFromFile(self, data,k=None):
         # Load file
-        data = np.array([k for k in data.values[0:, 2:23] if k[2] > 1])
+        data = np.array([k for k in data.values[0:, 2:23] if k[2] > 6])
+
         if self.__class__.__name__ == 'UnseenSeriesReader':
-            dt = data[ 81000:81050 ]
+            dt = data[ 81000:82000 ]
             #dt = data.sample(n=2880).values[ :90000:, 3:23 ]
             #dt = data.values[ 0:, 2:23 ]
         else:
 
 
-            dt = data[k*100:(k*100 + 100)]
+            dt = data[k*10000:(k*10000 + 10000)]
 
             #[0:5000]
             #dt=np.array(random.sample(dt,20000))
@@ -130,7 +131,7 @@ class BaseSeriesReader:
             candidateSetDist = X
             for i in range(0 ,len(subsetsX)):
                 dataDist=ks_2samp(subsetsX[i],candidateSetDist)
-                if dataDist[1] > 0.05:
+                if dataDist[1] < 0.05:
                     flag = True
             if flag == False or k==0:
                 return X,Y , WS , bearing

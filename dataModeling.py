@@ -637,10 +637,10 @@ class TensorFlowCA(BasePartitionModeler):
             model = keras.models.Sequential()
 
             model.add(keras.layers.Dense(len(partition_labels), input_shape=(2,)))
-            try:
-                model.add(keras.layers.Activation(custom_activation2))
-            except:
-                x=0
+            #try:
+            model.add(keras.layers.Activation(custom_activation2))
+            #except:
+                #x=0
             model.add(keras.layers.Dense(5, ))
             model.add(keras.layers.Dense(1, ))
 
@@ -656,9 +656,10 @@ class TensorFlowCA(BasePartitionModeler):
             # create model
             model = keras.models.Sequential()
 
-            model.add(keras.layers.Dense(len(partition_labels), input_shape=(2,)))
+            model.add(keras.layers.Dense(2 + genModelKnots, input_shape=(2,)))
+            model.add(keras.layers.Dense(genModelKnots, activation=custom_activation2() ))
 
-            model.add(keras.layers.Dense(10, input_shape=(2,)))
+            #model.add(keras.layers.Dense(10, input_shape=(2,)))
 
             model.add(keras.layers.Dense(1))
 
@@ -816,60 +817,72 @@ class TensorFlowCA(BasePartitionModeler):
         #estimatorGen = baseline_model1()
 
         #estimatorGen.fit(X, Y, epochs=100, validation_split=0.33, verbose=0)
+        if len(partition_labels)>1:
+            for idx, pCurLbl in enumerate(partition_labels):
 
-        for idx, pCurLbl in enumerate(partition_labels):
+                # try:
+                self.modelId = idx
+                self.countTimes += 1
+                #estimatorCl = baseline_model()
+                # modelId=idx
 
-            # try:
-            self.modelId = idx
-            self.countTimes += 1
-            estimatorCl = baseline_model1()
-            # modelId=idx
+                # estimatorCl = baseline_moDensedel1()
+                # estimatorCl.fit(np.array(DeepCLpartitionsX[ idx ]), np.array(DeepCLpartitionsY[ idx ]), epochs=100,
+                # validation_split=0.33)  # validation_split=0.33
+                # if idx==0:
+                # estimator.add(keras.layers.Activation(custom_activation2))
+                # else:
+                numOfNeurons = [x for x in ClModels['data'] if x['id'] == idx][0]['funcs']
+                # estimatorCl=replace_intermediate_layer_in_keras(estimator, -1 ,MyLayer(5))
+                # len(DeepClpartitionLabels)+
+                # estimatorCl = insert_intermediate_layer_in_keras(estimator, 1, keras.layers.Dense(numOfNeurons))
+                # lr = 0.001 if np.std(np.array(partitionsX[idx])) < 30  else 0.2
+                estimatorCl = keras.models.Sequential()
 
-            # estimatorCl = baseline_model1()
-            # estimatorCl.fit(np.array(DeepCLpartitionsX[ idx ]), np.array(DeepCLpartitionsY[ idx ]), epochs=100,
-            # validation_split=0.33)  # validation_split=0.33
-            # if idx==0:
-            # estimator.add(keras.layers.Activation(custom_activation2))
-            # else:
-            numOfNeurons = [x for x in ClModels['data'] if x['id'] == idx][0]['funcs']
-            # estimatorCl=replace_intermediate_layer_in_keras(estimator, -1 ,MyLayer(5))
-            # len(DeepClpartitionLabels)+
-            # estimatorCl = insert_intermediate_layer_in_keras(estimator, 1, keras.layers.Dense(numOfNeurons))
-            # lr = 0.001 if np.std(np.array(partitionsX[idx])) < 30  else 0.2
-            try:
+                estimatorCl.add(keras.layers.Dense(numOfNeurons, input_shape=(2,),))
+                # try:
+                #estimatorCl.add(keras.layers.Dense(numOfNeurons,activation=custom_activation2))
+                # except:
+                # x=0
+                #estimatorCl.add(keras.layers.Dense(5, ))
+                estimatorCl.add(keras.layers.Dense(1, ))
+                estimatorCl.compile(loss=keras.losses.mean_squared_error,
+                              optimizer=keras.optimizers.Adam(), )
 
-                estimatorCl = replace_intermediate_layer_in_keras(estimatorCl, 0, -1,
-                                                                  keras.layers.Dense(numOfNeurons, input_shape=(2,)),
-                                                                  keras.layers.Activation(custom_activation2))
+                '''try:
 
-            except:
-                self.modelId = 'Gen'
-                estimatorCl = replace_intermediate_layer_in_keras(estimatorCl, 0, -1,
-                                                                  keras.layers.Dense(numOfNeurons,
-                                                                                     input_shape=(2,)),
-                                                                  keras.layers.Activation(custom_activation2))
-                # estimatorCl = insert_intermediate_layer_in_keras(estimatorGen, 1,keras.layers.Activation(custom_activation2))
-                # estimatorCl = insert_intermediate_layer_in_keras(estimator,0,keras.layers.Activation(custom_activation2))
+                    estimatorCl = replace_intermediate_layer_in_keras(estimatorCl, 0, -1,
+                                                                      keras.layers.Dense(numOfNeurons, input_shape=(2,)),
+                                                                      keras.layers.Activation(custom_activation2))
 
-                # estimatorCl.add(keras.layers.Activation(custom_activation2))
-                # estimator.compile()
-                # estimator.layers[3] = custom_activation2(inputs=estimator.layers[2].output, modelId=idx) if idx ==0 else estimator.layers[3]
-                # estimator.layers[3] = custom_activation2 if idx ==3 else estimator.layers[3]
+                except:
+                    self.modelId = 'Gen'
+                    estimatorCl = replace_intermediate_layer_in_keras(estimatorCl, 0, -1,
+                                                                      keras.layers.Dense(numOfNeurons,
+                                                                                         input_shape=(2,)),
+                                                                      keras.layers.Activation(custom_activation2))'''
+                    # estimatorCl = insert_intermediate_layer_in_keras(estimatorGen, 1,keras.layers.Activation(custom_activation2))
+                    # estimatorCl = insert_intermediate_layer_in_keras(estimator,0,keras.layers.Activation(custom_activation2))
 
-            estimatorCl.fit(np.array(partitionsX[idx]), np.array(partitionsY[idx]), epochs=100,
-                            validation_split=0.33)  # validation_split=0.33
+                    # estimatorCl.add(keras.layers.Activation(custom_activation2))
+                    # estimator.compile()
+                    # estimator.layers[3] = custom_activation2(inputs=estimator.layers[2].output, modelId=idx) if idx ==0 else estimator.layers[3]
+                    # estimator.layers[3] = custom_activation2 if idx ==3 else estimator.layers[3]
 
-            score = estimatorCl.evaluate(np.array(partitionsX[idx]), np.array(partitionsY[idx]), verbose=0)
-            print("%s: %.2f%%" % ("acc: ", score))
-            scores.append(score)
-            NNmodels.append(estimatorCl)
-            # except Exception as e:
-            # print(str(e))
-            # return
-            # models[pCurLbl]=estimator
-            # self._partitionsPerModel[ estimator ] = partitionsX[idx]
-        # Update private models
-        # models=[]
+                estimatorCl.fit(np.array(partitionsX[idx]), np.array(partitionsY[idx]), epochs=100,
+                                validation_split=0.33)  # validation_split=0.33
+
+                score = estimatorCl.evaluate(np.array(partitionsX[idx]), np.array(partitionsY[idx]), verbose=0)
+                #print("%s: %.2f%%" % ("acc: ", score))
+                #scores.append(score)
+                NNmodels.append(estimatorCl)
+                # except Exception as e:
+                # print(str(e))
+                # return
+                # models[pCurLbl]=estimator
+                # self._partitionsPerModel[ estimator ] = partitionsX[idx]
+            # Update private models
+            # models=[]
 
         NNmodels.append(estimator)
         self._models = NNmodels
@@ -929,9 +942,10 @@ class TensorFlowW1(BasePartitionModeler):
             model = keras.models.Sequential()
 
 
-            model.add(keras.layers.Dense(genModelKnots-1, input_shape=(2,)))
+            model.add(keras.layers.Dense(2 + genModelKnots-1, input_shape=(2,)))
+            model.add(keras.layers.Dense(genModelKnots - 1, input_shape=(2,)))
 
-            model.add(keras.layers.Dense(2))
+            #model.add(keras.layers.Dense(2))
 
             model.add(keras.layers.Dense(1))
 
@@ -1424,18 +1438,19 @@ class TensorFlowW1(BasePartitionModeler):
 
         for i in range(0,len(X)):
             vector = extractFunctionsFromSplines(X[i][0],X[i][1])
-            XSplineVector.append(vector)
+            XSplineVector.append(np.append(X[i], vector))
+            #XSplineVector.append(vector)
 
 
         XSplineVector = np.array(XSplineVector)
         weights0 =  np.mean(XSplineVector, axis=0)
         #weights1 = self.intercepts
-        weights1 = estimator.layers[0].get_weights()[0][1]
+        #weights1 = estimator.layers[0].get_weights()[0][1]
         weights = np.array(np.append(weights0.reshape(-1,1),np.asmatrix(weights0).reshape(-1,1),axis=1).reshape(2,-1))
 
-        estimator.layers[0].set_weights([weights, np.array([0] * (genModelKnots-1))])
+        estimator.layers[0].set_weights([weights, np.array([0] * (2 +genModelKnots-1))])
 
-        estimator.fit(X, Y, epochs=100,verbose=0)
+        estimator.fit(X, Y, epochs=100,verbose=0,validation_split=0.33)
 
         self.flagGen = True
         from scipy.special import softmax
@@ -1480,8 +1495,9 @@ class TensorFlowW1(BasePartitionModeler):
                 estimatorCl = keras.models.Sequential()
 
                 #estimatorCl.add(keras.layers.Dense(numOfNeurons -1 ,input_shape=(2+numOfNeurons-1,)))
-                estimatorCl.add(keras.layers.Dense(numOfNeurons - 1, input_shape=(2 ,)))
-                estimatorCl.add(keras.layers.Dense(2))
+                estimatorCl.add(keras.layers.Dense(2 + numOfNeurons - 1, input_shape=(2 ,)))
+                estimatorCl.add(keras.layers.Dense( numOfNeurons - 1, input_shape=(2,)))
+                #estimatorCl.add(keras.layers.Dense(2))
                 estimatorCl.add(keras.layers.Dense(1, ))
                 estimatorCl.compile(loss=keras.losses.mean_squared_error, optimizer=keras.optimizers.Adam(), )                #try:
 
@@ -1808,9 +1824,12 @@ class TensorFlowW(BasePartitionModeler):
 
 
 
-            model.add(keras.layers.Dense(genModelKnots-1, input_shape=(2+genModelKnots-1,)))
+            model.add(keras.layers.Dense(2+genModelKnots-1, input_shape=(2+genModelKnots-1,)))
+
+            model.add(keras.layers.Dense(genModelKnots - 1,))
                                          #
-            model.add(keras.layers.Dense(2, ))
+            #model.add(keras.layers.Dense(5, ))
+            #model.add(keras.layers.Dense(2, ))
 
             model.add(keras.layers.Dense(1,))
 
@@ -2401,9 +2420,9 @@ class TensorFlowW(BasePartitionModeler):
 
                 estimatorCl = keras.models.Sequential()
 
-                estimatorCl.add(keras.layers.Dense(numOfNeurons -1 ,input_shape=(2+numOfNeurons-1,)))
-                #estimatorCl.add(keras.layers.Dense(numOfNeurons - 1, input_shape=(2 ,)))
-                estimatorCl.add(keras.layers.Dense(2))
+                estimatorCl.add(keras.layers.Dense(2 + numOfNeurons -1 ,input_shape=(2+numOfNeurons-1,)))
+                estimatorCl.add(keras.layers.Dense(numOfNeurons - 1, ))
+                #estimatorCl.add(keras.layers.Dense(2))
                 estimatorCl.add(keras.layers.Dense(1, ))
                 estimatorCl.compile(loss=keras.losses.mean_squared_error, optimizer=keras.optimizers.Adam(), )                #try:
 

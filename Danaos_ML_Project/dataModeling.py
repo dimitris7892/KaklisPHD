@@ -377,7 +377,7 @@ class TensorFlowW2(BasePartitionModeler):
             # model.add(keras.layers.Dense(20, input_shape=(7,)))
             # model.add(keras.layers.Dense(10, input_shape=(7,)))
 
-            model.add(keras.layers.Dense(genModelKnots - 1, input_shape=(7 ,)))
+            model.add(keras.layers.LSTM(genModelKnots - 1, input_shape=(7 ,1)))
 
             model.add(keras.layers.Dense(2))
 
@@ -964,6 +964,7 @@ class TensorFlowW2(BasePartitionModeler):
         # models=[]
 
         # Plot training & validation loss values
+        X = np.reshape(X, (X.shape[0], X.shape[1], 1))
         history = estimator.fit(X, Y, epochs=50, validation_split=0.33,verbose=0)
         NNmodels.append(estimator)
 

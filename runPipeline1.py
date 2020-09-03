@@ -8,6 +8,7 @@ from math import sqrt
 import sys
 import pandas as pd
 import random
+from sklearn.model_selection import train_test_split
 
 def main():
     # Init parameters based on command line
@@ -69,21 +70,44 @@ def main():
     meanVTr=[]
     #random.seed(1)
     subsetsW=[]
+    unseenXDt=[]
+    unseenYDt=[]
     data = pd.read_csv(sFile)
     for k in range(0,200):
         # The row indices to skip - make sure 0 is not included to keep the header!
         skip_idx = random.sample(range(1, num_linesx), num_linesx-size)
         # Read the data
                            #skiprows=skip_idx)
-        seriesX, targetY, targetW,targetB = reader.readStatDifferentSubsets(data, subsetsX, subsetsY,k, 4000)
+        #print(str(k))
+        try:
+            seriesX, targetY, targetW,targetB = reader.readStatDifferentSubsets(data, subsetsX, subsetsY,k, 4000)
+        except:
+            c=0
         if seriesX == [ ] and targetY == [ ] : continue
-        subsetsX.append(seriesX)
-        subsetsY.append(targetY)
-        subsetsW.append(targetW)
-        subsetsB.append(targetB)
+
+        '''dataset = np.array(np.append(seriesX.reshape(-1,1), np.asmatrix([targetY]).T, axis=1))
+
+        for i in range(0, len(dataset)):
+            dataset[i] = np.mean(dataset[i:i + 10], axis=0)
+
+        seriesX = dataset[:,0:2]
+        targetY = dataset[:, 2]'''
+        X_train, X_test, y_train, y_test = train_test_split(seriesX, targetY, test_size=0.2,
+                                                            random_state=42)
+
+        subsetsX.append(X_train.astype(float))
+        subsetsY.append(y_train.astype(float))
+
+        unseenXDt.append(X_test.astype(float))
+        unseenYDt.append(y_test.astype(float))
+
+        #subsetsX.append(seriesX)
+        #subsetsY.append(targetY)
+        #subsetsW.append(targetW)
+        #subsetsB.append(targetB)
         var.append(np.var(seriesX))
 
-        if len(subsetsX)>=5:
+        if len(subsetsX)>=2:
             break
 
     rangeSubs = k
@@ -95,13 +119,16 @@ def main():
     histTr=[]
     counter=0
 
+
+
     K = range(1,21)
     print("Number of Statistically ind. subsets for training: " + str(len(subsetsX)))
     subsetsX=[subsetsX[0:5]] if len(subsetsX) > 5 else subsetsX
     subsetsY = [ subsetsY[ 0:5 ] ] if len(subsetsY) > 5 else subsetsY
     #K=[10]
-
+    subsetsCounter=0
     for subsetX, subsetY in zip(subsetsX, subsetsY):
+
       skip_idxx = random.sample(range((rangeSubs * 1000) + 10, num_lines), 12000)
         # Read the data
 
@@ -145,7 +172,7 @@ def main():
                 #################
 
                 if modeler.__class__.__name__ != 'TensorFlowWD':
-                    seriesX, targetY, targetW,targetB = subsetX,subsetY,subsetsW[0],subsetsB[0]
+                    seriesX, targetY, targetW,targetB = subsetX,subsetY,None,None
                 counter=+1
 
                 print("Reading data... Done.")
@@ -155,6 +182,14 @@ def main():
                     print("Extracting features from training set...")
                     featureExtractor = fCalc.BaseFeatureExtractor()
                     X, Y , W = featureExtractor.extractFeatures(modeler,seriesX, targetY,targetW,targetB,history)
+                    dataset = np.array(np.append(X, np.asmatrix([Y]).T, axis=1))
+
+                    for i in range(0, len(dataset)):
+                        dataset[i] = np.mean(dataset[i:i + 10], axis=0)
+
+                    X = dataset[:, 0:2]
+                    Y = dataset[:, 2]
+
                     print("Extracting features from training set... Done.")
 
                 print("Partitioning training set...")
@@ -190,16 +225,26 @@ def main():
                 print("Reading unseen data...")
                 if modeler.__class__.__name__ != 'TensorFlowWD':
 
-                    unseenX,unseenY , unseenW,unseenB = dRead.UnseenSeriesReader.readRandomSeriesDataFromFile(dRead.UnseenSeriesReader(),data1)
+                    #unseenX,unseenY , unseenW,unseenB = dRead.UnseenSeriesReader.readRandomSeriesDataFromFile(dRead.UnseenSeriesReader(),data1)
                 # and their features
                 ##
-                    unseenX=unseenX[0:2880]
-                    unseenY=unseenY[0:2880]
-                    unseenW = unseenW[ 0:2880 ]
+                    #unseenX=unseenX[0:2880]
+                    #unseenY=unseenY[0:2880]
+                    #unseenW = unseenW[ 0:2880 ]
+                    unseenX = unseenXDt[subsetsCounter]
+                    unseenY = unseenYDt[subsetsCounter]
                     stdInU.append(np.std(unseenX))
                 ##
                     featureExtractor=fCalc.UnseenFeaturesExtractor()
-                    unseenFeaturesX, unseenFeaturesY , unseenFeaturesW = featureExtractor.extractFeatures(modeler,unseenX, unseenY,unseenW,unseenB,history)
+                    unseenFeaturesX, unseenFeaturesY , unseenFeaturesW = featureExtractor.extractFeatures(modeler,unseenX, unseenY,None,None,history)
+                    '''dataset = np.array(np.append(unseenFeaturesX, np.asmatrix([unseenFeaturesY]).T, axis=1))
+
+                    for i in range(0, len(dataset)):
+                        dataset[i] = np.mean(dataset[i:i + 10], axis=0)
+
+                    unseenFeaturesX = dataset[:, 0:2]
+                    unseenFeaturesY = dataset[:, 2]'''
+
                 print("Reading unseen data... Done")
 
                 # Predict and evaluate on seen data
@@ -289,6 +334,7 @@ def main():
                     break
                 if partitioner.__class__.__name__ == 'DelaunayTriPartitioner' and numOfclusters==1:
                     break
+      subsetsCounter = subsetsCounter + 1
 
 
 
@@ -304,7 +350,7 @@ def initParameters():
     startU = 30000
     endU = 31000
 
-    algs=['NNWCA']
+    algs=['NNW','NNW1','NNWCA']
     # ['SR','LR','RF','NN','NNW','TRI']
 
 
