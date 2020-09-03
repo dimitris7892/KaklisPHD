@@ -73,7 +73,7 @@ def main():
     unseenXDt=[]
     unseenYDt=[]
     data = pd.read_csv(sFile)
-    for k in range(0,200):
+    for k in range(0,500):
         # The row indices to skip - make sure 0 is not included to keep the header!
         skip_idx = random.sample(range(1, num_linesx), num_linesx-size)
         # Read the data
@@ -88,10 +88,10 @@ def main():
         '''dataset = np.array(np.append(seriesX.reshape(-1,1), np.asmatrix([targetY]).T, axis=1))
 
         for i in range(0, len(dataset)):
-            dataset[i] = np.mean(dataset[i:i + 10], axis=0)
+            dataset[i] = np.mean(dataset[i:i + 5], axis=0)
 
-        seriesX = dataset[:,0:2]
-        targetY = dataset[:, 2]'''
+        seriesX = dataset[:,0]
+        targetY = dataset[:, 1]'''
         X_train, X_test, y_train, y_test = train_test_split(seriesX, targetY, test_size=0.2,
                                                             random_state=42)
 
@@ -107,7 +107,7 @@ def main():
         #subsetsB.append(targetB)
         var.append(np.var(seriesX))
 
-        if len(subsetsX)>=2:
+        if len(subsetsX)>=5:
             break
 
     rangeSubs = k
@@ -182,13 +182,13 @@ def main():
                     print("Extracting features from training set...")
                     featureExtractor = fCalc.BaseFeatureExtractor()
                     X, Y , W = featureExtractor.extractFeatures(modeler,seriesX, targetY,targetW,targetB,history)
-                    dataset = np.array(np.append(X, np.asmatrix([Y]).T, axis=1))
+                    '''dataset = np.array(np.append(X, np.asmatrix([Y]).T, axis=1))
 
                     for i in range(0, len(dataset)):
                         dataset[i] = np.mean(dataset[i:i + 10], axis=0)
 
                     X = dataset[:, 0:2]
-                    Y = dataset[:, 2]
+                    Y = dataset[:, 2]'''
 
                     print("Extracting features from training set... Done.")
 
@@ -350,7 +350,7 @@ def initParameters():
     startU = 30000
     endU = 31000
 
-    algs=['NNW','NNW1','NNWCA']
+    algs=['NNW']
     # ['SR','LR','RF','NN','NNW','TRI']
 
 

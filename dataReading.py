@@ -6,6 +6,8 @@ import math
 import pyearth as sp
 import matplotlib
 import random
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 #import pyodbc
 import csv
 import datetime
@@ -46,9 +48,6 @@ class BaseSeriesReader:
         for row in cursor:
             print(row)
 
-
-
-
     def readRandomSeriesDataFromFileAF(self, data):
         # Load file
         #if self.__class__.__name__ == 'UnseenSeriesReader':
@@ -83,7 +82,21 @@ class BaseSeriesReader:
 
     def readRandomSeriesDataFromFile(self, data,k=None):
         # Load file
-        data = np.array([k for k in data.values[0:, 2:23] if k[2] > 6])
+        data = np.array([k for k in data.values[0:, 2:23] if k[3] >8 and k[5]>15])
+        #stw = data[:,3]
+        #rpm = data[:,5]
+        #stwRpm = np.array(np.append(stw.reshape(-1,1),np.asmatrix([rpm]).T,axis=1)).astype(float)
+        c=0
+        while c < len(data):
+            if np.std(data[c:c+10,3]) > 1.2:
+                data = np.delete(data,np.s_[c:c+10],axis=0)
+            c=c+10
+        #stw =data[:,0]
+        #rpm = data[:,1]
+        #plt.scatter(stw,rpm)
+        #plt.show()
+        #data[:,3]=stw
+        #data[:,5]=rpm
 
         if self.__class__.__name__ == 'UnseenSeriesReader':
             dt = data[ 81000:82000 ]
@@ -92,14 +105,14 @@ class BaseSeriesReader:
         else:
 
 
-            dt = data[k*10000:(k*10000 + 10000)]
+            dt = data[k*5000:(k*5000 + 5000)]
 
             #[0:5000]
             #dt=np.array(random.sample(dt,20000))
             #dt = data.values[0:,2:23]
 
         #PW = np.asarray([ np.nan_to_num(np.float(x)) for x in dt[ :, 0 ] ])
-        X = np.asarray([ np.nan_to_num(np.float(x)) for x in dt[ :, 2 ] ])
+        X = np.asarray([ np.nan_to_num(np.float(x)) for x in dt[ :, 3 ] ])
         Y = np.asarray([ np.nan_to_num(np.float(y)) for y in dt[ :, 5 ] ])
         Lat = np.asarray([ np.nan_to_num(np.float(y)) for y in dt[ :, 19 ] ])
         Lon = np.asarray([ np.nan_to_num(np.float(y)) for y in dt[ :, 20 ] ])
