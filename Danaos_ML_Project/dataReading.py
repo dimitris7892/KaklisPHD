@@ -17,7 +17,7 @@ import csv
 import locale
 #locale.setlocale(locale.LC_NUMERIC, "en_DK.UTF-8")
 import datetime
-#import cx_Oracle
+import cx_Oracle
 from dateutil.rrule import rrule, DAILY, MINUTELY
 from sympy.solvers import solve
 from sympy import Symbol

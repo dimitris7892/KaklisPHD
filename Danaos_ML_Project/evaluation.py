@@ -21,7 +21,7 @@ import pyearth as sp
 import sklearn.svm as svr
 #import latex
 from matplotlib import rc
-
+import random
 
 
 class Evaluation:
@@ -82,10 +82,15 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
         foc=[]
         preds=[]
         candidatePoints=[]
+<<<<<<< HEAD
         '''unseenDataset = np.array(np.append(unseenX,np.asmatrix([unseenY]).T,axis=1))
         np.random.shuffle(unseenDataset)
         unseenX = unseenDataset[:,0:7]
         unseenY = unseenDataset[:, 7]'''
+=======
+        #unseenDataset = np.concatenate(unseenX,unseenY)
+        #unseenX = random.shuffle(unseenX)
+>>>>>>> bdf3ac40dfb296867ee131582bc57abaaaa9dcc4
         for iCnt in range(np.shape(unseenX)[0]):
             pPoint =unseenX[iCnt]
             pPoint= pPoint.reshape(-1,unseenX.shape[1])
@@ -155,10 +160,14 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
             #prediction = pred / len(partitionsX)
 
             vector = self.extractFunctionsFromSplines(pPoint[0][0], pPoint[0][1],pPoint[0][2],pPoint[0][3],pPoint[0][4],pPoint[0][5],pPoint[0][6], ind)
+            #vector = self.extractFunctionsFromSplines(pPoint[0][0], pPoint[0][1], pPoint[0][2], pPoint[0][3],
+                                                      #pPoint[0][4],None,None, ind)
             XSplineVector = np.append(pPoint, vector)
             XSplineVector = XSplineVector.reshape(-1, XSplineVector.shape[0])
 
             vector = self.extractFunctionsFromSplines(pPoint[0][0], pPoint[0][1],pPoint[0][2],pPoint[0][3],pPoint[0][4],pPoint[0][5],pPoint[0][6], 'Gen')
+            #vector = self.extractFunctionsFromSplines(pPoint[0][0], pPoint[0][1], pPoint[0][2], pPoint[0][3],
+                                                     # pPoint[0][4],None,None, 'Gen')
             XSplineGenVector = np.append(pPoint, vector)
             XSplineGenVector = XSplineGenVector.reshape(-1, XSplineGenVector.shape[0])
 
@@ -234,7 +243,7 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
                     ['FOC_pred','FOC_act' ,'PERC','stw','draft','trim','sensor_wind_speed','sensor_wind_dir','comb_waves_height','comb_waves_dir'])
                 for i in range(0, len(errorFoc)):
                     data_writer.writerow(
-                        [np.round( preds[i][0][0]), np.round( foc[i]), errorFoc[i][0][0],candidatePoints[i][0][0], candidatePoints[i][0][1],candidatePoints[i][0][2],candidatePoints[i][0][3],candidatePoints[i][0][4],candidatePoints[i][0][5],candidatePoints[i][0][6]])
+                        [np.round( preds[i][0][0]), np.round( foc[i]), errorFoc[i][0][0]])#,candidatePoints[i][0][0], candidatePoints[i][0][1],candidatePoints[i][0][2],candidatePoints[i][0][3],candidatePoints[i][0][4],candidatePoints[i][0][5],candidatePoints[i][0][6]])
 
             with open('./TRAINerrorSTW' + str(len(partitionsX)) + '_' + str(subsetInd) + '.csv', mode='w') as data:
                 data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
@@ -250,7 +259,7 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
                     ['FOC_pred','FOC_act' ,'PERC','stw','draft','trim','sensor_wind_speed','sensor_wind_dir','comb_waves_height','comb_waves_dir'])
                 for i in range(0, len(errorFoc)):
                     data_writer.writerow(
-                        [np.round(preds[i][0][0],2),np.round(foc[i],2), errorFoc[i][0][0],candidatePoints[i][0][0], candidatePoints[i][0][1],candidatePoints[i][0][2],candidatePoints[i][0][3],candidatePoints[i][0][4],candidatePoints[i][0][5],candidatePoints[i][0][6]])
+                        [np.round(preds[i][0][0],2),np.round(foc[i],2), errorFoc[i][0][0]])#,candidatePoints[i][0][0], candidatePoints[i][0][1],candidatePoints[i][0][2],candidatePoints[i][0][3],candidatePoints[i][0][4],candidatePoints[i][0][5],candidatePoints[i][0][6]])
 
             with open('./TESTerrorSTW' + str(len(partitionsX)) + '_' + str(subsetInd) + '.csv', mode='w') as data:
                 data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
@@ -266,6 +275,7 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
             meanPercError = np.mean(percError[:, 2])
             meanAcc = 100 - meanPercError
             print("Mean acc: " + str(np.round(meanAcc, 2)) + "% on test set of " + str(np.shape(unseenX)) + " observations")
+            ####################################################################
         #plt.scatter(errorStwArr[:,0],errorStwArr[:,1])
         #plt.ylim(0, 2)
         #plt.title('Model loss with ' + str(1) + ' cluster(s)')
@@ -346,7 +356,7 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
 
         return errors, np.mean(errors), np.std(lErrors)
 
-    def extractFunctionsFromSplines(self,x0, x1, x2, x3, x4, x5, x6,modelId):
+    def extractFunctionsFromSplines(self,x0, x1, x2, x3, x4, x5=None, x6=None,modelId=None):
         piecewiseFunc = []
         csvModels=['./trainedModels/model_'+str(modelId)+'_.csv']
         for csvM in csvModels:
