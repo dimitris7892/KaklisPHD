@@ -4,7 +4,7 @@ import numpy as np
 from math import sqrt
 import pandas as pd
 import matplotlib
-matplotlib.use('TkAgg')
+#matplotlib.use('TkAgg')
 class ErrorGraphs:
 
     def ErrorGraphswithKandTrlen(self,errors,K,trSize,show,modeler):

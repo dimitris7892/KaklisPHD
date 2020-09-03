@@ -97,9 +97,10 @@ class TensorFlowCl(DefaultPartitioner):
             model = keras.models.Sequential()
 
 
-            while neurons < genModelKnots -1:
-                model.add(keras.layers.Dense(neurons, ))
-                neurons = neurons+2
+            #while neurons < genModelKnots -1:
+                #model.add(keras.layers.Dense(neurons, ))
+                #neurons = neurons+2
+            model.add(keras.layers.LSTM(2+genModelKnots - 1,input_shape=(2+genModelKnots -1,1) ))
             model.add(keras.layers.Dense(genModelKnots -1 , ))
 
             # Compile model
@@ -571,7 +572,7 @@ class TensorFlowCl(DefaultPartitioner):
             #np.append(weights0.reshape(-1, 1), np.asmatrix(weights0).reshape(-1, 1), axis=1).reshape(2, -1))
 
         # estimator.layers[0].set_weights([weights, np.array([0] * (genModelKnots-1))])
-
+        XSplineVector = np.reshape(XSplineVector, (XSplineVector.shape[0], XSplineVector.shape[1], 1))
         estimator.fit(XSplineVector, Y, epochs=50,verbose=0)
 
         self.flagGen = True

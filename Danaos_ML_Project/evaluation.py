@@ -82,6 +82,10 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
         foc=[]
         preds=[]
         candidatePoints=[]
+        '''unseenDataset = np.array(np.append(unseenX,np.asmatrix([unseenY]).T,axis=1))
+        np.random.shuffle(unseenDataset)
+        unseenX = unseenDataset[:,0:7]
+        unseenY = unseenDataset[:, 7]'''
         for iCnt in range(np.shape(unseenX)[0]):
             pPoint =unseenX[iCnt]
             pPoint= pPoint.reshape(-1,unseenX.shape[1])
@@ -286,6 +290,7 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
                 trueVal = unseenY[iCnt]
 
                 ind, fit = modeler.getBestPartitionForPoint(pPoint, partitionsX)
+                pPoint = np.reshape(pPoint, (pPoint.shape[0], pPoint.shape[1], 1))
                 prediction = (abs(modeler._models[ind].predict(pPoint)) + modeler._models[len(modeler._models) - 1].predict(
                     pPoint)) / 2
 
