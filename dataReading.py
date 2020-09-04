@@ -105,7 +105,7 @@ class BaseSeriesReader:
         else:
 
 
-            dt = data[k*5000:(k*5000 + 5000)]
+            dt = data[k*200:(k*200 + 200)]
 
             #[0:5000]
             #dt=np.array(random.sample(dt,20000))
@@ -144,8 +144,8 @@ class BaseSeriesReader:
             candidateSetDist = X
             for i in range(0 ,len(subsetsX)):
                 dataDist=ks_2samp(subsetsX[i],candidateSetDist)
-                if dataDist[1] < 0.05:
-                    flag = True
+                if dataDist[1] > 0:
+                    flag = False
             if flag == False or k==0:
                 return X,Y , WS , bearing
             else: return [],[],[],[]
