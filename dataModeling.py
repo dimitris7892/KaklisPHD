@@ -637,10 +637,10 @@ class TensorFlowCA(BasePartitionModeler):
             model = keras.models.Sequential()
 
             model.add(keras.layers.Dense(len(partition_labels), input_shape=(2,)))
-            #try:
-            model.add(keras.layers.Activation(custom_activation2))
-            #except:
-                #x=0
+            try:
+                model.add(keras.layers.Activation(custom_activation2))
+            except:
+                x=0
             model.add(keras.layers.Dense(5, ))
             model.add(keras.layers.Dense(1, ))
 
@@ -1520,10 +1520,10 @@ class TensorFlowW1(BasePartitionModeler):
                     # model2 = keras.models.Model(inputs=estimator.layers[2].input, outputs=estimator.layers[-1].output)
 
                     #estimatorCl.compile(optimizer=keras.optimizers.Adam(), loss='mse')
-                    estimatorCl.fit(partitionsX[idx], np.array(partitionsY[idx]), epochs=100)
+                    estimatorCl.fit(partitionsX[idx], np.array(partitionsY[idx]), epochs=100,verbose=0)
 
-                    Clscore = estimatorCl.evaluate(np.array(partitionsX[idx]), np.array(partitionsY[idx]), verbose=0)
-                    scores.append(Clscore)
+                    #Clscore = estimatorCl.evaluate(np.array(partitionsX[idx]), np.array(partitionsY[idx]), verbose=0)
+                    #scores.append(Clscore)
                     NNmodels.append(estimatorCl)
 
                 #self._partitionsPerModel[ estimator ] = partitionsX[idx]
