@@ -121,7 +121,7 @@ def main():
 
 
 
-    K = range(1,15)
+    K = range(1,12)
     print("Number of Statistically ind. subsets for training: " + str(len(subsetsX)))
     subsetsX=[subsetsX[0:5]] if len(subsetsX) > 5 else subsetsX
     subsetsY = [ subsetsY[ 0:5 ] ] if len(subsetsY) > 5 else subsetsY
@@ -350,12 +350,12 @@ def initParameters():
     startU = 30000
     endU = 31000
 
-    algs= ['SR','LR','RF','NNW','NNW1','NNWCA','TRI']
+    algs= ['NNW','NNW1','NNWCA']
     # ['SR','LR','RF','NN','NNW','TRI']
 
 
         #['SR','LR','RF','NN','NNW','TRI']
-    cls=['KM','DC','NNCL']
+    cls=['DC']
     #['SR','LR','RF','NN'] algs
     #['KM','DC'] clusterers / cls
 
