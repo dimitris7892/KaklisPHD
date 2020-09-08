@@ -1070,7 +1070,10 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
                 #pred+=fits[i]*modeler._models[i].predict(pPoint)
 
             #prediction = pred / len(fits)
-            prediction = (abs(modeler._models[ind].predict(pPoint)) )#+ modeler._models[len(modeler._models) - 1].predict(pPoint) )/ 2
+            if len(modeler._models) >1:
+                prediction = (abs(modeler._models[ind].predict(pPoint))  + modeler._models[len(modeler._models) - 1].predict(pPoint) )/ 2
+            else:
+                prediction =  modeler._models[len(modeler._models) - 1].predict(pPoint)
 
             lErrors.append(abs(prediction - trueVal))
 
@@ -1176,7 +1179,10 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
 
             XSplineVector = np.reshape(XSplineVector,(XSplineVector.shape[0], XSplineVector.shape[1], 1))
             XSplineGenVector = np.reshape(XSplineGenVector, (XSplineGenVector.shape[0], XSplineGenVector.shape[1], 1))
-            prediction = (abs(modeler._models[ind].predict(XSplineVector)) + modeler._models[len(modeler._models) - 1].predict(XSplineGenVector) )/ 2
+            if len(modeler._models)>1:
+                prediction = (abs(modeler._models[ind].predict(XSplineVector)) + modeler._models[len(modeler._models) - 1].predict(XSplineGenVector) )/ 2
+            else:
+                prediction =  modeler._models[len(modeler._models) - 1].predict(XSplineGenVector)
             #try:
                 #if modeler._models[ ind ][ 1 ] == 'GEN':
             #prediction = modeler._models[ len(modeler._models) - 1 ][ 0 ].predict(XSplineGenVector)
