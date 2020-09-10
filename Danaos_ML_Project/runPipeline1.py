@@ -183,7 +183,7 @@ def main():
     #errorPerc = errorPerc.drop(["wind_speed", "wind_dir"], axis=1)
 
     data = pd.read_csv(sFile, delimiter=';')
-    data = data.drop(["wind_speed", "wind_dir"], axis=1)
+    data = data.drop(["wind_speed", "wind_dir","trim"], axis=1)
     '''data = np.append(data['stw'].values.reshape(-1,1),
                      np.asmatrix([
                     data['apparent_wind_speed'].values,
@@ -198,42 +198,64 @@ def main():
     data = np.array(data).astype(float)
     data = data[data[:,0]>7 ]
     #data = data[data[:, 5] > 0]
-    trData = np.array(data[0:30000])
+    trData = np.array(data[0:100000])
 
     windDirection = trData[:,4]
     waveDirection = trData[:, 6]
-    for i in range(0,len(windDirection)):
+    '''for i in range(0,len(windDirection)):
         if windDirection[i] > 180:
-            windDirection[i] = windDirection[i] - 180
+            windDirection[i] = windDirection[i] - 180'''
 
     for i in range(0, len(windDirection)):
         if windDirection[i] >=0 and windDirection[i] <=22.5:
-                windDirection[i] = 22.5
+                windDirection[i] = 1
         if windDirection[i] >22.5 and windDirection[i] <=67.5:
-                windDirection[i] = 67.5
+                windDirection[i] = 2
         if windDirection[i] > 67.5 and windDirection[i] <=112.5:
-                windDirection[i] = 112.5
+                windDirection[i] = 3
         if windDirection[i] > 112.5 and windDirection[i] <=157.5:
-                windDirection[i] = 157.5
+                windDirection[i] = 4
         if windDirection[i] > 157.5 and windDirection[i] <=180:
-                windDirection[i] = 180
+                windDirection[i] = 5
+
+        if windDirection[i] >= 180 and windDirection[i] <= 202.5:
+            windDirection[i] = 5
+        if windDirection[i] > 202.5 and windDirection[i] <= 247.5:
+            windDirection[i] = 4
+        if windDirection[i] > 247.5 and windDirection[i] <= 292.5:
+            windDirection[i] = 3
+        if windDirection[i] > 292.5 and windDirection[i] <= 337.5:
+            windDirection[i] = 2
+        if windDirection[i] > 337.5 and windDirection[i] <= 360:
+            windDirection[i] = 1
     
 
-    for i in range(0, len(waveDirection)):
+    '''for i in range(0, len(waveDirection)):
         if waveDirection[i] > 180:
-            waveDirection[i] = waveDirection[i] - 180
+            waveDirection[i] = waveDirection[i] - 180'''
 
     for i in range(0, len(waveDirection)):
-        if waveDirection[i] >=0 and waveDirection[i] <=22.5:
-                waveDirection[i] = 22.5
-        if waveDirection[i] >22.5 and waveDirection[i] <=67.5:
-                waveDirection[i] = 67.5
-        if waveDirection[i] > 67.5 and waveDirection[i] <=112.5:
-                waveDirection[i] = 112.5
-        if waveDirection[i] > 112.5 and waveDirection[i] <=157.5:
-                waveDirection[i] = 157.5
-        if waveDirection[i] > 157.5 and waveDirection[i] <=180:
-                waveDirection[i] = 180
+        if waveDirection[i] >= 0 and waveDirection[i] <= 22.5:
+            waveDirection[i] = 1
+        if waveDirection[i] > 22.5 and waveDirection[i] <= 67.5:
+            waveDirection[i] = 2
+        if waveDirection[i] > 67.5 and waveDirection[i] <= 112.5:
+            waveDirection[i] = 3
+        if waveDirection[i] > 112.5 and waveDirection[i] <= 157.5:
+            waveDirection[i] = 4
+        if waveDirection[i] > 157.5 and waveDirection[i] <= 180:
+            waveDirection[i] = 5
+
+        if waveDirection[i] >= 180 and waveDirection[i] <= 202.5:
+            waveDirection[i] = 5
+        if waveDirection[i] > 202.5 and waveDirection[i] <= 247.5:
+            waveDirection[i] = 4
+        if waveDirection[i] > 247.5 and waveDirection[i] <= 292.5:
+            waveDirection[i] = 3
+        if waveDirection[i] > 292.5 and waveDirection[i] <= 337.5:
+            waveDirection[i] = 2
+        if waveDirection[i] > 337.5 and waveDirection[i] <= 360:
+            waveDirection[i] = 1
 
     trData[:,4] = windDirection
     trData[:,6] = waveDirection
@@ -291,12 +313,12 @@ def main():
     #unseenY = data[:, 7][90000:].astype(float)
     ##MOVING ANVERAGE
     for i in range(0,len(trData)):
-        trData[i] = np.mean(trData[i:i+10],axis=0)
+        trData[i] = np.mean(trData[i:i+20],axis=0)
     ######end moving average
 
 
 
-    X_train, X_test, y_train, y_test = train_test_split(trData[:,0:7], trData[:,7], test_size=0.2,random_state=42)
+    X_train, X_test, y_train, y_test = train_test_split(trData[:,0:6], trData[:,6], test_size=0.2,random_state=42)
 
 
     #dataTrain = np.array(np.append(X_train, np.asmatrix([y_train.reshape(-1)]).T, axis=1))

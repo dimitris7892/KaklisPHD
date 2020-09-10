@@ -156,15 +156,15 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
                 #pred +=modeler._models[i].predict(pPoint)
             #prediction = pred / len(partitionsX)
 
-            vector = self.extractFunctionsFromSplines(pPoint[0][0], pPoint[0][1],pPoint[0][2],pPoint[0][3],pPoint[0][4],pPoint[0][5],pPoint[0][6], ind)
-            #vector = self.extractFunctionsFromSplines(pPoint[0][0], pPoint[0][1], pPoint[0][2], pPoint[0][3],
-                                                      #pPoint[0][4],None,None, ind)
+            #vector = self.extractFunctionsFromSplines(pPoint[0][0], pPoint[0][1],pPoint[0][2],pPoint[0][3],pPoint[0][4],pPoint[0][5],pPoint[0][6], ind)
+            vector = self.extractFunctionsFromSplines(pPoint[0][0], pPoint[0][1], pPoint[0][2], pPoint[0][3],
+                                                      pPoint[0][4],pPoint[0][5],None, ind)
             XSplineVector = np.append(pPoint, vector)
             XSplineVector = XSplineVector.reshape(-1, XSplineVector.shape[0])
 
-            vector = self.extractFunctionsFromSplines(pPoint[0][0], pPoint[0][1],pPoint[0][2],pPoint[0][3],pPoint[0][4],pPoint[0][5],pPoint[0][6], 'Gen')
-            #vector = self.extractFunctionsFromSplines(pPoint[0][0], pPoint[0][1], pPoint[0][2], pPoint[0][3],
-                                                     # pPoint[0][4],None,None, 'Gen')
+            #vector = self.extractFunctionsFromSplines(pPoint[0][0], pPoint[0][1],pPoint[0][2],pPoint[0][3],pPoint[0][4],pPoint[0][5],pPoint[0][6], 'Gen')
+            vector = self.extractFunctionsFromSplines(pPoint[0][0], pPoint[0][1], pPoint[0][2], pPoint[0][3],
+                                                     pPoint[0][4],pPoint[0][5],None, 'Gen')
             XSplineGenVector = np.append(pPoint, vector)
             XSplineGenVector = XSplineGenVector.reshape(-1, XSplineGenVector.shape[0])
 

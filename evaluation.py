@@ -1070,6 +1070,7 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
                 #pred+=fits[i]*modeler._models[i].predict(pPoint)
 
             #prediction = pred / len(fits)
+            #pPoint = np.reshape(pPoint, (pPoint.shape[0], pPoint.shape[1], 1))
             if len(modeler._models) >1:
                 prediction = (abs(modeler._models[ind].predict(pPoint))  + modeler._models[len(modeler._models) - 1].predict(pPoint) )/ 2
             else:

@@ -82,15 +82,15 @@ class BaseSeriesReader:
 
     def readRandomSeriesDataFromFile(self, data,k=None):
         # Load file
-        data = np.array([k for k in data.values[0:, 2:23] if k[3] >8 and k[5]>15])
+        data = np.array([k for k in data.values[0:, 2:23]  if k[3]>5 and k[5]>0])
         #stw = data[:,3]
         #rpm = data[:,5]
         #stwRpm = np.array(np.append(stw.reshape(-1,1),np.asmatrix([rpm]).T,axis=1)).astype(float)
-        c=0
+        '''c=0
         while c < len(data):
             if np.std(data[c:c+10,3]) > 1.2:
                 data = np.delete(data,np.s_[c:c+10],axis=0)
-            c=c+10
+            c=c+10'''
         #stw =data[:,0]
         #rpm = data[:,1]
         #plt.scatter(stw,rpm)
