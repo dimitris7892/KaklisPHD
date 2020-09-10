@@ -65,7 +65,7 @@ def main():
     print(modelers)
 
 
-    data = pd.read_csv(sFile)
+
     meanBTr=[]
     meanVTr=[]
     #random.seed(1)
@@ -85,21 +85,25 @@ def main():
             c=0
         if seriesX == [ ] and targetY == [ ] : continue
 
-        '''dataset = np.array(np.append(seriesX.reshape(-1,1), np.asmatrix([targetY]).T, axis=1))
+        dataset = np.array(np.append(seriesX.reshape(-1,1), np.asmatrix([targetY]).T, axis=1))
 
         for i in range(0, len(dataset)):
-            dataset[i] = np.mean(dataset[i:i + 5], axis=0)
+            dataset[i] = np.mean(dataset[i:i + 10], axis=0)
 
         seriesX = dataset[:,0]
-        targetY = dataset[:, 1]'''
-        X_train, X_test, y_train, y_test = train_test_split(seriesX, targetY, test_size=0.2,
-                                                            random_state=42)
+        targetY = dataset[:, 1]
+        X_train, X_test, y_train, y_test = train_test_split(seriesX, targetY, test_size=0.2,random_state=42)
 
         subsetsX.append(X_train.astype(float))
         subsetsY.append(y_train.astype(float))
 
-        unseenXDt.append(X_test.astype(float))
-        unseenYDt.append(y_test.astype(float))
+        #unseenXDt.append(X_test.astype(float))
+        #unseenYDt.append(y_test.astype(float))
+        #subsetsX.append(seriesX.astype(float))
+        #subsetsY.append(targetY.astype(float))
+
+        #unseenXDt.append(X_test.astype(float))
+        #unseenYDt.append(y_test.astype(float))
 
         #subsetsX.append(seriesX)
         #subsetsY.append(targetY)
@@ -121,7 +125,7 @@ def main():
 
 
 
-    K = range(1,12)
+    K = range(1,15)
     print("Number of Statistically ind. subsets for training: " + str(len(subsetsX)))
     subsetsX=[subsetsX[0:5]] if len(subsetsX) > 5 else subsetsX
     subsetsY = [ subsetsY[ 0:5 ] ] if len(subsetsY) > 5 else subsetsY
@@ -138,11 +142,12 @@ def main():
            if modeler.__class__.__name__ == 'TriInterpolantModeler' and partitioner.__class__.__name__=='DelaunayTriPartitioner':
                 break
            if modeler.__class__.__name__ == 'TriInterpolantModeler' or modeler.__class__.__name__ == 'TensorFlow':
-                partK = [1]
-                partitioner.__class__.__name__ ="None"
+                #partK = [1]
+                t=0
+                #partitioner.__class__.__name__ ="None"
            if partitioner.__class__.__name__=='DelaunayTriPartitioner':
 
-                 partK=np.linspace(0.3,1,12)#[0.5]
+                 partK=np.linspace(0.3,1,15)#[0.5]
 
            elif partitioner.__class__.__name__=='KMeansPartitioner':
                if modeler.__class__.__name__=='TriInterpolantModeler' or modeler.__class__.__name__ == 'TensorFlow':
@@ -225,21 +230,21 @@ def main():
                 print("Reading unseen data...")
                 if modeler.__class__.__name__ != 'TensorFlowWD':
 
-                    #unseenX,unseenY , unseenW,unseenB = dRead.UnseenSeriesReader.readRandomSeriesDataFromFile(dRead.UnseenSeriesReader(),data1)
+                    unseenX,unseenY , unseenW,unseenB = dRead.UnseenSeriesReader.readRandomSeriesDataFromFile(dRead.UnseenSeriesReader(),data1)
                 # and their features
                 ##
                     #unseenX=unseenX[0:2880]
                     #unseenY=unseenY[0:2880]
                     #unseenW = unseenW[ 0:2880 ]
-                    unseenX = unseenXDt[subsetsCounter]
-                    unseenY = unseenYDt[subsetsCounter]
+                    #unseenX = unseenXDt[subsetsCounter]
+                    #unseenY = unseenYDt[subsetsCounter]
                     stdInU.append(np.std(unseenX))
                 ##
                     featureExtractor=fCalc.UnseenFeaturesExtractor()
                     unseenFeaturesX, unseenFeaturesY , unseenFeaturesW = featureExtractor.extractFeatures(modeler,unseenX, unseenY,None,None,history)
-                    '''dataset = np.array(np.append(unseenFeaturesX, np.asmatrix([unseenFeaturesY]).T, axis=1))
+                    dataset = np.array(np.append(unseenFeaturesX, np.asmatrix([unseenFeaturesY]).T, axis=1))
 
-                    for i in range(0, len(dataset)):
+                    '''for i in range(0, len(dataset)):
                         dataset[i] = np.mean(dataset[i:i + 10], axis=0)
 
                     unseenFeaturesX = dataset[:, 0:2]
@@ -317,7 +322,10 @@ def main():
                     models.append(modeler.__class__.__name__)
                 else:
                     models.append('Analytical method')
-                part.append(partitioner.__class__.__name__)
+                if modeler.__class__.__name__ == 'TriInterpolantModeler':
+                    part.append('none')
+                else:
+                    part.append(partitioner.__class__.__name__)
 
                 errors.append(meanError)
                 if modeler.__class__.__name__ == 'TriInterpolantModeler':
@@ -350,12 +358,12 @@ def initParameters():
     startU = 30000
     endU = 31000
 
-    algs= ['NNW','NNW1','NNWCA']
+    algs= ['SR','LR','TRI']
     # ['SR','LR','RF','NN','NNW','TRI']
 
 
         #['SR','LR','RF','NN','NNW','TRI']
-    cls=['DC']
+    cls=['KM','DC','NNCL']
     #['SR','LR','RF','NN'] algs
     #['KM','DC'] clusterers / cls
 

@@ -944,6 +944,7 @@ class TensorFlowW1(BasePartitionModeler):
 
             #model.add(keras.layers.Dense(2 + genModelKnots-1, input_shape=(2,)))
             model.add(keras.layers.Dense(genModelKnots - 1, input_shape=(2,)))
+            #model.add(keras.layers.Dense(genModelKnots - 1, input_shape=(2,)))
 
             model.add(keras.layers.Dense(2))
 
@@ -1496,7 +1497,7 @@ class TensorFlowW1(BasePartitionModeler):
 
                     #estimatorCl.add(keras.layers.Dense(numOfNeurons -1 ,input_shape=(2+numOfNeurons-1,)))
                     estimatorCl.add(keras.layers.Dense( numOfNeurons - 1, input_shape=(2 ,)))
-                    estimatorCl.add(keras.layers.Dense( numOfNeurons - 1, input_shape=(2,)))
+                    #estimatorCl.add(keras.layers.Dense( numOfNeurons - 1, input_shape=(2,)))
                     #estimatorCl.add(keras.layers.Dense(2))
                     estimatorCl.add(keras.layers.Dense(1, ))
                     estimatorCl.compile(loss=keras.losses.mean_squared_error, optimizer=keras.optimizers.Adam(), )                #try:
@@ -1582,7 +1583,8 @@ class TensorFlowW(BasePartitionModeler):
 
 
 
-            model.add(keras.layers.LSTM(2+genModelKnots-1, input_shape=(2+genModelKnots-1,1)))
+            #model.add(keras.layers.LSTM(2+genModelKnots-1, input_shape=(2+genModelKnots-1,1)))
+            model.add(keras.layers.LSTM(2+genModelKnots - 1, input_shape=(2+ genModelKnots - 1, 1)))
 
             model.add(keras.layers.Dense(genModelKnots - 1,))
             #model.add(keras.layers.Dense(genModelKnots - 2, ))
