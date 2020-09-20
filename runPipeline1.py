@@ -125,7 +125,7 @@ def main():
 
 
 
-    K = range(1,15)
+    K = range(1,16)
     print("Number of Statistically ind. subsets for training: " + str(len(subsetsX)))
     subsetsX=[subsetsX[0:5]] if len(subsetsX) > 5 else subsetsX
     subsetsY = [ subsetsY[ 0:5 ] ] if len(subsetsY) > 5 else subsetsY
@@ -230,19 +230,19 @@ def main():
                 print("Reading unseen data...")
                 if modeler.__class__.__name__ != 'TensorFlowWD':
 
-                    unseenX,unseenY , unseenW,unseenB = dRead.UnseenSeriesReader.readRandomSeriesDataFromFile(dRead.UnseenSeriesReader(),data1)
+                    #unseenX,unseenY , unseenW,unseenB = dRead.UnseenSeriesReader.readRandomSeriesDataFromFile(dRead.UnseenSeriesReader(),data1)
                 # and their features
                 ##
                     #unseenX=unseenX[0:2880]
                     #unseenY=unseenY[0:2880]
                     #unseenW = unseenW[ 0:2880 ]
-                    #unseenX = unseenXDt[subsetsCounter]
-                    #unseenY = unseenYDt[subsetsCounter]
+                    unseenX = unseenXDt[subsetsCounter]
+                    unseenY = unseenYDt[subsetsCounter]
                     stdInU.append(np.std(unseenX))
                 ##
                     featureExtractor=fCalc.UnseenFeaturesExtractor()
                     unseenFeaturesX, unseenFeaturesY , unseenFeaturesW = featureExtractor.extractFeatures(modeler,unseenX, unseenY,None,None,history)
-                    dataset = np.array(np.append(unseenFeaturesX, np.asmatrix([unseenFeaturesY]).T, axis=1))
+                   # dataset = np.array(np.append(unseenFeaturesX, np.asmatrix([unseenFeaturesY]).T, axis=1))
 
                     '''for i in range(0, len(dataset)):
                         dataset[i] = np.mean(dataset[i:i + 10], axis=0)
@@ -358,12 +358,12 @@ def initParameters():
     startU = 30000
     endU = 31000
 
-    algs= ['SR','LR','TRI']
+    algs= ['SR']
     # ['SR','LR','RF','NN','NNW','TRI']
 
 
         #['SR','LR','RF','NN','NNW','TRI']
-    cls=['KM','DC','NNCL']
+    cls=['NNCL']
     #['SR','LR','RF','NN'] algs
     #['KM','DC'] clusterers / cls
 
