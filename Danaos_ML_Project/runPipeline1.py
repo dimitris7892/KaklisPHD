@@ -66,7 +66,9 @@ def main():
     #DANreader.GenericParserForDataExtraction('LAROS', 'MARMARAS', 'MT_DELTA_MARIA')
     #DANreader = DANRead.BaseSeriesReader()
     #DANreader.readLarosDAta(datetime.datetime(2018,1,1),datetime.datetime(2019,1,1))
-
+    DANreader.GenericParserForDataExtraction('LEMAG', 'GOLDENPORT', 'Trammo Laoura', driver='ORACLE', server='10.2.5.80',
+                                             sid='OR12', usr='goldenport', password='goldenport',
+                                             rawData=True,telegrams=True,companyTelegrams=False,pathOfRawData='/home/dimitris/Desktop/SEEAMAG')
     #DANreader.GenericParserForDataExtraction('LAROS','MARMARAS','MT_DELTA_MARIA')
     #DANreader.GenericParserForDataExtraction('LEMAG', 'MILLENIA', 'MAGNIFICA',driver='ORACLE',server='10.2.5.80',sid='OR11',usr='millenia',password='millenia',
                                              #rawData=[],telegrams=True,companyTelegrams=False,pathOfRawData='C:/Users/dkaklis/Desktop/danaos')
@@ -182,8 +184,8 @@ def main():
     #errorPerc = pd.read_csv('C:/Users/dkaklis/Desktop/TESTerrorPercFOC4_0.csv', delimiter=',')
     #errorPerc = errorPerc.drop(["wind_speed", "wind_dir"], axis=1)
 
-    data = pd.read_csv(sFile, delimiter=';')
-    data = data.drop(["wind_speed", "wind_dir","trim"], axis=1)
+    data = pd.read_csv(sFile, delimiter=',',skiprows=0)
+    #data = data.drop(["wind_speed", "wind_dir","trim"], axis=1)
     '''data = np.append(data['stw'].values.reshape(-1,1),
                      np.asmatrix([
                     data['apparent_wind_speed'].values,
@@ -196,17 +198,18 @@ def main():
     #data = data.drop(["wind_speed", "wind_dir"], axis=1)
     #data = data[data['stw']>7].values
     data = np.array(data).astype(float)
-    data = data[data[:,0]>7 ]
+    #data = data[data[:,0]>7 ]
     #data = data[data[:, 5] > 0]
-    trData = np.array(data[0:100000])
-
-    windDirection = trData[:,4]
-    waveDirection = trData[:, 6]
+    #trData = np.array(data[0:100000])
+    trData = np.array(data)
+    trData = np.array(np.append(trData[:,0:4],np.asmatrix([trData[:,7],np.mean(trData[:,5:6],axis=1)]).T,axis=1))
+    #windDirection = trData[:,4]
+    #waveDirection = trData[:, 6]
     '''for i in range(0,len(windDirection)):
         if windDirection[i] > 180:
             windDirection[i] = windDirection[i] - 180'''
 
-    for i in range(0, len(windDirection)):
+    '''for i in range(0, len(windDirection)):
         if windDirection[i] >=0 and windDirection[i] <=22.5:
                 windDirection[i] = 1
         if windDirection[i] >22.5 and windDirection[i] <=67.5:
@@ -230,9 +233,9 @@ def main():
             windDirection[i] = 1
     
 
-    '''for i in range(0, len(waveDirection)):
+    for i in range(0, len(waveDirection)):
         if waveDirection[i] > 180:
-            waveDirection[i] = waveDirection[i] - 180'''
+            waveDirection[i] = waveDirection[i] - 180
 
     for i in range(0, len(waveDirection)):
         if waveDirection[i] >= 0 and waveDirection[i] <= 22.5:
@@ -258,7 +261,7 @@ def main():
             waveDirection[i] = 1
 
     trData[:,4] = windDirection
-    trData[:,6] = waveDirection
+    trData[:,6] = waveDirection'''
     HISTORY_SIZE = 10
     #stws =[]
     #for i in range(HISTORY_SIZE,len(trData)):
@@ -312,13 +315,13 @@ def main():
     #unseenX = data[:, 0:7][90000:].astype(float)
     #unseenY = data[:, 7][90000:].astype(float)
     ##MOVING ANVERAGE
-    for i in range(0,len(trData)):
-        trData[i] = np.mean(trData[i:i+20],axis=0)
+    '''for i in range(0,len(trData)):
+        trData[i] = np.mean(trData[i:i+10],axis=0)'''
     ######end moving average
 
 
 
-    X_train, X_test, y_train, y_test = train_test_split(trData[:,0:6], trData[:,6], test_size=0.2,random_state=42)
+    X_train, X_test, y_train, y_test = train_test_split(trData[:,0:5], trData[:,5], test_size=0.2,random_state=42)
 
 
     #dataTrain = np.array(np.append(X_train, np.asmatrix([y_train.reshape(-1)]).T, axis=1))
@@ -558,7 +561,9 @@ def main():
     eval.MeanAbsoluteErrorEvaluation.ANOVAtest(eval.MeanAbsoluteErrorEvaluation(), clusters, varTr, trErrors,errors,models,part)
 
 def initParameters():
-    sFile = "./neural_data/marmaras_data.csv"
+
+    sFile = "/home/dimitris/Desktop/mappedData_.csv"
+        #"./neural_data/marmaras_data.csv"
         #"./neural_data/marmaras_data.csv"
     # Get file name
     history = 20

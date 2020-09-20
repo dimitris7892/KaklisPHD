@@ -1027,7 +1027,7 @@ class TensorFlowW1(BasePartitionModeler):
             #model.add(keras.layers.Dense(20, input_shape=(7,)))
             #model.add(keras.layers.Dense(10, input_shape=(7,)))
 
-            model.add(keras.layers.LSTM(6+genModelKnots-1,input_shape=(6+genModelKnots-1,1)))
+            model.add(keras.layers.LSTM(5+genModelKnots-1,input_shape=(5+genModelKnots-1,1)))
             #model.add(keras.layers.Dense(30))
             #model.add(keras.layers.Dense(20))
             #model.add(keras.layers.Dense(genModelKnots - 3,activation='relu'))
@@ -1539,7 +1539,8 @@ class TensorFlowW1(BasePartitionModeler):
         vectorWeights = []
 
         for i in range(0, len(X)):
-            vector = extractFunctionsFromSplines(X[i][0], X[i][1], X[i][2], X[i][3],X[i][4],X[i][5])
+            #vector = extractFunctionsFromSplines(X[i][0], X[i][1], X[i][2], X[i][3],X[i][4],X[i][5])
+            vector = extractFunctionsFromSplines(X[i][0], X[i][1], X[i][2], X[i][3], X[i][4])
             #vector = extractFunctionsFromSplines(X[i][0], X[i][1],X[i][2],X[i][3],X[i][4],X[i][5],X[i][6])
             XSplineVector.append(np.append(X[i],vector))
 
