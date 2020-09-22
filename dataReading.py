@@ -82,7 +82,7 @@ class BaseSeriesReader:
 
     def readRandomSeriesDataFromFile(self, data,k=None):
         # Load file
-        data = np.array([k for k in data.values[0:, 2:23]  if k[3]>5 and k[5]>0])
+        data = np.array([k for k in data.values[0:, 2:23] if k[3]>0 and k[5]>0 ])#
         #stw = data[:,3]
         #rpm = data[:,5]
         #stwRpm = np.array(np.append(stw.reshape(-1,1),np.asmatrix([rpm]).T,axis=1)).astype(float)
@@ -99,13 +99,13 @@ class BaseSeriesReader:
         #data[:,5]=rpm
 
         if self.__class__.__name__ == 'UnseenSeriesReader':
-            dt = data[ 81000:81100 ]
+            dt = data[ 85000:86000 ]
             #dt = data.sample(n=2880).values[ :90000:, 3:23 ]
             #dt = data.values[ 0:, 2:23 ]
         else:
 
 
-            dt = data[k*1000:(k*1000 + 1000)]
+            dt = data[k*10000:(k*10000 + 10000)]
 
             #[0:5000]
             #dt=np.array(random.sample(dt,20000))

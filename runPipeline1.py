@@ -85,13 +85,14 @@ def main():
             c=0
         if seriesX == [ ] and targetY == [ ] : continue
 
-        dataset = np.array(np.append(seriesX.reshape(-1,1), np.asmatrix([targetY]).T, axis=1))
+        '''dataset = np.array(np.append(seriesX.reshape(-1,1), np.asmatrix([targetY]).T, axis=1))
 
         for i in range(0, len(dataset)):
             dataset[i] = np.mean(dataset[i:i + 10], axis=0)
 
         seriesX = dataset[:,0]
-        targetY = dataset[:, 1]
+        targetY = dataset[:, 1]'''
+
         X_train, X_test, y_train, y_test = train_test_split(seriesX, targetY, test_size=0.2,random_state=42)
 
         subsetsX.append(X_train.astype(float))
@@ -102,8 +103,8 @@ def main():
         #subsetsX.append(seriesX.astype(float))
         #subsetsY.append(targetY.astype(float))
 
-        #unseenXDt.append(X_test.astype(float))
-        #unseenYDt.append(y_test.astype(float))
+        unseenXDt.append(X_test.astype(float))
+        unseenYDt.append(y_test.astype(float))
 
         #subsetsX.append(seriesX)
         #subsetsY.append(targetY)
@@ -111,7 +112,7 @@ def main():
         #subsetsB.append(targetB)
         var.append(np.var(seriesX))
 
-        if len(subsetsX)>=5:
+        if len(subsetsX)>=1:
             break
 
     rangeSubs = k
@@ -125,7 +126,7 @@ def main():
 
 
 
-    K = range(1,16)
+    K = range(1,2)
     print("Number of Statistically ind. subsets for training: " + str(len(subsetsX)))
     subsetsX=[subsetsX[0:5]] if len(subsetsX) > 5 else subsetsX
     subsetsY = [ subsetsY[ 0:5 ] ] if len(subsetsY) > 5 else subsetsY
@@ -147,7 +148,7 @@ def main():
                 #partitioner.__class__.__name__ ="None"
            if partitioner.__class__.__name__=='DelaunayTriPartitioner':
 
-                 partK=np.linspace(0.3,1,15)#[0.5]
+                 partK=np.linspace(0.3,1,2)#[0.5]
 
            elif partitioner.__class__.__name__=='KMeansPartitioner':
                if modeler.__class__.__name__=='TriInterpolantModeler' or modeler.__class__.__name__ == 'TensorFlow':
@@ -169,7 +170,18 @@ def main():
                 reader = dRead.BaseSeriesReader()
                 trSize=80000
 
-                ####################################LAROS DATA STATISTICAL TESTS
+                if modeler.__class__.__name__ == 'TensorFlowW':
+
+                    dataset = np.array(np.append(subsetX.reshape(-1, 1), np.asmatrix([subsetY]).T, axis=1))
+
+                    for i in range(0, len(dataset)):
+                        dataset[i] = np.mean(dataset[i:i + 15], axis=0)
+
+                    subsetX = dataset[:, 0]
+                    subsetY = dataset[:, 1]
+
+
+                ####################################
                 if modeler.__class__.__name__ == 'TensorFlowWD':
 
                     reader.readExtractNewDataset('MILLENIA')
@@ -230,7 +242,7 @@ def main():
                 print("Reading unseen data...")
                 if modeler.__class__.__name__ != 'TensorFlowWD':
 
-                    #unseenX,unseenY , unseenW,unseenB = dRead.UnseenSeriesReader.readRandomSeriesDataFromFile(dRead.UnseenSeriesReader(),data1)
+                    unseenX,unseenY , unseenW,unseenB = dRead.UnseenSeriesReader.readRandomSeriesDataFromFile(dRead.UnseenSeriesReader(),data1)
                 # and their features
                 ##
                     #unseenX=unseenX[0:2880]
@@ -238,11 +250,20 @@ def main():
                     #unseenW = unseenW[ 0:2880 ]
                     unseenX = unseenXDt[subsetsCounter]
                     unseenY = unseenYDt[subsetsCounter]
+                    if modeler.__class__.__name__ == 'TensorFlowW':
+
+                        dataset = np.array(np.append(unseenX.reshape(-1, 1), np.asmatrix([unseenY]).T, axis=1))
+
+                        for i in range(0, len(dataset)):
+                            dataset[i] = np.mean(dataset[i:i + 15], axis=0)
+
+                        unseenX = dataset[:, 0]
+                        unseenY = dataset[:, 1]
                     stdInU.append(np.std(unseenX))
                 ##
                     featureExtractor=fCalc.UnseenFeaturesExtractor()
                     unseenFeaturesX, unseenFeaturesY , unseenFeaturesW = featureExtractor.extractFeatures(modeler,unseenX, unseenY,None,None,history)
-                   # dataset = np.array(np.append(unseenFeaturesX, np.asmatrix([unseenFeaturesY]).T, axis=1))
+                    #dataset = np.array(np.append(unseenFeaturesX, np.asmatrix([unseenFeaturesY]).T, axis=1))
 
                     '''for i in range(0, len(dataset)):
                         dataset[i] = np.mean(dataset[i:i + 10], axis=0)
@@ -358,12 +379,14 @@ def initParameters():
     startU = 30000
     endU = 31000
 
-    algs= ['SR']
+    algs= ['RF','NNW']
+        #['SR','LR','RF','NNW','NNW1','NNWCA','TRI']
     # ['SR','LR','RF','NN','NNW','TRI']
 
 
         #['SR','LR','RF','NN','NNW','TRI']
-    cls=['NNCL']
+    cls=['KM']
+        #['KM','DC','NNCL']
     #['SR','LR','RF','NN'] algs
     #['KM','DC'] clusterers / cls
 

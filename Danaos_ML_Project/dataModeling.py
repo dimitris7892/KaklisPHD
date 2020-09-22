@@ -1027,7 +1027,7 @@ class TensorFlowW1(BasePartitionModeler):
             #model.add(keras.layers.Dense(20, input_shape=(7,)))
             #model.add(keras.layers.Dense(10, input_shape=(7,)))
 
-            model.add(keras.layers.LSTM(5+genModelKnots-1,input_shape=(5+genModelKnots-1,1)))
+            model.add(keras.layers.LSTM(7+genModelKnots-1,input_shape=(7+genModelKnots-1,1)))
             #model.add(keras.layers.Dense(30))
             #model.add(keras.layers.Dense(20))
             #model.add(keras.layers.Dense(genModelKnots - 3,activation='relu'))
@@ -1539,8 +1539,8 @@ class TensorFlowW1(BasePartitionModeler):
         vectorWeights = []
 
         for i in range(0, len(X)):
-            #vector = extractFunctionsFromSplines(X[i][0], X[i][1], X[i][2], X[i][3],X[i][4],X[i][5])
-            vector = extractFunctionsFromSplines(X[i][0], X[i][1], X[i][2], X[i][3], X[i][4])
+            vector = extractFunctionsFromSplines(X[i][0], X[i][1], X[i][2], X[i][3],X[i][4],X[i][5],X[i][6])
+            #vector = extractFunctionsFromSplines(X[i][0], X[i][1], X[i][2], X[i][3], X[i][4])
             #vector = extractFunctionsFromSplines(X[i][0], X[i][1],X[i][2],X[i][3],X[i][4],X[i][5],X[i][6])
             XSplineVector.append(np.append(X[i],vector))
 
@@ -1589,7 +1589,11 @@ class TensorFlowW1(BasePartitionModeler):
 
                 XSplineClusterVector = []
                 for i in range(0, len(partitionsX[idx])):
-                    vector = extractFunctionsFromSplines(partitionsX[idx][i][0], partitionsX[idx][i][1],partitionsX[idx][i][2],partitionsX[idx][i][3],partitionsX[idx][i][4],partitionsX[idx][i][5],partitionsX[idx][i][6])
+                    #vector = extractFunctionsFromSplines(partitionsX[idx][i][0], partitionsX[idx][i][1],partitionsX[idx][i][2],partitionsX[idx][i][3],partitionsX[idx][i][4],partitionsX[idx][i][5],partitionsX[idx][i][6])
+                    vector = extractFunctionsFromSplines(partitionsX[idx][i][0], partitionsX[idx][i][1],
+                                                         partitionsX[idx][i][2], partitionsX[idx][i][3],
+                                                         partitionsX[idx][i][4], partitionsX[idx][i][5],
+                                                         )
                     XSplineClusterVector.append(np.append(partitionsX[idx][i],vector))
 
                 # X =  np.append(X, np.asmatrix([dataY]).T, axis=1)
@@ -1600,7 +1604,7 @@ class TensorFlowW1(BasePartitionModeler):
                 estimatorCl = keras.models.Sequential()
                 #estimatorCl = baseline_model()
 
-                estimatorCl.add(keras.layers.LSTM(numOfNeurons - 1, input_shape=(7 + numOfNeurons - 1,1)))
+                estimatorCl.add(keras.layers.LSTM(6 + numOfNeurons - 1, input_shape=(6 + numOfNeurons - 1,1)))
                 #estimatorCl.add(keras.layers.Dense(numOfNeurons - 3, input_shape=(7 + numOfNeurons - 1,)))
                 #estimatorCl.add(keras.layers.Dropout(0.0001))
                 estimatorCl.add(keras.layers.Dense(2))

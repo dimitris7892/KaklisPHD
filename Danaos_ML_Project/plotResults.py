@@ -253,3 +253,45 @@ class ErrorGraphs:
         plt.show()
 
         x=0
+
+    def plotStatistics(self,data):
+
+        x_1 = data.drop(["blFlags"], axis=1)  # .drop(drop_list1, axis=1)  # do not modify x, we will use it later
+        x_1.head()
+        f, ax = plt.subplots(figsize=(14, 14))
+        sns.heatmap(x_1.corr(), annot=True, linewidths=.5, fmt='.1f', ax=ax)
+        plt.show()
+
+        # data = data.drop(["wind_speed", "wind_dir","trim"], axis=1)
+        x_train = data.drop(["blFlags", "focs", "tlgsFocs"], axis=1)
+
+        foc = np.array(np.mean(data.values[:, 6:7], axis=1))
+        y_train = pd.DataFrame({
+            'FOC': foc,
+        })
+
+        clf_rf = RandomForestRegressor(random_state=43)
+        clr_rf = clf_rf.fit(x_train, y_train)
+
+        clf_rf_5 = RandomForestRegressor()
+        clr_rf_5 = clf_rf_5.fit(x_train, y_train)
+        importances = clr_rf_5.feature_importances_
+        std = np.std([tree.feature_importances_ for tree in clf_rf.estimators_],
+                     axis=0)
+        indices = np.argsort(importances)[::-1]
+
+        # Print the feature ranking
+        print("Feature ranking:")
+
+        for f in range(x_train.shape[1]):
+            print("%d. feature %d (%f)" % (f + 1, indices[f], importances[indices[f]]))
+
+        # Plot the feature importances of the forest
+
+        plt.figure(1, figsize=(14, 13))
+        plt.title("Feature importances")
+        plt.bar(range(x_train.shape[1]), importances[indices],
+                color="g", yerr=std[indices], align="center")
+        plt.xticks(range(x_train.shape[1]), x_train.columns[indices], rotation=90)
+        plt.xlim([-1, x_train.shape[1]])
+        # plt.show()
