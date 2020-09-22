@@ -4,9 +4,11 @@ import dataReading as dRead
 import dataReading as DANdRead
 import dataPartitioning as dPart
 import dataModeling as dModel
-import evaluation as eval
+import Danaos_ML_Project.evaluation as eval
 import numpy as np
+import seaborn as sns
 from math import sqrt
+from tensorflow import keras
 import sys
 import plotResults as plotRes
 import itertools
@@ -21,6 +23,7 @@ import  matplotlib.pyplot as plt
 from sklearn import svm
 import csv
 import Danaos_ML_Project.plotResults as pltRes
+from sklearn.ensemble import RandomForestRegressor
 import tensorflow as tf
 from matplotlib import rc
 #import latex
@@ -62,7 +65,8 @@ def main():
 
     #plRes.PlotTrueVsPredLine()
 
-
+    evluation = eval.MeanAbsoluteErrorEvaluation()
+    #evluation.fillExcelWithNeural()
     #DANreader.GenericParserForDataExtraction('LAROS', 'MARMARAS', 'MT_DELTA_MARIA')
     #DANreader = DANRead.BaseSeriesReader()
     #DANreader.readLarosDAta(datetime.datetime(2018,1,1),datetime.datetime(2019,1,1))
@@ -184,8 +188,18 @@ def main():
     #errorPerc = pd.read_csv('C:/Users/dkaklis/Desktop/TESTerrorPercFOC4_0.csv', delimiter=',')
     #errorPerc = errorPerc.drop(["wind_speed", "wind_dir"], axis=1)
 
+
+
     data = pd.read_csv(sFile, delimiter=',',skiprows=0)
+
+    data = data.drop(["blFlags"], axis=1)
     #data = data.drop(["wind_speed", "wind_dir","trim"], axis=1)
+    #x_train = data.drop(["blFlags","focs","tlgsFocs"], axis=1)
+
+    #foc = np.array(np.mean(data.values[:,6:7],axis=1))
+    #y_train = pd.DataFrame({
+        #'FOC': foc,
+       #})
     '''data = np.append(data['stw'].values.reshape(-1,1),
                      np.asmatrix([
                     data['apparent_wind_speed'].values,
@@ -198,11 +212,20 @@ def main():
     #data = data.drop(["wind_speed", "wind_dir"], axis=1)
     #data = data[data['stw']>7].values
     data = np.array(data).astype(float)
+
+    ##################################################
+    trData = np.array(np.append(data[:,1].reshape(-1,1),np.asmatrix([data[:,2],data[:,3],data[:,4],data[:,12],data[:,13],data[:,7],data[:,5]]).T,axis=1))
+    #y_train = np.array(np.mean(data[:,5:6],axis=1))
+
+
+
+    ##################################################
+
     #data = data[data[:,0]>7 ]
     #data = data[data[:, 5] > 0]
     #trData = np.array(data[0:100000])
-    trData = np.array(data)
-    trData = np.array(np.append(trData[:,0:4],np.asmatrix([trData[:,7],np.mean(trData[:,5:6],axis=1)]).T,axis=1))
+    #trData = np.array(data)
+    #trData = np.array(np.append(trData[:,0:4],np.asmatrix([trData[:,7],np.mean(trData[:,5:6],axis=1)]).T,axis=1))
     #windDirection = trData[:,4]
     #waveDirection = trData[:, 6]
     '''for i in range(0,len(windDirection)):
@@ -309,19 +332,25 @@ def main():
         #unseensY.append(data[(k+kInit):(n+k+kInit), 7])
         #k = n * i + 10
 
+    windDirection = trData[:,1]
 
+    for i in range(0,len(windDirection)):
+        if windDirection[i] > 180:
+            windDirection[i] = windDirection[i] - 180
+
+    trData[:,1]=windDirection
     #subsetsX.append(data[:,0:7][0:1000].astype(float))
     #subsetsY.append(data[:, 7][0:1000].astype(float))
     #unseenX = data[:, 0:7][90000:].astype(float)
     #unseenY = data[:, 7][90000:].astype(float)
     ##MOVING ANVERAGE
-    '''for i in range(0,len(trData)):
-        trData[i] = np.mean(trData[i:i+10],axis=0)'''
+    for i in range(0,len(trData)):
+        trData[i] = np.mean(trData[i:i+10],axis=0)
     ######end moving average
 
 
 
-    X_train, X_test, y_train, y_test = train_test_split(trData[:,0:5], trData[:,5], test_size=0.2,random_state=42)
+    X_train, X_test, y_train, y_test = train_test_split(trData[:,0:7], trData[:,7], test_size=0.2,random_state=42)
 
 
     #dataTrain = np.array(np.append(X_train, np.asmatrix([y_train.reshape(-1)]).T, axis=1))
@@ -562,7 +591,8 @@ def main():
 
 def initParameters():
 
-    sFile = "/home/dimitris/Desktop/mappedData_.csv"
+    sFile = "/home/dimitris/Desktop/mappedData/filteredDataNew.csv"
+        #"/home/dimitris/Desktop/mappedData_.csv"
         #"./neural_data/marmaras_data.csv"
         #"./neural_data/marmaras_data.csv"
     # Get file name

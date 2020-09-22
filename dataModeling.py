@@ -1584,7 +1584,7 @@ class TensorFlowW(BasePartitionModeler):
 
 
             #model.add(keras.layers.LSTM(2+genModelKnots-1, input_shape=(2+genModelKnots-1,1)))
-            model.add(keras.layers.LSTM(2+genModelKnots - 1, input_shape=(2+ genModelKnots - 1, 1)))
+            model.add(keras.layers.Dense(2+genModelKnots - 1, input_shape=(2+ genModelKnots - 1,)))
 
             model.add(keras.layers.Dense(genModelKnots - 1,))
             #model.add(keras.layers.Dense(genModelKnots - 2, ))
@@ -2100,7 +2100,7 @@ class TensorFlowW(BasePartitionModeler):
         XSplineVector = np.array(XSplineVector)
 
         #try:
-        XSplineVector = np.reshape(XSplineVector, (XSplineVector.shape[0], XSplineVector.shape[1], 1))
+        #XSplineVector = np.reshape(XSplineVector, (XSplineVector.shape[0], XSplineVector.shape[1], 1))
         estimator.fit(XSplineVector, Y, epochs=100, validation_split=0.33,verbose=0)
         #score = estimator.evaluate(np.array(XSplineVector),Y, verbose=0)
         #except:
