@@ -379,7 +379,7 @@ def initParameters():
     startU = 30000
     endU = 31000
 
-    algs= ['RF','SR','LR']
+    algs= ['NNW']
         #['SR','LR','RF','NNW','NNW1','NNWCA','TRI']
     # ['SR','LR','RF','NN','NNW','TRI']
 
