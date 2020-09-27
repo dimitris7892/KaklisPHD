@@ -1217,11 +1217,12 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
 
     def ANOVAtest(self,clusters,var,trError,error,models,partitioners):
 
+        # 'Trerror': trError,
         df = pd.DataFrame({
                             'clusters': clusters,
                             'var': var,
                             'error':error,
-                            'Trerror': trError,
+
                             'partitioners':partitioners,
                             'models':models
                             #'meanBearing':trFeatures[1]

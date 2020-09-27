@@ -1,3 +1,4 @@
-clusters,var,error,Trerror,partitioners,models
-1,7.750556581210937,0.9904233670033694,0.3265833834837844,KMeansPartitioner,RandomForestModeler
-1,0.7703496627385715,0.7288991212844849,0.7154386043548584,KMeansPartitioner,TensorFlowW
+clusters,var,error,partitioners,models
+1,19.051920707773437,1.2377266313932993,KMeansPartitioner,RandomForestModeler
+1,19.051920707773437,1.6162283318421313,KMeansPartitioner,SplineRegressionModeler
+1,19.051920707773437,2.0154687626730334,KMeansPartitioner,LinearRegressionModeler

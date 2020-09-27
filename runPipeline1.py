@@ -112,7 +112,7 @@ def main():
         #subsetsB.append(targetB)
         var.append(np.var(seriesX))
 
-        if len(subsetsX)>=1:
+        if len(subsetsX)>=5:
             break
 
     rangeSubs = k
@@ -126,7 +126,7 @@ def main():
 
 
 
-    K = range(1,2)
+    K = range(1,15)
     print("Number of Statistically ind. subsets for training: " + str(len(subsetsX)))
     subsetsX=[subsetsX[0:5]] if len(subsetsX) > 5 else subsetsX
     subsetsY = [ subsetsY[ 0:5 ] ] if len(subsetsY) > 5 else subsetsY
@@ -134,10 +134,10 @@ def main():
     subsetsCounter=0
     for subsetX, subsetY in zip(subsetsX, subsetsY):
 
-      skip_idxx = random.sample(range((rangeSubs * 1000) + 10, num_lines), 12000)
+      #skip_idxx = random.sample(range((rangeSubs * 1000) + 10, num_lines), 12000)
         # Read the data
 
-      data1 = pd.read_csv(sFile, skiprows=skip_idxx)
+      #data1 = pd.read_csv(sFile, skiprows=skip_idxx)
       for modeler in modelers:
         for partitioner in partitioners:
            if modeler.__class__.__name__ == 'TriInterpolantModeler' and partitioner.__class__.__name__=='DelaunayTriPartitioner':
@@ -148,7 +148,7 @@ def main():
                 #partitioner.__class__.__name__ ="None"
            if partitioner.__class__.__name__=='DelaunayTriPartitioner':
 
-                 partK=np.linspace(0.3,1,2)#[0.5]
+                 partK=np.linspace(0.3,1,15)#[0.5]
 
            elif partitioner.__class__.__name__=='KMeansPartitioner':
                if modeler.__class__.__name__=='TriInterpolantModeler' or modeler.__class__.__name__ == 'TensorFlow':
@@ -242,7 +242,7 @@ def main():
                 print("Reading unseen data...")
                 if modeler.__class__.__name__ != 'TensorFlowWD':
 
-                    unseenX,unseenY , unseenW,unseenB = dRead.UnseenSeriesReader.readRandomSeriesDataFromFile(dRead.UnseenSeriesReader(),data1)
+                    #unseenX,unseenY , unseenW,unseenB = dRead.UnseenSeriesReader.readRandomSeriesDataFromFile(dRead.UnseenSeriesReader(),data1)
                 # and their features
                 ##
                     #unseenX=unseenX[0:2880]
@@ -275,7 +275,7 @@ def main():
 
                 # Predict and evaluate on seen data
                 print("Evaluating on seen data...")
-                if modeler.__class__.__name__  != 'TriInterpolantModeler':
+                '''if modeler.__class__.__name__  != 'TriInterpolantModeler':
                     #print("Evaluating on seen data...")
 
                     if modeler.__class__.__name__ != 'TensorFlowW1' and  modeler.__class__.__name__ != 'TensorFlow'and modeler.__class__.__name__ != 'TensorFlowW' and modeler.__class__.__name__ != 'TriInterpolantModeler' and modeler.__class__.__name__ != 'TensorFlowWD':
@@ -298,7 +298,7 @@ def main():
 
                     print ("Mean absolute error on training data: %4.2f (+/- %4.2f standard error)" % (
                         meanErrorTr, sdError / sqrt(unseenFeaturesY.shape[ 0 ])))
-                    print("Evaluating on seen data... Done.")
+                    print("Evaluating on seen data... Done.")'''
 
                 # Predict and evaluate on unseen data
                 print("Evaluating on unseen data...")
@@ -349,10 +349,10 @@ def main():
                     part.append(partitioner.__class__.__name__)
 
                 errors.append(meanError)
-                if modeler.__class__.__name__ == 'TriInterpolantModeler':
+                '''if modeler.__class__.__name__ == 'TriInterpolantModeler':
                     trErrors.append(None)
                 else:
-                    trErrors.append(meanErrorTr)
+                    trErrors.append(meanErrorTr)'''
                 err={}
                 err["model"] =modeler.__class__.__name__
                 err["error"] = meanError
@@ -379,7 +379,7 @@ def initParameters():
     startU = 30000
     endU = 31000
 
-    algs= ['RF','NNW']
+    algs= ['RF','SR','LR']
         #['SR','LR','RF','NNW','NNW1','NNWCA','TRI']
     # ['SR','LR','RF','NN','NNW','TRI']
 
