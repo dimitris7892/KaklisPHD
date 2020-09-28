@@ -1,2 +1,4 @@
 Basis,Coeff
-(Intercept),39.6833
+(Intercept),78.1181
+h(x0-16.99),2.09006
+h(17.6-x0),-1.41689
