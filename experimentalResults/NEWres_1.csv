@@ -1,4 +1,6 @@
 clusters,var,error,partitioners,models
-1,19.051920707773437,1.2377266313932993,KMeansPartitioner,RandomForestModeler
-1,19.051920707773437,1.6162283318421313,KMeansPartitioner,SplineRegressionModeler
-1,19.051920707773437,2.0154687626730334,KMeansPartitioner,LinearRegressionModeler
+6,7.750556581210937,9.655354499816895,DelaunayTriPartitioner,TensorFlowW
+6,7.750556581210937,7.7553181648254395,DelaunayTriPartitioner,TensorFlowW
+4,7.750556581210937,4.594272136688232,DelaunayTriPartitioner,TensorFlowW
+2,7.750556581210937,1.3565129041671753,DelaunayTriPartitioner,TensorFlowW
+1,7.750556581210937,1.1147135496139526,DelaunayTriPartitioner,TensorFlowW
