@@ -109,8 +109,8 @@ class TensorFlowCl(DefaultPartitioner):
             return model
 
         def custom_loss(y_true,y_pred):
-
-            return tf.keras.losses.mean_squared_error(y_true,y_pred) + tf.keras.losses.categorical_crossentropy(y_true,y_pred) +\
+            #+ tf.keras.losses.categorical_crossentropy(y_true,y_pred)
+            return tf.keras.losses.mean_squared_error(y_true,y_pred) +\
                     tf.keras.losses.kullback_leibler_divergence(y_true, y_pred)
 
 
