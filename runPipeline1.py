@@ -126,7 +126,7 @@ def main():
 
 
 
-    K = range(1,15)
+    K = range(1,11)
     print("Number of Statistically ind. subsets for training: " + str(len(subsetsX)))
     subsetsX=[subsetsX[0:5]] if len(subsetsX) > 5 else subsetsX
     subsetsY = [ subsetsY[ 0:5 ] ] if len(subsetsY) > 5 else subsetsY
@@ -148,7 +148,7 @@ def main():
                 #partitioner.__class__.__name__ ="None"
            if partitioner.__class__.__name__=='DelaunayTriPartitioner':
 
-                 partK=np.linspace(0.3,1,15)#[0.5]
+                 partK=np.linspace(0.3,1,11)#[0.5]
 
            elif partitioner.__class__.__name__=='KMeansPartitioner':
                if modeler.__class__.__name__=='TriInterpolantModeler' or modeler.__class__.__name__ == 'TensorFlow':
@@ -250,6 +250,7 @@ def main():
                     #unseenW = unseenW[ 0:2880 ]
                     unseenX = unseenXDt[subsetsCounter]
                     unseenY = unseenYDt[subsetsCounter]
+                    print(str(subsetsCounter))
                     if modeler.__class__.__name__ == 'TensorFlowW':
 
                         dataset = np.array(np.append(unseenX.reshape(-1, 1), np.asmatrix([unseenY]).T, axis=1))
@@ -361,7 +362,7 @@ def main():
                 if modeler.__class__.__name__ == 'TriInterpolantModeler' and numOfclusters==1 or modeler.__class__.__name__ == 'TriInterpolantModeler' \
                         and partitioner.__class__.__name__ == 'DelaunayTriPartitioner':
                     break
-                if partitioner.__class__.__name__ == 'DelaunayTriPartitioner' and numOfclusters==1:
+                if partitioner.__class__.__name__ == 'DelaunayTriPartitioner' and numOfclusters==1 and k > 0.9:
                     break
       subsetsCounter = subsetsCounter + 1
 
