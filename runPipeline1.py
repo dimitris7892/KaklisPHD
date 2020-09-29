@@ -112,7 +112,7 @@ def main():
         #subsetsB.append(targetB)
         var.append(np.var(seriesX))
 
-        if len(subsetsX)>=5:
+        if len(subsetsX)>=1:
             break
 
     rangeSubs = k
@@ -148,7 +148,7 @@ def main():
                 #partitioner.__class__.__name__ ="None"
            if partitioner.__class__.__name__=='DelaunayTriPartitioner':
 
-                 partK=np.linspace(0.3,1,11)#[0.5]
+                 partK=np.linspace(0.3,1,5)#[0.5]
 
            elif partitioner.__class__.__name__=='KMeansPartitioner':
                if modeler.__class__.__name__=='TriInterpolantModeler' or modeler.__class__.__name__ == 'TensorFlow':
@@ -170,12 +170,12 @@ def main():
                 reader = dRead.BaseSeriesReader()
                 trSize=80000
 
-                if modeler.__class__.__name__ == 'TensorFlowW':
+                if modeler.__class__.__name__ == 'TensorFlowW' and  partitioner.__class__.__name__!='DelaunayTriPartitioner':
 
                     dataset = np.array(np.append(subsetX.reshape(-1, 1), np.asmatrix([subsetY]).T, axis=1))
 
                     for i in range(0, len(dataset)):
-                        dataset[i] = np.mean(dataset[i:i + 15], axis=0)
+                        dataset[i] = np.mean(dataset[i:i + 5], axis=0)
 
                     subsetX = dataset[:, 0]
                     subsetY = dataset[:, 1]
@@ -250,13 +250,12 @@ def main():
                     #unseenW = unseenW[ 0:2880 ]
                     unseenX = unseenXDt[subsetsCounter]
                     unseenY = unseenYDt[subsetsCounter]
-                    print(str(subsetsCounter))
-                    if modeler.__class__.__name__ == 'TensorFlowW':
+                    if modeler.__class__.__name__ == 'TensorFlowW' and partitioner.__class__.__name__!='DelaunayTriPartitioner':
 
                         dataset = np.array(np.append(unseenX.reshape(-1, 1), np.asmatrix([unseenY]).T, axis=1))
 
                         for i in range(0, len(dataset)):
-                            dataset[i] = np.mean(dataset[i:i + 15], axis=0)
+                            dataset[i] = np.mean(dataset[i:i + 5], axis=0)
 
                         unseenX = dataset[:, 0]
                         unseenY = dataset[:, 1]
@@ -362,7 +361,7 @@ def main():
                 if modeler.__class__.__name__ == 'TriInterpolantModeler' and numOfclusters==1 or modeler.__class__.__name__ == 'TriInterpolantModeler' \
                         and partitioner.__class__.__name__ == 'DelaunayTriPartitioner':
                     break
-                if partitioner.__class__.__name__ == 'DelaunayTriPartitioner' and numOfclusters==1 and k > 0.9:
+                if partitioner.__class__.__name__ == 'DelaunayTriPartitioner' and numOfclusters==1:
                     break
       subsetsCounter = subsetsCounter + 1
 
@@ -386,7 +385,7 @@ def initParameters():
 
 
         #['SR','LR','RF','NN','NNW','TRI']
-    cls=['KM']
+    cls=['DC']
         #['KM','DC','NNCL']
     #['SR','LR','RF','NN'] algs
     #['KM','DC'] clusterers / cls
