@@ -2183,13 +2183,13 @@ class TensorFlowW(BasePartitionModeler):
 
                     estimatorCl = keras.models.Sequential()
 
-                    estimatorCl.add(keras.layers.Dense(2 + numOfNeurons -1 ,input_shape=(2+numOfNeurons-1,)))
+                    estimatorCl.add(keras.layers.LSTM(2 + numOfNeurons -1 ,input_shape=(2+numOfNeurons-1,1)))
                     estimatorCl.add(keras.layers.Dense(numOfNeurons - 1, ))
                     #estimatorCl.add(keras.layers.Dense(2))
                     estimatorCl.add(keras.layers.Dense(1, ))
                     estimatorCl.compile(loss=keras.losses.mean_squared_error, optimizer=keras.optimizers.Adam(), )
                     #try:
-                    #XSplineClusterVector = np.reshape(XSplineClusterVector, (XSplineClusterVector.shape[0], XSplineClusterVector.shape[1], 1))
+                    XSplineClusterVector = np.reshape(XSplineClusterVector, (XSplineClusterVector.shape[0], XSplineClusterVector.shape[1], 1))
                     estimatorCl.fit(np.array(XSplineClusterVector),np.array(partitionsY[idx]),epochs=100,verbose=0)#validation_split=0.33
 
                     #Clscore = estimatorCl.evaluate(np.array(XSplineClusterVector), np.array(partitionsY[idx]), verbose=0)
