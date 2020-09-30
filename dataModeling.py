@@ -868,14 +868,17 @@ class TensorFlowCA(BasePartitionModeler):
                     # estimator.compile()
                     # estimator.layers[3] = custom_activation2(inputs=estimator.layers[2].output, modelId=idx) if idx ==0 else estimator.layers[3]
                     # estimator.layers[3] = custom_activation2 if idx ==3 else estimator.layers[3]
-
-                estimatorCl.fit(np.array(partitionsX[idx]), np.array(partitionsY[idx]), epochs=100,
-                                validation_split=0.33,verbose=0)  # validation_split=0.33
+                try:
+                    estimatorCl.fit(np.array(partitionsX[idx]), np.array(partitionsY[idx]), epochs=100,
+                                    validation_split=0.33,verbose=0)  # validation_split=0.33
+                    NNmodels.append(estimatorCl)
+                except:
+                    d=0
 
                 #score = estimatorCl.evaluate(np.array(partitionsX[idx]), np.array(partitionsY[idx]), verbose=0)
                 #print("%s: %.2f%%" % ("acc: ", score))
                 #scores.append(score)
-                NNmodels.append(estimatorCl)
+
                 # except Exception as e:
                 # print(str(e))
                 # return
