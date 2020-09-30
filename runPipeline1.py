@@ -379,13 +379,13 @@ def initParameters():
     startU = 30000
     endU = 31000
 
-    algs= ['NNW']
+    algs= ['SR','LR','RF','NNW','NNW1','NNWCA']
         #['SR','LR','RF','NNW','NNW1','NNWCA','TRI']
     # ['SR','LR','RF','NN','NNW','TRI']
 
 
         #['SR','LR','RF','NN','NNW','TRI']
-    cls=['DC']
+    cls=['KM','DC','NNCL']
         #['KM','DC','NNCL']
     #['SR','LR','RF','NN'] algs
     #['KM','DC'] clusterers / cls
