@@ -1586,8 +1586,8 @@ class TensorFlowW(BasePartitionModeler):
 
 
 
-            #model.add(keras.layers.LSTM(2+genModelKnots-1, input_shape=(2+genModelKnots-1,1)))
-            model.add(keras.layers.LSTM(2+genModelKnots - 1, input_shape=(2+ genModelKnots - 1,1)))
+            model.add(keras.layers.Dense(2+genModelKnots-1, input_shape=(2+genModelKnots-1,)))
+            #model.add(keras.layers.LSTM(2+genModelKnots - 1, input_shape=(2+ genModelKnots - 1,1)))
 
             model.add(keras.layers.Dense(genModelKnots - 1,))
             #model.add(keras.layers.Dense(genModelKnots - 2, ))
@@ -1614,7 +1614,7 @@ class TensorFlowW(BasePartitionModeler):
         self.genF=None
 
         sModel=[]
-        sr = sp.Earth(max_degree=1)
+        sr = sp.Earth()
         sr.fit(X,Y)
         sModel.append(sr)
         import csv
@@ -2103,7 +2103,7 @@ class TensorFlowW(BasePartitionModeler):
         XSplineVector = np.array(XSplineVector)
 
         #try:
-        XSplineVector = np.reshape(XSplineVector, (XSplineVector.shape[0], XSplineVector.shape[1], 1))
+        #XSplineVector = np.reshape(XSplineVector, (XSplineVector.shape[0], XSplineVector.shape[1], 1))
         estimator.fit(XSplineVector, Y, epochs=100, validation_split=0.33,verbose=0)
         #score = estimator.evaluate(np.array(XSplineVector),Y, verbose=0)
         #except:
@@ -2186,13 +2186,14 @@ class TensorFlowW(BasePartitionModeler):
 
                     estimatorCl = keras.models.Sequential()
 
-                    estimatorCl.add(keras.layers.LSTM(2 + numOfNeurons -1 ,input_shape=(2+numOfNeurons-1,1)))
+                    #estimatorCl.add(keras.layers.LSTM(2 + numOfNeurons -1 ,input_shape=(2+numOfNeurons-1,1)))
+                    estimatorCl.add(keras.layers.Dense(2 + numOfNeurons - 1, input_shape=(2 + numOfNeurons - 1, )))
                     estimatorCl.add(keras.layers.Dense(numOfNeurons - 1, ))
                     #estimatorCl.add(keras.layers.Dense(2))
                     estimatorCl.add(keras.layers.Dense(1, ))
                     estimatorCl.compile(loss=keras.losses.mean_squared_error, optimizer=keras.optimizers.Adam(), )
                     #try:
-                    XSplineClusterVector = np.reshape(XSplineClusterVector, (XSplineClusterVector.shape[0], XSplineClusterVector.shape[1], 1))
+                    #XSplineClusterVector = np.reshape(XSplineClusterVector, (XSplineClusterVector.shape[0], XSplineClusterVector.shape[1], 1))
                     estimatorCl.fit(np.array(XSplineClusterVector),np.array(partitionsY[idx]),epochs=100,verbose=0)#validation_split=0.33
 
                     #Clscore = estimatorCl.evaluate(np.array(XSplineClusterVector), np.array(partitionsY[idx]), verbose=0)
@@ -2449,6 +2450,7 @@ class RandomForestModeler(BasePartitionModeler):
             # Fit to data
             try:
                 curModel.fit(partitionsX[ idx ], partitionsY[ idx ])
+
             except:
                 print (idx)
             # Add to returned list
@@ -2480,6 +2482,8 @@ class SplineRegressionModeler(BasePartitionModeler):
         # Init model to partition map
         #self._partitionsPerModel = {}
         self._partitionsPerModel = []
+        genModel = sp.Earth()
+        genModel.fit(X, Y)
         # For each label/partition
         for idx, pCurLbl in enumerate(partition_labels):
             # Create a linear model
@@ -2493,6 +2497,7 @@ class SplineRegressionModeler(BasePartitionModeler):
             #else:
                 #n=2
             curModel = sp.Earth()
+
             ##HP tuning
             #random_search3 = RandomizedSearchCV(curModel, param_distributions=parameters.param_mars_dist, n_iter=4)
             #try:
@@ -2507,6 +2512,7 @@ class SplineRegressionModeler(BasePartitionModeler):
             #dataXnew=np.concatenate(dataX[tri.vertices[simplicesIndexes]])
             #dataYnew =np.concatenate(dataY[tri.vertices[simplicesIndexes]])
             curModel.fit(partitionsX[idx],partitionsY[idx])
+
             #plt.plot(partitionsX[ idx ], partitionsY[ idx ], 'o', markersize=3)
             #plt.plot(partitionsX[ idx ], curModel.predict(partitionsX[ idx ]), 'r--' )
 
@@ -2516,10 +2522,12 @@ class SplineRegressionModeler(BasePartitionModeler):
                 #print str(Exception)
             # Add to returned list
             models.append(curModel)
+
             #self._partitionsPerModel[ curModel ] = partitionsX[ idx ]
             self._partitionsPerModel.append(partitionsX[idx])
 
         # Update private models
+        #models.append(genModel)
         self._models = models
 
         # Return list of models
@@ -2530,7 +2538,7 @@ class SplineRegressionModeler(BasePartitionModeler):
         mBest = None
         dBestFit = 0
         # For each model
-        for i in range(0,len(self._models)):
+        for i in range(0,len(self._models )):
             # If it is a better for the point
             dCurFit = self.getFitnessOfModelForPoint(i, point)
             if dCurFit > dBestFit:

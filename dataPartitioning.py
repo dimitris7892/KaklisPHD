@@ -71,6 +71,21 @@ class TensorFlowCl(DefaultPartitioner):
         else:
             return mBest, dBestFit
 
+    def showClusterPlot(self, dataX, labels, nClusters,dataY=None):
+
+        if dataY==None:
+            xData = np.asarray(dataX[:, 0]).T
+            yData = np.asarray(dataX[:, 1]).T
+            #colors=tuple([numberToRGBAColor(l) for l in labels])
+        else:
+            xData = dataX[:,0].T
+            yData = dataY.T
+
+        plt.scatter(xData, yData, c=labels)
+        plt.title("NNCL with " + str(nClusters) + " clusters")
+        plt.show()
+        d=0
+
     def clustering(self, dataX, dataY=None, dataW=None, nClusters=None, showPlot=False, random_state=1000):
 
         models = []
@@ -100,8 +115,12 @@ class TensorFlowCl(DefaultPartitioner):
             #while neurons < genModelKnots -1:
                 #model.add(keras.layers.Dense(neurons, ))
                 #neurons = neurons+2
-            model.add(keras.layers.Dense(2+genModelKnots - 1,input_shape=(2+genModelKnots -1,) ))
-            model.add(keras.layers.Dense(genModelKnots -1 , ))
+            #model.add(keras.layers.Dense(2 , input_shape=(2 + genModelKnots -1 ,)))
+            model.add(keras.layers.Dense(2  ,input_shape=(2  ,) ))
+            model.add(keras.layers.Dense(  genModelKnots - 1, ))
+            #model.add(keras.layers.Dense(3, ))
+            #model.add(keras.layers.Dense(2, ))
+            #model.add(keras.layers.Dense(1, ))
 
             # Compile model
             model.compile(loss=custom_loss, optimizer=keras.optimizers.Adam())
@@ -110,8 +129,9 @@ class TensorFlowCl(DefaultPartitioner):
 
         def custom_loss(y_true,y_pred):
             #+ tf.keras.losses.categorical_crossentropy(y_true,y_pred)
-            return tf.keras.losses.mean_squared_error(y_true,y_pred) +\
-                    tf.keras.losses.kullback_leibler_divergence(y_true, y_pred)
+            #tf.keras.losses.mean_squared_error(y_true,y_pred)
+            return    tf.keras.losses.mean_squared_error(y_true,y_pred)+tf.keras.losses.kullback_leibler_divergence(y_true, y_pred) #+tf.keras.losses.categorical_crossentropy(y_true,y_pred)
+
 
 
 
@@ -121,7 +141,7 @@ class TensorFlowCl(DefaultPartitioner):
         self.genF = None
 
         sModel = []
-        sr = sp.Earth(max_degree=1)
+        sr = sp.Earth()
         sr.fit(X, Y)
         sModel.append(sr)
         import csv
@@ -152,10 +172,11 @@ class TensorFlowCl(DefaultPartitioner):
                         coeff = row[2]
                         # if basis=='x0' :continue
                         if pruned == "No":
+                        #if basis !='MSE:':
                             data_writer.writerow([basis, coeff])
                             genModelKnots.append(basis)
                     except:
-                        x = 0
+                        print('Exception')
 
             genModelKnots = len(genModelKnots)
             # modelCount += 1
@@ -187,7 +208,7 @@ class TensorFlowCl(DefaultPartitioner):
                             continue
                         d = row[0]
                         if self.count == 1:
-                            self.intercepts.append(float(row[1]))
+                            self.intercepts.append(float(row[1]) if row[1]!='None' else 'None')
 
                         if d.split("*").__len__() == 1:
                             split = ""
@@ -560,7 +581,8 @@ class TensorFlowCl(DefaultPartitioner):
 
         for i in range(0, len(X)):
             vector = extractFunctionsFromSplines(X[i][0], X[i][1])
-            XSplineVector.append(np.append(X[i], vector))
+            #XSplineVector.append(np.append(X[i], vector))
+            XSplineVector.append( vector)
 
         #XSplineVector.append(np.append(Y.reshape(-1,1), XSplineVector))
         XSplineVector = np.array(XSplineVector)
@@ -573,7 +595,45 @@ class TensorFlowCl(DefaultPartitioner):
 
         # estimator.layers[0].set_weights([weights, np.array([0] * (genModelKnots-1))])
         #XSplineVector = np.reshape(XSplineVector, (XSplineVector.shape[0], XSplineVector.shape[1], 1))
-        estimator.fit(XSplineVector, Y, epochs=50,verbose=0)
+        '''xy =[]
+        for i in range(0, len(X)):
+            xy.append( np.append(X[i], Y[i]))
+        xy = np.array(xy)'''
+        xy = []
+        '''for i in range(0, len(XSplineVector)):
+            if XSplineVector[i][0]>0:
+                XSplineVector[i][0]=1
+            elif XSplineVector[i][0]<0:
+                XSplineVector[i][0] = 0
+
+            if XSplineVector[i][1]>0:
+                XSplineVector[i][1]=1
+            elif XSplineVector[i][1]<0:
+                XSplineVector[i][1] = 0
+
+            if XSplineVector[i][2]>0:
+                XSplineVector[i][2]=1
+            elif XSplineVector[i][2]<0:
+                XSplineVector[i][2] = 0'''
+        xy = np.array(xy)
+
+        distances =[]
+        xyMins = []
+        '''for i in range(0,len(xy)):
+            distance=[]
+            for k in range(0,len(xy)):
+                if k!=i:
+                    distance.append(np.linalg.norm(xy[i]-xy[k]))
+
+            distances.append(distance)
+            ind = np.argmin(distance)
+            xyMin = xy[ind]
+            xyMins.append(xyMin)
+        distances = np.array(distances)
+        pca = PCA(n_components=8)
+        components = pca.fit(distances).components_.reshape(-1,8)
+        Xp = X[:len(X)-1,:]'''
+        estimator.fit(X, XSplineVector , epochs=50,verbose=0,)
 
         self.flagGen = True
         from scipy.special import softmax
@@ -588,18 +648,23 @@ class TensorFlowCl(DefaultPartitioner):
 
         # estimatorD.fit(X, Y, epochs=100)
         # keras.models.Model(inputs= keras.layers.Dense(input(estimator.layers[2].input)), outputs=estimator.layers[-1].output)
-        # model2 = keras.models.Model(inputs=input_img, outputs=x)
-        # model2 = keras.models.Model(inputs=estimator.layers[2].input, outputs=estimator.layers[-1].output)
+        #model2 = keras.models.Model(inputs=input_img, outputs=x)
+        #model2 = keras.models.Model(inputs=estimator.layers[2].input, outputs=estimator.layers[-1].output)
         # model2 = estimator.layers[-2]
-        # model2 =keras.models.Model(inputs=estimator.input, outputs=estimator.layers[-2].output)
-        # model2.compile(optimizer=keras.optimizers.Adam(), loss= keras.losses.KLD)
+        #model2 =keras.models.Model(inputs=estimator.input, outputs=estimator.layers[-2].output)
+        #model2.compile(optimizer=keras.optimizers.Adam(), loss= custom_loss)
         # model2.fit(X,Y,epochs=10)
-        try:
-            labels = np.unique(np.argmax(estimator.predict(XSplineVector), axis=1))
-            print(labels)
-            labels = np.argmax(estimator.predict(XSplineVector), axis=1)
-        except:
-            return [dataX], [dataY], [0], dataX, dataY, None
+        #try:
+        '''labels = np.unique(np.argmax(model2.predict(XSplineVector), axis=1))
+        print(labels)
+        labels = np.argmax(model2.predict(XSplineVector), axis=1)'''
+
+        labels = np.argmin(estimator.predict(X), axis=1)
+        y = (estimator.predict(X) * self.intercepts)
+        print(np.unique(labels))
+        #labels = np.argmax(estimator.predict(XSplineVector), axis=1)
+        #except:
+        #return [dataX], [dataY], [0], dataX, dataY, None
         NNmodels = []
         scores = []
 
@@ -616,7 +681,7 @@ class TensorFlowCl(DefaultPartitioner):
             # Keep partition label to ascertain same order of results
             partitionLabels.append(curLbl)
 
-
+        self.showClusterPlot(X,labels,len(np.unique(labels)),None)
         return partitionsX, partitionsY, partitionLabels , dataX , dataY,None
 
     def getFitnessOfModelForPoint(self, model, point):
@@ -624,7 +689,7 @@ class TensorFlowCl(DefaultPartitioner):
 
 class KMeansPartitioner(DefaultPartitioner):
     # Clusters data, for a given number of clusters
-    def clustering(self, dataX, dataY = None, dataW=None,nClusters = None, showPlot=False, random_state=1000):
+    def clustering(self, dataX, dataY = None, dataW=None,nClusters = None, showPlot=False, random_state=None):
 
         # Check if we need to use dataY
         dataUpdatedX = dataX
@@ -644,6 +709,7 @@ class KMeansPartitioner(DefaultPartitioner):
         # Fit the input data
         #dataUpdatedX=np.
         #dataUpdatedX = [dataX, dataY]
+        dataUpdatedX = np.array(dataUpdatedX)
         try:
             dataModel = clusteringModel.fit(np.nan_to_num(dataUpdatedX))
         except:

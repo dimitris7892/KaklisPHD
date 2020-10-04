@@ -88,7 +88,7 @@ class BaseSeriesReader:
         #stwRpm = np.array(np.append(stw.reshape(-1,1),np.asmatrix([rpm]).T,axis=1)).astype(float)
         '''c=0
         while c < len(data):
-            if np.std(data[c:c+10,3]) > 1.2:
+            if np.std(data[c:c+10,2]) > 1.2:
                 data = np.delete(data,np.s_[c:c+10],axis=0)
             c=c+10'''
         #stw =data[:,0]
@@ -112,7 +112,7 @@ class BaseSeriesReader:
             #dt = data.values[0:,2:23]
 
         #PW = np.asarray([ np.nan_to_num(np.float(x)) for x in dt[ :, 0 ] ])
-        X = np.asarray([ np.nan_to_num(np.float(x)) for x in dt[ :, 3 ] ])
+        X = np.asarray([ np.nan_to_num(np.float(x)) for x in dt[ :, 2 ] ])
         Y = np.asarray([ np.nan_to_num(np.float(y)) for y in dt[ :, 5 ] ])
         Lat = np.asarray([ np.nan_to_num(np.float(y)) for y in dt[ :, 19 ] ])
         Lon = np.asarray([ np.nan_to_num(np.float(y)) for y in dt[ :, 20 ] ])
