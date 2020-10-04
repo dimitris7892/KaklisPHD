@@ -1,6 +1,6 @@
 clusters,var,error,partitioners,models
-6,7.750556581210937,9.655354499816895,DelaunayTriPartitioner,TensorFlowW
-6,7.750556581210937,7.7553181648254395,DelaunayTriPartitioner,TensorFlowW
-4,7.750556581210937,4.594272136688232,DelaunayTriPartitioner,TensorFlowW
-2,7.750556581210937,1.3565129041671753,DelaunayTriPartitioner,TensorFlowW
-1,7.750556581210937,1.1147135496139526,DelaunayTriPartitioner,TensorFlowW
+2,7.0723286421,2.797896470163445,TensorFlowCl,SplineRegressionModeler
+2,5.4708173039000005,3.2164827398537206,TensorFlowCl,SplineRegressionModeler
+2,7.711656325623436,3.2971453090219973,TensorFlowCl,SplineRegressionModeler
+2,8.445704086275,2.1053709101023745,TensorFlowCl,SplineRegressionModeler
+2,3.9683040794,4.463821430460187,TensorFlowCl,SplineRegressionModeler

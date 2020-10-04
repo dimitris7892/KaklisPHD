@@ -210,7 +210,6 @@ def main():
                         data['STW'].values,
                         (data['AP_DRAFT AFT'].values + data['AP_DRAFT FORE'].values)/2,
                         data['M/EFOFlow'].values,
-
                          ]).T, axis=1)
 
     '''data = np.append(data['stw'].values.reshape(-1,1),
@@ -625,7 +624,7 @@ def main():
 
 def initParameters():
 
-    sFile = '/home/dimitris/Downloads/kaklisdedomena.csv'
+    sFile = '/home/dimitris/Desktop/new.csv'
         #"/home/dimitris/Desktop/mappedData/filteredDataNew.csv"
         #"/home/dimitris/Desktop/mappedData_.csv"
         #"./neural_data/marmaras_data.csv"
