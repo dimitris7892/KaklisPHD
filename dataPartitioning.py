@@ -15,6 +15,7 @@ import colorsys
 #from keras import losses
 #from sklearn.model_selection import KFold
 import sys
+from scipy.special import softmax
 sys.setrecursionlimit(1000000)
 #import SSplines as simplexSplines
 #from utils import *
@@ -73,7 +74,7 @@ class TensorFlowCl(DefaultPartitioner):
 
     def showClusterPlot(self, dataX, labels, nClusters,dataY=None):
 
-        if dataY==None:
+        if len(dataY)==0:
             xData = np.asarray(dataX[:, 0]).T
             yData = np.asarray(dataX[:, 1]).T
             #colors=tuple([numberToRGBAColor(l) for l in labels])
@@ -116,8 +117,8 @@ class TensorFlowCl(DefaultPartitioner):
                 #model.add(keras.layers.Dense(neurons, ))
                 #neurons = neurons+2
             #model.add(keras.layers.Dense(2 , input_shape=(2 + genModelKnots -1 ,)))
-            model.add(keras.layers.Dense(2  ,input_shape=(2  ,) ))
-            model.add(keras.layers.Dense(  genModelKnots - 1, ))
+            model.add(keras.layers.Dense(2  ,input_shape=(2   ,) ))
+            model.add(keras.layers.Dense(  genModelKnots -1  ,))
             #model.add(keras.layers.Dense(3, ))
             #model.add(keras.layers.Dense(2, ))
             #model.add(keras.layers.Dense(1, ))
@@ -130,7 +131,7 @@ class TensorFlowCl(DefaultPartitioner):
         def custom_loss(y_true,y_pred):
             #+ tf.keras.losses.categorical_crossentropy(y_true,y_pred)
             #tf.keras.losses.mean_squared_error(y_true,y_pred)
-            return    tf.keras.losses.mean_squared_error(y_true,y_pred)+tf.keras.losses.kullback_leibler_divergence(y_true, y_pred) #+tf.keras.losses.categorical_crossentropy(y_true,y_pred)
+            return    tf.keras.losses.mean_squared_error(y_true,y_pred)#+tf.keras.losses.kullback_leibler_divergence(y_true, y_pred) #+tf.keras.losses.categorical_crossentropy(y_true,y_pred)
 
 
 
@@ -582,7 +583,15 @@ class TensorFlowCl(DefaultPartitioner):
         for i in range(0, len(X)):
             vector = extractFunctionsFromSplines(X[i][0], X[i][1])
             #XSplineVector.append(np.append(X[i], vector))
-            XSplineVector.append( vector)
+            #vectorNew = np.array(self.intercepts) * [i if i > 0 else 0 for i in vector]
+            #vectorNew = np.array([i+ self.interceptsGen if i > 0 else 0 for i in vectorNew])
+            vectorNew = np.array(self.intercepts) * vector
+            vectorNew = np.array([i+ self.interceptsGen for i in vectorNew])
+
+            weights = [1/(1+ np.linalg.norm(k - Y[i])) for k in vectorNew]
+
+            XSplineVector.append( weights)
+            #XSplineVector.append(np.append(X[i], vectorNew))
 
         #XSplineVector.append(np.append(Y.reshape(-1,1), XSplineVector))
         XSplineVector = np.array(XSplineVector)
@@ -595,11 +604,11 @@ class TensorFlowCl(DefaultPartitioner):
 
         # estimator.layers[0].set_weights([weights, np.array([0] * (genModelKnots-1))])
         #XSplineVector = np.reshape(XSplineVector, (XSplineVector.shape[0], XSplineVector.shape[1], 1))
-        '''xy =[]
+        xy =[]
         for i in range(0, len(X)):
             xy.append( np.append(X[i], Y[i]))
-        xy = np.array(xy)'''
-        xy = []
+        xy = np.array(xy)
+        #xy = []
         '''for i in range(0, len(XSplineVector)):
             if XSplineVector[i][0]>0:
                 XSplineVector[i][0]=1
@@ -659,8 +668,8 @@ class TensorFlowCl(DefaultPartitioner):
         print(labels)
         labels = np.argmax(model2.predict(XSplineVector), axis=1)'''
 
-        labels = np.argmin(estimator.predict(X), axis=1)
-        y = (estimator.predict(X) * self.intercepts)
+        labels = np.argmax(estimator.predict(X), axis=1)
+        #y = (estimator.predict(X) * self.intercepts)
         print(np.unique(labels))
         #labels = np.argmax(estimator.predict(XSplineVector), axis=1)
         #except:
@@ -681,7 +690,7 @@ class TensorFlowCl(DefaultPartitioner):
             # Keep partition label to ascertain same order of results
             partitionLabels.append(curLbl)
 
-        self.showClusterPlot(X,labels,len(np.unique(labels)),None)
+        self.showClusterPlot(X,labels,len(np.unique(labels)),[])
         return partitionsX, partitionsY, partitionLabels , dataX , dataY,None
 
     def getFitnessOfModelForPoint(self, model, point):
@@ -699,7 +708,8 @@ class KMeansPartitioner(DefaultPartitioner):
             #dataXcl = dataX[:,0:3]
             #dataYcl=np.append(dataX[:,3].reshape(-1,1), np.asmatrix([dataY]).T, axis=1)
             #trnslatedDatax = np.array(np.append(dataX[:,0].reshape(-1,1),np.asmatrix([dataX[:,4]]).T,axis=1))
-            dataUpdatedX = np.append(dataX, np.asmatrix([dataY]).T, axis=1)
+            #dataUpdatedX = np.append(dataX, np.asmatrix([dataY]).T, axis=1)
+            dataUpdatedX = dataX
 
             # Init clustering model
         self._nClusters = nClusters
