@@ -55,6 +55,11 @@ def main():
         elif al == 'NNWD':modelers.append(dModel.TensorFlowWD())
         elif al == 'NNW1':modelers.append(dModel.TensorFlowW1())
         elif al == 'NNWCA':modelers.append(dModel.TensorFlowCA())
+        elif al == 'NNWE':
+            modelers.append(dModel.TensorFlowWeights())
+        elif al == 'NNWLSTM':
+            modelers.append(dModel.TensorFlowWLSTM())
+
 
     partitioners=[]
     for cl in cls:
@@ -126,7 +131,7 @@ def main():
 
 
 
-    K = range(1,11)
+    K = range(1,12)
     print("Number of Statistically ind. subsets for training: " + str(len(subsetsX)))
     subsetsX=[subsetsX[0:5]] if len(subsetsX) > 5 else subsetsX
     subsetsY = [ subsetsY[ 0:5 ] ] if len(subsetsY) > 5 else subsetsY
@@ -154,7 +159,7 @@ def main():
                if modeler.__class__.__name__=='TriInterpolantModeler' or modeler.__class__.__name__ == 'TensorFlow':
                  partK =[1]
                else:
-                 partK=K
+                 partK=[6]
            else:
                partK=[1]
            error = {"errors": [ ]}
@@ -302,9 +307,10 @@ def main():
 
                 # Predict and evaluate on unseen data
                 print("Evaluating on unseen data...")
-                if modeler.__class__.__name__ != 'TensorFlowW1' and modeler.__class__.__name__ != 'TensorFlow' and modeler.__class__.__name__ != 'TensorFlowW' and modeler.__class__.__name__ != 'TriInterpolantModeler' and modeler.__class__.__name__ != 'TensorFlowWD':
+                if modeler.__class__.__name__ != 'TensorFlowW1' and modeler.__class__.__name__ != 'TensorFlow' and modeler.__class__.__name__ != 'TensorFlowW' and modeler.__class__.__name__ != 'TriInterpolantModeler' \
+                        and modeler.__class__.__name__ != 'TensorFlowWD' and  modeler.__class__.__name__ != 'TensorFlowWeights' and  modeler.__class__.__name__ != 'TensorFlowWLSTM':
                     Errors, meanError, sdError = eval.MeanAbsoluteErrorEvaluation.evaluate(eval.MeanAbsoluteErrorEvaluation(),
-                                                                                      unseenFeaturesX, unseenFeaturesY, modeler,genericModel)
+                                                                                      unseenFeaturesX, unseenFeaturesY, modeler,genericModel,partitionsX)
 
 
                 elif modeler.__class__.__name__ == 'TensorFlow' or modeler.__class__.__name__ == 'TensorFlowW' or  modeler.__class__.__name__ == 'TensorFlowWD':
@@ -317,6 +323,19 @@ def main():
                         eval.MeanAbsoluteErrorEvaluation(), unseenFeaturesX,
                         unseenFeaturesY,
                         modeler, output, None, None, partitionsX, genericModel)
+
+                elif modeler.__class__.__name__ == 'TensorFlowWeights':
+                    _, meanError, sdError = eval.MeanAbsoluteErrorEvaluation.evaluateKerasNNNweights(
+                        eval.MeanAbsoluteErrorEvaluation(), unseenFeaturesX,
+                        unseenFeaturesY,
+                        modeler, output, None, None, partitionsX, genericModel)
+
+                elif modeler.__class__.__name__ == 'TensorFlowLSTM':
+                    _, meanError, sdError = eval.MeanAbsoluteErrorEvaluation.evaluateKerasNNLSTM(
+                        eval.MeanAbsoluteErrorEvaluation(), unseenFeaturesX,
+                        unseenFeaturesY,
+                        modeler, output, None, None, partitionsX, genericModel)
+
                 else:
                     if flagEvalTri == False:
                         Errors, meanError, sdError = eval.MeanAbsoluteErrorEvaluation.evaluateTriInterpolant(
@@ -379,13 +398,14 @@ def initParameters():
     startU = 30000
     endU = 31000
 
-    algs= ['SR']
+    algs=['NNWCA']
+    #algs= ['SR','LR','RF','NNW','NNW1','NNWCA','NNWE','NNWLSTM']
         #['SR','LR','RF','NNW','NNW1','NNWCA','TRI']
     # ['SR','LR','RF','NN','NNW','TRI']
 
 
         #['SR','LR','RF','NN','NNW','TRI']
-    cls=['NNCL']
+    cls=['KM']
         #['KM','DC','NNCL']
     #['SR','LR','RF','NN'] algs
     #['KM','DC'] clusterers / cls
