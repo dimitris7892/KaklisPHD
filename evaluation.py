@@ -27,19 +27,22 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
             trueVal = unseenY[iCnt]
             #prediction = (modeler.getBestModelForPoint(pPoint).predict(pPoint) )#+ modeler._models[len(modeler._models) - 1].predict(pPoint)) /2
 
-            fits = modeler.getFitForEachPartitionForPoint(pPoint, partitionsX)
+            if len(partitionsX)> 1:
+                fits = modeler.getFitForEachPartitionForPoint(pPoint, partitionsX)
 
-            preds = []
-            for n in range(0, len(partitionsX)):
-                if modeler.__class__.__name__ == 'TensorFlowCA':
-                    preds.append(modeler._models[n].predict(pPoint)[0][0])
-                else:
-                    preds.append(modeler._models[n].predict(pPoint))
-            # weightedPreds.append(modeler._models[len(modeler._models)-1].predict(pPoint))
-            #top_2_idx = np.argsort(fits)[-2:]
-            #top_2_values = [fits[i] for i in top_2_idx]
-            #top_2_preds = [preds[i] for i in top_2_idx]
-            prediction = np.average(preds, weights=fits)
+                preds = []
+                for n in range(0, len(partitionsX)):
+                    if modeler.__class__.__name__ == 'TensorFlowCA':
+                        preds.append(modeler._models[n].predict(pPoint)[0][0])
+                    else:
+                        preds.append(modeler._models[n].predict(pPoint)[0])
+                # weightedPreds.append(modeler._models[len(modeler._models)-1].predict(pPoint))
+                #top_2_idx = np.argsort(fits)[-2:]
+                #top_2_values = [fits[i] for i in top_2_idx]
+                #top_2_preds = [preds[i] for i in top_2_idx]
+                prediction = np.average(preds, weights=fits)
+            else:
+                prediction = (modeler.getBestModelForPoint(pPoint).predict(pPoint) )#+ modeler._models[len(modeler._models) - 1].predict(pPoint)) /2
 
             lErrors.append(abs(prediction - trueVal))
         errors = np.asarray(lErrors)
@@ -1073,23 +1076,26 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
 
             ind, fit = modeler.getBestPartitionForPoint(pPoint, partitionsX)
 
-            fits = modeler.getFitForEachPartitionForPoint(pPoint, partitionsX)
+            if len(partitionsX)>1:
+                fits = modeler.getFitForEachPartitionForPoint(pPoint, partitionsX)
 
-            #ind = predLabel
-            # prediction = modeler._models[len(modeler._models)-1].predict(pPoint)
+                #ind = predLabel
+                # prediction = modeler._models[len(modeler._models)-1].predict(pPoint)
 
-            preds = []
-            for n in range(0, len(partitionsX)):
+                preds = []
+                for n in range(0, len(partitionsX)):
 
-                preds.append(modeler._models[n].predict(pPoint)[0][0])
-            # weightedPreds.append(modeler._models[len(modeler._models)-1].predict(pPoint))
-            top_2_idx = np.argsort(fits)[-2:]
-            top_2_values = [fits[i] for i in top_2_idx]
-            top_2_preds=[preds[i] for i in top_2_idx]
-            prediction = np.average(preds, weights=fits)
-            #prediction = modeler._models[ind].predict(pPoint)
-            #prediction = pred / len(fits)
-            #pPoint = np.reshape(pPoint, (pPoint.shape[0], pPoint.shape[1], 1))
+                    preds.append(modeler._models[n].predict(pPoint)[0][0])
+                # weightedPreds.append(modeler._models[len(modeler._models)-1].predict(pPoint))
+                top_2_idx = np.argsort(fits)[-2:]
+                top_2_values = [fits[i] for i in top_2_idx]
+                top_2_preds=[preds[i] for i in top_2_idx]
+                prediction = np.average(preds, weights=fits)
+                #prediction = modeler._models[ind].predict(pPoint)
+                #prediction = pred / len(fits)
+                #pPoint = np.reshape(pPoint, (pPoint.shape[0], pPoint.shape[1], 1))
+            else:
+                prediction = abs(modeler._models[ind].predict(pPoint))
             '''if len(modeler._models) >1:
                 prediction = (abs(modeler._models[ind].predict(pPoint))  + modeler._models[len(modeler._models) - 1].predict(pPoint) )/ 2
             else:

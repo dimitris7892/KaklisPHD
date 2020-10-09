@@ -159,7 +159,7 @@ def main():
                if modeler.__class__.__name__=='TriInterpolantModeler' or modeler.__class__.__name__ == 'TensorFlow':
                  partK =[1]
                else:
-                 partK=[6]
+                 partK=K
            else:
                partK=[1]
            error = {"errors": [ ]}
@@ -398,7 +398,7 @@ def initParameters():
     startU = 30000
     endU = 31000
 
-    algs=['NNWCA']
+    algs=['RF',]
     #algs= ['SR','LR','RF','NNW','NNW1','NNWCA','NNWE','NNWLSTM']
         #['SR','LR','RF','NNW','NNW1','NNWCA','TRI']
     # ['SR','LR','RF','NN','NNW','TRI']
