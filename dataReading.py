@@ -105,7 +105,7 @@ class BaseSeriesReader:
         else:
 
 
-            dt = data[k*5000:(k*5000 + 5000)]
+            dt = data[k*3000:(k*3000 + 3000)]
 
             #[0:5000]
             #dt=np.array(random.sample(dt,20000))
