@@ -59,6 +59,9 @@ def main():
             modelers.append(dModel.TensorFlowWeights())
         elif al == 'NNWLSTM':
             modelers.append(dModel.TensorFlowWLSTM())
+        elif al == 'NNWLSTM2':
+            modelers.append(dModel.TensorFlowWLSTM2())
+
 
 
     partitioners=[]
@@ -117,7 +120,7 @@ def main():
         #subsetsB.append(targetB)
         var.append(np.var(seriesX))
 
-        if len(subsetsX)>=5:
+        if len(subsetsX)>=4:
             break
 
     rangeSubs = k
@@ -153,7 +156,7 @@ def main():
                 #partitioner.__class__.__name__ ="None"
            if partitioner.__class__.__name__=='DelaunayTriPartitioner':
 
-                 partK=np.linspace(0.3,1,7)#[0.5]
+                 partK=np.linspace(0.3,1,8)#[0.5]
 
            elif partitioner.__class__.__name__=='KMeansPartitioner':
                if modeler.__class__.__name__=='TriInterpolantModeler' or modeler.__class__.__name__ == 'TensorFlow':
@@ -175,7 +178,7 @@ def main():
                 reader = dRead.BaseSeriesReader()
                 trSize=80000
 
-                if modeler.__class__.__name__ == 'TensorFlowW' and  partitioner.__class__.__name__!='DelaunayTriPartitioner':
+                if (modeler.__class__.__name__ == 'TensorFlowWLSTM' or modeler.__class__.__name__ == 'TensorFlowW' or modeler.__class__.__name__ == 'TensorFlowLSTM2') and  partitioner.__class__.__name__!='DelaunayTriPartitioner':
 
                     dataset = np.array(np.append(subsetX.reshape(-1, 1), np.asmatrix([subsetY]).T, axis=1))
 
@@ -255,7 +258,7 @@ def main():
                     #unseenW = unseenW[ 0:2880 ]
                     unseenX = unseenXDt[subsetsCounter]
                     unseenY = unseenYDt[subsetsCounter]
-                    if modeler.__class__.__name__ == 'TensorFlowW' and partitioner.__class__.__name__!='DelaunayTriPartitioner':
+                    if (modeler.__class__.__name__ == 'TensorFlowWLSTM' or modeler.__class__.__name__ == 'TensorFlowW'  or modeler.__class__.__name__ == 'TensorFlowLSTM2') and partitioner.__class__.__name__!='DelaunayTriPartitioner':
 
                         dataset = np.array(np.append(unseenX.reshape(-1, 1), np.asmatrix([unseenY]).T, axis=1))
 
@@ -308,7 +311,8 @@ def main():
                 # Predict and evaluate on unseen data
                 print("Evaluating on unseen data...")
                 if modeler.__class__.__name__ != 'TensorFlowW1' and modeler.__class__.__name__ != 'TensorFlow' and modeler.__class__.__name__ != 'TensorFlowW' and modeler.__class__.__name__ != 'TriInterpolantModeler' \
-                        and modeler.__class__.__name__ != 'TensorFlowWD' and  modeler.__class__.__name__ != 'TensorFlowWeights' and  modeler.__class__.__name__ != 'TensorFlowWLSTM':
+                        and modeler.__class__.__name__ != 'TensorFlowWD' and  modeler.__class__.__name__ != 'TensorFlowWeights' and  modeler.__class__.__name__ != 'TensorFlowWLSTM'\
+                        and  modeler.__class__.__name__ != 'TensorFlowWLSTM2':
                     Errors, meanError, sdError = eval.MeanAbsoluteErrorEvaluation.evaluate(eval.MeanAbsoluteErrorEvaluation(),
                                                                                       unseenFeaturesX, unseenFeaturesY, modeler,genericModel,partitionsX)
 
@@ -330,8 +334,14 @@ def main():
                         unseenFeaturesY,
                         modeler, output, None, None, partitionsX, genericModel)
 
-                elif modeler.__class__.__name__ == 'TensorFlowLSTM':
+                elif modeler.__class__.__name__ == 'TensorFlowWLSTM':
                     _, meanError, sdError = eval.MeanAbsoluteErrorEvaluation.evaluateKerasNNLSTM(
+                        eval.MeanAbsoluteErrorEvaluation(), unseenFeaturesX,
+                        unseenFeaturesY,
+                        modeler, output, None, None, partitionsX, genericModel)
+
+                elif modeler.__class__.__name__ == 'TensorFlowWLSTM2':
+                    _, meanError, sdError = eval.MeanAbsoluteErrorEvaluation.evaluateKerasNNLSTM2(
                         eval.MeanAbsoluteErrorEvaluation(), unseenFeaturesX,
                         unseenFeaturesY,
                         modeler, output, None, None, partitionsX, genericModel)
@@ -398,7 +408,8 @@ def initParameters():
     startU = 30000
     endU = 31000
 
-    algs=['RF',]
+    algs=['SR','LR','RF','NNW','NNW1','NNWCA','NNWE','NNWLSTM','NNWLSTM2']
+        #['SR','LR','RF','NNW','NNW1','NNWCA','NNWE','NNWLSTM','NNWLSTM2']
     #algs= ['SR','LR','RF','NNW','NNW1','NNWCA','NNWE','NNWLSTM']
         #['SR','LR','RF','NNW','NNW1','NNWCA','TRI']
     # ['SR','LR','RF','NN','NNW','TRI']

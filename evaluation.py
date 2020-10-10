@@ -1190,7 +1190,8 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
             #pred=modeler._models[len(modeler._models)-1].predict(pPoint)
             #for i in range(0,len(fits)):
                 #pred+=fits[i]*modeler._models[i].predict(pPoint)
-            self.intercepts = []
+            ################################################################################
+            '''self.intercepts = []
             vector = self.extractFunctionsFromSplines(pPoint[0][0],pPoint[0][1],ind)
             XSplineVector=np.append(pPoint, vector)
             #XSplineVector = XSplineVector.reshape(-1, XSplineVector.shape[ 0 ])
@@ -1199,13 +1200,13 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
             XSplinevectorNew = np.array([i + self.interceptsGen for i in XSplinevectorNew])
 
             XSplinevectorNew = np.append(pPoint, XSplinevectorNew)
-            XSplinevectorNew = XSplinevectorNew.reshape(-1, XSplinevectorNew.shape[0])
-            pred = modeler._models[ind].predict(XSplinevectorNew)
+            XSplinevectorNew = XSplinevectorNew.reshape(-1, XSplinevectorNew.shape[0])'''
+            #pred = modeler._models[ind].predict(XSplinevectorNew)
             #######################################################
             #######################################################
             #######################################################
 
-            self.intercepts = []
+            '''self.intercepts = []
             vector = self.extractFunctionsFromSplines(pPoint[ 0 ][ 0 ], pPoint[ 0 ][ 1 ], 'Gen')
 
 
@@ -1215,7 +1216,7 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
             XSplineGenvectorNew = np.append(pPoint, XSplineGenvectorNew)
             XSplineGenvectorNew = XSplineGenvectorNew.reshape(-1, XSplineGenvectorNew.shape[0])
 
-            #prediction = abs(modeler._models[ 0 ].predict(XSplineVector))
+            prediction = abs(modeler._models[ 0 ].predict(XSplineGenvectorNew))'''
             #XSplineVector = XSplineGenVector if modeler._models[ind][1]=='GEN' else XSplineVector
             #prediction = (abs(modeler._models[ind].predict(XSplineVector)) + modeler._models[len(modeler._models)-1].predict(XSplineGenVector))/2
 
@@ -1225,22 +1226,38 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
                 prediction = (abs(modeler._models[ind].predict(XSplinevectorNew)) + modeler._models[len(modeler._models) - 1].predict(XSplineGenvectorNew) )/ 2
             else:
                 prediction =  modeler._models[len(modeler._models) - 1].predict(XSplinevectorNew)'''
+            if len(modeler._models) > 1:
+                preds = []
+                for n in range(0,len(partitionsX)):
+                    self.intercepts = []
+                    vector = self.extractFunctionsFromSplines(pPoint[0][0], pPoint[0][1], n)
+                    #XSplineVector = np.append(pPoint, vector)
+                    # XSplineVector = XSplineVector.reshape(-1, XSplineVector.shape[ 0 ])
 
-            preds = []
-            for n in range(0,len(partitionsX)):
+                    XSplinevectorNew = np.array(self.intercepts) * vector
+                    XSplinevectorNew = np.array([i + self.interceptsGen for i in XSplinevectorNew])
+
+                    XSplinevectorNew = np.append(pPoint, XSplinevectorNew)
+                    XSplinevectorNew = XSplinevectorNew.reshape(-1, XSplinevectorNew.shape[0])
+                    #try:
+                    preds.append(modeler._models[n].predict(XSplinevectorNew)[0][0] )
+                    #except:
+                        #d=0
+                # weightedPreds.append(modeler._models[len(modeler._models)-1].predict(pPoint))
+                prediction = np.average(preds ,weights=fits )
+            else:
+
                 self.intercepts = []
-                vector = self.extractFunctionsFromSplines(pPoint[0][0], pPoint[0][1], n)
-                #XSplineVector = np.append(pPoint, vector)
-                # XSplineVector = XSplineVector.reshape(-1, XSplineVector.shape[ 0 ])
+                vector = self.extractFunctionsFromSplines(pPoint[0][0], pPoint[0][1], 'Gen')
 
-                XSplinevectorNew = np.array(self.intercepts) * vector
-                XSplinevectorNew = np.array([i + self.interceptsGen for i in XSplinevectorNew])
+                XSplineGenvectorNew = np.array(self.intercepts) * vector
+                XSplineGenvectorNew = np.array([i + self.interceptsGen for i in XSplineGenvectorNew])
 
-                XSplinevectorNew = np.append(pPoint, XSplinevectorNew)
-                XSplinevectorNew = XSplinevectorNew.reshape(-1, XSplinevectorNew.shape[0])
-                preds.append(modeler._models[n].predict(XSplinevectorNew)[0][0] )
-            # weightedPreds.append(modeler._models[len(modeler._models)-1].predict(pPoint))
-            prediction = np.average(preds ,weights=fits )
+                XSplineGenvectorNew = np.append(pPoint, XSplineGenvectorNew)
+                XSplineGenvectorNew = XSplineGenvectorNew.reshape(-1, XSplineGenvectorNew.shape[0])
+
+                prediction = abs(modeler._models[0].predict(XSplineGenvectorNew))
+
             #try:
                 #if modeler._models[ ind ][ 1 ] == 'GEN':
             #prediction = modeler._models[ len(modeler._models) - 1 ][ 0 ].predict(XSplineGenVector)
@@ -1288,7 +1305,7 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
 
             ind, fit = modeler.getBestPartitionForPoint(pPoint, partitionsX)
 
-
+            self.intercepts = []
             vector = self.extractFunctionsFromSplines(pPoint[0][0],pPoint[0][1],ind)
             XSplineVector=np.append(pPoint, vector)
             XSplineVector = XSplineVector.reshape(-1, XSplineVector.shape[ 0 ])
@@ -1300,6 +1317,8 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
             XSplinevectorNew = XSplinevectorNew.reshape(-1, XSplinevectorNew.shape[0])
             XSplinevectorNew = np.reshape(XSplinevectorNew, (XSplinevectorNew.shape[0], XSplinevectorNew.shape[1], 1))
             #######################################################
+
+            self.intercepts = []
             vector = self.extractFunctionsFromSplines(pPoint[ 0 ][ 0 ], pPoint[ 0 ][ 1 ], 'Gen')
 
 
@@ -1348,7 +1367,7 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
 
             if len(modeler._models) > 1:
                 vector = self.extractFunctionsFromSplines(pPoint[0][0], pPoint[0][1], ind)
-                weightsCl = abs(modeler._models[ind].predict(pPoint))
+                weightsCl = abs(modeler._models[ind].predict(pPoint)[0])
                 XSplinevectorNew = np.array(self.intercepts) * vector
                 XSplinevectorNew = np.array([i + self.interceptsGen for i in XSplinevectorNew])
 
@@ -1356,20 +1375,22 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
             else:
 
                 vector = self.extractFunctionsFromSplines(pPoint[0][0], pPoint[0][1], 'Gen')
-                weightsCl = abs(modeler._models[ind].predict(pPoint)[0])
+                weightsCl = abs(modeler._models[len(modeler._models) - 1].predict(pPoint)[0])
                 #XSplinevectorNew = np.array(self.intercepts) * vector
                 #XSplinevectorNew = np.array([i + self.interceptsGen for i in XSplinevectorNew])
 
-                XSplinevectorNew = np.array(self.intercepts) * [i if i > 0 else 0 for i in vector]
-                XSplinevectorNew = np.array([i + self.interceptsGen if i > 0 else 0  for i in XSplinevectorNew])
+                XSplinevectorNew = np.array(self.intercepts) *  vector
+                XSplinevectorNew = np.array([i + self.interceptsGen  for i in XSplinevectorNew])
                 #weightsCl = [weightsCl[w] if XSplinevectorNew[w]>0 else 0 for w in range(0,len(weightsCl))]
 
+            #
             try:
                 prediction = np.average(XSplinevectorNew, weights=weightsCl)
+            except:
+                d=0
+
                     #np.average((np.array(self.intercepts) * [i for i in vector]),weights=(modeler._models[ind].predict(pPoint)[0]))+self.interceptsGen
 
-            except:
-                x=0
             #prediction = [XSplinevectorNew[k] * weightsCl[k] for k in range(0,len(XSplinevectorNew))]
             #prediction = np.sum(prediction)
             #prediction = XSplinevectorNew[np.argmax(weightsCl)]
@@ -1384,9 +1405,7 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
                 w=0
         #x=unseenX[:,0].reshape(-1,unseenX.shape[0])
             lErrors.append(abs(prediction - trueVal))
-        #prediction =modeler._models[ 0 ].predict(unseenX.reshape(2,2860))
-        #print np.mean(abs(prediction - unseenY))
-        #print("EXCEPTIONS :  "+str(count))
+
         errors = np.asarray(lErrors)
 
         return errors, np.mean(errors), np.std(lErrors)
@@ -1423,3 +1442,31 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
         #formula = 'error ~ C(clusters) + C(var) + C(error)'
         ##model =  ols(formula, df).fit()
         #aov_tab
+
+    def evaluateKerasNNLSTM2(self, unseenX, unseenY, modeler, output, xs, genericModel, partitionsX, scores):
+        lErrors = []
+        self.intercepts = []
+        self.count = 0
+
+        for iCnt in range(np.shape(unseenX)[0]):
+            pPoint = unseenX[iCnt]
+            pPoint = pPoint.reshape(-1, unseenX.shape[1])
+
+            # try:
+            trueVal = unseenY[iCnt]
+
+            ind, fit = modeler.getBestPartitionForPoint(pPoint, partitionsX)
+
+            pPoint = np.reshape(pPoint, (pPoint.shape[0], pPoint.shape[1], 1))
+            if len(modeler._models) > 1:
+                prediction = (abs(modeler._models[ind].predict(pPoint)) + modeler._models[
+                    len(modeler._models) - 1].predict(pPoint)) / 2
+            else:
+                prediction = modeler._models[len(modeler._models) - 1].predict(pPoint)
+
+
+            lErrors.append(abs(prediction - trueVal))
+
+        errors = np.asarray(lErrors)
+
+        return errors, np.mean(errors), np.std(lErrors)
