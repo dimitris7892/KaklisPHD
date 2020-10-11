@@ -3379,6 +3379,7 @@ class TensorFlowWeights(BasePartitionModeler):
             vector = extractFunctionsFromSplines(X[i][0], X[i][1])
             # XSplineVector.append(np.append(X[i], vector))
             vectorNew = np.array(self.intercepts) * [i if i > 0 else 0 for i in vector]
+            vectorNew = vectorNew if len(vectorNew)>0 else [0]
             vectorNew = np.array([i+ self.interceptsGen if i > 0 else 0  for i in vectorNew])
             #vectorNew = np.array(self.intercepts) * vector
             #vectorNew = np.array([i + self.interceptsGen for i in vectorNew])
@@ -3404,54 +3405,6 @@ class TensorFlowWeights(BasePartitionModeler):
 
          # validation_data=(X_test,y_test)
 
-        def insert_intermediate_layer_in_keras(model,layer_id, new_layer):
-
-
-            layers = [ l for l in model.layers ]
-
-            x = layers[ 0 ].output
-            for i in range(1, len(layers)):
-                if i == layer_id:
-                    x = new_layer(x)
-                if i == len(layers)-1:
-                    x = keras.layers.Dense(1)(x)
-                else:
-                    x = layers[ i ](x)
-            #x = new_layer(x)
-            new_model = keras.Model(inputs=model.input, outputs=x)
-            #new_model.add(new_layer)
-            new_model.compile(loss='mse', optimizer=keras.optimizers.Adam())
-            #.add(x)
-            return new_model
-
-        def replace_intermediate_layer_in_keras(model, layer_id,layer_id1 ,new_layer,new_layer1):
-
-
-            layers = [ l for l in model.layers ]
-
-            x = layers[ 0 ].output
-            for i in range(1, len(layers)):
-                if i == layer_id:
-                    x = new_layer(x)
-
-                elif  i == layer_id1:
-                    x = new_layer1(x)
-
-                else:########
-                    #if i == len(layers) - 1:
-                        #x = keras.layers.Dense(1)(x)
-                    #else:
-                    x = layers[ i ](x)
-
-            new_model = keras.Model(inputs=model.input, outputs=x)
-            new_model.compile(loss='mse', optimizer=keras.optimizers.Adam(),)
-            return new_model
-
-        #for train, test in kfold.split(partitionsX[idx],partitionsY[idx]):
-        #if len(partition_labels)>0:
-        #models.append(estimator)
-        #models={}
-        #models[ 300 ] = estimator
 
         NNmodels=[]
         scores=[]
@@ -3468,7 +3421,9 @@ class TensorFlowWeights(BasePartitionModeler):
                         # XSplineVector.append(np.append(X[i], vector))
                         # vectorNew = np.array(self.intercepts) * [i if i > 0 else 0 for i in vector]
                         # vectorNew = np.array([i+ self.interceptsGen if i > 0 else 0 for i in vectorNew])
+
                         vectorNew = np.array(self.intercepts) * vector
+                        vectorNew = vectorNew if len(vectorNew) > 0 else [0]
                         vectorNew = np.array([i + self.interceptsGen for i in vectorNew])
 
                         weights = [abs(1 / (1 + np.linalg.norm(k - partitionsY[idx][i]))) for k in vectorNew]
@@ -3484,6 +3439,7 @@ class TensorFlowWeights(BasePartitionModeler):
                     estimatorCl = keras.models.Sequential()
 
                     #estimatorCl.add(keras.layers.LSTM(2 + numOfNeurons -1 ,input_shape=(2+numOfNeurons-1,1)))
+                    numOfNeurons = numOfNeurons if numOfNeurons > 1 else 2
                     estimatorCl.add(keras.layers.Dense(2 , input_shape=(2 , )))
                     estimatorCl.add(keras.layers.Dense(numOfNeurons - 1, ))
                     #estimatorCl.add(keras.layers.Dense(2))

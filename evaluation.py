@@ -1369,7 +1369,9 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
                 vector = self.extractFunctionsFromSplines(pPoint[0][0], pPoint[0][1], ind)
                 weightsCl = abs(modeler._models[ind].predict(pPoint)[0])
                 XSplinevectorNew = np.array(self.intercepts) * vector
+
                 XSplinevectorNew = np.array([i + self.interceptsGen for i in XSplinevectorNew])
+                XSplinevectorNew = XSplinevectorNew if len(XSplinevectorNew) > 0 else [self.interceptsGen]
 
 
             else:
@@ -1384,10 +1386,10 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
                 #weightsCl = [weightsCl[w] if XSplinevectorNew[w]>0 else 0 for w in range(0,len(weightsCl))]
 
             #
-            try:
-                prediction = np.average(XSplinevectorNew, weights=weightsCl)
-            except:
-                d=0
+
+            prediction = np.average(XSplinevectorNew, weights=weightsCl)
+
+
 
                     #np.average((np.array(self.intercepts) * [i for i in vector]),weights=(modeler._models[ind].predict(pPoint)[0]))+self.interceptsGen
 
