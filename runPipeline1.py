@@ -148,6 +148,7 @@ def main():
       #data1 = pd.read_csv(sFile, skiprows=skip_idxx)
       for modeler in modelers:
         for partitioner in partitioners:
+           if (modeler.__class__.__name__ == 'TensorFlowWLSTM2') and partitioner.__class__.__name__ == 'DelaunayTriPartitioner': continue
            if modeler.__class__.__name__ == 'TriInterpolantModeler' and partitioner.__class__.__name__=='DelaunayTriPartitioner':
                 break
            if modeler.__class__.__name__ == 'TriInterpolantModeler' or modeler.__class__.__name__ == 'TensorFlow':
@@ -170,7 +171,7 @@ def main():
 
            flagEvalTri = False
            for k in partK:
-                if modeler.__class__.__name__ == 'TensorFlowW' and K==1: continue
+                #if modeler.__class__.__name__ == 'TensorFlowW' and K==1: continue
 
                 #if  modeler.__class__.__name__ == 'TensorFlow' and k>1: continue
                 print(modeler.__class__.__name__)
@@ -178,7 +179,7 @@ def main():
                 reader = dRead.BaseSeriesReader()
                 trSize=80000
 
-                if (modeler.__class__.__name__ == 'TensorFlowWLSTM' or modeler.__class__.__name__ == 'TensorFlowW' or modeler.__class__.__name__ == 'TensorFlowLSTM2') and  partitioner.__class__.__name__!='DelaunayTriPartitioner':
+                if (modeler.__class__.__name__ == 'TensorFlowWLSTM' or modeler.__class__.__name__ == 'TensorFlowW' or modeler.__class__.__name__ == 'TensorFlowWLSTM2') and  partitioner.__class__.__name__!='DelaunayTriPartitioner':
 
                     dataset = np.array(np.append(subsetX.reshape(-1, 1), np.asmatrix([subsetY]).T, axis=1))
 
@@ -400,7 +401,7 @@ def main():
 
 def initParameters():
     sFile = "./kaklis.csv"
-    # Get file name
+    # Get file namehttps://danaos-mc.slack.com/archives/D015U6TDFDL
     history = 20
     future=30
     start = 10000
@@ -408,7 +409,7 @@ def initParameters():
     startU = 30000
     endU = 31000
 
-    algs=['NNWE']
+    algs=['NNW','NNW1','NNWCA','NNWE','NNWLSTM','NNWLSTM2']
         #['SR','LR','RF','NNW','NNW1','NNWCA','NNWE','NNWLSTM','NNWLSTM2']
     #algs= ['SR','LR','RF','NNW','NNW1','NNWCA','NNWE','NNWLSTM']
         #['SR','LR','RF','NNW','NNW1','NNWCA','TRI']
@@ -416,7 +417,7 @@ def initParameters():
 
 
         #['SR','LR','RF','NN','NNW','TRI']
-    cls=['DC']
+    cls=['DC','KM']
         #['KM','DC','NNCL']
     #['SR','LR','RF','NN'] algs
     #['KM','DC'] clusterers / cls
