@@ -190,7 +190,7 @@ def main():
 
 
 
-    data = pd.read_csv(sFile, delimiter=',',skiprows=0)
+    '''data = pd.read_csv(sFile, delimiter=',',skiprows=0)
 
     #data = data.drop(["blFlags"], axis=1)
     #data = data.drop(["wind_speed", "wind_dir","trim"], axis=1)
@@ -212,25 +212,13 @@ def main():
                         data['M/EFOFlow'].values,
                          ]).T, axis=1)
 
-    '''data = np.append(data['stw'].values.reshape(-1,1),
-                     np.asmatrix([
-                    data['apparent_wind_speed'].values,
-                    data['apparent_wind_angle'].values,
-                    data['mid_draft'].values,
-                    data['trim'].values,
-                    data['rpm'].values]).T, axis=1)'''
+
 
     #data = pd.read_csv(sFile, delimiter=';')
     #data = data.drop(["wind_speed", "wind_dir"], axis=1)
     #data = data[data['stw']>7].values
     data = np.array(data)#.astype(float)
 
-    '''for i in range(0,len(data)):
-        data[i] = np.mean(data[i:i+10],axis=0)
-
-    for i in range(1,len(data)):
-
-        data[i,7] =np.abs( data[i,7] - data[i-1,7])'''
 
     ##################################################
     trData = data
@@ -240,7 +228,7 @@ def main():
         data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
         for i in range(0, len(trData)):
             data_writer.writerow(
-                [trData[i][0], trData[i][1], trData[i][2],trData[i][3],trData[i][4],trData[i][5],trData[i][6],trData[i][7],trData[i][8]])
+                [trData[i][0], trData[i][1], trData[i][2],trData[i][3],trData[i][4],trData[i][5],trData[i][6],trData[i][7],trData[i][8]])'''
 
     DANreader.GenericParserForDataExtraction('LEMAG', 'DANAOS', 'EXPRESS ATHENS', driver='ORACLE',
                                              server='10.2.5.80',
@@ -251,6 +239,20 @@ def main():
     #y_train = np.array(np.mean(data[:,5:6],axis=1))
 
 
+    '''for i in range(0,len(data)):
+        data[i] = np.mean(data[i:i+10],axis=0)
+
+    for i in range(1,len(data)):
+
+        data[i,7] =np.abs( data[i,7] - data[i-1,7])'''
+
+    '''data = np.append(data['stw'].values.reshape(-1,1),
+                     np.asmatrix([
+                    data['apparent_wind_speed'].values,
+                    data['apparent_wind_angle'].values,
+                    data['mid_draft'].values,
+                    data['trim'].values,
+                    data['rpm'].values]).T, axis=1)'''
 
     ##################################################
 
