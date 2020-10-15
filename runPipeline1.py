@@ -171,221 +171,224 @@ def main():
 
            flagEvalTri = False
            for k in partK:
+                try:
+                    print(modeler.__class__.__name__)
+                    print("Reading data...")
+                    reader = dRead.BaseSeriesReader()
+                    #or modeler.__class__.__name__ == 'TensorFlowWLSTM2'
+                    print("Reading data... Done.")
+                    if (modeler.__class__.__name__ == 'TensorFlowWLSTM' or modeler.__class__.__name__ == 'TensorFlowW' ) and partitioner.__class__.__name__ != 'DelaunayTriPartitioner':
 
-                print(modeler.__class__.__name__)
-                print("Reading data...")
-                reader = dRead.BaseSeriesReader()
-                #or modeler.__class__.__name__ == 'TensorFlowWLSTM2'
-                print("Reading data... Done.")
-                if (modeler.__class__.__name__ == 'TensorFlowWLSTM' or modeler.__class__.__name__ == 'TensorFlowW' ) and partitioner.__class__.__name__ != 'DelaunayTriPartitioner':
-
-                    dataset = np.array(np.append(subsetX.reshape(-1, subsetX.shape[1] if len(subsetX.shape)>1 else 1), np.asmatrix([subsetY]).T, axis=1))
-
-                    for i in range(0, len(dataset)):
-                        dataset[i] = np.mean(dataset[i:i + 15], axis=0)
-
-                    subsetX = dataset[:, 0:(dataset.shape[1]) - 1 if len(dataset.shape)>1 else 1]
-                    subsetY = dataset[:, dataset.shape[1] - 1 if len(dataset.shape)>1 else 1]
-                # Extract features
-                seriesX = subsetX
-                targetY = subsetY
-                if modeler.__class__.__name__ != 'TensorFlowWD':
-                    print("Extracting features from training set...")
-                    featureExtractor = fCalc.BaseFeatureExtractor()
-                    X, Y , W = featureExtractor.extractFeatures(modeler,seriesX, targetY,targetW,targetB,history)
-                    '''dataset = np.array(np.append(X, np.asmatrix([Y]).T, axis=1))
-
-                    for i in range(0, len(dataset)):
-                        dataset[i] = np.mean(dataset[i:i + 10], axis=0)
-
-                    X = dataset[:, 0:2]
-                    Y = dataset[:, 2]'''
-
-
-                    print("Extracting features from training set... Done.")
-                #X = subsetX
-                #Y = subsetY
-                print("Partitioning training set...")
-                NUM_OF_CLUSTERS =k# TODO: Read from command line
-
-                ##IF MODEL != OF ANALYTICAL METHOD IMPLEMENT CLUSTERING
-                if modeler.__class__.__name__ != 'TriInterpolantModeler':
-                    if modeler.__class__.__name__ != 'TensorFlowWD':
-                        partitionsX, partitionsY, partitionLabels, partitionRepresentatives, partitioningModel  , centroids  = partitioner.clustering(X, Y, W ,NUM_OF_CLUSTERS, True,k)
-                    else:
-
-                        partitionsX, partitionsY, partitionLabels, partitionRepresentatives, partitioningModel, tri  = partitioner.clustering(
-
-                            seriesX, targetY, None, NUM_OF_CLUSTERS, True, k)
-                else:
-                    partitionsX, partitionsY, partitionLabels,partitionRepresentatives,partitioningModel  , centroids= X,Y,[1],None,None,None
-
-
-                print("Partitioning training set... Done.")
-                # For each partition create model
-                print("Creating models per partition...")
-
-
-                unseenX=[]
-                unseenY=[]
-                if modeler.__class__.__name__!= 'TriInterpolantModeler' :
-
-                    modelMap, history,scores, output,genericModel = modeler.createModelsFor(partitionsX, partitionsY, partitionLabels,None,X,Y)
-
-                    print("Creating models per partition... Done")
-
-                # Get unseen data
-                print("Reading unseen data...")
-                if modeler.__class__.__name__ != 'TensorFlowWD':
-
-                    #unseenX,unseenY , unseenW,unseenB = dRead.UnseenSeriesReader.readRandomSeriesDataFromFile(dRead.UnseenSeriesReader(),data1)
-                # and their features
-                ##
-                    #unseenX=unseenX[0:2880]
-                    #unseenY=unseenY[0:2880]
-                    #unseenW = unseenW[ 0:2880 ]
-                    unseenX = unseenXDt[subsetsCounter]
-                    unseenY = unseenYDt[subsetsCounter]
-                    # or modeler.__class__.__name__ == 'TensorFlowLSTM2'
-                    #or modeler.__class__.__name__ == 'TensorFlowLSTM2'
-                    if (modeler.__class__.__name__ == 'TensorFlowWLSTM' or modeler.__class__.__name__ == 'TensorFlowW') \
-                    and partitioner.__class__.__name__ != 'DelaunayTriPartitioner':
-
-                        dataset = np.array(
-                            np.append(unseenX.reshape(-1, unseenX.shape[1] if len(unseenX.shape)>1 else 1), np.asmatrix([unseenY]).T, axis=1))
+                        dataset = np.array(np.append(subsetX.reshape(-1, subsetX.shape[1] if len(subsetX.shape)>1 else 1), np.asmatrix([subsetY]).T, axis=1))
 
                         for i in range(0, len(dataset)):
                             dataset[i] = np.mean(dataset[i:i + 15], axis=0)
 
-                        unseenX = dataset[:, 0:(dataset.shape[1]) - 1 if len(dataset.shape)>1 else 1]
-                        unseenY = dataset[:, dataset.shape[1] - 1 if len(dataset.shape)>1 else 1]
-                    stdInU.append(np.std(unseenX))
-                ##
-                    featureExtractor=fCalc.UnseenFeaturesExtractor()
-                    unseenFeaturesX, unseenFeaturesY , unseenFeaturesW = featureExtractor.extractFeatures(modeler,unseenX, unseenY,None,None,history)
-                    #dataset = np.array(np.append(unseenFeaturesX, np.asmatrix([unseenFeaturesY]).T, axis=1))
+                        subsetX = dataset[:, 0:(dataset.shape[1]) - 1 if len(dataset.shape)>1 else 1]
+                        subsetY = dataset[:, dataset.shape[1] - 1 if len(dataset.shape)>1 else 1]
+                    # Extract features
+                    seriesX = subsetX
+                    targetY = subsetY
+                    if modeler.__class__.__name__ != 'TensorFlowWD':
+                        print("Extracting features from training set...")
+                        featureExtractor = fCalc.BaseFeatureExtractor()
+                        X, Y , W = featureExtractor.extractFeatures(modeler,seriesX, targetY,targetW,targetB,history)
+                        '''dataset = np.array(np.append(X, np.asmatrix([Y]).T, axis=1))
+    
+                        for i in range(0, len(dataset)):
+                            dataset[i] = np.mean(dataset[i:i + 10], axis=0)
+    
+                        X = dataset[:, 0:2]
+                        Y = dataset[:, 2]'''
+
+
+                        print("Extracting features from training set... Done.")
+                    #X = subsetX
+                    #Y = subsetY
+                    print("Partitioning training set...")
+                    NUM_OF_CLUSTERS =k# TODO: Read from command line
+
+                    ##IF MODEL != OF ANALYTICAL METHOD IMPLEMENT CLUSTERING
+                    if modeler.__class__.__name__ != 'TriInterpolantModeler':
+                        if modeler.__class__.__name__ != 'TensorFlowWD':
+                            partitionsX, partitionsY, partitionLabels, partitionRepresentatives, partitioningModel  , centroids  = partitioner.clustering(X, Y, W ,NUM_OF_CLUSTERS, True,k)
+                        else:
+
+                            partitionsX, partitionsY, partitionLabels, partitionRepresentatives, partitioningModel, tri  = partitioner.clustering(
+
+                                seriesX, targetY, None, NUM_OF_CLUSTERS, True, k)
+                    else:
+                        partitionsX, partitionsY, partitionLabels,partitionRepresentatives,partitioningModel  , centroids= X,Y,[1],None,None,None
+
+
+                    print("Partitioning training set... Done.")
+                    # For each partition create model
+                    print("Creating models per partition...")
+
+
+                    unseenX=[]
+                    unseenY=[]
+                    if modeler.__class__.__name__!= 'TriInterpolantModeler' :
+
+                        modelMap, history,scores, output,genericModel = modeler.createModelsFor(partitionsX, partitionsY, partitionLabels,None,X,Y)
+
+                        print("Creating models per partition... Done")
+
+                    # Get unseen data
+                    print("Reading unseen data...")
+                    if modeler.__class__.__name__ != 'TensorFlowWD':
+
+                        #unseenX,unseenY , unseenW,unseenB = dRead.UnseenSeriesReader.readRandomSeriesDataFromFile(dRead.UnseenSeriesReader(),data1)
+                    # and their features
+                    ##
+                        #unseenX=unseenX[0:2880]
+                        #unseenY=unseenY[0:2880]
+                        #unseenW = unseenW[ 0:2880 ]
+                        unseenX = unseenXDt[subsetsCounter]
+                        unseenY = unseenYDt[subsetsCounter]
+                        # or modeler.__class__.__name__ == 'TensorFlowLSTM2'
+                        #or modeler.__class__.__name__ == 'TensorFlowLSTM2'
+                        if (modeler.__class__.__name__ == 'TensorFlowWLSTM' or modeler.__class__.__name__ == 'TensorFlowW') \
+                        and partitioner.__class__.__name__ != 'DelaunayTriPartitioner':
+
+                            dataset = np.array(
+                                np.append(unseenX.reshape(-1, unseenX.shape[1] if len(unseenX.shape)>1 else 1), np.asmatrix([unseenY]).T, axis=1))
+
+                            for i in range(0, len(dataset)):
+                                dataset[i] = np.mean(dataset[i:i + 15], axis=0)
+
+                            unseenX = dataset[:, 0:(dataset.shape[1]) - 1 if len(dataset.shape)>1 else 1]
+                            unseenY = dataset[:, dataset.shape[1] - 1 if len(dataset.shape)>1 else 1]
+                        stdInU.append(np.std(unseenX))
+                    ##
+                        featureExtractor=fCalc.UnseenFeaturesExtractor()
+                        unseenFeaturesX, unseenFeaturesY , unseenFeaturesW = featureExtractor.extractFeatures(modeler,unseenX, unseenY,None,None,history)
+                        #dataset = np.array(np.append(unseenFeaturesX, np.asmatrix([unseenFeaturesY]).T, axis=1))
 
 
 
-                    '''for i in range(0, len(dataset)):
-                        dataset[i] = np.mean(dataset[i:i + 10], axis=0)
+                        '''for i in range(0, len(dataset)):
+                            dataset[i] = np.mean(dataset[i:i + 10], axis=0)
+    
+                        unseenFeaturesX = dataset[:, 0:2]
+                        unseenFeaturesY = dataset[:, 2]'''
 
-                    unseenFeaturesX = dataset[:, 0:2]
-                    unseenFeaturesY = dataset[:, 2]'''
+                    print("Reading unseen data... Done")
 
-                print("Reading unseen data... Done")
+                    # Predict and evaluate on seen data
+                    print("Evaluating on seen data...")
+                    '''if modeler.__class__.__name__  != 'TriInterpolantModeler':
+                        #print("Evaluating on seen data...")
+    
+                        if modeler.__class__.__name__ != 'TensorFlowW1' and  modeler.__class__.__name__ != 'TensorFlow'and modeler.__class__.__name__ != 'TensorFlowW' and modeler.__class__.__name__ != 'TriInterpolantModeler' and modeler.__class__.__name__ != 'TensorFlowWD':
+                            x=1
+                            _, meanErrorTr, sdError = eval.MeanAbsoluteErrorEvaluation.evaluate(eval.MeanAbsoluteErrorEvaluation(), X,
+                                                                                              Y,
+                                                                                              modeler, genericModel)
+    
+                        elif modeler.__class__.__name__ == 'TensorFlow' or modeler.__class__.__name__ == 'TensorFlowW' or modeler.__class__.__name__ == 'TensorFlowWD':
+                            _,meanErrorTr, sdError = eval.MeanAbsoluteErrorEvaluation.evaluateKerasNN(
+                                eval.MeanAbsoluteErrorEvaluation(), X,
+                                Y,
+                                modeler, output, None,genericModel,partitionsX,None)
+    
+                        elif modeler.__class__.__name__ == 'TensorFlowW1':
+                               _, meanErrorTr, sdError = eval.MeanAbsoluteErrorEvaluation.evaluateKerasNN1(
+                                   eval.MeanAbsoluteErrorEvaluation(), X,
+                                   Y,
+                                   modeler, output, None,genericModel,partitionsX,None)
+    
+                        print ("Mean absolute error on training data: %4.2f (+/- %4.2f standard error)" % (
+                            meanErrorTr, sdError / sqrt(unseenFeaturesY.shape[ 0 ])))
+                        print("Evaluating on seen data... Done.")'''
 
-                # Predict and evaluate on seen data
-                print("Evaluating on seen data...")
-                '''if modeler.__class__.__name__  != 'TriInterpolantModeler':
-                    #print("Evaluating on seen data...")
+                    # Predict and evaluate on unseen data
+                    print("Evaluating on unseen data...")
+                    if modeler.__class__.__name__ != 'TensorFlowW1' and modeler.__class__.__name__ != 'TensorFlow' and modeler.__class__.__name__ != 'TensorFlowW' and modeler.__class__.__name__ != 'TriInterpolantModeler' \
+                            and modeler.__class__.__name__ != 'TensorFlowWD' and  modeler.__class__.__name__ != 'TensorFlowWeights' and  modeler.__class__.__name__ != 'TensorFlowWLSTM'\
+                            and  modeler.__class__.__name__ != 'TensorFlowWLSTM2':
+                        Errors, meanError, sdError = eval.MeanAbsoluteErrorEvaluation.evaluate(eval.MeanAbsoluteErrorEvaluation(),
+                                                                                          unseenFeaturesX, unseenFeaturesY, modeler,genericModel,partitionsX)
 
-                    if modeler.__class__.__name__ != 'TensorFlowW1' and  modeler.__class__.__name__ != 'TensorFlow'and modeler.__class__.__name__ != 'TensorFlowW' and modeler.__class__.__name__ != 'TriInterpolantModeler' and modeler.__class__.__name__ != 'TensorFlowWD':
-                        x=1
-                        _, meanErrorTr, sdError = eval.MeanAbsoluteErrorEvaluation.evaluate(eval.MeanAbsoluteErrorEvaluation(), X,
-                                                                                          Y,
-                                                                                          modeler, genericModel)
 
-                    elif modeler.__class__.__name__ == 'TensorFlow' or modeler.__class__.__name__ == 'TensorFlowW' or modeler.__class__.__name__ == 'TensorFlowWD':
-                        _,meanErrorTr, sdError = eval.MeanAbsoluteErrorEvaluation.evaluateKerasNN(
-                            eval.MeanAbsoluteErrorEvaluation(), X,
-                            Y,
-                            modeler, output, None,genericModel,partitionsX,None)
-
+                    elif modeler.__class__.__name__ == 'TensorFlow' or modeler.__class__.__name__ == 'TensorFlowW' or  modeler.__class__.__name__ == 'TensorFlowWD':
+                        _, meanError, sdError = eval.MeanAbsoluteErrorEvaluation.evaluateKerasNN(
+                            eval.MeanAbsoluteErrorEvaluation(),unseenFeaturesX,
+                            unseenFeaturesY,
+                            modeler,output, None,None,partitionsX , genericModel)
                     elif modeler.__class__.__name__ == 'TensorFlowW1':
-                           _, meanErrorTr, sdError = eval.MeanAbsoluteErrorEvaluation.evaluateKerasNN1(
-                               eval.MeanAbsoluteErrorEvaluation(), X,
-                               Y,
-                               modeler, output, None,genericModel,partitionsX,None)
+                        _, meanError, sdError = eval.MeanAbsoluteErrorEvaluation.evaluateKerasNN1(
+                            eval.MeanAbsoluteErrorEvaluation(), unseenFeaturesX,
+                            unseenFeaturesY,
+                            modeler, output, None, None, partitionsX, genericModel)
 
-                    print ("Mean absolute error on training data: %4.2f (+/- %4.2f standard error)" % (
-                        meanErrorTr, sdError / sqrt(unseenFeaturesY.shape[ 0 ])))
-                    print("Evaluating on seen data... Done.")'''
+                    elif modeler.__class__.__name__ == 'TensorFlowWeights':
+                        _, meanError, sdError = eval.MeanAbsoluteErrorEvaluation.evaluateKerasNNNweights(
+                            eval.MeanAbsoluteErrorEvaluation(), unseenFeaturesX,
+                            unseenFeaturesY,
+                            modeler, output, None, None, partitionsX, genericModel)
 
-                # Predict and evaluate on unseen data
-                print("Evaluating on unseen data...")
-                if modeler.__class__.__name__ != 'TensorFlowW1' and modeler.__class__.__name__ != 'TensorFlow' and modeler.__class__.__name__ != 'TensorFlowW' and modeler.__class__.__name__ != 'TriInterpolantModeler' \
-                        and modeler.__class__.__name__ != 'TensorFlowWD' and  modeler.__class__.__name__ != 'TensorFlowWeights' and  modeler.__class__.__name__ != 'TensorFlowWLSTM'\
-                        and  modeler.__class__.__name__ != 'TensorFlowWLSTM2':
-                    Errors, meanError, sdError = eval.MeanAbsoluteErrorEvaluation.evaluate(eval.MeanAbsoluteErrorEvaluation(),
-                                                                                      unseenFeaturesX, unseenFeaturesY, modeler,genericModel,partitionsX)
+                    elif modeler.__class__.__name__ == 'TensorFlowWLSTM':
+                        _, meanError, sdError = eval.MeanAbsoluteErrorEvaluation.evaluateKerasNNLSTM(
+                            eval.MeanAbsoluteErrorEvaluation(), unseenFeaturesX,
+                            unseenFeaturesY,
+                            modeler, output, None, None, partitionsX, genericModel)
 
+                    elif modeler.__class__.__name__ == 'TensorFlowWLSTM2':
+                        _, meanError, sdError = eval.MeanAbsoluteErrorEvaluation.evaluateKerasNNLSTM2(
+                            eval.MeanAbsoluteErrorEvaluation(), unseenFeaturesX,
+                            unseenFeaturesY,
+                            modeler, output, None, None, partitionsX, genericModel)
 
-                elif modeler.__class__.__name__ == 'TensorFlow' or modeler.__class__.__name__ == 'TensorFlowW' or  modeler.__class__.__name__ == 'TensorFlowWD':
-                    _, meanError, sdError = eval.MeanAbsoluteErrorEvaluation.evaluateKerasNN(
-                        eval.MeanAbsoluteErrorEvaluation(),unseenFeaturesX,
-                        unseenFeaturesY,
-                        modeler,output, None,None,partitionsX , genericModel)
-                elif modeler.__class__.__name__ == 'TensorFlowW1':
-                    _, meanError, sdError = eval.MeanAbsoluteErrorEvaluation.evaluateKerasNN1(
-                        eval.MeanAbsoluteErrorEvaluation(), unseenFeaturesX,
-                        unseenFeaturesY,
-                        modeler, output, None, None, partitionsX, genericModel)
+                    else:
+                        if flagEvalTri == False:
+                            Errors, meanError, sdError = eval.MeanAbsoluteErrorEvaluation.evaluateTriInterpolant(
+                            eval.MeanAbsoluteErrorEvaluation(),
+                            unseenFeaturesX, unseenFeaturesY, partitionsX, partitionsY, partitionRepresentatives,
+                            partitioningModel, None, modelers[0])
 
-                elif modeler.__class__.__name__ == 'TensorFlowWeights':
-                    _, meanError, sdError = eval.MeanAbsoluteErrorEvaluation.evaluateKerasNNNweights(
-                        eval.MeanAbsoluteErrorEvaluation(), unseenFeaturesX,
-                        unseenFeaturesY,
-                        modeler, output, None, None, partitionsX, genericModel)
-
-                elif modeler.__class__.__name__ == 'TensorFlowWLSTM':
-                    _, meanError, sdError = eval.MeanAbsoluteErrorEvaluation.evaluateKerasNNLSTM(
-                        eval.MeanAbsoluteErrorEvaluation(), unseenFeaturesX,
-                        unseenFeaturesY,
-                        modeler, output, None, None, partitionsX, genericModel)
-
-                elif modeler.__class__.__name__ == 'TensorFlowWLSTM2':
-                    _, meanError, sdError = eval.MeanAbsoluteErrorEvaluation.evaluateKerasNNLSTM2(
-                        eval.MeanAbsoluteErrorEvaluation(), unseenFeaturesX,
-                        unseenFeaturesY,
-                        modeler, output, None, None, partitionsX, genericModel)
-
-                else:
-                    if flagEvalTri == False:
-                        Errors, meanError, sdError = eval.MeanAbsoluteErrorEvaluation.evaluateTriInterpolant(
-                        eval.MeanAbsoluteErrorEvaluation(),
-                        unseenFeaturesX, unseenFeaturesY, partitionsX, partitionsY, partitionRepresentatives,
-                        partitioningModel, None, modelers[0])
-
-                        flagEvalTri = True
+                            flagEvalTri = True
 
 
-                print ("Mean absolute error on unseen data: %4.2f (+/- %4.2f standard error)"%(meanError, sdError/sqrt(unseenFeaturesY.shape[0])))
-                print("Evaluating on unseen data... Done.")
+                    print ("Mean absolute error on unseen data: %4.2f (+/- %4.2f standard error)"%(meanError, sdError/sqrt(unseenFeaturesY.shape[0])))
+                    print("Evaluating on unseen data... Done.")
 
-                print("Standard Deviation of training Data: %4.2f" % (np.std(X)))
-                print("Standard Deviation of unseen Data: %4.2f" % (np.std(unseenX)))
-                # # Evaluate performance
-                numOfclusters= len(partitionsX)
-                #pltRes = plotRes()
-                #pltRes
+                    print("Standard Deviation of training Data: %4.2f" % (np.std(X)))
+                    print("Standard Deviation of unseen Data: %4.2f" % (np.std(unseenX)))
+                    # # Evaluate performance
+                    numOfclusters= len(partitionsX)
+                    #pltRes = plotRes()
+                    #pltRes
 
-                clusters.append(numOfclusters)
-                varTr.append(np.var(subsetX))
-                if modeler.__class__.__name__  != 'TriInterpolantModeler':
-                    models.append(modeler.__class__.__name__)
-                else:
-                    models.append('Analytical method')
-                if modeler.__class__.__name__ == 'TriInterpolantModeler':
-                    part.append('none')
-                else:
-                    part.append(partitioner.__class__.__name__)
+                    clusters.append(numOfclusters)
+                    varTr.append(np.var(subsetX))
+                    if modeler.__class__.__name__  != 'TriInterpolantModeler':
+                        models.append(modeler.__class__.__name__)
+                    else:
+                        models.append('Analytical method')
+                    if modeler.__class__.__name__ == 'TriInterpolantModeler':
+                        part.append('none')
+                    else:
+                        part.append(partitioner.__class__.__name__)
 
-                errors.append(meanError)
-                '''if modeler.__class__.__name__ == 'TriInterpolantModeler':
-                    trErrors.append(None)
-                else:
-                    trErrors.append(meanErrorTr)'''
-                err={}
-                err["model"] =modeler.__class__.__name__
-                err["error"] = meanError
-                err["k"]=k
-                error["errors"].append(err)
-                if modeler.__class__.__name__ == 'TriInterpolantModeler' and numOfclusters==1 or modeler.__class__.__name__ == 'TriInterpolantModeler' \
-                        and partitioner.__class__.__name__ == 'DelaunayTriPartitioner':
-                    break
-                if partitioner.__class__.__name__ == 'DelaunayTriPartitioner' and numOfclusters==1:
-                    break
+                    errors.append(meanError)
+                    '''if modeler.__class__.__name__ == 'TriInterpolantModeler':
+                        trErrors.append(None)
+                    else:
+                        trErrors.append(meanErrorTr)'''
+                    err={}
+                    err["model"] =modeler.__class__.__name__
+                    err["error"] = meanError
+                    err["k"]=k
+                    error["errors"].append(err)
+                    if modeler.__class__.__name__ == 'TriInterpolantModeler' and numOfclusters==1 or modeler.__class__.__name__ == 'TriInterpolantModeler' \
+                            and partitioner.__class__.__name__ == 'DelaunayTriPartitioner':
+                        break
+                    if partitioner.__class__.__name__ == 'DelaunayTriPartitioner' and numOfclusters==1:
+                        break
+                except:
+                    eval.MeanAbsoluteErrorEvaluation.ANOVAtest(eval.MeanAbsoluteErrorEvaluation(), clusters, varTr,
+                                                               trErrors, errors, models, part)
       subsetsCounter = subsetsCounter + 1
 
 
@@ -402,7 +405,7 @@ def initParameters():
     startU = 30000
     endU = 31000
 
-    algs=['SR','LR','RF','NNW','NNW1','NNWCA','NNWE','NNWLSTM','NNWLSTM2']
+    algs=['NNWLSTM2']
         #['SR','LR','RF','NNW','NNW1','NNWCA','NNWE','NNWLSTM','NNWLSTM2']
     #algs= ['SR','LR','RF','NNW','NNW1','NNWCA','NNWE','NNWLSTM']
         #['SR','LR','RF','NNW','NNW1','NNWCA','TRI']
@@ -410,7 +413,7 @@ def initParameters():
 
 
         #['SR','LR','RF','NN','NNW','TRI']
-    cls=['KM','DC']
+    cls=['KM']
         #['KM','DC','NNCL']
     #['SR','LR','RF','NN'] algs
     #['KM','DC'] clusterers / cls
