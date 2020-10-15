@@ -3864,9 +3864,9 @@ class TensorFlowWLSTM2(BasePartitionModeler):
 
 
             #model.add(keras.layers.Dense(2+genModelKnots-1, input_shape=(2+genModelKnots-1,)))
-            model.add(keras.layers.LSTM(16+genModelKnots, input_shape=(16,1)))
+            model.add(keras.layers.LSTM(16, input_shape=(16,1)))
 
-            model.add(keras.layers.Dense(genModelKnots - 1,))
+            #model.add(keras.layers.Dense(genModelKnots - 1,))
             #model.add(keras.layers.Dense(genModelKnots - 2, ))
             #model.add(keras.layers.Dense(genModelKnots - 3, ))
                                          #
