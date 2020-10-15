@@ -171,39 +171,24 @@ def main():
 
            flagEvalTri = False
            for k in partK:
-                #if modeler.__class__.__name__ == 'TensorFlowW' and K==1: continue
 
-                #if  modeler.__class__.__name__ == 'TensorFlow' and k>1: continue
                 print(modeler.__class__.__name__)
                 print("Reading data...")
                 reader = dRead.BaseSeriesReader()
-                trSize=80000
+                #or modeler.__class__.__name__ == 'TensorFlowWLSTM2'
+                print("Reading data... Done.")
+                if (modeler.__class__.__name__ == 'TensorFlowWLSTM' or modeler.__class__.__name__ == 'TensorFlowW' ) and partitioner.__class__.__name__ != 'DelaunayTriPartitioner':
 
-                if (modeler.__class__.__name__ == 'TensorFlowWLSTM' or modeler.__class__.__name__ == 'TensorFlowW' or modeler.__class__.__name__ == 'TensorFlowWLSTM2') and  partitioner.__class__.__name__!='DelaunayTriPartitioner':
-
-                    dataset = np.array(np.append(subsetX.reshape(-1, 1), np.asmatrix([subsetY]).T, axis=1))
+                    dataset = np.array(np.append(subsetX.reshape(-1, subsetX.shape[1] if len(subsetX.shape)>1 else 1), np.asmatrix([subsetY]).T, axis=1))
 
                     for i in range(0, len(dataset)):
-                        dataset[i] = np.mean(dataset[i:i + 5], axis=0)
+                        dataset[i] = np.mean(dataset[i:i + 15], axis=0)
 
-                    subsetX = dataset[:, 0]
-                    subsetY = dataset[:, 1]
-
-
-                ####################################
-                if modeler.__class__.__name__ == 'TensorFlowWD':
-
-                    reader.readExtractNewDataset('MILLENIA')
-                    seriesX, targetY,unseenFeaturesX, unseenFeaturesY  , drftB6 , drftS6 , drftTargetB6 , drftTargetS6, partitionsX, partitionsY,partitionLabels = reader.readLarosDataFromCsvNew(data)
-                #################
-
-                if modeler.__class__.__name__ != 'TensorFlowWD':
-                    seriesX, targetY, targetW,targetB = subsetX,subsetY,None,None
-                counter=+1
-
-                print("Reading data... Done.")
-
+                    subsetX = dataset[:, 0:(dataset.shape[1]) - 1 if len(dataset.shape)>1 else 1]
+                    subsetY = dataset[:, dataset.shape[1] - 1 if len(dataset.shape)>1 else 1]
                 # Extract features
+                seriesX = subsetX
+                targetY = subsetY
                 if modeler.__class__.__name__ != 'TensorFlowWD':
                     print("Extracting features from training set...")
                     featureExtractor = fCalc.BaseFeatureExtractor()
@@ -216,8 +201,10 @@ def main():
                     X = dataset[:, 0:2]
                     Y = dataset[:, 2]'''
 
-                    print("Extracting features from training set... Done.")
 
+                    print("Extracting features from training set... Done.")
+                #X = subsetX
+                #Y = subsetY
                 print("Partitioning training set...")
                 NUM_OF_CLUSTERS =k# TODO: Read from command line
 
@@ -259,20 +246,26 @@ def main():
                     #unseenW = unseenW[ 0:2880 ]
                     unseenX = unseenXDt[subsetsCounter]
                     unseenY = unseenYDt[subsetsCounter]
-                    if (modeler.__class__.__name__ == 'TensorFlowWLSTM' or modeler.__class__.__name__ == 'TensorFlowW'  or modeler.__class__.__name__ == 'TensorFlowLSTM2') and partitioner.__class__.__name__!='DelaunayTriPartitioner':
+                    # or modeler.__class__.__name__ == 'TensorFlowLSTM2'
+                    #or modeler.__class__.__name__ == 'TensorFlowLSTM2'
+                    if (modeler.__class__.__name__ == 'TensorFlowWLSTM' or modeler.__class__.__name__ == 'TensorFlowW') \
+                    and partitioner.__class__.__name__ != 'DelaunayTriPartitioner':
 
-                        dataset = np.array(np.append(unseenX.reshape(-1, 1), np.asmatrix([unseenY]).T, axis=1))
+                        dataset = np.array(
+                            np.append(unseenX.reshape(-1, unseenX.shape[1] if len(unseenX.shape)>1 else 1), np.asmatrix([unseenY]).T, axis=1))
 
                         for i in range(0, len(dataset)):
-                            dataset[i] = np.mean(dataset[i:i + 5], axis=0)
+                            dataset[i] = np.mean(dataset[i:i + 15], axis=0)
 
-                        unseenX = dataset[:, 0]
-                        unseenY = dataset[:, 1]
+                        unseenX = dataset[:, 0:(dataset.shape[1]) - 1 if len(dataset.shape)>1 else 1]
+                        unseenY = dataset[:, dataset.shape[1] - 1 if len(dataset.shape)>1 else 1]
                     stdInU.append(np.std(unseenX))
                 ##
                     featureExtractor=fCalc.UnseenFeaturesExtractor()
                     unseenFeaturesX, unseenFeaturesY , unseenFeaturesW = featureExtractor.extractFeatures(modeler,unseenX, unseenY,None,None,history)
                     #dataset = np.array(np.append(unseenFeaturesX, np.asmatrix([unseenFeaturesY]).T, axis=1))
+
+
 
                     '''for i in range(0, len(dataset)):
                         dataset[i] = np.mean(dataset[i:i + 10], axis=0)
@@ -409,7 +402,7 @@ def initParameters():
     startU = 30000
     endU = 31000
 
-    algs=['NNW','NNW1','NNWCA','NNWE','NNWLSTM','NNWLSTM2']
+    algs=['SR','LR','RF','NNW','NNW1','NNWCA','NNWE','NNWLSTM','NNWLSTM2']
         #['SR','LR','RF','NNW','NNW1','NNWCA','NNWE','NNWLSTM','NNWLSTM2']
     #algs= ['SR','LR','RF','NNW','NNW1','NNWCA','NNWE','NNWLSTM']
         #['SR','LR','RF','NNW','NNW1','NNWCA','TRI']
@@ -417,7 +410,7 @@ def initParameters():
 
 
         #['SR','LR','RF','NN','NNW','TRI']
-    cls=['DC','KM']
+    cls=['KM','DC']
         #['KM','DC','NNCL']
     #['SR','LR','RF','NN'] algs
     #['KM','DC'] clusterers / cls
