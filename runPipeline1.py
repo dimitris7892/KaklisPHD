@@ -386,9 +386,11 @@ def main():
                         break
                     if partitioner.__class__.__name__ == 'DelaunayTriPartitioner' and numOfclusters==1:
                         break
-                except:
-                    eval.MeanAbsoluteErrorEvaluation.ANOVAtest(eval.MeanAbsoluteErrorEvaluation(), clusters, varTr,
-                                                               trErrors, errors, models, part)
+                except Exception as e:
+                    print(str(e))
+                    print(str(modeler.__class__.__name__ +" "+str(partitioner.__class__.__name__ )))
+                    #eval.MeanAbsoluteErrorEvaluation.ANOVAtest(eval.MeanAbsoluteErrorEvaluation(), clusters, varTr,
+                                                               #trErrors, errors, models, part)
       subsetsCounter = subsetsCounter + 1
 
 
@@ -397,7 +399,7 @@ def main():
 
 def initParameters():
     sFile = "./kaklis.csv"
-    # Get file namehttps://danaos-mc.slack.com/archives/D015U6TDFDL
+
     history = 20
     future=30
     start = 10000
@@ -405,7 +407,7 @@ def initParameters():
     startU = 30000
     endU = 31000
 
-    algs=['NNWLSTM2']
+    algs=['NNW','NNWE','NNWLSTM','NNWLSTM2']
         #['SR','LR','RF','NNW','NNW1','NNWCA','NNWE','NNWLSTM','NNWLSTM2']
     #algs= ['SR','LR','RF','NNW','NNW1','NNWCA','NNWE','NNWLSTM']
         #['SR','LR','RF','NNW','NNW1','NNWCA','TRI']
@@ -413,7 +415,7 @@ def initParameters():
 
 
         #['SR','LR','RF','NN','NNW','TRI']
-    cls=['KM']
+    cls=['KM','DC']
         #['KM','DC','NNCL']
     #['SR','LR','RF','NN'] algs
     #['KM','DC'] clusterers / cls
