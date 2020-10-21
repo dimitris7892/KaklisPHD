@@ -391,6 +391,8 @@ def main():
                     print(str(modeler.__class__.__name__ +" "+str(partitioner.__class__.__name__ )))
                     #eval.MeanAbsoluteErrorEvaluation.ANOVAtest(eval.MeanAbsoluteErrorEvaluation(), clusters, varTr,
                                                                #trErrors, errors, models, part)
+                eval.MeanAbsoluteErrorEvaluation.ANOVAtest(eval.MeanAbsoluteErrorEvaluation(), clusters, varTr,
+                                                           trErrors, errors, models, part)
       subsetsCounter = subsetsCounter + 1
 
 
@@ -407,7 +409,7 @@ def initParameters():
     startU = 30000
     endU = 31000
 
-    algs=['NNW','NNWE','NNWLSTM','NNWLSTM2']
+    algs=['NNWLSTM']
         #['SR','LR','RF','NNW','NNW1','NNWCA','NNWE','NNWLSTM','NNWLSTM2']
     #algs= ['SR','LR','RF','NNW','NNW1','NNWCA','NNWE','NNWLSTM']
         #['SR','LR','RF','NNW','NNW1','NNWCA','TRI']
