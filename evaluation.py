@@ -1318,6 +1318,7 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
                 XSplinevectorNew = XSplinevectorNew.reshape(-1, XSplinevectorNew.shape[0])
                 XSplinevectorNew = np.reshape(XSplinevectorNew, (XSplinevectorNew.shape[0], XSplinevectorNew.shape[1], 1))
                 #######################################################
+                prediction = abs(modeler._models[ind].predict(XSplinevectorNew))
             else:
                 self.intercepts = []
                 vector = self.extractFunctionsFromSplines(pPoint[ 0 ][ 0 ], pPoint[ 0 ][ 1 ], 'Gen')
@@ -1329,12 +1330,12 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
                 XSplineGenvectorNew = np.append(pPoint, XSplineGenvectorNew)
                 XSplineGenvectorNew = XSplineGenvectorNew.reshape(-1, XSplineGenvectorNew.shape[0])
                 XSplineGenvectorNew = np.reshape(XSplineGenvectorNew, (XSplineGenvectorNew.shape[0], XSplineGenvectorNew.shape[1], 1))
+                prediction = modeler._models[len(modeler._models) - 1].predict(XSplineGenvectorNew)
 
-
-            if len(modeler._models)>1:
+            '''if len(modeler._models)>1:
                 prediction = (abs(modeler._models[ind].predict(XSplinevectorNew)) + modeler._models[len(modeler._models) - 1].predict(XSplineGenvectorNew) )/ 2
             else:
-                prediction =  modeler._models[len(modeler._models) - 1].predict(XSplinevectorNew)
+                prediction =  modeler._models[len(modeler._models) - 1].predict(XSplinevectorNew)'''
 
             #if abs(prediction - trueVal)>10:
                 #w=0
