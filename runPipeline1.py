@@ -141,17 +141,17 @@ def main():
 
 
 
-    K = range(1,12)
+    K = range(2,12)
     print("Number of Statistically ind. subsets for training: " + str(len(subsetsX)))
     subsetsX=[subsetsX[0:5]] if len(subsetsX) > 5 else subsetsX
     subsetsY = [ subsetsY[ 0:5 ] ] if len(subsetsY) > 5 else subsetsY
     #K=[10]
     subsetsCounter=0
-    for subsetX, subsetY in zip(subsetsX, subsetsY):
 
+    for subsetX, subsetY in zip(subsetsX, subsetsY):
+      clustersGeneratedByDC = []
       #skip_idxx = random.sample(range((rangeSubs * 1000) + 10, num_lines), 12000)
         # Read the data
-
       #data1 = pd.read_csv(sFile, skiprows=skip_idxx)
       for modeler in modelers:
         for partitioner in partitioners:
@@ -164,14 +164,14 @@ def main():
                 #partitioner.__class__.__name__ ="None"
            if partitioner.__class__.__name__=='DelaunayTriPartitioner':
 
-                 partK=np.linspace(0.3,1,10)#[0.5]
+                 partK=np.linspace(0.2,1,11)#[0.5]
                  #artK.insert(9,6)
 
            elif partitioner.__class__.__name__=='KMeansPartitioner':
                if modeler.__class__.__name__=='TriInterpolantModeler' or modeler.__class__.__name__ == 'TensorFlow':
                  partK =[1]
                else:
-                 partK=[5]
+                 partK=K
            else:
                partK=[1]
            error = {"errors": [ ]}
@@ -231,6 +231,8 @@ def main():
 
 
                     print("Partitioning training set... Done.")
+                    if len(partitionsX) in clustersGeneratedByDC: break
+                    clustersGeneratedByDC.append(len(partitionsX))
                     # For each partition create model
                     print("Creating models per partition...")
 
