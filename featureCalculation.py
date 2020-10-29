@@ -38,7 +38,8 @@ class BaseFeatureExtractor:
           #else:
           #if X[i] > 1:
           if modeler.__class__.__name__ == 'TensorFlowWLSTM2':
-            prev = np.append(X[i],X[ i - HISTORY_SIZE:i ])
+            prev =X[i]
+            #np.append(X[i],X[ i - HISTORY_SIZE:i ])
             Yt.append(Y[i])
           else:
             prev = np.append(X[i], np.mean(X[i - HISTORY_SIZE:i]))
@@ -55,7 +56,7 @@ class BaseFeatureExtractor:
         if modeler.__class__.__name__ != 'TensorFlowWLSTM2':
             Xnew = np.array(Xnew).reshape(-1, 2)
         else:
-            Xnew = np.array(Xnew).reshape(-1, 16)
+            Xnew = np.array(Xnew).reshape(-1, 1)
         #Xnew = np.array(X).reshape(-1, 1)
 
         #Wnew = [ ]

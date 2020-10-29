@@ -1065,9 +1065,9 @@ class DelaunayTriPartitioner:
               #c = tri.find_simplex(dataX[ i ])
               neighboringVertices=tri.vertex_neighbor_vertices[1][tri.vertex_neighbor_vertices[0][i]:tri.vertex_neighbor_vertices[0][i+1]]
               for n in list(neighboringVertices):
-                  #if np.linalg.norm(np.array((dataX[i][0],dataX[i][1],dataY[i])) -np.array((dataX[n][0],dataX[n][1],dataY[n]))) <=cutoffPoint:
+                  #if np.linalg.norm(np.array((dataX[i][0],dataX[i][1])) -np.array((dataX[n][0],dataX[n][1],))) <=cutoffPoint:
                   if spatial.distance.euclidean(dataX[ i ], dataX[ n ]) <= cutoffPoint :
-                      #spatial.distance.euclidean([dataX[ i ][0],dataX[i][1],dataY[i]], [dataX[n][0],dataX[n][1],dataY[n]])<0.5:
+                  #if spatial.distance.euclidean([dataX[ i ][0],dataX[i][1],dataY[i]], [dataX[n][0],dataX[n][1],dataY[n]])<=cutoffPoint:
 
                        # and  spatial.distance.euclidean( dataY[ i ],dataY[ n ] )<=cutoffPoint:
                             #and spatial.distance.euclidean( [dataX[i][1],dataY[ i ]], [dataX[n][1],dataY[ n ]] )<=cutoffPoint:

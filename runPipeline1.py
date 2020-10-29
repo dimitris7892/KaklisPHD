@@ -3,6 +3,7 @@ import featureCalculation as fCalc
 import dataPartitioning as dPart
 import dataModeling as dModel
 import evaluation as eval
+import plotResults as plRes
 import numpy as np
 from math import sqrt
 import sys
@@ -36,7 +37,13 @@ def main():
     subsetsY = []
     subsetsB=[]
     reader = dRead.BaseSeriesReader()
+    plotRes = plRes.ErrorGraphs()
 
+    #plotRes.PlotTrueVsPredLine()
+    #plotRes.PlotExpRes()
+    #plotRes.boxPLotsKMDT()
+    #plotRes.boxPLots()
+    #plotRes.computeMeansStd()
 
     ####
     num_lines = sum(1 for l in open(sFile))
@@ -120,7 +127,7 @@ def main():
         #subsetsB.append(targetB)
         var.append(np.var(seriesX))
 
-        if len(subsetsX)>=4:
+        if len(subsetsX)>=5:
             break
 
     rangeSubs = k
@@ -157,13 +164,14 @@ def main():
                 #partitioner.__class__.__name__ ="None"
            if partitioner.__class__.__name__=='DelaunayTriPartitioner':
 
-                 partK=np.linspace(0.3,1,8)#[0.5]
+                 partK=np.linspace(0.3,1,10)#[0.5]
+                 #artK.insert(9,6)
 
            elif partitioner.__class__.__name__=='KMeansPartitioner':
                if modeler.__class__.__name__=='TriInterpolantModeler' or modeler.__class__.__name__ == 'TensorFlow':
                  partK =[1]
                else:
-                 partK=K
+                 partK=[5]
            else:
                partK=[1]
            error = {"errors": [ ]}
@@ -171,13 +179,14 @@ def main():
 
            flagEvalTri = False
            for k in partK:
-                try:
+
+                #try:
                     print(modeler.__class__.__name__)
                     print("Reading data...")
                     reader = dRead.BaseSeriesReader()
                     #or modeler.__class__.__name__ == 'TensorFlowWLSTM2'
                     print("Reading data... Done.")
-                    if (modeler.__class__.__name__ == 'TensorFlowWLSTM' or modeler.__class__.__name__ == 'TensorFlowW' ) and partitioner.__class__.__name__ != 'DelaunayTriPartitioner':
+                    if (modeler.__class__.__name__ == 'TensorFlowWLSTM3' or modeler.__class__.__name__ == 'TensorFlowW3' ) and partitioner.__class__.__name__ != 'DelaunayTriPartitioner':
 
                         dataset = np.array(np.append(subsetX.reshape(-1, subsetX.shape[1] if len(subsetX.shape)>1 else 1), np.asmatrix([subsetY]).T, axis=1))
 
@@ -248,14 +257,14 @@ def main():
                         unseenY = unseenYDt[subsetsCounter]
                         # or modeler.__class__.__name__ == 'TensorFlowLSTM2'
                         #or modeler.__class__.__name__ == 'TensorFlowLSTM2'
-                        if (modeler.__class__.__name__ == 'TensorFlowWLSTM' or modeler.__class__.__name__ == 'TensorFlowW') \
+                        if (modeler.__class__.__name__ == 'TensorFlowWLSTM3'  or modeler.__class__.__name__ == 'TensorFlowW3') \
                         and partitioner.__class__.__name__ != 'DelaunayTriPartitioner':
 
                             dataset = np.array(
                                 np.append(unseenX.reshape(-1, unseenX.shape[1] if len(unseenX.shape)>1 else 1), np.asmatrix([unseenY]).T, axis=1))
 
                             for i in range(0, len(dataset)):
-                                dataset[i] = np.mean(dataset[i:i + 15], axis=0)
+                                dataset[i] = np.mean(dataset[i:i +15], axis=0)
 
                             unseenX = dataset[:, 0:(dataset.shape[1]) - 1 if len(dataset.shape)>1 else 1]
                             unseenY = dataset[:, dataset.shape[1] - 1 if len(dataset.shape)>1 else 1]
@@ -316,6 +325,7 @@ def main():
                             eval.MeanAbsoluteErrorEvaluation(),unseenFeaturesX,
                             unseenFeaturesY,
                             modeler,output, None,None,partitionsX , genericModel)
+
                     elif modeler.__class__.__name__ == 'TensorFlowW1':
                         _, meanError, sdError = eval.MeanAbsoluteErrorEvaluation.evaluateKerasNN1(
                             eval.MeanAbsoluteErrorEvaluation(), unseenFeaturesX,
@@ -384,15 +394,15 @@ def main():
                     if modeler.__class__.__name__ == 'TriInterpolantModeler' and numOfclusters==1 or modeler.__class__.__name__ == 'TriInterpolantModeler' \
                             and partitioner.__class__.__name__ == 'DelaunayTriPartitioner':
                         break
-                    if partitioner.__class__.__name__ == 'DelaunayTriPartitioner' and numOfclusters==1:
-                        break
-                except Exception as e:
-                    print(str(e))
-                    print(str(modeler.__class__.__name__ +" "+str(partitioner.__class__.__name__ )))
+                    #if partitioner.__class__.__name__ == 'DelaunayTriPartitioner' and numOfclusters==1:
+                        #break
+                #except Exception as e:
+                    #print(str(e))
+                    #print(str(modeler.__class__.__name__ +" "+str(partitioner.__class__.__name__ )))
                     #eval.MeanAbsoluteErrorEvaluation.ANOVAtest(eval.MeanAbsoluteErrorEvaluation(), clusters, varTr,
                                                                #trErrors, errors, models, part)
-                eval.MeanAbsoluteErrorEvaluation.ANOVAtest(eval.MeanAbsoluteErrorEvaluation(), clusters, varTr,
-                                                           trErrors, errors, models, part)
+                    eval.MeanAbsoluteErrorEvaluation.ANOVAtest(eval.MeanAbsoluteErrorEvaluation(), clusters, varTr,
+                                                                       trErrors, errors, models, part)
       subsetsCounter = subsetsCounter + 1
 
 
@@ -409,15 +419,15 @@ def initParameters():
     startU = 30000
     endU = 31000
 
-    algs=['NNWLSTM']
-        #['SR','LR','RF','NNW','NNW1','NNWCA','NNWE','NNWLSTM','NNWLSTM2']
+    algs=['NNW']
+        #`['SR','LR','RF','NNW','NNW1','NNWCA','NNWE','NNWLSTM','NNWLSTM2']`
     #algs= ['SR','LR','RF','NNW','NNW1','NNWCA','NNWE','NNWLSTM']
         #['SR','LR','RF','NNW','NNW1','NNWCA','TRI']
     # ['SR','LR','RF','NN','NNW','TRI']
 
 
         #['SR','LR','RF','NN','NNW','TRI']
-    cls=['KM','DC']
+    cls=['KM']
         #['KM','DC','NNCL']
     #['SR','LR','RF','NN'] algs
     #['KM','DC'] clusterers / cls
