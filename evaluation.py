@@ -34,10 +34,12 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
                     preds = []
                     for n in range(0, len(partitionsX)):
                             preds.append(modeler._models[n].predict(pPoint)[0][0])
-                trainedWeights = genericModel
+                #trainedWeights = genericModel
                 prediction = modeler._models[len(modeler._models) - 1].predict(pPoint)
+                preds.append(prediction)
                 if len(partitionsX) > 1:
-                    np.average(np.array(preds), weights=trainedWeights.reshape(len(preds)))
+                    prediction = genericModel.predict(np.array(preds).reshape(-1,len(partitionsX)+1))
+                    #np.average(np.array(preds), weights=trainedWeights.reshape(len(preds)))
                 else:
                     prediction =  prediction
             else:
@@ -1052,12 +1054,14 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
                 for n in range(0, len(partitionsX)):
                     preds.append(modeler._models[n].predict(pPoint)[0][0])
 
-            prediction = modeler._models[0].predict(pPoint)
-            trainedWeights =  scores.reshape(len(partitionsX)) if str(scores) !='None' else scores
+            prediction = modeler._models[len(partitionsX)-1].predict(pPoint)
+            preds.append(prediction)
+            #trainedWeights =  scores.reshape(len(partitionsX)) if str(scores) !='None' else scores
                 #np.where(scores<0, 0, scores).reshape(len(partitionsX))
             #trainedWeights = np.sum(preds*trainedWeights)/trainedWeights
             if len(modeler._models) > 1:
-                prediction = (np.average(preds, weights=trainedWeights) + prediction) / 2
+                prediction = scores.predict(np.array(preds).reshape(-1,len(partitionsX)+1))
+                    #(np.average(preds, weights=trainedWeights) + prediction) / 2
             else:
                 prediction = prediction
 
@@ -1098,8 +1102,8 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
                     #XSplineVector = np.append(pPoint, vector)
                     # XSplineVector = XSplineVector.reshape(-1, XSplineVector.shape[ 0 ])
 
-                    XSplinevectorNew = np.array(self.intercepts) * vector
-                    XSplinevectorNew = np.array([i + self.interceptsGen for i in XSplinevectorNew])
+                    #XSplinevectorNew = np.array(self.intercepts) * vector
+                    #XSplinevectorNew = np.array([i + self.interceptsGen for i in XSplinevectorNew])
 
                     XSplinevectorNew = np.append(pPoint, vector)
                     XSplinevectorNew = XSplinevectorNew.reshape(-1, XSplinevectorNew.shape[0])
@@ -1118,8 +1122,8 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
             self.intercepts = []
             vector = self.extractFunctionsFromSplines(pPoint[0][0], pPoint[0][1], 'Gen')
 
-            XSplineGenvectorNew = np.array(self.intercepts) * vector
-            SplineGenvectorNew = np.array([i + self.interceptsGen for i in vector])
+            #XSplineGenvectorNew = np.array(self.intercepts) * vector
+            #XSplineGenvectorNew = np.array([i + self.interceptsGen for i in vector])
 
             #XSplineGenvectorNew= np.sum(np.array(self.intercepts) * vector) + self.interceptsGen
             XSplineGenvectorNew = np.append(pPoint, vector)

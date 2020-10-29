@@ -9,6 +9,8 @@ import random
 #from sklearn.cross_validation import train_test_split
 import csv
 from numpy import array
+from tensorflow.keras.callbacks import EarlyStopping
+from tensorflow.keras.callbacks import Callback
 import parameters
 import itertools
 #from sklearn.model_selection import KFold as kf
@@ -610,7 +612,7 @@ class TensorFlowCA(BasePartitionModeler):
 
         preds = []
         estimatorW = keras.models.Sequential()
-        estimatorW.add(keras.layers.Dense(len(partition_labels), input_shape=(len(partition_labels),)))
+        estimatorW.add(keras.layers.Dense(len(partition_labels)+1, input_shape=(len(partition_labels)+1,)))
         estimatorW.add(keras.layers.Dense(1, ))
         estimatorW.compile(loss=keras.losses.mean_squared_error, optimizer=keras.optimizers.Adam(), )
 
@@ -618,25 +620,25 @@ class TensorFlowCA(BasePartitionModeler):
 
             pred = []
 
-            for n in range(0, len(partitionsX)):
+            for n in range(0, len(NNmodels)):
                 self.intercepts = []
-                # self.modelId = 'Gen' if n == len(NNmodels)-1 else n
-                self.modelId = n
+                self.modelId = 'Gen' if n == len(NNmodels)-1 else n
+                #self.modelId = n
                 self.countTimes += 1
                 self.count = 0
 
                 pred.append(NNmodels[n].predict(X[i].reshape(-1,2))[0][0])
             preds.append(pred)
 
-        preds = np.array(preds).reshape(-1, len(partition_labels))
+        preds = np.array(preds).reshape(-1, len(partition_labels)+1)
         estimatorW.fit(preds, Y.reshape(-1, 1), epochs=100, verbose=0)
-        trainedWeights = estimatorW.get_weights()[2]
+        #trainedWeights = estimatorW.get_weights()[2]
 
 
         self._models = NNmodels
 
         # Return list of models
-        return estimator, None, scores, numpy.empty, trainedWeights  # , estimator , DeepCLpartitionsX
+        return estimator, None, scores, numpy.empty, estimatorW  # , estimator , DeepCLpartitionsX
 
 class TensorFlowW1(BasePartitionModeler):
 
@@ -1189,13 +1191,15 @@ class TensorFlowW1(BasePartitionModeler):
         for i in range(0, len(X)):
                 vector = extractFunctionsFromSplines(X[i][0], X[i][1])
                 # XSplineVector.append(np.append(X[i], vector))
-                vectorNew = np.array(self.intercepts) * [i if i > 0 else 0 for i in vector]
+                vectorNew = np.array(self.intercepts) * [i for i in vector]
+                vectorNew = np.array([i + self.interceptsGen for i in vectorNew])
+                vectorNew = np.array([i if i > 0 else 0 for i in vectorNew ])
                 vectorNew = vectorNew if len(vectorNew) > 0 else [0]
-                vectorNew = np.array([i + self.interceptsGen if i > 0 else 0 for i in vectorNew])
                 # vectorNew = np.array(self.intercepts) * vector
                 # vectorNew = np.array([i + self.interceptsGen for i in vectorNew])
 
-                weights = [abs(1 / (1 + np.linalg.norm(k - Y[i]))) for k in vectorNew]
+                weights = vector
+                    #[abs(1 / (1 + np.linalg.norm(k - Y[i]))) for k in vectorNew]
 
                 XSplineVector.append(weights)
 
@@ -1215,7 +1219,7 @@ class TensorFlowW1(BasePartitionModeler):
 
         NNmodels=[]
         scores=[]
-        NNmodels.append(estimator)
+
         if len(partition_labels)>1:
             for idx, pCurLbl in enumerate(partition_labels):
 
@@ -1230,13 +1234,13 @@ class TensorFlowW1(BasePartitionModeler):
                         XSplineClusterVector.append(vectorNew)'''
                         vector = extractFunctionsFromSplines(X[i][0], X[i][1])
                         # XSplineVector.append(np.append(X[i], vector))
-                        vectorNew = np.array(self.intercepts) * [i if i > 0 else 0 for i in vector]
+                        vectorNew = np.array(self.intercepts) * [i for i in vector]
+                        vectorNew = np.array([i + self.interceptsGen for i in vectorNew])
+                        vectorNew = np.array([i if i > 0 else 0 for i in vectorNew ])
                         vectorNew = vectorNew if len(vectorNew) > 0 else [0]
-                        vectorNew = np.array([i + self.interceptsGen if i > 0 else 0 for i in vectorNew])
-                        # vectorNew = np.array(self.intercepts) * vector
-                        # vectorNew = np.array([i + self.interceptsGen for i in vectorNew])
 
-                        weights = [abs(1 / (1 + np.linalg.norm(k - Y[i]))) for k in vectorNew]
+                        weights =vector
+                            #[abs(1 / (1 + np.linalg.norm(k - Y[i]))) for k in vectorNew]
 
                         XSplineClusterVector.append(weights)
 
@@ -1250,19 +1254,22 @@ class TensorFlowW1(BasePartitionModeler):
 
                     #estimatorCl.add(keras.layers.Dense(numOfNeurons -1 ,input_shape=(2+numOfNeurons-1,)))
                     #estimatorCl.add(keras.layers.Dense( numOfNeurons - 1, input_shape=(2 ,)))
-                    estimatorCl.add(keras.layers.Dense(10, input_shape=(2,)))
+                    estimatorCl.add(keras.layers.Dense(numOfNeurons -1, input_shape=(2,)))
                     #estimatorCl.add(keras.layers.Dense( numOfNeurons - 1, input_shape=(2,)))
                     #estimatorCl.add(keras.layers.Dense(2))
                     estimatorCl.add(keras.layers.Dense(1, ))
                     estimatorCl.compile(loss=keras.losses.mean_squared_error, optimizer=keras.optimizers.Adam(), )                #try:
 
-                    #weights0 = np.mean(XSplineClusterVector, axis=0)
+                    weights0 = np.mean(XSplineClusterVector, axis=0)
+                    weights0 = np.array([1]) if len(weights0)==0 else weights0
                     # weights1 = self.intercepts
                     #weights1 = estimatorCl.layers[ 0 ].get_weights()[ 0 ][ 1 ]
-                    #weights = np.array(
-                        #np.append(weights0.reshape(-1, 1), np.asmatrix(weights0).reshape(-1, 1), axis=0).reshape(2, -1))
-
+                    weights = np.array(
+                        np.append(weights0.reshape(-1, 1), np.asmatrix(weights0).reshape(-1, 1), axis=0).reshape(2, -1))
+                    #try:
                     #estimatorCl.layers[ 0 ].set_weights([ weights, np.array([0]*(numOfNeurons-1))])
+                    #except:
+                        #d=0
                         #modelId=idx
 
                     #estimatorCl.fit(partitionsX[idx], np.array(partitionsY[idx]),epochs=100)  # validation_split=0.33
@@ -1275,40 +1282,40 @@ class TensorFlowW1(BasePartitionModeler):
                     # model2 = keras.models.Model(inputs=estimator.layers[2].input, outputs=estimator.layers[-1].output)
 
                     #estimatorCl.compile(optimizer=keras.optimizers.Adam(), loss='mse')
-                    estimator.fit(partitionsX[idx], np.array(partitionsY[idx]), epochs=100,verbose=0)
+                    estimatorCl.fit(partitionsX[idx], np.array(partitionsY[idx]), epochs=100,verbose=0)
 
                     #Clscore = estimatorCl.evaluate(np.array(partitionsX[idx]), np.array(partitionsY[idx]), verbose=0)
                     #scores.append(Clscore)
-                    NNmodels.append(estimator)
+                    NNmodels.append(estimatorCl)
 
                 #self._partitionsPerModel[ estimator ] = partitionsX[idx]
         # Update private models
         #models=[]
 
-
+        NNmodels.append(estimator)
 
         trainedWeights=None
         if len(partition_labels) > 1:
             preds = []
             estimatorW = keras.models.Sequential()
-            estimatorW.add(keras.layers.Dense(len(partition_labels), input_shape=(len(partition_labels),)))
+            estimatorW.add(keras.layers.Dense(len(partition_labels)+1, input_shape=(len(partition_labels)+1,)))
             estimatorW.add(keras.layers.Dense(1, ))
             estimatorW.compile(loss=keras.losses.mean_squared_error, optimizer=keras.optimizers.Adam(), )
 
             for i in range(0, len(X)):
                 pred = []
-                for n in range(0, len(partitionsX)):
+                for n in range(0, len(NNmodels)):
                     pred.append(NNmodels[n].predict(X[i].reshape(-1, 2))[0][0])
                 preds.append(pred)
 
-            preds = np.array(preds).reshape(-1, len(partition_labels))
+            preds = np.array(preds).reshape(-1, len(partition_labels)+1)
             estimatorW.fit(preds, Y.reshape(-1, 1), epochs=100, verbose=0)
-            trainedWeights = estimatorW.get_weights()[2]
+            #trainedWeights = estimatorW.get_weights()[2]
 
         self._models = NNmodels
 
         # Return list of models
-        return estimator, None ,scores, numpy.empty,trainedWeights #, estimator , DeepCLpartitionsX
+        return estimator, None ,scores, numpy.empty,estimatorW #, estimator , DeepCLpartitionsX
 
 
     def getFitnessOfModelForPoint(self, model, point):
@@ -1386,7 +1393,7 @@ class TensorFlowW(BasePartitionModeler):
         csvModels = [ ]
         genModelKnots=[]
 
-        self.modelId = 'Gen'
+
         self.countTimes=0
         self.models = {"data": [ ]}
         self.intercepts = [ ]
@@ -1853,12 +1860,12 @@ class TensorFlowW(BasePartitionModeler):
         XSplineVector=[]
         velocities = []
         vectorWeights=[]
-
+        self.modelId = 'Gen'
         for i in range(0,len(X)):
             vector = extractFunctionsFromSplines(X[i][0],X[i][1])
 
-            vectorNew = np.array(self.intercepts) * vector
-            vectorNew = np.array([i + self.interceptsGen for i in vector])
+            #vectorNew = np.array(self.intercepts) * vector
+            #vectorNew = np.array([i + self.interceptsGen for i in vectorNew])
 
             XSplineVector.append(np.append(X[i],vector))
 
@@ -1867,7 +1874,8 @@ class TensorFlowW(BasePartitionModeler):
 
         #try:
         #XSplineVector = np.reshape(XSplineVector, (XSplineVector.shape[0], XSplineVector.shape[1], 1))
-        estimator.fit(XSplineVector, Y, epochs=100, validation_split=0.33,verbose=0)
+        #es = EarlyStopping(monitor='loss', mode='min', verbose=0)
+        estimator.fit(XSplineVector, Y, epochs=100, validation_split=0.33,verbose=0,)
         #score = estimator.evaluate(np.array(XSplineVector),Y, verbose=0)
         #except:
 
@@ -1896,8 +1904,8 @@ class TensorFlowW(BasePartitionModeler):
                     for i in range(0, len(partitionsX[idx])):
                         vector = extractFunctionsFromSplines(partitionsX[idx][ i ][ 0 ], partitionsX[idx][ i ][ 1 ])
 
-                        vectorNew = np.array(self.intercepts) * vector
-                        vectorNew = np.array([i + self.interceptsGen for i in vectorNew])
+                        #vectorNew = np.array(self.intercepts) * vector
+                        #vectorNew = np.array([i + self.interceptsGen for i in vectorNew])
 
                         XSplineClusterVector.append(np.append(partitionsX[idx][i], vector))
 
@@ -1911,13 +1919,15 @@ class TensorFlowW(BasePartitionModeler):
 
                     #estimatorCl.add(keras.layers.LSTM(2 + numOfNeurons -1 ,input_shape=(2+numOfNeurons-1,1)))
                     estimatorCl.add(keras.layers.Dense(2 + numOfNeurons - 1, input_shape=(2 + numOfNeurons - 1, )))
-                    estimatorCl.add(keras.layers.Dense(numOfNeurons - 1, ))
+                    estimatorCl.add(keras.layers.Dense(numOfNeurons - 1,))
                     #estimatorCl.add(keras.layers.Dense(2))
                     estimatorCl.add(keras.layers.Dense(1, ))
                     estimatorCl.compile(loss=keras.losses.mean_squared_error, optimizer=keras.optimizers.Adam(), )
                     #try:
                     #XSplineClusterVector = np.reshape(XSplineClusterVector, (XSplineClusterVector.shape[0], XSplineClusterVector.shape[1], 1))
-                    estimatorCl.fit(np.array(XSplineClusterVector),np.array(partitionsY[idx]),epochs=100,verbose=0)#validation_split=0.33
+
+                    #es = EarlyStopping(monitor='loss', mode='min', verbose=0)
+                    estimatorCl.fit(np.array(XSplineClusterVector),np.array(partitionsY[idx]),epochs=100,verbose=0, )#validation_split=0.33
 
                     #Clscore = estimatorCl.evaluate(np.array(XSplineClusterVector), np.array(partitionsY[idx]), verbose=0)
                     #scores.append(Clscore)
@@ -1941,6 +1951,9 @@ class TensorFlowW(BasePartitionModeler):
             #models=[]
 
         ###Train Weights
+        def custom_loss(y_true,y_pred):
+            return    tf.keras.losses.mean_squared_error(y_true,y_pred)
+                      #+tf.keras.losses.kullback_leibler_divergence(y_true, y_pred) +tf.keras.losses.categorical_crossentropy(y_true,y_pred)
         NNmodels.append(estimator)
         preds=[]
         trainedWeights=None
@@ -1948,7 +1961,7 @@ class TensorFlowW(BasePartitionModeler):
         estimatorW.add(keras.layers.Dense(len(partition_labels)+1, input_shape=(len(partition_labels)+1,)))
         #estimatorW.add(keras.layers.Dense(len(partition_labels) + 1,))
         estimatorW.add(keras.layers.Dense(1, ))
-        estimatorW.compile(loss=keras.losses.mean_squared_error, optimizer=keras.optimizers.Adam(), )
+        estimatorW.compile(loss=custom_loss, optimizer=keras.optimizers.Adam(), )
         if len(partition_labels) > 1:
             for i in range(0, len(X)):
 
@@ -1961,19 +1974,19 @@ class TensorFlowW(BasePartitionModeler):
                         self.countTimes += 1
                         self.count = 0
                         vector = extractFunctionsFromSplines(X[0][0], X[0][1])
-                        XSplinevectorNew = np.array(self.intercepts) * vector
-                        XSplinevectorNew = np.array([i + self.interceptsGen for i in XSplinevectorNew])
+                        #XSplinevectorNew = np.array(self.intercepts) * vector
+                        #XSplinevectorNew = np.array([i + self.interceptsGen for i in XSplinevectorNew])
 
                         XSplinevectorNew = np.append(X[i], vector)
                         XSplinevectorNew = XSplinevectorNew.reshape(-1, XSplinevectorNew.shape[0])
 
-                        pred.append(NNmodels[n].predict(XSplinevectorNew)[0][0] )
+                        pred.append(NNmodels[n].predict(XSplinevectorNew)[0][0])
                 pred.append(estimator.predict(XSplineVector[i].reshape(-1,genModelKnots+1))[0][0])
                 preds.append(pred)
 
             preds = np.array(preds).reshape(-1,len(partition_labels)+1)
-            estimatorW.fit(preds, Y.reshape(-1,1), epochs=100, verbose=1)
-            trainedWeights = estimatorW.get_weights()[2]
+            estimatorW.fit(preds, Y.reshape(-1,1), epochs=100, verbose=0)
+            #trainedWeights = estimatorW.get_weights()[2]
 
         #NNmodels.append(estimator)
         #estimator.save('./DeployedModels/estimatorCl_Gen.h5')

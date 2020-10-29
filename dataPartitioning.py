@@ -50,8 +50,6 @@ class DefaultPartitioner:
         plt.title("K-means with " + str(nClusters) + " clusters")
         plt.show()
 
-
-
 class TensorFlowCl(DefaultPartitioner):
 
     def getBestPartitionForPoint(self, point, partitions):
@@ -772,7 +770,6 @@ class KMeansPartitioner(DefaultPartitioner):
 
     def getCentroids(self):
         return self._dataModel.cluster_centers_
-
 
 class BoundedProximityPartitioner (DefaultPartitioner):
     def clustering(self, dataX, dataY = None, nClusters = None, showPlot=False, random_state=1000):
