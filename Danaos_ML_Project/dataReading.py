@@ -26,7 +26,7 @@ from sympy import cos, sin , tan , exp , sqrt , E
 from openpyxl import load_workbook
 import glob, os
 from pathlib import Path
-from openpyxl.styles.colors import YELLOW
+#from openpyxl.styles.colors import YELLOW
 from openpyxl.styles import Font
 from openpyxl.styles.borders import Border, Side
 import shutil
@@ -2107,6 +2107,7 @@ class BaseSeriesReader:
 
         boolTlg = telegrams
         pathExcel = '/home/dimitris/Desktop/templateDETAILED.xlsx'
+        #'/home/dimitris/Desktop/templateDETAILED.xlsx'
         #'/home/dimitris/Desktop/template.xlsx'
         #'C:/Users/dkaklis/Desktop/template.xlsx'
         #'/home/dimitris/Desktop/template.xlsx'
@@ -7063,25 +7064,125 @@ class BaseSeriesReader:
         meanLaddenFoc = np.mean(ladenDt[:,8])
         stdLadenFoc = np.std(ladenDt[:,8])
         ladenDt =np.array([ k for k in ladenDt if  k[8] >= meanLaddenFoc - (2 * stdLadenFoc) and k[8] <= meanLaddenFoc + (2 * stdLadenFoc)])
+
+        windForceWeights = [0, 0.45, 0.65, 0.85, 0.95, 1.35, 1.45, 1.55, 1.65]
+        swellHeightWeights = [0, 0.0043, 0.0023, 0.0024, 0.0025, 0.0046, 0.0057, 0.0058, 0.0059]
+        windDirWeights = [0.1, 0.09, 0.08, 0.07, 0.06, 0.05, 0.04, 0.03, 0.02]
+        ###########################################################################################
+
+        velMin = 11.75
+        velMax = 12.25
+
+        FocCentral = np.array([k for k in ladenDt if
+                               k[5] >= velMin and k[5] <= velMax and k[8] > 0])[:, 8]
+
+        meanFocCentral = np.mean(FocCentral)
+        stdFocCentral = np.std(FocCentral)
+
+        FocCentral = np.array([k for k in FocCentral if
+        (k >= meanFocCentral - 2 * stdFocCentral and k <= meanFocCentral + 2 * stdFocCentral)])
+
+        #steamTimeGen = np.array([k for k in ladenDt if
+                                 #[5] >= velMin and k[5] <= velMax and (k[8] > 0 and (k >= meanFocCentral - 2 * stdFocCentral and k <= meanFocCentral + 2 * stdFocCentral))])[:, 12]
+
+        #weighted_avgFocCentral = np.average(FocCentral, weights=steamTimeGen)
+
+        meanFocCentral = np.mean(FocCentral)
+        stdFocCentral = np.std(FocCentral)
+
+        centralMean = meanFocCentral - stdFocCentral #weighted_avgFocCentral
+        #centralArray = np.array([k for k in ladenDt if
+                                 #k[5] >= velMin and k[5] <= velMax and k[8] > 0])[:, 8]
+
+        row = [641, 650, 659, 668, 677, 686, 695, 704]
+        wind = [0, 22.5, 67.5, 112.5, 157.5, 180]
+        windF = [0, 1, 2, 3, 4, 5, 6, 7, 8]
+        swellH = [0, 1, 2, 3, 4, 5, 6, 7, 8]
+        column = ['B', 'C', 'D', 'E', 'F', 'G', 'H', 'I']
+        ladenDt7801 = []
+        numberOfApp11_8 = []
+        for w in range(0, len(windF) - 1):
+            for s in range(0, len(swellH) - 1):
+                ladenDt7_8 = []
+                numberOfApp11_8 = []
+                for i in range(0, len(wind) - 1):
+
+                    arrayFoc = np.array([k for k in ladenDt if
+                                         k[4] > windF[w] and k[4] <= windF[w + 1] and k[5] > velMin and k[
+                                             5] <= velMax and k[3] >= wind[i] and
+                                         k[3] <= wind[i + 1] and k[13] >= swellH[s] and k[13] <= swellH[s + 1]])
+                    if arrayFoc.__len__() > minAccThres:
+                        meanArrayFoc = np.mean(arrayFoc[:, 8])
+                        stdArrayFoc = np.std(arrayFoc[:, 8])
+                        arrayFoc = np.array([k for k in arrayFoc if
+                                             k[8] >= meanArrayFoc - (2 * stdArrayFoc) and k[8] <= meanArrayFoc + (
+                                                     2 * stdArrayFoc)])
+
+                        steamTime = arrayFoc[:, 12]
+
+                    tlgarrayFoc = arrayFoc[:, 9] if arrayFoc.__len__() > minAccThres else []
+                    tlgarrayFoc = np.array([k for k in tlgarrayFoc if k > 5])
+                    tlgarrayFoc = np.array(
+                        [k for k in ladenDt if k[5] > velMax and k[5] <= velMax and k[8] > 10])
+                    if tlgarrayFoc.__len__() > lenConditionTlg:
+                        tlgarrayFoc = np.array(
+
+                            [k for k in ladenDt if k[5] > velMax and k[5] <= velMax and k[8] > 10])[:, 9]
+                        meanFoc = (np.mean(arrayFoc[:, 8]) + np.mean(
+                            tlgarrayFoc) + centralMean) / 3 if arrayFoc.__len__() > minAccThres else (
+                                                                                                             centralMean + np.mean(
+                                                                                                         tlgarrayFoc)) / 2
+                        numberOfApp11_8.append(arrayFoc.__len__() + tlgarrayFoc.__len__() + centralArray.__len__())
+                    else:
+                        # np.average(arrayFoc[:, 8],weights=steamTime)
+                        weighted_avgFocArray = np.average(arrayFoc[:, 8],
+                                                          weights=steamTime) if arrayFoc.__len__() > minAccThres else centralMean
+                        meanFoc = (
+                                          weighted_avgFocArray + centralMean) / 2 if arrayFoc.__len__() > minAccThres else centralMean
+                        numberOfApp11_8.append(arrayFoc.__len__())  # + centralArray.__len__())
+                        if (s > 0 and w >= 0):
+                            cellValue = round((ladenDt7801[len(ladenDt7801) - 5] + ladenDt7801[len(ladenDt7801) - 5] * (swellHeightWeights[s])) +windDirWeights[i], 2)
+                        elif s == 0 and w == 0:
+                            cellValue = round(centralMean + windDirWeights[i], 2)
+                        elif s == 0 and w > 0:
+                            cellValue = round(centralMean + windForceWeights[w] + windDirWeights[i], 2)
+                            # round(ladenDt7801[lastLenLadenDt7801 - (39-((i-1 if i < 5 else i-2) ))] + windForceWeights[w] + windDirWeights[i], 2)
+                    ladenDt7_8.append(cellValue)
+                    ladenDt7801.append(cellValue)
+                lastLenDt_8 = len(ladenDt7_8)
+                for i in range(row[w], row[w] + 5):
+                    try:
+                        workbook._sheets[1][column[s - 1 if s == 8 else s] + str(i)] = str(
+                            ladenDt7_8[i - row[w]])  # + '(' + str(numberOfApp11_8[i - row[w]]) + ')'
+                        workbook._sheets[1][column[s - 1 if s == 8 else s] + str(i)].alignment = Alignment(
+                            horizontal='right')
+                    except:
+                        print("Exception")
+
+
         velMin = 7.75
         velMax = 8.25
 
         FocCentral = np.array([k for k in ladenDt if
-                               k[5] >= velMin and k[5] <= velMax and k[8]>0 ])[:, 8]
+                               k[5] >= velMin and k[5] <= velMax and k[8] > 0])[:, 8]
 
         meanFocCentral = np.mean(FocCentral)
-        stdFocCentral =np.std(FocCentral)
+        stdFocCentral = np.std(FocCentral)
 
-        FocCentral = np.array([k for k in FocCentral if (k >= meanFocCentral - 3* stdFocCentral and k <= meanFocCentral + 3* stdFocCentral)])
+        FocCentral = np.array([k for k in FocCentral if
+                               (k >= meanFocCentral - 2 * stdFocCentral and k <= meanFocCentral + 2 * stdFocCentral)])
 
-        steamTimeGen = np.array([k for k in ladenDt if
-                                 k[5] >= velMin and k[5] <= velMax  and (k[8] >= meanFocCentral - 3 * stdFocCentral and k[8] <= meanFocCentral + 3 * stdFocCentral and k[8]>0)])[:, 12]
+        # steamTimeGen = np.array([k for k in ladenDt if
+        # [5] >= velMin and k[5] <= velMax and (k[8] > 0 and (k >= meanFocCentral - 2 * stdFocCentral and k <= meanFocCentral + 2 * stdFocCentral))])[:, 12]
 
-        weighted_avgFocCentral = np.average(FocCentral, weights=steamTimeGen)
+        # weighted_avgFocCentral = np.average(FocCentral, weights=steamTimeGen)
 
-        centralMean = np.mean(weighted_avgFocCentral)
-        centralArray = np.array([k for k in ladenDt if
-                                 k[5] >= velMin and k[5] <= velMax and k[8] > 10])[:, 8]
+        meanFocCentral = np.mean(FocCentral)
+        stdFocCentral = np.std(FocCentral)
+
+        centralMean = meanFocCentral - stdFocCentral  # weighted_avgFocCentral
+        # centralArray = np.array([k for k in ladenDt if
+        # k[5] >= velMin and k[5] <= velMax and k[8] > 0])[:, 8]
 
         row = [10, 19, 28, 37, 46, 55, 64, 73]
         wind = [0, 22.5, 67.5, 112.5, 157.5, 180]
@@ -7090,36 +7191,8 @@ class BaseSeriesReader:
         speed=[7,8]#,8.75,9.25,9.75]
         column = ['B', 'C', 'D', 'E', 'F', 'G', 'H', 'I']
 
-        ##build weight vector for SWELLWH
-        '''focs=[]
-        for v in range(0, len(speed) - 1):
-            focWF=[]
-            for w in range(0, len(windF) - 1):
-                focSW=[]
-                for s in range(0, len(swellH) - 1):
-                    try:
-                        focSW01 = np.array([k for k in ladenDt if (k[5]>=speed[v] and k[5]<=speed[v+1]) and (k[4]>=windF[w] and k[4]<=windF[w+1]) and (k[13] > swellH[s] and k[13] <= swellH[s+1])])[:, 8]
-                        focSW01 = focSW01[focSW01>0]
-                        print(str(len(focSW01)))
-                        meanFocSW01 = np.mean(focSW01)
-                        stdFocSW01 = np.std(focSW01)
-                        focSW01 = np.array([k for k in focSW01 if  k >= meanFocSW01 - (2* stdFocSW01) and k <= meanFocSW01 + (2* stdFocSW01)])
-                    except:
-                        #print(str(len(focSW01)))
-                        focSW01 = 0
-                    focSW.append(np.mean(focSW01))
-                #focSW = list(list(np.where(np.array(focSW) == 0, np.mean(np.array(focSW)[np.array(focSW) > 0]), focSW))[0])
-                focWF.append(focSW)
-            focs.append(focWF)
-        focs = np.array(focs[0])
-        for i in range(0,len(focs)):
-            for k in range(0,len(focs[i])):
-                if focs[i][k] ==0:
-                    focs[i][k] = np.mean(focs[i][focs[i]>0])'''
 
-        windForceWeights = [0, 0.35, 0.55, 0.75, 0.85, 0.95, 1.15, 1.25, 1.35]
-        swellHeightWeights = [0, 0.043, 0.023, 0.024, 0.025, 0.046, 0.057, 0.058, 0.04]
-        windDirWeights = [0.1, 0.09, 0.08, 0.07, 0.06, 0.05, 0.04, 0.03, 0.02]
+
 
         ladenDt11_8 = []
         numberOfApp11_8 = []
@@ -7182,8 +7255,8 @@ class BaseSeriesReader:
                         print("Exception")
             lastLenLadenDt7801 = len(ladenDt7801)
 
-        workbook.save(filename=pathToexcel.split('.')[0] + '_1.' + pathToexcel.split('.')[1])
-        return
+        #workbook.save(filename=pathToexcel.split('.')[0] + '_1.' + pathToexcel.split('.')[1])
+        #return
         ####################END 8 SPEED ########################################################################
         ####################END 8 SPEED ########################################################################
 
@@ -7193,16 +7266,22 @@ class BaseSeriesReader:
         FocCentral = np.array([k for k in ladenDt if
                                k[5] >= velMin and k[5] <= velMax and k[8] > 0])[:, 8]
 
-        steamTimeGen = np.array([k for k in ladenDt if
-                                 k[5] >= velMin and k[5] <= velMax and k[8] > 0])[:, 12]
+        meanFocCentral = np.mean(FocCentral)
+        stdFocCentral = np.std(FocCentral)
 
-        weighted_avgFocCentral = np.average(FocCentral, weights=steamTimeGen)
+        FocCentral = np.array([k for k in FocCentral if
+                               (k >= meanFocCentral - 2 * stdFocCentral and k <= meanFocCentral + 2 * stdFocCentral)])
 
-        centralMean = np.mean(np.array([k for k in ladenDt if
-                                        k[5] >= velMin and k[5] <= velMax and k[8] > 0])[:, 8])
-        centralMean = weighted_avgFocCentral
-        centralArray = np.array([k for k in ladenDt if
-                                 k[5] >= velMin and k[5] <= velMax and k[8] > 0])[:, 8]
+        # steamTimeGen = np.array([k for k in ladenDt if
+        # [5] >= velMin and k[5] <= velMax and (k[8] > 0 and (k >= meanFocCentral - 2 * stdFocCentral and k <= meanFocCentral + 2 * stdFocCentral))])[:, 12]
+
+        # weighted_avgFocCentral = np.average(FocCentral, weights=steamTimeGen)
+
+        meanFocCentral = np.mean(FocCentral)
+        stdFocCentral = np.std(FocCentral)
+
+        centralMean = meanFocCentral - stdFocCentral  # weighted_avgFocCentral
+        # centralArray = np.array([k for k in ladenDt if
 
         row = [89, 98, 107, 116, 124, 134, 143, 152]
         windF = [0, 1, 2, 3, 4, 5, 6, 7, 8]
@@ -7248,9 +7327,7 @@ class BaseSeriesReader:
                                               weighted_avgFocArray + centralMean) / 2 if arrayFoc.__len__() > minAccThres else centralMean
                         numberOfApp11_8.append(arrayFoc.__len__())  # + centralArray.__len__())
                         if (s > 0 and w >= 0):
-                            cellValue = round(
-                                (ladenDt7801[0] + ladenDt7801[len(ladenDt7801) - 5] * (swellHeightWeights[s])) +
-                                windForceWeights[w] + windDirWeights[i], 2)
+                            cellValue = round( (ladenDt7801[len(ladenDt7801) -5]  + ladenDt7801[len(ladenDt7801) - 5] * (swellHeightWeights[s]))  + windDirWeights[i], 2)
                         elif s == 0 and w == 0:
                             cellValue = round(centralMean + windDirWeights[i], 2)
                         elif s == 0 and w > 0:
@@ -7277,16 +7354,23 @@ class BaseSeriesReader:
         FocCentral = np.array([k for k in ladenDt if
                                k[5] >= velMin and k[5] <= velMax and k[8] > 0])[:, 8]
 
-        steamTimeGen = np.array([k for k in ladenDt if
-                                 k[5] >= velMin and k[5] <= velMax and k[8] > 0])[:, 12]
+        meanFocCentral = np.mean(FocCentral)
+        stdFocCentral = np.std(FocCentral)
 
-        weighted_avgFocCentral = np.average(FocCentral, weights=steamTimeGen)
+        FocCentral = np.array([k for k in FocCentral if
+                               (k >= meanFocCentral - 2 * stdFocCentral and k <= meanFocCentral + 2 * stdFocCentral)])
 
-        centralMean = np.mean(np.array([k for k in ladenDt if
-                                        k[5] >= velMin and k[5] <= velMax and k[8] > 0])[:, 8])
-        centralMean = weighted_avgFocCentral
-        centralArray = np.array([k for k in ladenDt if
-                                 k[5] >= velMin and k[5] <= velMax and k[8] > 0])[:, 8]
+        # steamTimeGen = np.array([k for k in ladenDt if
+        # [5] >= velMin and k[5] <= velMax and (k[8] > 0 and (k >= meanFocCentral - 2 * stdFocCentral and k <= meanFocCentral + 2 * stdFocCentral))])[:, 12]
+
+        # weighted_avgFocCentral = np.average(FocCentral, weights=steamTimeGen)
+
+        meanFocCentral = np.mean(FocCentral)
+        stdFocCentral = np.std(FocCentral)
+
+        centralMean = meanFocCentral - stdFocCentral  # weighted_avgFocCentral
+        # centralArray = np.array([k for k in ladenDt if
+        # k[5] >= velMin and k[5] <= velMax and k[8] > 0])[:, 8]
 
         row = [168,177,186,195,204,213,222,231]
         windF = [0,1,2,3,4,5,6,7,8]
@@ -7337,7 +7421,7 @@ class BaseSeriesReader:
                         if (s > 0 and w >= 0):
                             cellValue = round(
                                 (ladenDt7801[len(ladenDt7801) - 5] + ladenDt7801[len(ladenDt7801) - 5] * (swellHeightWeights[s])) +
-                                windForceWeights[w] + windDirWeights[i], 2)
+                                 + windDirWeights[i], 2)
                         elif s == 0 and w == 0:
                             cellValue = round(centralMean + windDirWeights[i], 2)
                         elif s == 0 and w > 0:
@@ -7361,16 +7445,23 @@ class BaseSeriesReader:
         FocCentral = np.array([k for k in ladenDt if
                                k[5] >= velMin and k[5] <= velMax and k[8] > 0])[:, 8]
 
-        steamTimeGen = np.array([k for k in ladenDt if
-                                 k[5] >= velMin and k[5] <= velMax and k[8] > 0])[:, 12]
+        meanFocCentral = np.mean(FocCentral)
+        stdFocCentral = np.std(FocCentral)
 
-        weighted_avgFocCentral = np.average(FocCentral, weights=steamTimeGen)
+        FocCentral = np.array([k for k in FocCentral if
+                               (k >= meanFocCentral - 2 * stdFocCentral and k <= meanFocCentral + 2 * stdFocCentral)])
 
-        centralMean = np.mean(np.array([k for k in ladenDt if
-                                        k[5] >= velMin and k[5] <= velMax and k[8] > 0])[:, 8])
-        centralMean = weighted_avgFocCentral
-        centralArray = np.array([k for k in ladenDt if
-                                 k[5] >= velMin and k[5] <= velMax and k[8] > 0])[:, 8]
+        # steamTimeGen = np.array([k for k in ladenDt if
+        # [5] >= velMin and k[5] <= velMax and (k[8] > 0 and (k >= meanFocCentral - 2 * stdFocCentral and k <= meanFocCentral + 2 * stdFocCentral))])[:, 12]
+
+        # weighted_avgFocCentral = np.average(FocCentral, weights=steamTimeGen)
+
+        meanFocCentral = np.mean(FocCentral)
+        stdFocCentral = np.std(FocCentral)
+
+        centralMean = meanFocCentral - stdFocCentral  # weighted_avgFocCentral
+        # centralArray = np.array([k for k in ladenDt if
+        # k[5] >= velMin and k[5] <= velMax and k[8] > 0])[:, 8]
 
         row = [247, 256, 265, 274, 283, 292, 301, 310]
         windF = [0, 1, 2, 3, 4, 5, 6, 7, 8]
@@ -7419,8 +7510,8 @@ class BaseSeriesReader:
                         numberOfApp11_8.append(arrayFoc.__len__())  # + centralArray.__len__())
                         if (s > 0 and w >= 0):
                             cellValue = round(
-                                (ladenDt7801[0] + ladenDt7801[len(ladenDt7801) - 5] * (swellHeightWeights[s])) +
-                                windForceWeights[w] + windDirWeights[i], 2)
+                                (ladenDt7801[len(ladenDt7801) -5]  + ladenDt7801[len(ladenDt7801) - 5] * (swellHeightWeights[s])) +
+                                 windDirWeights[i], 2)
                         elif s == 0 and w == 0:
                             cellValue = round(centralMean + windDirWeights[i], 2)
                         elif s == 0 and w > 0:
@@ -7444,16 +7535,23 @@ class BaseSeriesReader:
         FocCentral = np.array([k for k in ladenDt if
                                k[5] >= velMin and k[5] <= velMax and k[8] > 0])[:, 8]
 
-        steamTimeGen = np.array([k for k in ladenDt if
-                                 k[5] >= velMin and k[5] <= velMax and k[8] > 0])[:, 12]
+        meanFocCentral = np.mean(FocCentral)
+        stdFocCentral = np.std(FocCentral)
 
-        weighted_avgFocCentral = np.average(FocCentral, weights=steamTimeGen)
+        FocCentral = np.array([k for k in FocCentral if
+                               (k >= meanFocCentral - 2 * stdFocCentral and k <= meanFocCentral + 2 * stdFocCentral)])
 
-        centralMean = np.mean(np.array([k for k in ladenDt if
-                                        k[5] >= velMin and k[5] <= velMax and k[8] > 0])[:, 8])
-        centralMean = weighted_avgFocCentral
-        centralArray = np.array([k for k in ladenDt if
-                                 k[5] >= velMin and k[5] <= velMax and k[8] > 0])[:, 8]
+        # steamTimeGen = np.array([k for k in ladenDt if
+        # [5] >= velMin and k[5] <= velMax and (k[8] > 0 and (k >= meanFocCentral - 2 * stdFocCentral and k <= meanFocCentral + 2 * stdFocCentral))])[:, 12]
+
+        # weighted_avgFocCentral = np.average(FocCentral, weights=steamTimeGen)
+
+        meanFocCentral = np.mean(FocCentral)
+        stdFocCentral = np.std(FocCentral)
+
+        centralMean = meanFocCentral - stdFocCentral  # weighted_avgFocCentral
+        # centralArray = np.array([k for k in ladenDt if
+        # k[5] >= velMin and k[5] <= velMax and k[8] > 0])[:, 8]
 
         row = [325, 334, 343, 352, 361, 370, 379, 388]
         windF = [0, 1, 2, 3, 4, 5, 6, 7, 8]
@@ -7502,8 +7600,8 @@ class BaseSeriesReader:
                         numberOfApp11_8.append(arrayFoc.__len__())  # + centralArray.__len__())
                         if (s > 0 and w >= 0):
                             cellValue = round(
-                                (ladenDt7801[0] + ladenDt7801[len(ladenDt7801) - 5] * (swellHeightWeights[s])) +
-                                windForceWeights[w] + windDirWeights[i], 2)
+                                (ladenDt7801[len(ladenDt7801) -5]  + ladenDt7801[len(ladenDt7801) - 5] * (swellHeightWeights[s])) +
+                                 + windDirWeights[i], 2)
                         elif s == 0 and w == 0:
                             cellValue = round(centralMean + windDirWeights[i], 2)
                         elif s == 0 and w > 0:
@@ -7527,16 +7625,23 @@ class BaseSeriesReader:
         FocCentral = np.array([k for k in ladenDt if
                                k[5] >= velMin and k[5] <= velMax and k[8] > 0])[:, 8]
 
-        steamTimeGen = np.array([k for k in ladenDt if
-                                 k[5] >= velMin and k[5] <= velMax and k[8] > 0])[:, 12]
+        meanFocCentral = np.mean(FocCentral)
+        stdFocCentral = np.std(FocCentral)
 
-        weighted_avgFocCentral = np.average(FocCentral, weights=steamTimeGen)
+        FocCentral = np.array([k for k in FocCentral if
+                               (k >= meanFocCentral - 2 * stdFocCentral and k <= meanFocCentral + 2 * stdFocCentral)])
 
-        centralMean = np.mean(np.array([k for k in ladenDt if
-                                        k[5] >= velMin and k[5] <= velMax and k[8] > 0])[:, 8])
-        centralMean = weighted_avgFocCentral
-        centralArray = np.array([k for k in ladenDt if
-                                 k[5] >= velMin and k[5] <= velMax and k[8] > 0])[:, 8]
+        # steamTimeGen = np.array([k for k in ladenDt if
+        # [5] >= velMin and k[5] <= velMax and (k[8] > 0 and (k >= meanFocCentral - 2 * stdFocCentral and k <= meanFocCentral + 2 * stdFocCentral))])[:, 12]
+
+        # weighted_avgFocCentral = np.average(FocCentral, weights=steamTimeGen)
+
+        meanFocCentral = np.mean(FocCentral)
+        stdFocCentral = np.std(FocCentral)
+
+        centralMean = meanFocCentral - stdFocCentral  # weighted_avgFocCentral
+        # centralArray = np.array([k for k in ladenDt if
+        # k[5] >= velMin and k[5] <= velMax and k[8] > 0])[:, 8]
 
         row = [404, 413, 422, 431, 440, 449, 458, 467]
         windF = [0, 1, 2, 3, 4, 5, 6, 7, 8]
@@ -7585,8 +7690,8 @@ class BaseSeriesReader:
                         numberOfApp11_8.append(arrayFoc.__len__())  # + centralArray.__len__())
                         if (s > 0 and w >= 0):
                             cellValue = round(
-                                (ladenDt7801[0] + ladenDt7801[len(ladenDt7801) - 5] * (swellHeightWeights[s])) +
-                                windForceWeights[w] + windDirWeights[i], 2)
+                                (ladenDt7801[len(ladenDt7801) -5]  + ladenDt7801[len(ladenDt7801) - 5] * (swellHeightWeights[s])) +
+                                 windDirWeights[i], 2)
                         elif s == 0 and w == 0:
                             cellValue = round(centralMean + windDirWeights[i], 2)
                         elif s == 0 and w > 0:
@@ -7610,16 +7715,23 @@ class BaseSeriesReader:
         FocCentral = np.array([k for k in ladenDt if
                                k[5] >= velMin and k[5] <= velMax and k[8] > 0])[:, 8]
 
-        steamTimeGen = np.array([k for k in ladenDt if
-                                 k[5] >= velMin and k[5] <= velMax and k[8] > 0])[:, 12]
+        meanFocCentral = np.mean(FocCentral)
+        stdFocCentral = np.std(FocCentral)
 
-        weighted_avgFocCentral = np.average(FocCentral, weights=steamTimeGen)
+        FocCentral = np.array([k for k in FocCentral if
+                               (k >= meanFocCentral - 2 * stdFocCentral and k <= meanFocCentral + 2 * stdFocCentral)])
 
-        centralMean = np.mean(np.array([k for k in ladenDt if
-                                        k[5] >= velMin and k[5] <= velMax and k[8] > 0])[:, 8])
-        centralMean = weighted_avgFocCentral
-        centralArray = np.array([k for k in ladenDt if
-                                 k[5] >= velMin and k[5] <= velMax and k[8] > 0])[:, 8]
+        # steamTimeGen = np.array([k for k in ladenDt if
+        # [5] >= velMin and k[5] <= velMax and (k[8] > 0 and (k >= meanFocCentral - 2 * stdFocCentral and k <= meanFocCentral + 2 * stdFocCentral))])[:, 12]
+
+        # weighted_avgFocCentral = np.average(FocCentral, weights=steamTimeGen)
+
+        meanFocCentral = np.mean(FocCentral)
+        stdFocCentral = np.std(FocCentral)
+
+        centralMean = meanFocCentral - stdFocCentral  # weighted_avgFocCentral
+        # centralArray = np.array([k for k in ladenDt if
+        # k[5] >= velMin and k[5] <= velMax and k[8] > 0])[:, 8]
 
         row = [483, 492, 501, 510, 519, 528, 537, 546]
         windF = [0, 1, 2, 3, 4, 5, 6, 7, 8]
@@ -7668,8 +7780,8 @@ class BaseSeriesReader:
                         numberOfApp11_8.append(arrayFoc.__len__())  # + centralArray.__len__())
                         if (s > 0 and w >= 0):
                             cellValue = round(
-                                (ladenDt7801[0] + ladenDt7801[len(ladenDt7801) - 5] * (swellHeightWeights[s])) +
-                                windForceWeights[w] + windDirWeights[i], 2)
+                                (ladenDt7801[len(ladenDt7801) -5]  + ladenDt7801[len(ladenDt7801) - 5] * (swellHeightWeights[s])) +
+                               windDirWeights[i], 2)
                         elif s == 0 and w == 0:
                             cellValue = round(centralMean + windDirWeights[i], 2)
                         elif s == 0 and w > 0:
@@ -7693,16 +7805,23 @@ class BaseSeriesReader:
         FocCentral = np.array([k for k in ladenDt if
                                k[5] >= velMin and k[5] <= velMax and k[8] > 0])[:, 8]
 
-        steamTimeGen = np.array([k for k in ladenDt if
-                                 k[5] >= velMin and k[5] <= velMax and k[8] > 0])[:, 12]
+        meanFocCentral = np.mean(FocCentral)
+        stdFocCentral = np.std(FocCentral)
 
-        weighted_avgFocCentral = np.average(FocCentral, weights=steamTimeGen)
+        FocCentral = np.array([k for k in FocCentral if
+                               (k >= meanFocCentral - 2 * stdFocCentral and k <= meanFocCentral + 2 * stdFocCentral)])
 
-        centralMean = np.mean(np.array([k for k in ladenDt if
-                                        k[5] >= velMin and k[5] <= velMax and k[8] > 0])[:, 8])
-        centralMean = weighted_avgFocCentral
-        centralArray = np.array([k for k in ladenDt if
-                                 k[5] >= velMin and k[5] <= velMax and k[8] > 0])[:, 8]
+        # steamTimeGen = np.array([k for k in ladenDt if
+        # [5] >= velMin and k[5] <= velMax and (k[8] > 0 and (k >= meanFocCentral - 2 * stdFocCentral and k <= meanFocCentral + 2 * stdFocCentral))])[:, 12]
+
+        # weighted_avgFocCentral = np.average(FocCentral, weights=steamTimeGen)
+
+        meanFocCentral = np.mean(FocCentral)
+        stdFocCentral = np.std(FocCentral)
+
+        centralMean = meanFocCentral - stdFocCentral  # weighted_avgFocCentral
+        # centralArray = np.array([k for k in ladenDt if
+        # k[5] >= velMin and k[5] <= velMax and k[8] > 0])[:, 8]
 
         row = [562, 571, 580, 589, 598, 607, 616, 626]
         windF = [0, 1, 2, 3, 4, 5, 6, 7, 8]
@@ -7751,8 +7870,8 @@ class BaseSeriesReader:
                         numberOfApp11_8.append(arrayFoc.__len__())  # + centralArray.__len__())
                         if (s > 0 and w >= 0):
                             cellValue = round(
-                                (ladenDt7801[0] + ladenDt7801[len(ladenDt7801) - 5] * (swellHeightWeights[s])) +
-                                windForceWeights[w] + windDirWeights[i], 2)
+                                (ladenDt7801[len(ladenDt7801) -5]  + ladenDt7801[len(ladenDt7801) - 5] * (swellHeightWeights[s])) +
+                                windDirWeights[i], 2)
                         elif s == 0 and w == 0:
                             cellValue = round(centralMean + windDirWeights[i], 2)
                         elif s == 0 and w > 0:
@@ -7770,88 +7889,7 @@ class BaseSeriesReader:
                     except:
                         print("Exception")
 
-        velMin = 11.75
-        velMax = 12.25
 
-        FocCentral = np.array([k for k in ladenDt if
-                               k[5] >= velMin and k[5] <= velMax and k[8] > 0])[:, 8]
-
-        steamTimeGen = np.array([k for k in ladenDt if
-                                 k[5] >= velMin and k[5] <= velMax and k[8] > 0])[:, 12]
-
-        weighted_avgFocCentral = np.average(FocCentral, weights=steamTimeGen)
-
-        centralMean = np.mean(np.array([k for k in ladenDt if
-                                        k[5] >= velMin and k[5] <= velMax and k[8] > 0])[:, 8])
-        centralMean = weighted_avgFocCentral
-        centralArray = np.array([k for k in ladenDt if
-                                 k[5] >= velMin and k[5] <= velMax and k[8] > 0])[:, 8]
-
-        row = [641, 650, 659, 668, 677, 686, 695, 704]
-        windF = [0, 1, 2, 3, 4, 5, 6, 7, 8]
-        swellH = [0, 1, 2, 3, 4, 5, 6, 7, 8]
-        column = ['B', 'C', 'D', 'E', 'F', 'G', 'H', 'I']
-        ladenDt7801 = []
-        numberOfApp11_8 = []
-        for w in range(0, len(windF) - 1):
-            for s in range(0, len(swellH) - 1):
-                ladenDt7_8 = []
-                numberOfApp11_8 = []
-                for i in range(0, len(wind) - 1):
-
-                    arrayFoc = np.array([k for k in ladenDt if
-                                         k[4] > windF[w] and k[4] <= windF[w + 1] and k[5] > velMin and k[
-                                             5] <= velMax and k[3] >= wind[i] and
-                                         k[3] <= wind[i + 1] and k[13] >= swellH[s] and k[13] <= swellH[s + 1]])
-                    if arrayFoc.__len__() > minAccThres:
-                        meanArrayFoc = np.mean(arrayFoc[:, 8])
-                        stdArrayFoc = np.std(arrayFoc[:, 8])
-                        arrayFoc = np.array([k for k in arrayFoc if
-                                             k[8] >= meanArrayFoc - (2 * stdArrayFoc) and k[8] <= meanArrayFoc + (
-                                                         2 * stdArrayFoc)])
-
-                        steamTime = arrayFoc[:, 12]
-
-                    tlgarrayFoc = arrayFoc[:, 9] if arrayFoc.__len__() > minAccThres else []
-                    tlgarrayFoc = np.array([k for k in tlgarrayFoc if k > 5])
-                    tlgarrayFoc = np.array(
-                        [k for k in ladenDt if k[5] > velMax and k[5] <= velMax and k[8] > 10])
-                    if tlgarrayFoc.__len__() > lenConditionTlg:
-                        tlgarrayFoc = np.array(
-
-                            [k for k in ladenDt if k[5] > velMax and k[5] <= velMax and k[8] > 10])[:, 9]
-                        meanFoc = (np.mean(arrayFoc[:, 8]) + np.mean(
-                            tlgarrayFoc) + centralMean) / 3 if arrayFoc.__len__() > minAccThres else (
-                                                                                                             centralMean + np.mean(
-                                                                                                         tlgarrayFoc)) / 2
-                        numberOfApp11_8.append(arrayFoc.__len__() + tlgarrayFoc.__len__() + centralArray.__len__())
-                    else:
-                        # np.average(arrayFoc[:, 8],weights=steamTime)
-                        weighted_avgFocArray = np.average(arrayFoc[:, 8],
-                                                          weights=steamTime) if arrayFoc.__len__() > minAccThres else centralMean
-                        meanFoc = (
-                                          weighted_avgFocArray + centralMean) / 2 if arrayFoc.__len__() > minAccThres else centralMean
-                        numberOfApp11_8.append(arrayFoc.__len__())  # + centralArray.__len__())
-                        if (s > 0 and w >= 0):
-                            cellValue = round(
-                                (ladenDt7801[0] + ladenDt7801[len(ladenDt7801) - 5] * (swellHeightWeights[s])) +
-                                windForceWeights[w] + windDirWeights[i], 2)
-                        elif s == 0 and w == 0:
-                            cellValue = round(centralMean + windDirWeights[i], 2)
-                        elif s == 0 and w > 0:
-                            cellValue = round(centralMean + windForceWeights[w] + windDirWeights[i], 2)
-                            # round(ladenDt7801[lastLenLadenDt7801 - (39-((i-1 if i < 5 else i-2) ))] + windForceWeights[w] + windDirWeights[i], 2)
-                    ladenDt7_8.append(cellValue)
-                    ladenDt7801.append(cellValue)
-                lastLenDt_8 = len(ladenDt7_8)
-                for i in range(row[w], row[w] + 5):
-                    try:
-                        workbook._sheets[1][column[s - 1 if s == 8 else s] + str(i)] = str(
-                            ladenDt7_8[i - row[w]])  # + '(' + str(numberOfApp11_8[i - row[w]]) + ')'
-                        workbook._sheets[1][column[s - 1 if s == 8 else s] + str(i)].alignment = Alignment(
-                            horizontal='right')
-                    except:
-                        print("Exception")
 
         velMin = 12.25
         velMax = 12.75
@@ -7859,16 +7897,23 @@ class BaseSeriesReader:
         FocCentral = np.array([k for k in ladenDt if
                                k[5] >= velMin and k[5] <= velMax and k[8] > 0])[:, 8]
 
-        steamTimeGen = np.array([k for k in ladenDt if
-                                 k[5] >= velMin and k[5] <= velMax and k[8] > 0])[:, 12]
+        meanFocCentral = np.mean(FocCentral)
+        stdFocCentral = np.std(FocCentral)
 
-        weighted_avgFocCentral = np.average(FocCentral, weights=steamTimeGen)
+        FocCentral = np.array([k for k in FocCentral if
+                               (k >= meanFocCentral - 2 * stdFocCentral and k <= meanFocCentral + 2 * stdFocCentral)])
 
-        centralMean = np.mean(np.array([k for k in ladenDt if
-                                        k[5] >= velMin and k[5] <= velMax and k[8] > 0])[:, 8])
-        centralMean = weighted_avgFocCentral
-        centralArray = np.array([k for k in ladenDt if
-                                 k[5] >= velMin and k[5] <= velMax and k[8] > 0])[:, 8]
+        # steamTimeGen = np.array([k for k in ladenDt if
+        # [5] >= velMin and k[5] <= velMax and (k[8] > 0 and (k >= meanFocCentral - 2 * stdFocCentral and k <= meanFocCentral + 2 * stdFocCentral))])[:, 12]
+
+        # weighted_avgFocCentral = np.average(FocCentral, weights=steamTimeGen)
+
+        meanFocCentral = np.mean(FocCentral)
+        stdFocCentral = np.std(FocCentral)
+
+        centralMean = meanFocCentral - stdFocCentral  # weighted_avgFocCentral
+        # centralArray = np.array([k for k in ladenDt if
+        # k[5] >= velMin and k[5] <= velMax and k[8] > 0])[:, 8]
 
         row = [720, 729, 738, 747, 756, 765, 774, 783]
         windF = [0, 1, 2, 3, 4, 5, 6, 7, 8]
@@ -7917,8 +7962,8 @@ class BaseSeriesReader:
                         numberOfApp11_8.append(arrayFoc.__len__())  # + centralArray.__len__())
                         if (s > 0 and w >= 0):
                             cellValue = round(
-                                (ladenDt7801[0] + ladenDt7801[len(ladenDt7801) - 5] * (swellHeightWeights[s])) +
-                                windForceWeights[w] + windDirWeights[i], 2)
+                                (ladenDt7801[len(ladenDt7801) -5]  + ladenDt7801[len(ladenDt7801) - 5] * (swellHeightWeights[s])) +
+                              windDirWeights[i], 2)
                         elif s == 0 and w == 0:
                             cellValue = round(centralMean + windDirWeights[i], 2)
                         elif s == 0 and w > 0:
@@ -7942,16 +7987,23 @@ class BaseSeriesReader:
         FocCentral = np.array([k for k in ladenDt if
                                k[5] >= velMin and k[5] <= velMax and k[8] > 0])[:, 8]
 
-        steamTimeGen = np.array([k for k in ladenDt if
-                                 k[5] >= velMin and k[5] <= velMax and k[8] > 0])[:, 12]
+        meanFocCentral = np.mean(FocCentral)
+        stdFocCentral = np.std(FocCentral)
 
-        weighted_avgFocCentral = np.average(FocCentral, weights=steamTimeGen)
+        FocCentral = np.array([k for k in FocCentral if
+                               (k >= meanFocCentral - 2 * stdFocCentral and k <= meanFocCentral + 2 * stdFocCentral)])
 
-        centralMean = np.mean(np.array([k for k in ladenDt if
-                                        k[5] >= velMin and k[5] <= velMax and k[8] > 0])[:, 8])
-        centralMean = weighted_avgFocCentral
-        centralArray = np.array([k for k in ladenDt if
-                                 k[5] >= velMin and k[5] <= velMax and k[8] > 0])[:, 8]
+        # steamTimeGen = np.array([k for k in ladenDt if
+        # [5] >= velMin and k[5] <= velMax and (k[8] > 0 and (k >= meanFocCentral - 2 * stdFocCentral and k <= meanFocCentral + 2 * stdFocCentral))])[:, 12]
+
+        # weighted_avgFocCentral = np.average(FocCentral, weights=steamTimeGen)
+
+        meanFocCentral = np.mean(FocCentral)
+        stdFocCentral = np.std(FocCentral)
+
+        centralMean = meanFocCentral - stdFocCentral  # weighted_avgFocCentral
+        # centralArray = np.array([k for k in ladenDt if
+        # k[5] >= velMin and k[5] <= velMax and k[8] > 0])[:, 8]
 
         row = [798, 807, 816, 825, 834, 843, 852, 861]
         windF = [0, 1, 2, 3, 4, 5, 6, 7, 8]
@@ -8000,8 +8052,8 @@ class BaseSeriesReader:
                         numberOfApp11_8.append(arrayFoc.__len__())  # + centralArray.__len__())
                         if (s > 0 and w >= 0):
                             cellValue = round(
-                                (ladenDt7801[0] + ladenDt7801[len(ladenDt7801) - 5] * (swellHeightWeights[s])) +
-                                windForceWeights[w] + windDirWeights[i], 2)
+                                (ladenDt7801[len(ladenDt7801) -5]  + ladenDt7801[len(ladenDt7801) - 5] * (swellHeightWeights[s])) +
+                                windDirWeights[i], 2)
                         elif s == 0 and w == 0:
                             cellValue = round(centralMean + windDirWeights[i], 2)
                         elif s == 0 and w > 0:
@@ -8025,16 +8077,23 @@ class BaseSeriesReader:
         FocCentral = np.array([k for k in ladenDt if
                                k[5] >= velMin and k[5] <= velMax and k[8] > 0])[:, 8]
 
-        steamTimeGen = np.array([k for k in ladenDt if
-                                 k[5] >= velMin and k[5] <= velMax and k[8] > 0])[:, 12]
+        meanFocCentral = np.mean(FocCentral)
+        stdFocCentral = np.std(FocCentral)
 
-        weighted_avgFocCentral = np.average(FocCentral, weights=steamTimeGen)
+        FocCentral = np.array([k for k in FocCentral if
+                               (k >= meanFocCentral - 2 * stdFocCentral and k <= meanFocCentral + 2 * stdFocCentral)])
 
-        centralMean = np.mean(np.array([k for k in ladenDt if
-                                        k[5] >= velMin and k[5] <= velMax and k[8] > 0])[:, 8])
-        centralMean = weighted_avgFocCentral
-        centralArray = np.array([k for k in ladenDt if
-                                 k[5] >= velMin and k[5] <= velMax and k[8] > 0])[:, 8]
+        # steamTimeGen = np.array([k for k in ladenDt if
+        # [5] >= velMin and k[5] <= velMax and (k[8] > 0 and (k >= meanFocCentral - 2 * stdFocCentral and k <= meanFocCentral + 2 * stdFocCentral))])[:, 12]
+
+        # weighted_avgFocCentral = np.average(FocCentral, weights=steamTimeGen)
+
+        meanFocCentral = np.mean(FocCentral)
+        stdFocCentral = np.std(FocCentral)
+
+        centralMean = meanFocCentral - stdFocCentral  # weighted_avgFocCentral
+        # centralArray = np.array([k for k in ladenDt if
+        # k[5] >= velMin and k[5] <= velMax and k[8] > 0])[:, 8]
 
         row = [877, 886, 895, 904, 913, 922, 931, 940]
         windF = [0, 1, 2, 3, 4, 5, 6, 7, 8]
@@ -8083,8 +8142,8 @@ class BaseSeriesReader:
                         numberOfApp11_8.append(arrayFoc.__len__())  # + centralArray.__len__())
                         if (s > 0 and w >= 0):
                             cellValue = round(
-                                (ladenDt7801[0] + ladenDt7801[len(ladenDt7801) - 5] * (swellHeightWeights[s])) +
-                                windForceWeights[w] + windDirWeights[i], 2)
+                                (ladenDt7801[len(ladenDt7801) -5]  + ladenDt7801[len(ladenDt7801) - 5] * (swellHeightWeights[s])) +
+                                 windDirWeights[i], 2)
                         elif s == 0 and w == 0:
                             cellValue = round(centralMean + windDirWeights[i], 2)
                         elif s == 0 and w > 0:
@@ -8108,16 +8167,23 @@ class BaseSeriesReader:
         FocCentral = np.array([k for k in ladenDt if
                                k[5] >= velMin and k[5] <= velMax and k[8] > 0])[:, 8]
 
-        steamTimeGen = np.array([k for k in ladenDt if
-                                 k[5] >= velMin and k[5] <= velMax and k[8] > 0])[:, 12]
+        meanFocCentral = np.mean(FocCentral)
+        stdFocCentral = np.std(FocCentral)
 
-        weighted_avgFocCentral = np.average(FocCentral, weights=steamTimeGen)
+        FocCentral = np.array([k for k in FocCentral if
+                               (k >= meanFocCentral - 2 * stdFocCentral and k <= meanFocCentral + 2 * stdFocCentral)])
 
-        centralMean = np.mean(np.array([k for k in ladenDt if
-                                        k[5] >= velMin and k[5] <= velMax and k[8] > 0])[:, 8])
-        centralMean = weighted_avgFocCentral
-        centralArray = np.array([k for k in ladenDt if
-                                 k[5] >= velMin and k[5] <= velMax and k[8] > 0])[:, 8]
+        # steamTimeGen = np.array([k for k in ladenDt if
+        # [5] >= velMin and k[5] <= velMax and (k[8] > 0 and (k >= meanFocCentral - 2 * stdFocCentral and k <= meanFocCentral + 2 * stdFocCentral))])[:, 12]
+
+        # weighted_avgFocCentral = np.average(FocCentral, weights=steamTimeGen)
+
+        meanFocCentral = np.mean(FocCentral)
+        stdFocCentral = np.std(FocCentral)
+
+        centralMean = meanFocCentral - stdFocCentral  # weighted_avgFocCentral
+        # centralArray = np.array([k for k in ladenDt if
+        # k[5] >= velMin and k[5] <= velMax and k[8] > 0])[:, 8]
 
         row = [955, 964, 973, 982, 991, 1000,1009, 1018]
         windF = [0, 1, 2, 3, 4, 5, 6, 7, 8]
@@ -8166,8 +8232,8 @@ class BaseSeriesReader:
                         numberOfApp11_8.append(arrayFoc.__len__())  # + centralArray.__len__())
                         if (s > 0 and w >= 0):
                             cellValue = round(
-                                (ladenDt7801[0] + ladenDt7801[len(ladenDt7801) - 5] * (swellHeightWeights[s])) +
-                                windForceWeights[w] + windDirWeights[i], 2)
+                                (ladenDt7801[len(ladenDt7801) -5]  + ladenDt7801[len(ladenDt7801) - 5] * (swellHeightWeights[s])) +
+                               windDirWeights[i], 2)
                         elif s == 0 and w == 0:
                             cellValue = round(centralMean + windDirWeights[i], 2)
                         elif s == 0 and w > 0:

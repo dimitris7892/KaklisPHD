@@ -6,6 +6,7 @@ from scipy import stats
 import math
 from scipy.spatial import Delaunay, ConvexHull
 import csv
+from numpy import array
 import pyearth as sp
 
 
@@ -25,50 +26,30 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
         for iCnt in range(np.shape(unseenX)[0]):
             pPoint = unseenX[iCnt].reshape(1, -1)#[0] # Convert to matrix
             trueVal = unseenY[iCnt]
-            #prediction = (modeler.getBestModelForPoint(pPoint).predict(pPoint) )#+ modeler._models[len(modeler._models) - 1].predict(pPoint)) /2
+            preds=[]
+            # fits = modeler.getFitForEachPartitionForPoint(pPoint, partitionsX)
 
-            if len(partitionsX)> 1:
-                fits = modeler.getFitForEachPartitionForPoint(pPoint, partitionsX)
-
-                preds = []
-                for n in range(0, len(partitionsX)):
-                    if modeler.__class__.__name__ == 'TensorFlowCA':
-                        preds.append(modeler._models[n].predict(pPoint)[0][0])
-                    else:
-                        preds.append(modeler._models[n].predict(pPoint)[0])
-                # weightedPreds.append(modeler._models[len(modeler._models)-1].predict(pPoint))
-                #top_2_idx = np.argsort(fits)[-2:]
-                #top_2_values = [fits[i] for i in top_2_idx]
-                #top_2_preds = [preds[i] for i in top_2_idx]
-                prediction = np.average(preds, weights=fits)
+            if modeler.__class__.__name__ == 'TensorFlowCA':
+                if len(partitionsX)> 1:
+                    preds = []
+                    for n in range(0, len(partitionsX)):
+                            preds.append(modeler._models[n].predict(pPoint)[0][0])
+                trainedWeights = genericModel
+                prediction = modeler._models[len(modeler._models) - 1].predict(pPoint)
+                if len(partitionsX) > 1:
+                    np.average(np.array(preds), weights=trainedWeights.reshape(len(preds)))
+                else:
+                    prediction =  prediction
             else:
-                prediction = (modeler.getBestModelForPoint(pPoint).predict(pPoint) )#+ modeler._models[len(modeler._models) - 1].predict(pPoint)) /2
+                prediction = (modeler.getBestModelForPoint(pPoint).predict(pPoint) + modeler._models[len(modeler._models) - 1].predict(pPoint)) / 2
+
 
             lErrors.append(abs(prediction - trueVal))
         errors = np.asarray(lErrors)
 
         return errors, np.mean(errors), np.std(lErrors)
 
-    def evaluateNN(self, unseenX, unseenY, modeler,output,xs):
-        lErrors = []
-        self.session = tf.Session()
-        saver = tf.train.Saver()
-       # tf.saved_model.loader.load(
-       #     self.session,
-       #     [ tf.saved_model.tag_constants.TRAINING ],
-       #     './save')
 
-        for iCnt in range(np.shape(unseenX)[0]):
-
-            saver.restore(self.session, "./save/test_" + str(iCnt) + ".ckpt")
-            model = modeler.getBestModelForPoint(pPoint)
-            pPoint = unseenX[iCnt].reshape(1, -1)#[0] # Convert to matrix
-            trueVal = unseenY[iCnt]
-            prediction = self.session.run(output, feed_dict={xs: pPoint})
-            lErrors.append(abs(prediction - trueVal))
-            errors = np.asarray(lErrors)
-
-        return errors, np.mean(errors), np.std(lErrors)
 
     def sign(self, p1, p2, p3):
         return (p1[ 0 ] - p3[ 0 ]) * (p2[ 1 ] - p3[ 1 ]) - (p2[ 0 ] - p3[ 0 ]) * (p1[ 1 ] - p3[ 1 ])
@@ -1056,11 +1037,6 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
 
     def evaluateKerasNN1(self, unseenX, unseenY, modeler,output,xs,genericModel,partitionsX , scores):
         lErrors = []
-        from scipy.special import softmax
-
-        from tensorflow import keras
-        path = '.\\'
-        clusters = '30'
 
         count = 0
         for iCnt in range(np.shape(unseenX)[0]):
@@ -1068,38 +1044,23 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
             pPoint= pPoint.reshape(-1,unseenX.shape[1])
             XSplineVector=[]
             trueVal = unseenY[iCnt]
-
-            #vector = self.extractFunctionsFromSplines(pPoint[0], pPoint[1], 'Gen')
-            #XSplineVector = np.append(pPoint, vector)
-            #XSplineVector = XSplineVector.reshape(-1, XSplineVector.shape[0])
-            #predLabel = abs(CLmodeler.predict(XSplineVector))[0]
-
+            preds = []
             ind, fit = modeler.getBestPartitionForPoint(pPoint, partitionsX)
 
             if len(partitionsX)>1:
-                fits = modeler.getFitForEachPartitionForPoint(pPoint, partitionsX)
-
-                #ind = predLabel
-                # prediction = modeler._models[len(modeler._models)-1].predict(pPoint)
-
-                preds = []
+                #fits = modeler.getFitForEachPartitionForPoint(pPoint, partitionsX)
                 for n in range(0, len(partitionsX)):
-
                     preds.append(modeler._models[n].predict(pPoint)[0][0])
-                # weightedPreds.append(modeler._models[len(modeler._models)-1].predict(pPoint))
-                top_2_idx = np.argsort(fits)[-2:]
-                top_2_values = [fits[i] for i in top_2_idx]
-                top_2_preds=[preds[i] for i in top_2_idx]
-                prediction = np.average(preds, weights=fits)
-                #prediction = modeler._models[ind].predict(pPoint)
-                #prediction = pred / len(fits)
-                #pPoint = np.reshape(pPoint, (pPoint.shape[0], pPoint.shape[1], 1))
+
+            prediction = modeler._models[0].predict(pPoint)
+            trainedWeights =  scores.reshape(len(partitionsX)) if str(scores) !='None' else scores
+                #np.where(scores<0, 0, scores).reshape(len(partitionsX))
+            #trainedWeights = np.sum(preds*trainedWeights)/trainedWeights
+            if len(modeler._models) > 1:
+                prediction = (np.average(preds, weights=trainedWeights) + prediction) / 2
             else:
-                prediction = abs(modeler._models[ind].predict(pPoint))
-            '''if len(modeler._models) >1:
-                prediction = (abs(modeler._models[ind].predict(pPoint))  + modeler._models[len(modeler._models) - 1].predict(pPoint) )/ 2
-            else:
-                prediction =  modeler._models[len(modeler._models) - 1].predict(pPoint)'''
+                prediction = prediction
+
 
             lErrors.append(abs(prediction - trueVal))
 
@@ -1110,122 +1071,25 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
     def evaluateKerasNN(self, unseenX, unseenY, modeler,output,xs,genericModel,partitionsX , scores):
         lErrors = []
         self.intercepts = []
+        preds=[]
         self.count = 0
-        #vectorWeights = scores
-        #unseenX = unseenX.reshape((unseenX.shape[ 0 ], 1, unseenX.shape[ 1 ]))
-        #from sklearn.decomposition import PCA
-        #pca = PCA()
-        #pca.fit(unseenX)
-        #unseenX = pca.transform(unseenX)
-        from tensorflow import keras
-        path = '.\\'
-        clusters = '30'
-        #partitionsX = [ ]
-        #partitionsY = [ ]
-        #for cl in range(0,30):
-            # models.append(load_model(path+'\estimatorCl_'+str(cl)+'.h5'))
-            #data = pd.read_csv('cluster_' + str(cl) + '_.csv')
-            #partitionsX.append(self.readClusteredLarosDataFromCsvNew(data))
+        errorStwArr = []
+        rpm = []
+        errorRpm = []
 
-        #for cl in range(0,30):
-            # models.append(load_model(path+'\estimatorCl_'+str(cl)+'.h5'))
-            #data = pd.read_csv('cluster_foc' + str(cl) + '_.csv')
-            #partitionsY.append(self.readClusteredLarosDataFromCsvNew(data))
-
-        #from sklearn import preprocessing
-        #scalerX = preprocessing.StandardScaler()
-        #scalerY =preprocessing.StandardScaler()
-        ##scalerX = scalerX.fit(np.concatenate(partitionsX))
-        #scalerY = scalerY.fit(np.concatenate(partitionsY).reshape(-1, 1))
-        count = 0
         for iCnt in range(np.shape(unseenX)[0]):
             pPoint =unseenX[iCnt]
             pPoint= pPoint.reshape(-1,unseenX.shape[1])
 
 
-            preds = [ ]
-            #listOfPoints = np.array(listOfPoints.split('[')[ 1 ].split(']')[ 0 ].split(',')).astype(np.float)
-            #listOfPoints = listOfPoints.reshape(-1, 4)
-            #pPoint = pPoint.reshape(-1,1,2)
-            #pPoint = pPoint.reshape((pPoint.shape[ 0 ], 1, pPoint.shape[ 1 ]))
-             # Convert to matrix
-            #for vector in pPoint:
-                #ind, fit = modeler.getBestPartitionForPoint(vector, partitionsX)
-                #currModeler = keras.models.load_model('estimatorCl_rpm' + str(ind) + '.h5')
-                #vector = vector.reshape(-1, 4)
-                #rpm = currModeler.predict(vector)
-                #preds.append(prediction[ 0 ][ 0 ])
-                #pPoint = np.append(pPoint, [ rpm ])
-
-            #try:
             trueVal = unseenY[iCnt]
-            #except:
-            #z=0
-            #pPoint=[ pPoint for _ in range(len(modeler._models[0].input)) ]
-            #trueVal = unseenY[ iCnt ]
-            #prediction = modeler._models[0].model.predict([unseenX[:,0].reshape(1,unseenX.shape[0],1) , unseenX[ :, 1 ].reshape(1, unseenX.shape[ 0 ], 1)])
-            #q = model1.predict(pPoint, verbose=0)
-            #cl = q.argmax(1)
-            #weight= model2.layers[1].get_weights()[0][0,:][cl]
-            #prediction = np.sum(model2.predict(pPoint, verbose=0)) / 5
-
-            #ind , fit = modeler.getBestPartitionForPoint(pPoint,partitionsX)
-            ind, fit = modeler.getBestPartitionForPoint(pPoint, partitionsX)
-
-            #fits = modeler.getFitsOfPoint(partitionsX,pPoint)
-            #fit  = modeler.getFitofPointIncluster(pPoint,centroids[ind])
-            #scaledPoint = scalerX.fit_transform(pPoint)
 
 
-            #scaledPoint = scalerX.fit_transform(pPoint)
+            #ind, fit = modeler.getBestPartitionForPoint(pPoint, partitionsX)
+
+            #fits = modeler.getFitForEachPartitionForPoint(pPoint, partitionsX)
 
 
-            fits = modeler.getFitForEachPartitionForPoint(pPoint, partitionsX)
-
-
-            #prediction = modeler._models[0].predict(pPoint)
-            #prediction = modeler._models[len(modeler._models)-1].predict(pPoint)
-            #from scipy.special import softmax
-            #fits = softmax(fits)
-            #pred=modeler._models[len(modeler._models)-1].predict(pPoint)
-            #for i in range(0,len(fits)):
-                #pred+=fits[i]*modeler._models[i].predict(pPoint)
-            ################################################################################
-            '''self.intercepts = []
-            vector = self.extractFunctionsFromSplines(pPoint[0][0],pPoint[0][1],ind)
-            XSplineVector=np.append(pPoint, vector)
-            #XSplineVector = XSplineVector.reshape(-1, XSplineVector.shape[ 0 ])
-
-            XSplinevectorNew = np.array(self.intercepts) * vector
-            XSplinevectorNew = np.array([i + self.interceptsGen for i in XSplinevectorNew])
-
-            XSplinevectorNew = np.append(pPoint, XSplinevectorNew)
-            XSplinevectorNew = XSplinevectorNew.reshape(-1, XSplinevectorNew.shape[0])'''
-            #pred = modeler._models[ind].predict(XSplinevectorNew)
-            #######################################################
-            #######################################################
-            #######################################################
-
-            '''self.intercepts = []
-            vector = self.extractFunctionsFromSplines(pPoint[ 0 ][ 0 ], pPoint[ 0 ][ 1 ], 'Gen')
-
-
-            XSplineGenvectorNew = np.array(self.intercepts) * vector
-            XSplineGenvectorNew = np.array([i + self.interceptsGen for i in XSplineGenvectorNew])
-
-            XSplineGenvectorNew = np.append(pPoint, XSplineGenvectorNew)
-            XSplineGenvectorNew = XSplineGenvectorNew.reshape(-1, XSplineGenvectorNew.shape[0])
-
-            prediction = abs(modeler._models[ 0 ].predict(XSplineGenvectorNew))'''
-            #XSplineVector = XSplineGenVector if modeler._models[ind][1]=='GEN' else XSplineVector
-            #prediction = (abs(modeler._models[ind].predict(XSplineVector)) + modeler._models[len(modeler._models)-1].predict(XSplineGenVector))/2
-
-            #XSplineVector = np.reshape(XSplineVector,(XSplineVector.shape[0], XSplineVector.shape[1], 1))
-            #XSplineGenVector = np.reshape(XSplineGenVector, (XSplineGenVector.shape[0], XSplineGenVector.shape[1], 1))
-            '''if len(modeler._models)>1:
-                prediction = (abs(modeler._models[ind].predict(XSplinevectorNew)) + modeler._models[len(modeler._models) - 1].predict(XSplineGenvectorNew) )/ 2
-            else:
-                prediction =  modeler._models[len(modeler._models) - 1].predict(XSplinevectorNew)'''
             if len(modeler._models) > 1:
                 preds = []
                 for n in range(0,len(partitionsX)):
@@ -1237,52 +1101,88 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
                     XSplinevectorNew = np.array(self.intercepts) * vector
                     XSplinevectorNew = np.array([i + self.interceptsGen for i in XSplinevectorNew])
 
-                    XSplinevectorNew = np.append(pPoint, XSplinevectorNew)
+                    XSplinevectorNew = np.append(pPoint, vector)
                     XSplinevectorNew = XSplinevectorNew.reshape(-1, XSplinevectorNew.shape[0])
                     #try:
                     preds.append(modeler._models[n].predict(XSplinevectorNew)[0][0] )
                     #except:
                         #d=0
                 # weightedPreds.append(modeler._models[len(modeler._models)-1].predict(pPoint))
-                prediction = np.average(preds ,weights=fits )
+                #############################
+
+
+
+                #prediction = np.average(preds ,weights=fits )
+            #else:
+
+            self.intercepts = []
+            vector = self.extractFunctionsFromSplines(pPoint[0][0], pPoint[0][1], 'Gen')
+
+            XSplineGenvectorNew = np.array(self.intercepts) * vector
+            SplineGenvectorNew = np.array([i + self.interceptsGen for i in vector])
+
+            #XSplineGenvectorNew= np.sum(np.array(self.intercepts) * vector) + self.interceptsGen
+            XSplineGenvectorNew = np.append(pPoint, vector)
+            XSplineGenvectorNew = XSplineGenvectorNew.reshape(-1, XSplineGenvectorNew.shape[0])
+
+            prediction = abs(modeler._models[len(modeler._models)-1].predict(XSplineGenvectorNew))
+            preds.append(prediction)
+
+            #trainedWeights = genericModel
+            if len(modeler._models) > 1:
+                prediction = scores.predict(np.array(preds).reshape(-1,len(partitionsX)+1))
+                #prediction = (np.average(preds, weights=trainedWeights) )#+ prediction) / 2
             else:
+                prediction = prediction
 
-                self.intercepts = []
-                vector = self.extractFunctionsFromSplines(pPoint[0][0], pPoint[0][1], 'Gen')
-
-                XSplineGenvectorNew = np.array(self.intercepts) * vector
-                XSplineGenvectorNew = np.array([i + self.interceptsGen for i in XSplineGenvectorNew])
-
-                XSplineGenvectorNew = np.append(pPoint, XSplineGenvectorNew)
-                XSplineGenvectorNew = XSplineGenvectorNew.reshape(-1, XSplineGenvectorNew.shape[0])
-
-                prediction = abs(modeler._models[0].predict(XSplineGenvectorNew))
-
-            #try:
-                #if modeler._models[ ind ][ 1 ] == 'GEN':
-            #prediction = modeler._models[ len(modeler._models) - 1 ][ 0 ].predict(XSplineGenVector)
-                #else:
-                    #prediction = (abs(modeler._models[ind][0].predict(XSplineVector)) + modeler._models[len(modeler._models)-1][0].predict(XSplineGenVector))/2
-                #lErrors.append(abs(prediction - trueVal))
-            #except:
-                #prediction = modeler._models[len(modeler._models) - 1][0].predict(XSplineGenVector)
-                #count=count+1
-                #abs(modeler._models[ind].predict(XSplineVector))
-                #(abs(modeler._models[ind].predict(XSplineVector)) + modeler._models[len(modeler._models)-1].predict(XSplineGenVector))/2
-                #abs(modeler._models[ind].predict(XSplineVector)) if fit > 0.5 else  modeler._models[len(modeler._models)-1].predict(XSplineGenVector)
-
-            #prediction = (scalerY.inverse_transform(prediction))  # + scalerY.inverse_transform(currModeler1.predict(scaled))) / 2
-            #states_value = modeler._models[0].model.predict([unseenX[:,0].reshape(1,unseenX.shape[200],1) , unseenX[ :, 1 ].reshape(1, unseenX.shape[ 200 ], 1)])
-
-            ##########
-
-            #if abs(prediction - trueVal)>10:
-                #w=0
-        #x=unseenX[:,0].reshape(-1,unseenX.shape[0])
             lErrors.append(abs(prediction - trueVal))
+
+            #lErrors.append(abs(prediction - trueVal))
+            percError = abs((prediction - trueVal) / trueVal) * 100
+            #errorStwArr.append(np.array(
+                #np.append(np.asmatrix(pPoint[0][0]).reshape(-1, 1), np.asmatrix([percError[0]]).T, axis=1)))
+            errorRpm.append(percError)
+            rpm.append(trueVal)
+            preds.append(prediction[0][0])
+
+            error = abs(prediction - trueVal)
+            lErrors.append(error)
+
+        errorStwArr = np.array(errorStwArr)
+        errorStwArr = errorStwArr.reshape(-1, 2)
+
+        if type == 'train':
+            with open('./TRAINerrorPercFOC' + str(len(partitionsX)) + '_' + str(subsetInd) + '.csv',
+                      mode='w') as data:
+                data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+                data_writer.writerow(
+                    ['FOC', 'PERC'])
+                for i in range(0, len(errorFoc)):
+                    data_writer.writerow(
+                        [foc[i], errorFoc[i][0][0]])
+
+            with open('./TRAINerrorSTW' + str(len(partitionsX)) + '_' + str(subsetInd) + '.csv', mode='w') as data:
+                data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+                data_writer.writerow(
+                    ['STW', 'MAE'])
+                for i in range(0, len(errorStwArr)):
+                    data_writer.writerow(
+                        [errorStwArr[i][0], errorStwArr[i][1]])
+        else:
+            with open('./TESTerrorPercRPMxiNN' + str(len(partitionsX)) + '_' + str(0) + '.csv',
+                      mode='w') as data:
+                data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+                data_writer.writerow(
+                    ['FOC', 'PRED','PERC'])
+                for i in range(0, len(errorRpm)):
+                    data_writer.writerow([])
+                        #[rpm[i],preds[i] ,errorRpm[i][0][0]])
+
+
         #prediction =modeler._models[ 0 ].predict(unseenX.reshape(2,2860))
         #print np.mean(abs(prediction - unseenY))
         #print("EXCEPTIONS :  "+str(count))
+        print('Accuracy: ' + str(np.round(100 - np.mean(errorRpm), 2)))
         errors = np.asarray(lErrors)
 
         return errors, np.mean(errors), np.std(lErrors)
@@ -1291,19 +1191,69 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
         lErrors = []
         self.intercepts = []
         self.count = 0
-
+        errorStwArr = []
+        rpm = []
+        errorRpm = []
+        preds=[]
+        subsetInd=0
+        type='test'
+        XSplineGenvectorNews=[]
         for iCnt in range(np.shape(unseenX)[0]):
             pPoint =unseenX[iCnt]
             pPoint= pPoint.reshape(-1,unseenX.shape[1])
 
-
-
             #try:
             trueVal = unseenY[iCnt]
 
+
+            self.intercepts = []
+            vector = self.extractFunctionsFromSplines(pPoint[ 0 ][ 0 ], pPoint[ 0 ][ 1 ], 'Gen')
+
+
+            #XSplineGenvectorNew = np.array(self.intercepts) * vector
+            #XSplineGenvectorNew = np.array([i + self.interceptsGen for i in XSplineGenvectorNew])
+
+            #XSplineGenvectorNew = np.append(pPoint, vector)
+            #XSplineGenvectorNews.append(XSplineGenvectorNew)
+
+            splineVector = np.append(pPoint, vector)
+            XSplineGenvectorNews.append(np.append(splineVector, unseenY[iCnt]))
+            #XSplineGenvectorNew = XSplineGenvectorNew.reshape(-1, XSplineGenvectorNew.shape[0])
+
+        def split_sequence(sequence, n_steps):
+            X, y = list(), list()
+            for i in range(len(sequence)):
+                # find the end of this pattern
+                end_ix = i + n_steps
+                # check if we are beyond the sequence
+                if end_ix > len(sequence) - 1:
+                    break
+                # gather input and output parts of the pattern
+                seq_x, seq_y = sequence[i:end_ix][:,0:sequence.shape[1]-1], sequence[i][sequence.shape[1]-1]
+                X.append(seq_x)
+                y.append(seq_y)
+            return array(X), array(y)
+
+            # define input sequence
+
+        raw_seq = np.array(XSplineGenvectorNews)
+
+        n_steps = 5
+        # split into samples
+        unseenXlstm, unseenYlstm = split_sequence(raw_seq, n_steps)
+
+        for iCnt in range(np.shape(unseenXlstm)[0]):
+            pPoint =unseenXlstm[iCnt]
+            #pPoint= pPoint.reshape(-1,unseenX.shape[1])
+
+
+
+            #try:
+            trueVal = unseenYlstm[iCnt]
+
             #ind , fit = modeler.getBestPartitionForPoint(pPoint,partitionsX)
 
-            ind, fit = modeler.getBestPartitionForPoint(pPoint, partitionsX)
+            '''ind, fit = modeler.getBestPartitionForPoint(pPoint, partitionsX)
 
             if len(modeler._models) > 1:
                 self.intercepts = []
@@ -1329,23 +1279,63 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
 
                 XSplineGenvectorNew = np.append(pPoint, XSplineGenvectorNew)
                 XSplineGenvectorNew = XSplineGenvectorNew.reshape(-1, XSplineGenvectorNew.shape[0])
-                XSplineGenvectorNew = np.reshape(XSplineGenvectorNew, (XSplineGenvectorNew.shape[0], XSplineGenvectorNew.shape[1], 1))
-                prediction = modeler._models[len(modeler._models) - 1].predict(XSplineGenvectorNew)
+                XSplineGenvectorNew = np.reshape(XSplineGenvectorNew, (XSplineGenvectorNew.shape[0], XSplineGenvectorNew.shape[1], 1))'''
+
+            pPoint = np.reshape(pPoint, (1, pPoint.shape[0], pPoint.shape[1]))
+            prediction = modeler._models[len(modeler._models) - 1].predict(pPoint)
 
             '''if len(modeler._models)>1:
                 prediction = (abs(modeler._models[ind].predict(XSplinevectorNew)) + modeler._models[len(modeler._models) - 1].predict(XSplineGenvectorNew) )/ 2
             else:
                 prediction =  modeler._models[len(modeler._models) - 1].predict(XSplinevectorNew)'''
 
-            #if abs(prediction - trueVal)>10:
-                #w=0
-        #x=unseenX[:,0].reshape(-1,unseenX.shape[0])
-            lErrors.append(abs(prediction - trueVal))
-        #prediction =modeler._models[ 0 ].predict(unseenX.reshape(2,2860))
-        #print np.mean(abs(prediction - unseenY))
-        #print("EXCEPTIONS :  "+str(count))
-        errors = np.asarray(lErrors)
+            percError = abs((prediction - trueVal) / trueVal) * 100
+            # errorStwArr.append(np.array(
+            # np.append(np.asmatrix(pPoint[0][0]).reshape(-1, 1), np.asmatrix([percError[0]]).T, axis=1)))
+            errorRpm.append(percError)
+            rpm.append(trueVal)
+            preds.append(prediction[0][0])
 
+            error = abs(prediction - trueVal)
+            lErrors.append(error)
+
+        errorStwArr = np.array(errorStwArr)
+        errorStwArr = errorStwArr.reshape(-1, 2)
+
+        if type == 'train':
+            with open('./TRAINerrorPercFOC' + str(len(partitionsX)) + '_' + str(subsetInd) + '.csv',
+                      mode='w') as data:
+                data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+                data_writer.writerow(
+                    ['FOC', 'PERC'])
+                for i in range(0, len(errorRpm)):
+                    data_writer.writerow(
+                        [rpm[i], errorRpm[i][0][0]])
+
+            with open('./TRAINerrorSTW' + str(len(partitionsX)) + '_' + str(subsetInd) + '.csv', mode='w') as data:
+                data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+                data_writer.writerow(
+                    ['STW', 'MAE'])
+                for i in range(0, len(errorStwArr)):
+                    data_writer.writerow(
+                        [errorStwArr[i][0], errorStwArr[i][1]])
+        else:
+            with open('./TESTerrorPercRPMxiLSTM' + str(len(partitionsX)) + '_' + str(0) + '.csv',
+                      mode='w') as data:
+                data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+                data_writer.writerow(
+                    ['FOC', 'PRED', 'PERC'])
+                for i in range(0, len(errorRpm)):
+                    data_writer.writerow(
+                        [rpm[i], preds[i], errorRpm[i][0][0]])
+
+
+
+        # prediction =modeler._models[ 0 ].predict(unseenX.reshape(2,2860))
+        # print np.mean(abs(prediction - unseenY))
+        # print("EXCEPTIONS :  "+str(count))
+        print('Accuracy: ' + str(np.round(100 - np.mean(errorRpm), 2)))
+        errors = np.asarray(lErrors)
         return errors, np.mean(errors), np.std(lErrors)
 
     def evaluateKerasNNNweights(self, unseenX, unseenY, modeler,output,xs,genericModel,partitionsX , scores):
@@ -1451,10 +1441,35 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
         lErrors = []
         self.intercepts = []
         self.count = 0
+        rpm=[]
+        errorRpm=[]
+        preds=[]
+        def split_sequence(sequence, n_steps):
+            X, y = list(), list()
+            for i in range(len(sequence)):
+                # find the end of this pattern
+                end_ix = i + n_steps
+                # check if we are beyond the sequence
+                if end_ix > len(sequence) - 1:
+                    break
+                # gather input and output parts of the pattern
+                seq_x, seq_y = sequence[i:end_ix], sequence[end_ix]
+                X.append(seq_x)
+                y.append(unseenY[i])
+            return array(X), array(y)
 
-        for iCnt in range(np.shape(unseenX)[0]):
-            pPoint = unseenX[iCnt]
-            pPoint = pPoint.reshape(-1, unseenX.shape[1])
+            # define input sequence
+
+        raw_seq = np.array(unseenX)
+
+        n_steps = 5
+        # split into samples
+        unseenXlstm, unseenYlstm = split_sequence(raw_seq, n_steps)
+
+        for iCnt in range(np.shape(unseenXlstm)[0]):
+            pPoint =unseenXlstm[iCnt]
+            pPoint = np.reshape(pPoint, (1, pPoint.shape[0], pPoint.shape[1]))
+            #pPoint = pPoint.reshape(-1, unseenX.shape[1])
 
             # try:
             trueVal = unseenY[iCnt]
@@ -1470,6 +1485,54 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
 
 
             lErrors.append(abs(prediction - trueVal))
+
+            percError = abs((prediction - trueVal) / trueVal) * 100
+            # errorStwArr.append(np.array(
+            # np.append(np.asmatrix(pPoint[0][0]).reshape(-1, 1), np.asmatrix([percError[0]]).T, axis=1)))
+            errorRpm.append(percError)
+            rpm.append(trueVal)
+            preds.append(prediction[0][0])
+
+            error = abs(prediction - trueVal)
+            lErrors.append(error)
+
+        errorStwArr = np.array([])
+        errorStwArr = errorStwArr.reshape(-1, 2)
+
+        if type == 'train':
+            with open('./TRAINerrorPercFOC' + str(len(partitionsX)) + '_' + str(subsetInd) + '.csv',
+                      mode='w') as data:
+                data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+                data_writer.writerow(
+                    ['FOC', 'PERC'])
+                for i in range(0, len(errorFoc)):
+                    data_writer.writerow(
+                        [foc[i], errorFoc[i][0][0]])
+
+            with open('./TRAINerrorSTW' + str(len(partitionsX)) + '_' + str(subsetInd) + '.csv', mode='w') as data:
+                data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+                data_writer.writerow(
+                    ['STW', 'MAE'])
+                for i in range(0, len(errorStwArr)):
+                    data_writer.writerow(
+                        [errorStwArr[i][0], errorStwArr[i][1]])
+        else:
+            with open('./TESTerrorPercRPMLSTM' + str(len(partitionsX)) + '_' + str(0) + '.csv',
+                      mode='w') as data:
+                data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+                data_writer.writerow(
+                    ['FOC', 'PRED', 'PERC'])
+                for i in range(0, len(errorRpm)):
+                    data_writer.writerow(
+                        [rpm[i], preds[i], errorRpm[i][0][0]])
+
+
+
+        # prediction =modeler._models[ 0 ].predict(unseenX.reshape(2,2860))
+        # print np.mean(abs(prediction - unseenY))
+        # print("EXCEPTIONS :  "+str(count))
+        print('Accuracy: ' + str(np.round(100 - np.mean(errorRpm), 2)))
+
 
         errors = np.asarray(lErrors)
 
