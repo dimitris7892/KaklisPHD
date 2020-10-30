@@ -615,23 +615,23 @@ class TensorFlowCA(BasePartitionModeler):
         estimatorW.add(keras.layers.Dense(len(partition_labels)+1, input_shape=(len(partition_labels)+1,)))
         estimatorW.add(keras.layers.Dense(1, ))
         estimatorW.compile(loss=keras.losses.mean_squared_error, optimizer=keras.optimizers.Adam(), )
+        if len(partition_labels) > 1:
+            for i in range(0, len(X)):
 
-        for i in range(0, len(X)):
+                pred = []
 
-            pred = []
+                for n in range(0, len(NNmodels)):
+                    self.intercepts = []
+                    self.modelId = 'Gen' if n == len(NNmodels)-1 else n
+                    #self.modelId = n
+                    self.countTimes += 1
+                    self.count = 0
 
-            for n in range(0, len(NNmodels)):
-                self.intercepts = []
-                self.modelId = 'Gen' if n == len(NNmodels)-1 else n
-                #self.modelId = n
-                self.countTimes += 1
-                self.count = 0
+                    pred.append(NNmodels[n].predict(X[i].reshape(-1,2))[0][0])
+                preds.append(pred)
 
-                pred.append(NNmodels[n].predict(X[i].reshape(-1,2))[0][0])
-            preds.append(pred)
-
-        preds = np.array(preds).reshape(-1, len(partition_labels)+1)
-        estimatorW.fit(preds, Y.reshape(-1, 1), epochs=100, verbose=0)
+            preds = np.array(preds).reshape(-1, len(partition_labels)+1)
+            estimatorW.fit(preds, Y.reshape(-1, 1), epochs=100, verbose=0)
         #trainedWeights = estimatorW.get_weights()[2]
 
 
@@ -1294,7 +1294,7 @@ class TensorFlowW1(BasePartitionModeler):
 
         NNmodels.append(estimator)
 
-        trainedWeights=None
+        estimatorW=None
         if len(partition_labels) > 1:
             preds = []
             estimatorW = keras.models.Sequential()

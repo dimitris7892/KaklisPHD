@@ -149,23 +149,19 @@ def main():
     subsetsCounter=0
 
     for subsetX, subsetY in zip(subsetsX, subsetsY):
-      clustersGeneratedByDC = []
+
       #skip_idxx = random.sample(range((rangeSubs * 1000) + 10, num_lines), 12000)
         # Read the data
       #data1 = pd.read_csv(sFile, skiprows=skip_idxx)
       for modeler in modelers:
         for partitioner in partitioners:
-           if (modeler.__class__.__name__ == 'TensorFlowWLSTM2') and partitioner.__class__.__name__ == 'DelaunayTriPartitioner': continue
+           if (modeler.__class__.__name__ == 'TensorFlowWLSTM2' or modeler.__class__.__name__ == 'TensorFlowWLSTM') and partitioner.__class__.__name__ == 'DelaunayTriPartitioner': continue
            if modeler.__class__.__name__ == 'TriInterpolantModeler' and partitioner.__class__.__name__=='DelaunayTriPartitioner':
                 break
            if modeler.__class__.__name__ == 'TriInterpolantModeler' or modeler.__class__.__name__ == 'TensorFlow':
-                #partK = [1]
                 t=0
-                #partitioner.__class__.__name__ ="None"
            if partitioner.__class__.__name__=='DelaunayTriPartitioner':
-
-                 partK=np.linspace(0.2,1,11)#[0.5]
-                 #artK.insert(9,6)
+                 partK=np.linspace(0.1,1,11)#[0.5]
 
            elif partitioner.__class__.__name__=='KMeansPartitioner':
                if modeler.__class__.__name__=='TriInterpolantModeler' or modeler.__class__.__name__ == 'TensorFlow':
@@ -178,11 +174,15 @@ def main():
            #random.seed(1)
 
            flagEvalTri = False
+           clustersGeneratedByDC = []
            for k in partK:
 
                 #try:
+
                     print(modeler.__class__.__name__)
                     print("Reading data...")
+                    if (modeler.__class__.__name__ == 'TensorFlowWLSTM' or modeler.__class__.__name__ == 'TensorFlowWLSTM2') and k > 1:
+                        break
                     reader = dRead.BaseSeriesReader()
                     #or modeler.__class__.__name__ == 'TensorFlowWLSTM2'
                     print("Reading data... Done.")
@@ -421,7 +421,7 @@ def initParameters():
     startU = 30000
     endU = 31000
 
-    algs=['NNW']
+    algs=['NNW','NNW1','NNWCA','NNWLSTM','NNWLSTM2']
         #`['SR','LR','RF','NNW','NNW1','NNWCA','NNWE','NNWLSTM','NNWLSTM2']`
     #algs= ['SR','LR','RF','NNW','NNW1','NNWCA','NNWE','NNWLSTM']
         #['SR','LR','RF','NNW','NNW1','NNWCA','TRI']
@@ -429,7 +429,7 @@ def initParameters():
 
 
         #['SR','LR','RF','NN','NNW','TRI']
-    cls=['KM']
+    cls=['DC']
         #['KM','DC','NNCL']
     #['SR','LR','RF','NN'] algs
     #['KM','DC'] clusterers / cls
