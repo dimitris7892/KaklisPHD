@@ -1145,14 +1145,10 @@ class DelaunayTriPartitioner:
                   return clusters,clustersy,uncl,uncly
                           ######################################
           clusters,clustersy,uncl,uncly=DFS()
-          train_x_list = [ ]
-          train_y_list = [ ]
+
           trains_x_list = [ ]
           trains_y_list = [ ]
           trlabels=np.empty(sum(map(len,clusters)))
-          trData=[]
-          counter=0
-          outliers=[]
           for i in range(0,len(clusters)):
 
               #clusters[i]=[clusters[i][ k ][ 0:2 ] for k in range(0,len(clusters[i]))]

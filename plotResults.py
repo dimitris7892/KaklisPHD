@@ -1,7 +1,9 @@
 import matplotlib.pyplot as plt
+import matplotlib as pl
 from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
 import pandas as pd
+from sklearn.cluster import KMeans
 from pylab import figure,axes
 from pylab import plot, show, savefig, xlim, figure, ylim, legend, boxplot, setp, axes
 
@@ -584,3 +586,81 @@ class ErrorGraphs:
         dataErrorLSTM = pd.read_csv('/home/dimitris/Desktop/resultsNEW/LSTM_xiNNLSTM.csv', delimiter=',')
 
         x=0
+    
+    def generateGraphVRPM(self):
+
+        data = pd.read_csv('./kaklis.csv')
+        data = data.values[0:20000]
+        data = np.array([k for k in data[0:, 2:23] if k[3] > 3 and k[5] > 0])  #
+
+        #for i in range(0, len(data)):
+            #data[i] = np.mean(data[i:i + 5], axis=0)
+
+        stw = np.asarray([np.nan_to_num(np.float(x)) for x in data[:, 3]])
+        rpm = np.asarray([np.nan_to_num(np.float(y)) for y in data[:, 5]])
+        minrpm = np.min(rpm)
+        maxrpm = np.max(rpm)
+
+        rpmsApp = []
+        meanSpeeds = []
+        stdSpeeds = []
+        ranges = []
+        k = 0
+        i = minrpm if minrpm > 0 else 1
+
+        
+        rpmsPLot = []
+        speedsPlot = []
+     
+        while i <= maxrpm:
+            # workbook._sheets[sheet].insert_rows(k+27)
+         
+            rpmArray = np.array([k for k in data if float(k[5]) >= i and float(k[5]) <= i +1])
+            #rpmsApp.append(str(np.round(rpmArray.__len__() / rpmAmount * 100, 2)) + '%')
+
+
+           
+            if rpmArray.__len__() > 10:
+                rpmsPLot.append(rpmArray.__len__())
+                speedsPlot.append(np.round((np.min(np.nan_to_num(rpmArray[:, 3].astype(float)))), 2))
+                ranges.append(i)
+            i += 1
+            k += 1
+
+        xi = np.array(speedsPlot)
+        yi = np.array(ranges)
+        zi = np.array(rpmsPLot)
+
+        plt.clf()
+        # Change color with c and alpha
+        p2 = np.poly1d(np.polyfit(xi, yi, 2))
+        xp = np.linspace(min(xi), max(xi), 100)
+        plt.plot([], [], '.', xp, p2(xp))
+
+        plt.scatter(xi, yi, s=zi, c="red", alpha=0.4, linewidth=4)
+        plt.xticks(np.arange(np.floor(min(xi)) - 1, np.ceil(max(xi)) + 1, 1))
+        plt.yticks(np.arange(np.floor(min(yi)), np.ceil(max(yi)) + 1, 5))
+        plt.xlabel("Speed (knots)")
+        plt.ylabel("RPM")
+        plt.title("Density plot", loc="center")
+        fig = plt.gcf()
+        fig.set_size_inches(17.5, 9.5)
+
+        dataModel = KMeans(n_clusters=3)
+        zi = zi.reshape(-1, 1)
+        dataModel.fit(zi)
+        # Extract centroid values
+        centroids = dataModel.cluster_centers_
+        ziSorted = np.sort(centroids, axis=0)
+
+        sizeZ =[100,300,500]
+        k=0
+        for z in ziSorted:
+            plt.scatter([], [], c='r', alpha=0.5, s=sizeZ[k],
+                        label=str(int(np.floor(z[0]))) + ' obs.')
+            k=k+1
+        plt.legend(scatterpoints=1, frameon=False, labelspacing=2, title='# of obs')
+
+        plt.show()
+        #fig.savefig('/home/dimitris/Desktop/newResults/v_rpm.eps',)
+        

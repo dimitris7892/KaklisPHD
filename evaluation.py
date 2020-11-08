@@ -7,7 +7,17 @@ import math
 from scipy.spatial import Delaunay, ConvexHull
 import csv
 from numpy import array
+import matplotlib.pyplot as plt
 import pyearth as sp
+from matplotlib import rc
+from mpl_toolkits.mplot3d.art3d import Poly3DCollection
+from mpl_toolkits.mplot3d import Axes3D
+#rc('text', usetex=True)
+font = {'family': 'normal',
+        'weight': 'bold',
+        'size': 14}
+
+plt.rc('font', **font)
 
 
 class Evaluation:
@@ -126,7 +136,7 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
         flagedVertices=[]
         '''DELETE ALL TRIANGLES WITH CORRESPONDING VARIANCE OF RPM of their points belonging in their adjacency list BIGGER  THAN A PREDEFINED TRESHOLD = > MORE stable triangulation'''
         '''????'''
-        for i in range(0, len(dataXnew)):
+        '''for i in range(0, len(dataXnew)):
             simplex = triNew.find_simplex(dataXnew[ i ])
             # for k in range(0, len(triNew.vertices)):
             k = triNew.vertices[ simplex ]
@@ -174,10 +184,10 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
 
                     else:
                         if (dataXnew[ i ] == V3).all() == True:
-                            delIndexes.append(i)
+                            delIndexes.append(i)'''
         ##################################3
-        dataXnew = np.delete(dataXnew,delIndexes,axis=0)
-        dataYnew = np.delete(dataYnew, delIndexes)
+        #dataXnew = np.delete(dataXnew,delIndexes,axis=0)
+        #dataYnew = np.delete(dataYnew, delIndexes)
         '''END OF PRE - PROCESSING STEP'''
 
 
@@ -190,7 +200,7 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
             #t = plt.Polygon(k, fill=False,color='red',linewidth=3)
             #plt.gca().add_patch(t)
         #plt.show()
-        x=1
+
         triNew = Delaunay(dataXnew, qhull_options='Q14')
         #hull = ConvexHull(dataXnew)
         #for simplex in hull.simplices:
@@ -209,9 +219,9 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
             V2 = dataXnew[ k ][ 1 ]
             V3 = dataXnew[ k ][ 2 ]
 
-            if varPerTri > 10:
+            #if varPerTri > 10:
                 # delSimplices.append(int(i))
-                flagedVertices.append(int(i))
+                #flagedVertices.append(int(i))
 
         ###build triangulations on clusters
         #triangulationsClusters = [ ]
@@ -222,18 +232,15 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
                 #print(str(e))
                 #x=0
 
-        #for v in triNew.vertices[ i ]:
-            #k = np.array([ [ v[ 0 ][ 0 ], v[ 0 ][ 2 ] ], [ v[ 1 ][ 0 ], v[ 1 ][ 2 ] ], [ v[ 2 ][ 0 ], v[ 2 ][ 2 ] ] ])
-            #t = plt.Polygon(k, fill=False,color='red',linewidth=3)
-            #plt.gca().add_patch(t)
-            #plt.show()
+
 
 
         errorsTue=[]
         errorsFalse=[]
         countTrue = 0
         countFalse = 0
-
+        predictions=[]
+        yTrue=[]
         for iu in range(0,len(unseenX)):
 
             flg = False
@@ -259,7 +266,7 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
                 if W1>0 and W2>0 and W3>0:
 
                     flg  = True######
-                    ##plt.plot(candidatePoint[0], candidatePoint[1], 'o', markersize=8)####
+
 
                     rpm1 = dataYnew[ triNew.vertices[ k ] ][ 0 ]
                     rpm2 = dataYnew[ triNew.vertices[ k ] ][ 1 ]
@@ -272,6 +279,8 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
                     tri1 =np.array(triNew.vertices[
                     [ i for i, x in enumerate(list(triNew.vertices[ :, 0 ] == triNew.vertices[ k, 0 ] )) if x ] ])
 
+
+
                     tri11=[]
                     k_set = set(triNew.vertices[k])
 
@@ -281,32 +290,43 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
                                  (tr !=triNew.vertices[k]).any():
                             tri11.append(tr)
 
+                    tri11 = np.array(tri11)
+                    neighboringTri1 = dataXnew[tri11] if tri11.__len__() > 0 else []
+                    neighboringTri1rpm = dataYnew[tri11] if tri11.__len__() > 0 else []
+
                     tri2 =np.array( triNew.vertices[
                         [ i for i, x in enumerate(list(triNew.vertices[ :, 1 ] == triNew.vertices[ k, 1 ])) if x ] ])
+
+
+
                     #tri2 = np.delete(tri2, triNew.vertices[ k ])
                     tri22 = [ ]
-                    tri11=np.array(tri11)
                     for tr in tri2:
                         b_set = set(tr)
                         if len(k_set.intersection(b_set)) == 2 \
-                                and \
-                                (tr !=triNew.vertices[k]).any():
+                                and (tr !=triNew.vertices[k]).any():
                             tri22.append(tr)
+                    tri22 = np.array(tri22)
+                    neighboringTri2 = dataXnew[tri22] if tri22.__len__() > 0 else []
+                    neighboringTri2rpm = dataYnew[tri22] if tri22.__len__() > 0 else []
 
                     tri3 =np.array( triNew.vertices[
                         [ i for i, x in enumerate(list(triNew.vertices[ :, 2 ] == triNew.vertices[ k, 2 ])) if x ] ])
+
+
                     #tri3 = np.delete(tri3, triNew.vertices[ k ])
                     tri33 = [ ]
-                    tri22=np.array(tri22)
+
+
                     for tr in tri3:
                         c_set = set(tr)
                         if len(k_set.intersection(c_set)) == 2 \
-                                and \
-                                (tr !=triNew.vertices[k]).any():
+                                and (tr !=triNew.vertices[k]).any():
                             tri33.append(tr)
 
                     tri33 = np.array(tri33)
-                    #####
+                    neighboringTri3 = dataXnew[tri33] if tri33.__len__() > 0 else []
+                    neighboringTri3rpm = dataYnew[tri33] if tri33.__len__() > 0 else []
 
                     ######
                     #attched_vertex = np.concatenate([tri11,tri22,tri33])
@@ -317,19 +337,19 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
                         for tr in tri11:
                             vi=[ x for x in tr if x not in triNew.vertices[k] ]
                             rpms.append( dataYnew[ vi ])
-                            vs.append( dataXnew[ vi ])
+                            vs.append( dataXnew[ vi ][0])
 
                     if tri22!=[]:
                         for tr in tri22:
                             vi=[ x for x in tr if x not in triNew.vertices[k] ]
                             rpms.append( dataYnew[ vi ])
-                            vs.append(dataXnew[ vi ])
+                            vs.append(dataXnew[ vi ][0])
 
                     if tri33!=[]:
                         for tr in tri33:
                             vi=[ x for x in tr if x not in triNew.vertices[k] ]
                             rpms.append( dataYnew[ vi ])
-                            vs.append(dataXnew[ vi ])
+                            vs.append(dataXnew[ vi ][0])
 
                     if len(rpms) < 3:
                         flgR = True
@@ -357,7 +377,7 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
                         eq1 = np.array([ [ (V1[ 0 ] - V3[ 0 ]), (V2[ 0 ] - V3[ 0 ]) ],
                                          [ (V1[ 1 ] - V3[ 1 ]), (V2[ 1 ] - V3[ 1 ]) ] ])
 
-                        eq2 = np.array([ v12[ 0 ] - V3[ 0 ], v12[ 1 ] - V3[ 1 ] ])
+                        eq2 = np.array([ v12 - V3[ 0 ], v12 - V3[ 1 ] ])
                         solutions = np.linalg.solve(eq1, eq2)
 
                         W12_1 = solutions[ 0 ]
@@ -370,7 +390,7 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
                         eq1 = np.array([ [ (V1[ 0 ] - V3[ 0 ]), (V2[ 0 ] - V3[ 0 ]) ],
                                          [ (V1[ 1 ] - V3[ 1 ]), (V2[ 1 ] - V3[ 1 ]) ] ])
 
-                        eq2 = np.array([ v23[ 0 ] - V3[ 0 ], v23[ 1 ] - V3[ 1 ] ])
+                        eq2 = np.array([ v23 - V3[ 0 ], v23 - V3[ 1 ] ])
                         solutions = np.linalg.solve(eq1, eq2)
 
                         W23_1 = solutions[ 0 ]
@@ -382,7 +402,7 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
                         eq1 = np.array([ [ (V1[ 0 ] - V3[ 0 ]), (V2[ 0 ] - V3[ 0 ]) ],
                                          [ (V1[ 1 ] - V3[ 1 ]), (V2[ 1 ] - V3[ 1 ]) ] ])
 
-                        eq2 = np.array([ v31[ 0 ] - V3[ 0 ], v31[ 1 ] - V3[ 1 ] ])
+                        eq2 = np.array([ v31- V3[ 0 ], v31 - V3[ 1 ] ])
                         solutions = np.linalg.solve(eq1, eq2)
 
                         W31_1 = solutions[ 0 ]
@@ -390,7 +410,42 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
                         W31_3 = 1 - solutions[ 0 ] - solutions[ 1 ]
                         cond_numer3 = np.linalg.cond(eq1)
                     ####################################
+                    ####################################
+                        b = triNew.transform[k, :2].dot(vs[0] - triNew.transform[k, 2])
+                        W12_1 = b[0]
+                        W12_2 = b[1]
+                        W12_3 = 1 - np.sum(b)
+                    ####################################
+                        b = triNew.transform[k, :2].dot(vs[1] - triNew.transform[k, 2])
+                        W23_1 = b[0]
+                        W23_2 = b[1]
+                        W23_3 = 1 - np.sum(b)
                     ##############################
+                        b = triNew.transform[k, :2].dot(vs[2] - triNew.transform[k, 2])
+                        W31_1 = b[0]
+                        W31_2 = b[1]
+                        W31_3 = 1 - np.sum(b)
+                    #####################################
+                        eq1 = np.array([[2 * W12_1 * W12_2, 2 * W12_2 * W12_3, 2 * W12_1 * W12_3],
+                                        [2 * W23_1 * W23_2, 2 * W23_2 * W23_3, 2 * W23_1 * W23_3],
+                                        [2 * W31_1 * W31_2, 2 * W31_2 * W31_3, 2 * W31_1 * W31_3]])
+                        eq2 = np.array([rpm12 -
+                                        math.pow(W12_2, 2) * rpm1 - math.pow(W12_1, 2) * rpm2 - math.pow(W12_3, 2) * rpm3,
+
+                                        rpm23 - math.pow(W23_2, 2) * rpm1 - math.pow(W23_1, 2) * rpm2 - math.pow(
+                                            W23_3, 2) * rpm3,
+
+                                        rpm31 - math.pow(W31_2, 2) * rpm1 - math.pow(W31_1, 2) * rpm2 - math.pow(
+                                            W31_3, 2) * rpm3])
+                        cond_numerGen = np.linalg.cond(eq1)
+
+                        solutions = np.linalg.solve(eq1, eq2)
+                        ypredS = (math.pow(W2, 2) * rpm2 + math.pow(W1, 2) * rpm1 + math.pow(W3, 2) * rpm3) + \
+                                    2 * W1 * W2 * solutions[0] + 2 * W2 * W3 * solutions[1] + 2 * W1 * W3 * solutions[2]
+
+                        predictions.append(ypredS)
+                        yTrue.append(trueVal)
+
                     except :
                         #print(str(e))
                         x=0
@@ -429,7 +484,368 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
                                 2 * W1 * W2 *rpm12 + 2 * W2 * W3 * rpm23 + 2 * W1 * W3 * rpm31
 
 
-                            Xpred=XpredN
+                            if iu in np.arange(0,40):
+                                plt.clf()
+                                plt.plot(candidatePoint[0], candidatePoint[1], 'o', markersize=10)  ####
+
+                                if neighboringTri1.__len__()>0:
+                                    for v in neighboringTri1:
+                                        r = np.array(v)
+                                        t = plt.Polygon(r, fill=False, color='green', linewidth=3)
+                                        plt.gca().add_patch(t)
+
+
+                                if neighboringTri2.__len__() > 0:
+                                    for v in neighboringTri2:
+                                        r = np.array(v)
+                                        t = plt.Polygon(r, fill=False, color='green', linewidth=3)
+                                        plt.gca().add_patch(t)
+
+
+                                if neighboringTri3.__len__() > 0:
+                                    for v in neighboringTri3:
+                                        r = np.array(v)
+                                        t = plt.Polygon(r, fill=False, color='green', linewidth=3)
+                                        plt.gca().add_patch(t)
+
+
+
+                                r = np.array([[V1[0], V1[1]], [V2[0], V2[1]], [V3[0], V3[1]]])
+                                t = plt.Polygon(r, fill=False, color='red', linewidth=3)
+                                plt.gca().add_patch(t)
+
+                                #plt.xlabel(r'V', fontsize=16)
+                                #plt.ylabel(r'\bar{V}_N', fontsize=16)
+
+                                rpm= [rpm1,  rpm2,  rpm3,  rpm12,    rpm23,    rpm31   ]
+                                v=   [V1[0], V2[0], V3[0], vs[0][0], vs[1][0], vs[2][0]]
+                                vn = [V1[1], V2[1], V3[1], vs[0][1], vs[1][1], vs[2][1]]
+
+                                #=(math.pow(W2, 2) * x + math.pow(W1, 2) * x + math.pow(W3, 2) * x) + \
+                                        #2 * W1 * W2 * solutions[0] + 2 * W2 * W3 * solutions[1] + 2 * W1 * W3 * solutions[2]
+
+                                plt.grid()
+
+                                fig = plt.figure()
+                                #ax = Axes3D(fig)
+                                ax = fig.add_subplot(111, projection='3d')
+                                x = [v[0], v[1], v[2]]
+                                y = [vn[0], vn[1], vn[2]]
+                                z = [0,0,0]
+                                    #[rpm1, rpm2, rpm3]
+                                verts = [list(zip(x, y, z))]
+                                if neighboringTri1.__len__()==2 and neighboringTri2.__len__()==1:
+                                    ax.add_collection3d(Poly3DCollection(verts, facecolors='red'),)
+
+                                    x = [neighboringTri1[0][0][0], neighboringTri1[0][1][0], neighboringTri1[0][2][0]]
+                                    y = [neighboringTri1[0][0][1], neighboringTri1[0][1][1], neighboringTri1[0][2][1]]
+                                    z = [0,0,0]
+                                        #[neighboringTri1rpm[0][0], neighboringTri1rpm[0][1], neighboringTri1rpm[0][2]]
+                                    verts = [list(zip(x, y, z))]
+
+                                    ax.add_collection3d(Poly3DCollection(verts, facecolors='green'), )
+
+                                    x = [neighboringTri2[0][0][0], neighboringTri2[0][1][0], neighboringTri2[0][2][0]]
+                                    y = [neighboringTri2[0][0][1], neighboringTri2[0][1][1], neighboringTri2[0][2][1]]
+                                    z = [0,0,0]
+                                        #[neighboringTri2rpm[0][0], neighboringTri2rpm[0][1], neighboringTri2rpm[0][2]]
+                                    verts = [list(zip(x, y, z))]
+
+                                    ax.add_collection3d(Poly3DCollection(verts, facecolors='green', ))
+
+                                    x = [neighboringTri1[1][0][0], neighboringTri1[1][1][0], neighboringTri1[1][2][0]]
+                                    y = [neighboringTri1[1][0][1], neighboringTri1[1][1][1], neighboringTri1[1][2][1]]
+                                    z = [0,0,0]
+                                        #[neighboringTri1rpm[1][0], neighboringTri1rpm[1][1], neighboringTri1rpm[1][2]]
+                                    verts = [list(zip(x, y, z))]
+                                    #ax.plot_trisurf(x, y, z,
+                                                    #linewidth=0.2, antialiased=True)
+                                    ax.add_collection3d(Poly3DCollection(verts ,facecolors='green',) )
+
+                                elif neighboringTri1.__len__() == 2 and neighboringTri3.__len__() == 1:
+                                    ax.add_collection3d(Poly3DCollection(verts, facecolors='red'), )
+
+                                    x = [neighboringTri1[0][0][0], neighboringTri1[0][1][0], neighboringTri1[0][2][0]]
+                                    y = [neighboringTri1[0][0][1], neighboringTri1[0][1][1], neighboringTri1[0][2][1]]
+                                    z = [0, 0, 0]
+                                    # [neighboringTri1rpm[0][0], neighboringTri1rpm[0][1], neighboringTri1rpm[0][2]]
+                                    verts = [list(zip(x, y, z))]
+
+                                    ax.add_collection3d(Poly3DCollection(verts, facecolors='green'), )
+
+                                    x = [neighboringTri3[0][0][0], neighboringTri3[0][1][0], neighboringTri3[0][2][0]]
+                                    y = [neighboringTri3[0][0][1], neighboringTri3[0][1][1], neighboringTri3[0][2][1]]
+                                    z = [0, 0, 0]
+                                    # [neighboringTri2rpm[0][0], neighboringTri2rpm[0][1], neighboringTri2rpm[0][2]]
+                                    verts = [list(zip(x, y, z))]
+
+                                    ax.add_collection3d(Poly3DCollection(verts, facecolors='green', ))
+
+                                    x = [neighboringTri1[1][0][0], neighboringTri1[1][1][0], neighboringTri1[1][2][0]]
+                                    y = [neighboringTri1[1][0][1], neighboringTri1[1][1][1], neighboringTri1[1][2][1]]
+                                    z = [0, 0, 0]
+                                    # [neighboringTri1rpm[1][0], neighboringTri1rpm[1][1], neighboringTri1rpm[1][2]]
+                                    verts = [list(zip(x, y, z))]
+                                    # ax.plot_trisurf(x, y, z,
+                                    # linewidth=0.2, antialiased=True)
+                                    ax.add_collection3d(Poly3DCollection(verts, facecolors='green', ))
+
+                                elif neighboringTri2.__len__() == 2 and neighboringTri1.__len__()==1:
+                                    ax.add_collection3d(Poly3DCollection(verts, facecolors='red'), )
+
+                                    x = [neighboringTri1[0][0][0], neighboringTri1[0][1][0], neighboringTri1[0][2][0]]
+                                    y = [neighboringTri1[0][0][1], neighboringTri1[0][1][1], neighboringTri1[0][2][1]]
+                                    z = [0, 0, 0]
+                                    # [neighboringTri1rpm[0][0], neighboringTri1rpm[0][1], neighboringTri1rpm[0][2]]
+                                    verts = [list(zip(x, y, z))]
+
+                                    ax.add_collection3d(Poly3DCollection(verts, facecolors='green'), )
+
+                                    x = [neighboringTri2[0][0][0], neighboringTri2[0][1][0], neighboringTri2[0][2][0]]
+                                    y = [neighboringTri2[0][0][1], neighboringTri2[0][1][1], neighboringTri2[0][2][1]]
+                                    z = [0, 0, 0]
+                                    # [neighboringTri2rpm[0][0], neighboringTri2rpm[0][1], neighboringTri2rpm[0][2]]
+                                    verts = [list(zip(x, y, z))]
+
+                                    ax.add_collection3d(Poly3DCollection(verts, facecolors='green', ))
+
+                                    x = [neighboringTri2[1][0][0], neighboringTri2[1][1][0], neighboringTri2[1][2][0]]
+                                    y = [neighboringTri2[1][0][1], neighboringTri2[1][1][1], neighboringTri2[1][2][1]]
+                                    z = [0, 0, 0]
+                                    # [neighboringTri1rpm[1][0], neighboringTri1rpm[1][1], neighboringTri1rpm[1][2]]
+                                    verts = [list(zip(x, y, z))]
+                                    # ax.plot_trisurf(x, y, z,
+                                    # linewidth=0.2, antialiased=True)
+                                    ax.add_collection3d(Poly3DCollection(verts, facecolors='green', ))
+
+                                elif neighboringTri3.__len__() == 2 and neighboringTri1.__len__()==1:
+                                    ax.add_collection3d(Poly3DCollection(verts, facecolors='red'), )
+
+                                    x = [neighboringTri1[0][0][0], neighboringTri1[0][1][0], neighboringTri1[0][2][0]]
+                                    y = [neighboringTri1[0][0][1], neighboringTri1[0][1][1], neighboringTri1[0][2][1]]
+                                    z = [0, 0, 0]
+                                    # [neighboringTri1rpm[0][0], neighboringTri1rpm[0][1], neighboringTri1rpm[0][2]]
+                                    verts = [list(zip(x, y, z))]
+
+                                    ax.add_collection3d(Poly3DCollection(verts, facecolors='green'), )
+
+                                    x = [neighboringTri3[0][0][0], neighboringTri3[0][1][0], neighboringTri3[0][2][0]]
+                                    y = [neighboringTri3[0][0][1], neighboringTri3[0][1][1], neighboringTri3[0][2][1]]
+                                    z = [0, 0, 0]
+                                    # [neighboringTri2rpm[0][0], neighboringTri2rpm[0][1], neighboringTri2rpm[0][2]]
+                                    verts = [list(zip(x, y, z))]
+
+                                    ax.add_collection3d(Poly3DCollection(verts, facecolors='green', ))
+
+                                    x = [neighboringTri3[1][0][0], neighboringTri3[1][1][0], neighboringTri3[1][2][0]]
+                                    y = [neighboringTri3[1][0][1], neighboringTri3[1][1][1], neighboringTri3[1][2][1]]
+                                    z = [0, 0, 0]
+                                    # [neighboringTri1rpm[1][0], neighboringTri1rpm[1][1], neighboringTri1rpm[1][2]]
+                                    verts = [list(zip(x, y, z))]
+                                    # ax.plot_trisurf(x, y, z,
+                                    # linewidth=0.2, antialiased=True)
+                                    ax.add_collection3d(Poly3DCollection(verts, facecolors='green', ))
+
+                                elif neighboringTri3.__len__() == 2 and neighboringTri2.__len__()==1:
+                                    ax.add_collection3d(Poly3DCollection(verts, facecolors='red'), )
+
+                                    x = [neighboringTri2[0][0][0], neighboringTri2[0][1][0], neighboringTri2[0][2][0]]
+                                    y = [neighboringTri2[0][0][1], neighboringTri2[0][1][1], neighboringTri2[0][2][1]]
+                                    z = [0, 0, 0]
+                                    # [neighboringTri1rpm[0][0], neighboringTri1rpm[0][1], neighboringTri1rpm[0][2]]
+                                    verts = [list(zip(x, y, z))]
+
+                                    ax.add_collection3d(Poly3DCollection(verts, facecolors='green'), )
+
+                                    x = [neighboringTri3[0][0][0], neighboringTri3[0][1][0], neighboringTri3[0][2][0]]
+                                    y = [neighboringTri3[0][0][1], neighboringTri3[0][1][1], neighboringTri3[0][2][1]]
+                                    z = [0, 0, 0]
+                                    # [neighboringTri2rpm[0][0], neighboringTri2rpm[0][1], neighboringTri2rpm[0][2]]
+                                    verts = [list(zip(x, y, z))]
+
+                                    ax.add_collection3d(Poly3DCollection(verts, facecolors='green', ))
+
+                                    x = [neighboringTri3[1][0][0], neighboringTri3[1][1][0], neighboringTri3[1][2][0]]
+                                    y = [neighboringTri3[1][0][1], neighboringTri3[1][1][1], neighboringTri3[1][2][1]]
+                                    z = [0, 0, 0]
+                                    # [neighboringTri1rpm[1][0], neighboringTri1rpm[1][1], neighboringTri1rpm[1][2]]
+                                    verts = [list(zip(x, y, z))]
+                                    # ax.plot_trisurf(x, y, z,
+                                    # linewidth=0.2, antialiased=True)
+                                    ax.add_collection3d(Poly3DCollection(verts, facecolors='green', ))
+
+
+                                ax.scatter(candidatePoint[0], candidatePoint[1],trueVal,marker='o',s=60,)
+
+                                x = []
+                                y = []
+                                z = []
+                                for i in range(0, int(trueVal)-10, 10):
+                                    x.append(candidatePoint[0])
+                                    y.append(candidatePoint[1])
+                                    z.append(i)
+                                x.append(candidatePoint[0])
+                                y.append(candidatePoint[1])
+                                z.append(trueVal)
+                                ax.plot(x, y, z, '--', alpha=0.8, linewidth=1, )
+
+                                #ax.scatter(candidatePoint[0], candidatePoint[1], 0, marker='o', s=200, )
+
+                                def point_on_triangle(pt1, pt2, pt3):
+                                    """
+                                    Random point on the triangle with vertices pt1, pt2 and pt3.
+                                    """
+                                    s, t = sorted([np.random.random(), np.random.random()])
+                                    return (s * pt1[0] + (t - s) * pt2[0] + (1 - t) * pt3[0],
+                                            s * pt1[1] + (t - s) * pt2[1] + (1 - t) * pt3[1])
+
+                                rpmApprxs = []
+                                from matplotlib import cm
+                                pointsInside = [point_on_triangle(V1, V2, V3) for _ in range(1500)]
+                                pointsInside.append(candidatePoint)
+                                for  i in range(0,len(pointsInside)):
+                                    b = triNew.transform[k, :2].dot(pointsInside[i] - triNew.transform[k, 2])
+                                    W1i = b[0]
+                                    W2i = b[1]
+                                    W3i = 1 - np.sum(b)
+
+                                    rpmApprx =   (math.pow(W2i, 2) * rpm2 + math.pow(W1i, 2) * rpm1 + math.pow(W3i, 2) * rpm3) + \
+                                    2 * W1i * W2i * solutions[0] + 2 * W2i * W3i * solutions[1] + 2 * W1i * W3i * solutions[2]
+                                    rpmApprxs.append(rpmApprx)
+                                    #rpmApprxs.append(rpmApprx)
+
+
+                                #pointsInside.append((V1[0],V1[1]))
+                                #pointsInside.append((V2[0],V2[1]))
+                                #pointsInside.append((V3[0],V3[1]))
+                                #rpmApprxs.append([rpm1])
+                                #rpmApprxs.append([rpm2])
+                                #rpmApprxs.append([rpm3])
+                                rpmApprxs = np.array(rpmApprxs).reshape(len(pointsInside))
+
+                                #verts = [list(zip(np.array(pointsInside)[:,0], np.array(pointsInside)[:,1], rpmApprxs))]
+                                #ax.add_collection3d(Poly3DCollection(verts, facecolors='lightblue',antialiased=True ))
+
+                                #ax.plot_wireframe(np.array(pointsInside)[:,0], np.array(pointsInside)[:,1], rpmApprxs)
+                                ax.plot_trisurf(np.array(pointsInside)[:,0], np.array(pointsInside)[:,1], rpmApprxs, linewidth=1, antialiased=True,color='lightblue',shade=True)
+                                #ax.contour3D(np.array(pointsInside)[:,0], np.array(pointsInside)[:,1], rpmApprxs, 50, cmap='binary')
+                                #ax.plot_surface(np.array(pointsInside)[:,0], np.array(pointsInside)[:,1], rpmApprxs, rstride=1, cstride=1, alpha=0.2,antialiased=True)
+                                #X, Y = np.meshgrid(np.array(pointsInside)[:, 0],  np.array(pointsInside)[:, 1])
+                                #ax.plot_surface(X, Y,
+                                                #np.array(rpmApprxs),
+                                                #linewidth=0, antialiased=True)
+                                #ax.scatter(pointsInside[i][0], pointsInside[i][1], rpmApprx, marker='o', s=10,
+                                               #c='black')
+
+
+
+
+
+                                ax.scatter(V1[0], V1[1], rpm1, marker='o', s=60,c='red')
+                                ax.scatter(V2[0], V2[1], rpm2, marker='o', s=60, c='red')
+                                ax.scatter(V3[0], V3[1], rpm3, marker='o', s=60, c='red')
+
+                                #ax.scatter(candidatePoint[0], candidatePoint[1], ypredS, marker='o', s=50,c='blue')
+
+                                x=[]
+                                y=[]
+                                z=[]
+                                for i in range(0,int(rpm1)-10,10):
+                                    x.append(V1[0])
+                                    y.append(V1[1])
+                                    z.append(i)
+
+                                x.append(V1[0])
+                                y.append(V1[1])
+                                z.append(rpm1)
+                                ax.plot(x, y, z, '--', alpha=0.8, linewidth=0.7, c='red')
+                                x = []
+                                y = []
+                                z = []
+                                for i in range(0, int(rpm2)-10, 10):
+                                    x.append(V2[0])
+                                    y.append(V2[1])
+                                    z.append(i)
+                                x.append(V2[0])
+                                y.append(V2[1])
+                                z.append(rpm2)
+
+                                ax.plot(x, y, z, '--', alpha=0.8, linewidth=0.7, c='red')
+                                x = []
+                                y = []
+                                z = []
+                                for i in range(0, int(rpm2)-10, 10):
+                                    x.append(V3[0])
+                                    y.append(V3[1])
+                                    z.append(i)
+
+                                x.append(V3[0])
+                                y.append(V3[1])
+                                z.append(rpm3)
+                                ax.plot(x, y, z, '--', alpha=0.8, linewidth=0.7,c='red')
+
+                                v12=vs[0]
+                                v23 = vs[1]
+                                v31 = vs[2]
+                                #ax.scatter(v12[0], v12[1], rpm12, marker='o', s=60, c='green')
+                                #ax.scatter(v23[0], v23[1], rpm23, marker='o', s=60, c='green')
+                                #ax.scatter(v31[0], v31[1], rpm31, marker='o', s=60, c='green')
+                                x = []
+                                y = []
+                                z = []
+                                for i in range(0, int(rpm12)-10, 10):
+                                    x.append(v12[0])
+                                    y.append(v12[1])
+                                    z.append(i)
+                                x.append(v12[0])
+                                y.append(v12[1])
+                                z.append(rpm12)
+                                #ax.plot(x, y, z, '--', alpha=0.8, linewidth=1,c='green' )
+
+                                x = []
+                                y = []
+                                z = []
+                                for i in range(0, int(rpm23)-10, 10):
+                                    x.append(v23[0])
+                                    y.append(v23[1])
+                                    z.append(i)
+                                x.append(v23[0])
+                                y.append(v23[1])
+                                z.append(rpm23)
+                                #ax.plot(x, y, z, '--', alpha=0.8, linewidth=1, c='green')
+
+                                x = []
+                                y = []
+                                z = []
+                                for i in range(0, int(rpm31)-10, 10):
+                                    x.append(v31[0])
+                                    y.append(v31[1])
+                                    z.append(i)
+                                x.append(v31[0])
+                                y.append(v31[1])
+                                z.append(rpm31)
+                                #ax.plot(x, y, z, '--', alpha=0.8, linewidth=1, c='green')
+
+                                xlim =np.array(vs)[:,0]
+                                ylim = np.array(vs)[:,1]
+                                xlim = [V1[0],V2[0],V3[0],xlim[0],xlim[1],xlim[2]]
+                                ylim = [V1[1], V2[1], V3[1], ylim[0], ylim[1], ylim[2]]
+
+                                ax.set_xlim(np.min(xlim)-0.3, np.max(xlim)+0.3)
+                                ax.set_ylim(np.min(ylim)-0.3, np.max(ylim)+0.3)
+                                #ax.set_xlim(11, 19)
+                                #ax.set_ylim(11,19)
+                                ax.set_zlim(0, 90)
+
+                                #ax.set_xlabel(r'V',fontsize=16)
+                                #ax.set_ylabel(r'\bar{V}_N', fontsize=16)
+                                #ax.set_zlabel(r'RPM', fontsize=16)
+
+                            plt.show()
+                            #list(neighboringTri1rpm[1]).index([k for k in neighboringTri1rpm[1] if k not in  [rpm1,rpm2,rpm3]  ])
+                            x=0
+
+                            #Xpred=XpredN
                             #Xpred = [ W2 * rpm2 + W1 * rpm1 + W3 * rpm3 ]
 
                         elif flgV==True or flgR==True:
@@ -486,11 +902,11 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
                                         Xpred =((math.pow(W2, 2) * rpm2 + math.pow(W1, 2) * rpm1 + math.pow(W3, 2) * rpm3) + \
                                         2 * W1 * W2 * rpm12 + 2 * W2 * W3 * rpm23 + 2 * W1 * W3 * rpm31) if Xpred < 0 or (solutions[0]<0 or solutions[1]<0 or solutions[2]<0) else Xpred
                                         x=0
-                                Xpred=XpredN
+                                #Xpred=XpredN
                                         #Xpred = [ W2 * rpm2 + W1 * rpm1 + W3 * rpm3 ]
 
-                    except :
-                        flgExc = True
+                    except Exception as e:
+                        print(str(e))
 
                     break
             '''if point doesn't belong to any triangle of the triangulated space  
@@ -645,6 +1061,20 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
                                                                               +" Count True: " +str(countTrue)\
              +" Count False " +str(countFalse))
         print(np.mean(np.nan_to_num(errors)))
+
+        plt.plot(np.linspace(0, len(predictions), len(predictions)), predictions, '-', c='blue',
+                 label='RPM Predictions with triangulation, acc: %')
+
+        plt.plot(np.linspace(0, len(yTrue), len(yTrue)), yTrue, '-', c='red', label='Actual RPM')
+        # plt.fill_between(np.linspace(0, len(rpmMean), len(rpmMean)), abs(np.array(rpmMean) - 1.434),abs(np.array(rpmMean) + 1.434),color='gray', alpha=0.2)
+
+        plt.ylabel('RPM', fontsize=19)
+        plt.xlabel('Observations', fontsize=19)
+        # plt.title('Performance comparison of top 3 methods')
+        plt.legend()
+        plt.grid()
+        plt.show()
+
         return errors, np.mean(errors), np.std(lErrors)
 
     def readClusteredLarosDataFromCsvNew(self,data):
@@ -1113,8 +1543,6 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
                         #d=0
                 # weightedPreds.append(modeler._models[len(modeler._models)-1].predict(pPoint))
                 #############################
-
-
 
                 #prediction = np.average(preds ,weights=fits )
             #else:

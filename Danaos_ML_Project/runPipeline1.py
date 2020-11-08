@@ -70,7 +70,7 @@ def main():
     #DANreader.GenericParserForDataExtraction('LAROS', 'MARMARAS', 'MT_DELTA_MARIA')
     #DANreader = DANRead.BaseSeriesReader()
     #DANreader.readLarosDAta(datetime.datetime(2018,1,1),datetime.datetime(2019,1,1))
-    '''DANreader.GenericParserForDataExtraction('LEMAG', 'GOLDENPORT', 'Trammo Laoura', driver='ORACLE', server='10.2.5.80',
+    '''DANreader.GenericParserForDataExtraction('LEMAG', 'DANAOS', 'DOMINIA', driver='ORACLE', server='10.2.5.80',
                                              sid='OR12', usr='goldenport', password='goldenport',
                                              rawData=True,telegrams=True,companyTelegrams=False,pathOfRawData='/home/dimitris/Desktop/SEEAMAG')'''
     #DANreader.GenericParserForDataExtraction('LAROS','MARMARAS','MT_DELTA_MARIA')
@@ -190,47 +190,8 @@ def main():
 
 
 
-    '''data = pd.read_csv(sFile, delimiter=',',skiprows=0)
-
-    #data = data.drop(["blFlags"], axis=1)
-    #data = data.drop(["wind_speed", "wind_dir","trim"], axis=1)
-    #x_train = data.drop(["blFlags","focs","tlgsFocs"], axis=1)
-
-    #foc = np.array(np.mean(data.values[:,6:7],axis=1))
-    #y_train = pd.DataFrame({
-        #'FOC': foc,
-       #})
-    data = np.append(data['ttime'].values.reshape(-1,1),
-                         np.asmatrix([
-                        data['VesselHeading'],
-                        data['Latitude'].values,
-                        data['Longitude'].values,
-                        data['WindAngle'].values,
-                        data['WindSpeed'].values,
-                        data['STW'].values,
-                        (data['AP_DRAFT AFT'].values + data['AP_DRAFT FORE'].values)/2,
-                        data['M/EFOFlow'].values,
-                         ]).T, axis=1)
-
-
-
-    #data = pd.read_csv(sFile, delimiter=';')
-    #data = data.drop(["wind_speed", "wind_dir"], axis=1)
-    #data = data[data['stw']>7].values
-    data = np.array(data)#.astype(float)
-
-
-    ##################################################
-    trData = data
-    company ='DANAOS'
-    vessel = 'EXPRESS ATHENS'
-    with open('./data/' + company + '/' + vessel + '/kaklisData.csv', mode='w') as data:
-        data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-        for i in range(0, len(trData)):
-            data_writer.writerow(
-                [trData[i][0], trData[i][1], trData[i][2],trData[i][3],trData[i][4],trData[i][5],trData[i][6],trData[i][7],trData[i][8]])'''
-
-    DANreader.GenericParserForDataExtraction('LEMAG', 'DANAOS', 'EXPRESS ATHENS', driver='ORACLE',
+    
+    DANreader.GenericParserForDataExtraction('LEMAG', 'DANAOS', 'ZIM LUANDA', driver='ORACLE',
                                              server='10.2.5.80',
                                              sid='OR12', usr='shipping', password='shipping',
                                              rawData=True, telegrams=True, companyTelegrams=False,

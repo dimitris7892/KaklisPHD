@@ -44,6 +44,7 @@ def main():
     #plotRes.boxPLotsKMDT()
     #plotRes.boxPLots()
     #plotRes.computeMeansStd()
+    #plotRes.generateGraphVRPM()
 
     ####
     num_lines = sum(1 for l in open(sFile))
@@ -127,7 +128,7 @@ def main():
         #subsetsB.append(targetB)
         var.append(np.var(seriesX))
 
-        if len(subsetsX)>=5:
+        if len(subsetsX)>=1:
             break
 
     rangeSubs = k
@@ -141,7 +142,7 @@ def main():
 
 
 
-    K = range(2,12)
+    K = range(1,3)
     print("Number of Statistically ind. subsets for training: " + str(len(subsetsX)))
     subsetsX=[subsetsX[0:5]] if len(subsetsX) > 5 else subsetsX
     subsetsY = [ subsetsY[ 0:5 ] ] if len(subsetsY) > 5 else subsetsY
@@ -155,13 +156,14 @@ def main():
       #data1 = pd.read_csv(sFile, skiprows=skip_idxx)
       for modeler in modelers:
         for partitioner in partitioners:
-           if (modeler.__class__.__name__ == 'TensorFlowWLSTM2' or modeler.__class__.__name__ == 'TensorFlowWLSTM') and partitioner.__class__.__name__ == 'DelaunayTriPartitioner': continue
+           if (modeler.__class__.__name__ == 'TensorFlowWLSTM2' or modeler.__class__.__name__ == 'TensorFlowWLSTM') and partitioner.__class__.__name__ == 'DelaunayTriPartitioner':
+               break
            if modeler.__class__.__name__ == 'TriInterpolantModeler' and partitioner.__class__.__name__=='DelaunayTriPartitioner':
                 break
            if modeler.__class__.__name__ == 'TriInterpolantModeler' or modeler.__class__.__name__ == 'TensorFlow':
                 t=0
            if partitioner.__class__.__name__=='DelaunayTriPartitioner':
-                 partK=np.linspace(0.1,1,11)#[0.5]
+                 partK=np.linspace(0.1,1,3)#[0.5]
 
            elif partitioner.__class__.__name__=='KMeansPartitioner':
                if modeler.__class__.__name__=='TriInterpolantModeler' or modeler.__class__.__name__ == 'TensorFlow':
@@ -429,7 +431,7 @@ def initParameters():
 
 
         #['SR','LR','RF','NN','NNW','TRI']
-    cls=['DC']
+    cls=['KM','DC']
         #['KM','DC','NNCL']
     #['SR','LR','RF','NN'] algs
     #['KM','DC'] clusterers / cls
