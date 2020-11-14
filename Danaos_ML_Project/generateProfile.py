@@ -5,6 +5,7 @@ import math
 import seaborn as sns
 #from pyproj import Proj, transform
 import pyearth as sp
+import json
 import matplotlib
 from sklearn.cluster import KMeans
 from scipy.spatial import distance as dis
@@ -4618,13 +4619,13 @@ class BaseProfileGenerator:
 
         profCons = list(itertools.chain(ballastCons, ladenCons))
 
-        with open('./data/' + company + '/' + vessel + '/ListOfCons.csv', mode='w') as data:
+        '''with open('./data/' + company + '/' + vessel + '/ListOfCons.csv', mode='w') as data:
             data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
             data_writer.writerow(
                 ['FOC'])
             for i in range(0, len(profCons)):
                 data_writer.writerow(
-                    [profCons[i]])
+                    [profCons[i]])'''
 
         workbook.save(filename=pathToexcel.split('.')[0] + '_1.' + pathToexcel.split('.')[1])
         return
@@ -4650,7 +4651,8 @@ class BaseProfileGenerator:
           })
           sns.displot(df, x="foc")
           plt.show()'''
-
+        d=0
+        #dataSet = dataSet[0:30000]
         # if float(k[5])>6.5
         # dataSet = np.array(dataSet).astype(float)
         bl = np.array([k for k in dataSet])[:, 2]
@@ -4755,94 +4757,137 @@ class BaseProfileGenerator:
                     ranges.append(i)
                 i += 3
                 k += 1
+            try:
+                xi = np.array([k for k in ladenDt if k[15] > 0 and k[15]<=1 if (k[5] > 7 and k[5]<=9)  ])[:,8]
+                yi = np.array([k for k in ladenDt if k[15] > 1 and k[15] <= 2 if (k[5] > 7 and k[5]<=9) ])[:,8]
+                zi = np.array([k for k in ladenDt if k[15] > 2 and k[15] <= 3 if (k[5] > 7 and k[5] <= 9)])[:, 8]
+                fi = np.array([k for k in ladenDt if k[15] > 3 and k[15] <= 4 if (k[5] > 7 and k[5] <= 9)])[:, 8]
+                ci = np.array([k for k in ladenDt if k[15] > 4 and k[15] <= 5 if (k[5] > 7 and k[5] <= 9)])[:, 8]
+                si = np.array([k for k in ladenDt if k[15] > 5 and k[15] <= 6 if (k[5] > 7 and k[5] <= 9)])[:, 8]
+                #di = np.array([k for k in ladenDt if k[15] > 6 and k[15] <= 7 if (k[5] > 7 and k[5] <= 9)])[:, 8]
+                #ri = np.array([k for k in ladenDt if k[15] > 7 and k[15] <= 8 if (k[5] > 7 and k[5] <= 9)])[:, 8]
 
-            xi = np.array([k for k in ladenDt if k[15] > 0 and k[15]<=1 if (k[5] > 7 and k[5]<=9)  ])[:,8]
-            yi = np.array([k for k in ladenDt if k[15] > 1 and k[15] <= 2 if (k[5] > 7 and k[5]<=9) ])[:,8]
-            zi = np.array([k for k in ladenDt if k[15] > 2 and k[15] <= 3 if (k[5] > 7 and k[5] <= 9)])[:, 8]
-            fi = np.array([k for k in ladenDt if k[15] > 3 and k[15] <= 4 if (k[5] > 7 and k[5] <= 9)])[:, 8]
-            ci = np.array([k for k in ladenDt if k[15] > 4 and k[15] <= 5 if (k[5] > 7 and k[5] <= 9)])[:, 8]
-            si = np.array([k for k in ladenDt if k[15] > 5 and k[15] <= 6 if (k[5] > 7 and k[5] <= 9)])[:, 8]
+                weightsSWH79=  [0,ks_2samp(xi, yi)[0] / 10, ks_2samp(yi, zi)[0] / 10, ks_2samp(zi, fi)[0] / 10,
+                                 ks_2samp(fi, ci)[0] / 10, ks_2samp(ci, si)[0] / 10, ks_2samp(ci, si)[0] / 10+0.01, (ks_2samp(ci, si)[0] / 10) + 0.02]
 
-            weightsSWH79=[0,ks_2samp(xi,yi)[0]/10,ks_2samp(yi,zi)[0]/10,ks_2samp(zi,fi)[0]/10,ks_2samp(fi,ci)[0]/10,
-                          ks_2samp(ci,si)[0]/10,ks_2samp(ci, si)[0] / 10,ks_2samp(ci, si)[0] / 10]
+                xi = np.array([k for k in ladenDt if k[15] > 0 and k[15] <= 1 if (k[5] > 9 and k[5] <= 11)])[:, 8]
+                yi = np.array([k for k in ladenDt if k[15] > 1 and k[15] <= 2 if (k[5] > 9 and k[5] <= 11)])[:, 8]
+                zi = np.array([k for k in ladenDt if k[15] > 2 and k[15] <= 3 if (k[5] > 9 and k[5] <= 11)])[:, 8]
+                fi = np.array([k for k in ladenDt if k[15] > 3 and k[15] <= 4 if (k[5] > 9 and k[5] <= 11)])[:, 8]
+                ci = np.array([k for k in ladenDt if k[15] > 4 and k[15] <= 5 if (k[5] > 9 and k[5] <= 11)])[:, 8]
+                si = np.array([k for k in ladenDt if k[15] > 5 and k[15] <= 6 if (k[5] > 9 and k[5] <= 11)])#
+                #di = np.array([k for k in ladenDt if k[15] > 6 and k[15] <= 7 if (k[5] > 7 and k[5] <= 9)])[:, 8]
+                #ri = np.array([k for k in ladenDt if k[15] > 7 and k[15] <= 8 if (k[5] > 7 and k[5] <= 9)])[:, 8]
+                si = si [:,8]  if si.__len__()>0 else ci
 
-            xi = np.array([k for k in ladenDt if k[15] > 0 and k[15] <= 1 if (k[5] > 9 and k[5] <= 11)])[:, 8]
-            yi = np.array([k for k in ladenDt if k[15] > 1 and k[15] <= 2 if (k[5] > 9 and k[5] <= 11)])[:, 8]
-            zi = np.array([k for k in ladenDt if k[15] > 2 and k[15] <= 3 if (k[5] > 9 and k[5] <= 11)])[:, 8]
-            fi = np.array([k for k in ladenDt if k[15] > 3 and k[15] <= 4 if (k[5] > 9 and k[5] <= 11)])[:, 8]
-            ci = np.array([k for k in ladenDt if k[15] > 4 and k[15] <= 5 if (k[5] > 9 and k[5] <= 11)])[:, 8]
-            si = np.array([k for k in ladenDt if k[15] > 5 and k[15] <= 6 if (k[5] > 9 and k[5] <= 11)])#
-            si = si [:,8]  if si.__len__()>0 else ci
+                weightsSWH911 =  [0,ks_2samp(xi, yi)[0] / 10, ks_2samp(yi, zi)[0] / 10, ks_2samp(zi, fi)[0] / 10,
+                                 ks_2samp(fi, ci)[0] / 10, ks_2samp(ci, si)[0] / 10, ks_2samp(ci, si)[0] / 10+0.01, (ks_2samp(ci, si)[0] / 10) + 0.02]
 
-            weightsSWH911 = [0,ks_2samp(xi, yi)[0] / 10, ks_2samp(yi, zi)[0] / 10, ks_2samp(zi, fi)[0] / 10,
-                            ks_2samp(fi, ci)[0] / 10, ks_2samp(ci, si)[0] / 10,ks_2samp(ci, si)[0] / 10,ks_2samp(ci, si)[0] / 10]
+                xi = np.array([k for k in ladenDt if k[15] > 0 and k[15] <= 1 if (k[5] > 11 and k[5] <= 14)])[:, 8]
+                yi = np.array([k for k in ladenDt if k[15] > 1 and k[15] <= 2 if (k[5] > 11 and k[5] <= 14)])[:, 8]
+                zi = np.array([k for k in ladenDt if k[15] > 2 and k[15] <= 3 if (k[5] > 11 and k[5] <= 14)])[:, 8]
+                fi = np.array([k for k in ladenDt if k[15] > 3 and k[15] <= 4 if (k[5] > 11 and k[5] <= 14)])[:, 8]
+                ci = np.array([k for k in ladenDt if k[15] > 4 and k[15] <= 5 if (k[5] > 11 and k[5] <= 14)])[:, 8]
+                si = np.array([k for k in ladenDt if k[15] > 5 and k[15] <= 6 if (k[5] > 11 and k[5] <= 14)])#[:, 8]
+                #di = np.array([k for k in ladenDt if k[15] > 6 and k[15] <= 7 if (k[5] > 7 and k[5] <= 9)])[:, 8]
+                #ri = np.array([k for k in ladenDt if k[15] > 7 and k[15] <= 8 if (k[5] > 7 and k[5] <= 9)])[:, 8]
+                si = si [:,8] if si.__len__() > 0 else ci
 
-            xi = np.array([k for k in ladenDt if k[15] > 0 and k[15] <= 1 if (k[5] > 11 and k[5] <= 14)])[:, 8]
-            yi = np.array([k for k in ladenDt if k[15] > 1 and k[15] <= 2 if (k[5] > 11 and k[5] <= 14)])[:, 8]
-            zi = np.array([k for k in ladenDt if k[15] > 2 and k[15] <= 3 if (k[5] > 11 and k[5] <= 14)])[:, 8]
-            fi = np.array([k for k in ladenDt if k[15] > 3 and k[15] <= 4 if (k[5] > 11 and k[5] <= 14)])[:, 8]
-            ci = np.array([k for k in ladenDt if k[15] > 4 and k[15] <= 5 if (k[5] > 11 and k[5] <= 14)])[:, 8]
-            si = np.array([k for k in ladenDt if k[15] > 5 and k[15] <= 6 if (k[5] > 11 and k[5] <= 14)])#[:, 8]
-            si = si [:,8] if si.__len__() > 0 else ci
+                weightsSWH1114 = [0,ks_2samp(xi, yi)[0] / 10, ks_2samp(yi, zi)[0] / 10, ks_2samp(zi, fi)[0] / 10,
+                                 ks_2samp(fi, ci)[0] / 10, ks_2samp(ci, si)[0] / 10, ks_2samp(ci, si)[0] / 10+0.01, (ks_2samp(ci, si)[0] / 10) + 0.02]
 
-            weightsSWH1114 = [0,ks_2samp(xi, yi)[0] / 10, ks_2samp(yi, zi)[0] / 10, ks_2samp(zi, fi)[0] / 10,
-                             ks_2samp(fi, ci)[0] / 10, ks_2samp(ci, si)[0] / 10, ks_2samp(ci, si)[0] / 10, ks_2samp(ci, si)[0] / 10]
+                ############################################################################################################################
+                ############################################################################################################################
+                '''xi = np.array([k for k in ladenDt if k[4] > 0 and k[4] <= 1 if (k[5] > 7 and k[5] <= 9)])[:, 8]
+                yi = np.array([k for k in ladenDt if k[4] > 1 and k[4] <= 2 if (k[5] > 7 and k[5] <= 9)])[:, 8]
+                zi = np.array([k for k in ladenDt if k[4] > 2 and k[4] <= 3 if (k[5] > 7 and k[5] <= 9)])[:, 8]
+                fi = np.array([k for k in ladenDt if k[4] > 3 and k[4] <= 4 if (k[5] > 7 and k[5] <= 9)])[:, 8]
+                ci = np.array([k for k in ladenDt if k[4] > 4 and k[4] <= 5 if (k[5] > 7 and k[5] <= 9)])[:, 8]
+                si = np.array([k for k in ladenDt if k[4] > 5 and k[4] <= 6 if (k[5] > 7 and k[5] <= 9)])[:, 8]
+                di = np.array([k for k in ladenDt if k[4] > 6 and k[4] <= 7 if (k[5] > 7 and k[5] <= 9)])[:, 8]
+                ri = np.array([k for k in ladenDt if k[4] > 7 and k[4] <= 8 if (k[5] > 7 and k[5] <= 9)])[:, 8]
 
-            ############################################################################################################################
-            ############################################################################################################################
-            xi = np.array([k for k in ladenDt if k[4] > 0 and k[4] <= 1 if (k[5] > 7 and k[5] <= 9)])[:, 8]
-            yi = np.array([k for k in ladenDt if k[4] > 1 and k[4] <= 2 if (k[5] > 7 and k[5] <= 9)])[:, 8]
-            zi = np.array([k for k in ladenDt if k[4] > 2 and k[4] <= 3 if (k[5] > 7 and k[5] <= 9)])[:, 8]
-            fi = np.array([k for k in ladenDt if k[4] > 3 and k[4] <= 4 if (k[5] > 7 and k[5] <= 9)])[:, 8]
-            ci = np.array([k for k in ladenDt if k[4] > 4 and k[4] <= 5 if (k[5] > 7 and k[5] <= 9)])[:, 8]
-            si = np.array([k for k in ladenDt if k[4] > 5 and k[4] <= 6 if (k[5] > 7 and k[5] <= 9)])[:, 8]
-            di = np.array([k for k in ladenDt if k[4] > 6 and k[4] <= 7 if (k[5] > 7 and k[5] <= 9)])[:, 8]
-            ri = np.array([k for k in ladenDt if k[4] > 7 and k[4] <= 8 if (k[5] > 7 and k[5] <= 9)])[:, 8]
+                weightsWS79 = [0, ks_2samp(xi, yi)[0] , ks_2samp(yi, zi)[0] , ks_2samp(zi, fi)[0] ,
+                                ks_2samp(fi, ci)[0] ,
+                                ks_2samp(ci, si)[0] , ks_2samp(si, di)[0] , ks_2samp(di, ri)[0] ]
 
-            weightsWS79 = [0, ks_2samp(xi, yi)[0] / 10, ks_2samp(yi, zi)[0] / 10, ks_2samp(zi, fi)[0] / 10,
-                            ks_2samp(fi, ci)[0] / 10,
-                            ks_2samp(ci, si)[0] / 10, ks_2samp(si, di)[0] / 10, ks_2samp(di, ri)[0] / 10]
+                xi = np.array([k for k in ladenDt if k[4] > 0 and k[15] <= 1 if (k[5] > 9 and k[5] <= 11)])[:, 8]
+                yi = np.array([k for k in ladenDt if k[4] > 1 and k[15] <= 2 if (k[5] > 9 and k[5] <= 11)])[:, 8]
+                zi = np.array([k for k in ladenDt if k[4] > 2 and k[15] <= 3 if (k[5] > 9 and k[5] <= 11)])[:, 8]
+                fi = np.array([k for k in ladenDt if k[4] > 3 and k[15] <= 4 if (k[5] > 9 and k[5] <= 11)])[:, 8]
+                ci = np.array([k for k in ladenDt if k[4] > 4 and k[15] <= 5 if (k[5] > 9 and k[5] <= 11)])[:, 8]
+                si = np.array([k for k in ladenDt if k[4] > 5 and k[15] <= 6 if (k[5] > 9 and k[5] <= 11)])  #
+                si = si[:, 8] if si.__len__() > 0 else ci
+                di = np.array([k for k in ladenDt if k[4] > 6 and k[4] <= 7 if (k[5] > 9 and k[5] <= 11)])[:, 8]
+                ri = np.array([k for k in ladenDt if k[4] > 7 and k[4] <= 8 if (k[5] > 9 and k[5] <= 11)])[:, 8]
 
-            xi = np.array([k for k in ladenDt if k[4] > 0 and k[15] <= 1 if (k[5] > 9 and k[5] <= 11)])[:, 8]
-            yi = np.array([k for k in ladenDt if k[4] > 1 and k[15] <= 2 if (k[5] > 9 and k[5] <= 11)])[:, 8]
-            zi = np.array([k for k in ladenDt if k[4] > 2 and k[15] <= 3 if (k[5] > 9 and k[5] <= 11)])[:, 8]
-            fi = np.array([k for k in ladenDt if k[4] > 3 and k[15] <= 4 if (k[5] > 9 and k[5] <= 11)])[:, 8]
-            ci = np.array([k for k in ladenDt if k[4] > 4 and k[15] <= 5 if (k[5] > 9 and k[5] <= 11)])[:, 8]
-            si = np.array([k for k in ladenDt if k[4] > 5 and k[15] <= 6 if (k[5] > 9 and k[5] <= 11)])  #
-            si = si[:, 8] if si.__len__() > 0 else ci
-            di = np.array([k for k in ladenDt if k[4] > 6 and k[4] <= 7 if (k[5] > 7 and k[5] <= 9)])[:, 8]
-            ri = np.array([k for k in ladenDt if k[4] > 7 and k[4] <= 8 if (k[5] > 7 and k[5] <= 9)])[:, 8]
+                weightsWS911 = [0, ks_2samp(xi, yi)[0] , ks_2samp(yi, zi)[0] , ks_2samp(zi, fi)[0] ,
+                                 ks_2samp(fi, ci)[0] , ks_2samp(ci, si)[0] , ks_2samp(si, di)[0] ,
+                                 ks_2samp(di, ri)[0] ]
 
-            weightsWS911 = [0, ks_2samp(xi, yi)[0] / 10, ks_2samp(yi, zi)[0] / 10, ks_2samp(zi, fi)[0] / 10,
-                             ks_2samp(fi, ci)[0] / 10, ks_2samp(ci, si)[0] / 10, ks_2samp(si, di)[0] / 10,
-                             ks_2samp(di, ri)[0] / 10]
+                xi = np.array([k for k in ladenDt if k[4] > 0 and k[15] <= 1 if (k[5] > 11 and k[5] <= 14)])[:, 8]
+                yi = np.array([k for k in ladenDt if k[4] > 1 and k[15] <= 2 if (k[5] > 11 and k[5] <= 14)])[:, 8]
+                zi = np.array([k for k in ladenDt if k[4] > 2 and k[15] <= 3 if (k[5] > 11 and k[5] <= 14)])[:, 8]
+                fi = np.array([k for k in ladenDt if k[4] > 3 and k[15] <= 4 if (k[5] > 11 and k[5] <= 14)])[:, 8]
+                ci = np.array([k for k in ladenDt if k[4] > 4 and k[15] <= 5 if (k[5] > 11 and k[5] <= 14)])[:, 8]
+                si = np.array([k for k in ladenDt if k[4] > 5 and k[15] <= 6 if (k[5] > 11 and k[5] <= 14)])  # [:, 8]
+                si = si[:, 8] if si.__len__() > 0 else ci
+                di = np.array([k for k in ladenDt if k[4] > 6 and k[4] <= 7 if (k[5] > 11 and k[5] <= 14)])[:, 8]
+                ri = np.array([k for k in ladenDt if k[4] > 7 and k[4] <= 8 if (k[5] > 11 and k[5] <= 14)])[:, 8]
 
-            xi = np.array([k for k in ladenDt if k[4] > 0 and k[15] <= 1 if (k[5] > 11 and k[5] <= 14)])[:, 8]
-            yi = np.array([k for k in ladenDt if k[4] > 1 and k[15] <= 2 if (k[5] > 11 and k[5] <= 14)])[:, 8]
-            zi = np.array([k for k in ladenDt if k[4] > 2 and k[15] <= 3 if (k[5] > 11 and k[5] <= 14)])[:, 8]
-            fi = np.array([k for k in ladenDt if k[4] > 3 and k[15] <= 4 if (k[5] > 11 and k[5] <= 14)])[:, 8]
-            ci = np.array([k for k in ladenDt if k[4] > 4 and k[15] <= 5 if (k[5] > 11 and k[5] <= 14)])[:, 8]
-            si = np.array([k for k in ladenDt if k[4] > 5 and k[15] <= 6 if (k[5] > 11 and k[5] <= 14)])  # [:, 8]
-            si = si[:, 8] if si.__len__() > 0 else ci
-            di = np.array([k for k in ladenDt if k[4] > 6 and k[4] <= 7 if (k[5] > 7 and k[5] <= 9)])[:, 8]
-            ri = np.array([k for k in ladenDt if k[4] > 7 and k[4] <= 8 if (k[5] > 7 and k[5] <= 9)])[:, 8]
-
-            weightsWS1114 = [0, ks_2samp(xi, yi)[0] / 10, ks_2samp(yi, zi)[0] / 10, ks_2samp(zi, fi)[0] / 10,
-                              ks_2samp(fi, ci)[0] / 10, ks_2samp(ci, si)[0] / 10, ks_2samp(si, di)[0] / 10,
-                              ks_2samp(di, ri)[0] / 10]
+                weightsWS1114 = [0, ks_2samp(xi, yi)[0] , ks_2samp(yi, zi)[0] , ks_2samp(zi, fi)[0] ,
+                                  ks_2samp(fi, ci)[0] , ks_2samp(ci, si)[0] , ks_2samp(si, di)[0] ,
+                                  ks_2samp(di, ri)[0] ]'''
 
 
-            foc01 = [(itm, '0-1') for itm in xi]
+                ##########################################WIND DIRECTION ###############################################
+                ##########################################WIND DIRECTION ###############################################
+
+                xi = np.array([k for k in ladenDt if k[3] > 0 and k[3] <= 22.5 if (k[5] > 7 and k[5] <= 9)])[:, 8]
+                yi = np.array([k for k in ladenDt if k[3] >22.5 and k[3] <= 67.5 if (k[5] > 7 and k[5] <= 9)])[:, 8]
+                zi = np.array([k for k in ladenDt if k[3] > 67.5 and k[3] <= 112.5 if (k[5] > 7 and k[5] <= 9)])[:, 8]
+                fi = np.array([k for k in ladenDt if k[3] > 112.5 and k[3] <= 157.5 if (k[5] > 7 and k[5] <= 9)])[:, 8]
+                ci = np.array([k for k in ladenDt if k[3] > 157.5 and k[3] <= 180 if (k[5] > 7 and k[5] <= 9)])[:, 8]
+
+
+                weightsWD79 = [ks_2samp(xi, ci)[0], ks_2samp(yi, fi)[0] , (ks_2samp(fi, zi)[0] +  ks_2samp(yi, zi)[0] )/2 ,  ks_2samp(fi, ci)[0]  , 0 ]
+
+                xi = np.array([k for k in ladenDt if k[3] > 0 and k[3] <= 22.5 if (k[5] > 9 and k[5] <= 11)])[:, 8]
+                yi = np.array([k for k in ladenDt if k[3] > 22.5 and k[3] <= 67.5 if (k[5] > 9 and k[5] <= 11)])[:, 8]
+                zi = np.array([k for k in ladenDt if k[3] > 67.5 and k[3] <= 112.5 if (k[5] > 9 and k[5] <= 11)])[:, 8]
+                fi = np.array([k for k in ladenDt if k[3] > 112.5 and k[3] <= 157.5 if (k[5] > 9 and k[5] <= 11)])[:, 8]
+                ci = np.array([k for k in ladenDt if k[3] > 157.5 and k[3] <= 180 if (k[5] > 9 and k[5] <= 11)])[:, 8]
+
+                weightsWD911 =[ks_2samp(xi, ci)[0], ks_2samp(yi, fi)[0] , (ks_2samp(fi, zi)[0] +  ks_2samp(yi, zi)[0] )/2 ,  ks_2samp(fi, ci)[0]  , 0 ]
+
+                xi = np.array([k for k in ladenDt if k[3] > 0 and k[3] <= 22.5 if (k[5] > 11 and k[5] <= 14)])[:, 8]
+                yi = np.array([k for k in ladenDt if k[3] > 22.5 and k[3] <= 67.5 if (k[5] > 11 and k[5] <= 14)])[:, 8]
+                zi = np.array([k for k in ladenDt if k[3] > 67.5 and k[3] <= 112.5 if (k[5] > 11 and k[5] <= 14)])[:, 8]
+                fi = np.array([k for k in ladenDt if k[3] > 112.5 and k[3] <= 157.5 if (k[5] > 11 and k[5] <= 14)])[:, 8]
+                ci = np.array([k for k in ladenDt if k[3] > 157.5 and k[3] <= 180 if (k[5] > 11 and k[5] <= 14)])[:, 8]
+
+                weightsWD1114 = [ks_2samp(xi, ci)[0], ks_2samp(yi, fi)[0] , (ks_2samp(fi, zi)[0] +  ks_2samp(yi, zi)[0] )/2 ,  ks_2samp(fi, ci)[0] -0.13  , 0 ]
+
+            except:
+                print('EXCEPTION IN WEIGHTS')
+                weightsSWH79 = [0, 0.0043, 0.0023, 0.0024, 0.0025, 0.0046, 0.0057, 0.0058, 0.0059]
+                weightsSWH911 = [0, 0.0043, 0.0023, 0.0024, 0.0025, 0.0046, 0.0057, 0.0058, 0.0059]
+                weightsSWH1114 = [0, 0.0043, 0.0023, 0.0024, 0.0025, 0.0046, 0.0057, 0.0058, 0.0059]
+
+                weightsWD79 = [0.2,0.1,0.09,0.08,0.07]
+                weightsWD911 = [0.2, 0.1, 0.09, 0.08, 0.07]
+                weightsWD1114 = [0.2, 0.1, 0.09, 0.08, 0.07]
+            '''foc01 = [(itm, '0-1') for itm in xi]
             foc12 = [(itm, '1-2') for itm in yi]
             foc23 = [(itm, '2-3') for itm in zi]
             foc34 = [(itm, '3-4') for itm in fi]
-            foc45 = [(itm, '4-5') for itm in ci]
-            joinedFoc =  foc12 + foc23
+            foc45 = [(itm, '4-5') for itm in ci]'''
+            #joinedFoc =  foc12 + foc23
 
-            df = pd.DataFrame(data=joinedFoc,
-                columns=['foc', 'swh'])
+            #df = pd.DataFrame(data=joinedFoc,
+                #columns=['foc', 'swh'])
             #df.Zip = df.Zip.astype(str).str.zfill(5)
-            sns.displot(df, x="foc", hue='swh')
+            #sns.displot(df, x="foc", hue='swh')
             '''foc1 = yi
             df = pd.DataFrame({
                 'foc1': foc1,
@@ -4913,6 +4958,8 @@ class BaseProfileGenerator:
             plt.plot([], [], '.', xp, p2(xp))
 
             #############################################################################################
+
+
             #############################################################################################
 
 
@@ -5010,8 +5057,8 @@ class BaseProfileGenerator:
             plt.show()
             X=0
 
-        # meanDraftBallast = round(float(np.mean(np.array([k for k in ballastDt if k[1] > 0])[:, 1])), 2)
-        # meanDraftLadden = round(float(np.mean(np.array([k for k in ladenDt if k[1] > 0])[:, 1])), 2)
+        #meanDraftBallast = round(float(np.mean(np.array([k for k in ballastDt if k[1] > 0])[:, 1])), 2)
+        meanDraftLadden = round(float(np.mean(np.array([k for k in ladenDt if k[1] > 0])[:, 1])), 2)
         # minDraftLadden = round(float(np.min(np.array([k for k in ladenDt if k[1] > 0])[:, 1])), 2)
         # maxDraftBallast = round(float(np.max(np.array([k for k in ballastDt if k[1] > 0])[:, 1])), 2)
 
@@ -5152,7 +5199,8 @@ class BaseProfileGenerator:
             #ballastDt = np.array([k for k in ballastDt if
                                 #k[8] >= meanballastFoc - (2 * stdballastFoc) and k[8] <= meanballastFoc + (2 * stdballastFoc)])
 
-            windForceWeights = [0, 0.25, 0.45, 0.65, 0.75, 1.15, 1.25, 1.35, 1.45]
+            windForceWeights = weightsSWH1114
+                #[0, 0.25, 0.45, 0.65, 0.75, 1.15, 1.25, 1.35, 1.45]
             swellHeightWeights = weightsSWH1114
                 #[0, 0.0043, 0.0023, 0.0024, 0.0025, 0.0046, 0.0057, 0.0058, 0.0059]
 
@@ -6372,30 +6420,33 @@ class BaseProfileGenerator:
         ####################################################LADDEN START ###################################################################
         if ladenFlag==True:
 
+            laddenJSON = '{}'
 
-            windForceWeights = [0, 0.25, 0.45, 0.65, 0.75, 1.15, 1.25, 1.35, 1.45]
+            windForceWeights = [0, 0.25, 0.35, 0.45, 0.55, 0.65, 0.75, 0.85, 1.05]
+                #[0, 0.25, 0.45, 0.65, 0.75, 1.15, 1.25, 1.35, 1.45]
             swellHeightWeights = weightsSWH1114
                 #[0, 0.0043, 0.0023, 0.0024, 0.0025, 0.0046, 0.0057, 0.0058, 0.0059]
 
             ###########################################################################################
-            foc0 = np.mean(np.array([k for k in ladenDt if k[3] > 0 and k[3] <= 22.5])[:, 8])
+            '''foc0 = np.mean(np.array([k for k in ladenDt if k[3] > 0 and k[3] <= 22.5])[:, 8])
             foc1 = np.mean(np.array([k for k in ladenDt if k[3] > 22.5 and k[3] <= 67.5])[:, 8])
             foc2 = np.mean(np.array([k for k in ladenDt if k[3] > 67.5 and k[3] <= 112.5])[:, 8])
             foc3 = np.mean(np.array([k for k in ladenDt if k[3] > 112.5 and k[3] <= 157.5])[:, 8])
-            foc4 = np.mean(np.array([k for k in ladenDt if k[3] > 157.5 and k[3] <= 180])[:, 8])
+            foc4 = np.mean(np.array([k for k in ladenDt if k[3] > 157.5 and k[3] <= 180])[:, 8])'''
 
             '''wd0 = abs((foc1 - foc0) / foc0)
               wd1 = abs((foc2 - foc1) / foc1)
               wd2 = abs((foc3 - foc2) / foc2)
               wd3 = abs((foc4 - foc0) / foc4)'''
 
-            wd0 = abs(1 / (1 + (foc4 - foc0)))  # against - with
-            wd1 = abs(1 / (1 + (foc1 - foc3)))  # against side - side with
+            wd0 = abs(1 / (1 + (33 - 23)))  # against - with
+            wd1 = abs(1 / (1 + (28 - 26)))  # against side - side with
             wd2 = wd1 -0.3  # + abs(1 / (1 + (foc2 - foc4))))/2 #side - with - against
             wd3 = 0.0123  # side with - side
             wd4 = 0
 
-            windDirWeights = [wd0, wd1, wd2, wd3, wd4]
+            windDirWeights = weightsWD79
+            #[wd0, wd1, wd2, wd3, wd4]
 
             velMin = 11.75
             velMax = 12.25
@@ -6427,12 +6478,20 @@ class BaseProfileGenerator:
             ladenDt7801 = []
             numberOfApp11_8 = []
             arrayFoc=[]
+
+            json_decoded = json.loads(laddenJSON)
+            #json_decoded['draft']['ladden']['speedGroup8'] = {}
+            json_decoded['ConsumptionProfile']=[]
+            outerItem={"draft":meanDraftLadden,"speed":(velMin+velMax) / 2,"cells":[]}
+
             for w in range(0, len(windF) - 1):
+                #json_decoded['draft']['ladden']['speedGroup8']['ws' + str(w) + str(w + 1)] = {}
+
                 for s in range(0, len(swellH) - 1):
                     ladenDt7_8 = []
                     numberOfApp11_8 = []
+                    #json_decoded['draft']['ladden']['speedGroup8']['ws' + str(w) + str(w + 1)]['swh' + str(s) + str(s + 1)] = {}
                     for i in range(0, len(wind) - 1):
-
                         #arrayFoc = np.array([k for k in ladenDt if
                                              #k[4] > windF[w] and k[4] <= windF[w + 1] and k[5] > velMin and k[
                                                 # 5] <= velMax and k[3] >= wind[i] and
@@ -6471,11 +6530,17 @@ class BaseProfileGenerator:
                             elif s == 0 and w == 0:
                                 cellValue = round(centralMean + windDirWeights[i], 2)
                             elif s == 0 and w > 0:
-                                cellValue = round(centralMean + windForceWeights[w] + windDirWeights[i], 2)
+                                cellValue = round(ladenDt7801[len(ladenDt7801) - 40] + windForceWeights[w] + windDirWeights[i], 2)
+
+
+                            item = {"windBFT":w+1,"windDir":i+1,"swell":s+1,"cons":cellValue}
+                            outerItem['cells'].append(item)
+
                                 # round(ladenDt7801[lastLenLadenDt7801 - (39-((i-1 if i < 5 else i-2) ))] + windForceWeights[w] + windDirWeights[i], 2)
                         ladenDt7_8.append(cellValue)
                         ladenDt7801.append(cellValue)
                     lastLenDt_8 = len(ladenDt7_8)
+
                     for i in range(row[w], row[w] + 5):
                         try:
                             workbook._sheets[1][column[s - 1 if s == 8 else s] + str(i)] = str(
@@ -6485,11 +6550,15 @@ class BaseProfileGenerator:
                         except:
                             print("Exception")
 
+            json_decoded['ConsumptionProfile'].append(outerItem)
+            ladenSPEED8 =ladenDt7_8
+
+
             velMin = 7.75
             velMax = 8.25
 
             swellHeightWeights = weightsSWH79
-
+            #windForceWeights = [0, 0.234, 0.354, 0.463, 0.572, 0.681, 0.791, 0.832, 0.953]
             #FocCentral = np.array([k for k in ladenDt if
                                    #k[5] >= velMin and k[5] <= velMax and k[8] > 0])[:, 8]
 
@@ -6516,11 +6585,9 @@ class BaseProfileGenerator:
             speed = [7, 8]  # ,8.75,9.25,9.75]
             column = ['B', 'C', 'D', 'E', 'F', 'G', 'H', 'I']
 
-            ladenDt11_8 = []
-            numberOfApp11_8 = []
+            outerItem = {"draft": meanDraftLadden, "speed": (velMin + velMax) / 2, "cells": []}
             ladenDt7801 = []
             for w in range(0, len(windF) - 1):
-
                 for s in range(0, len(swellH) - 1):
                     ladenDt7_8 = []
                     numberOfApp11_8 = []
@@ -6559,12 +6626,13 @@ class BaseProfileGenerator:
                             #meanFoc = (weighted_avgFocArray + centralMean) / 2 if arrayFoc.__len__() > minAccThres else centralMean
                             numberOfApp11_8.append(arrayFoc.__len__())  # + centralArray.__len__())
                             if (s > 0 and w >= 0):
-                                cellValue = round((ladenDt7801[len(ladenDt7801) - 5] + ( swellHeightWeights[s])) + windDirWeights[i], 2)
+                                cellValue = round((ladenDt7801[len(ladenDt7801) - 5] + ( swellHeightWeights[s])) + windDirWeights[i] , 2)
                             elif s == 0 and w == 0:
                                 cellValue = round(centralMean + windDirWeights[i], 2)
                             elif s == 0 and w > 0:
-                                cellValue = round(centralMean + windForceWeights[w] + windDirWeights[i], 2)
-                                # round(ladenDt7801[lastLenLadenDt7801 - (39-((i-1 if i < 5 else i-2) ))] + windForceWeights[w] + windDirWeights[i], 2)
+                                cellValue = round(ladenDt7801[len(ladenDt7801) - 40] + windForceWeights[w] + windDirWeights[i], 2)
+                            item = {"windBFT": w + 1, "windDir": i + 1, "swell": s + 1, "cons": cellValue}
+                            outerItem['cells'].append(item)
                         ladenDt7_8.append(cellValue)
                         ladenDt7801.append(cellValue)
                     lastLenDt_8 = len(ladenDt7_8)
@@ -6577,14 +6645,16 @@ class BaseProfileGenerator:
                         except:
                             print("Exception")
                 lastLenLadenDt7801 = len(ladenDt7801)
-
-            # workbook.save(filename=pathToexcel.split('.')[0] + '_1.' + pathToexcel.split('.')[1])
-            # return
+            json_decoded['ConsumptionProfile'].append(outerItem)
+            #workbook.save(filename=pathToexcel.split('.')[0] + '_1.' + pathToexcel.split('.')[1])
+            #return
+            ladenSPEEDMin = ladenDt7_8
             ####################END 8 SPEED ########################################################################
             ####################END 8 SPEED ########################################################################
 
             velMin = 8.25
             velMax = 8.75
+
 
             #FocCentral = np.array([k for k in ladenDt if
                                    #k[5] >= velMin and k[5] <= velMax and k[8] > 0])[:, 8]
@@ -6609,7 +6679,7 @@ class BaseProfileGenerator:
             swellH = [0, 1, 2, 3, 4, 5, 6, 7, 8]
             column = ['B', 'C', 'D', 'E', 'F', 'G', 'H', 'I']
             ladenDt7801 = []
-            numberOfApp11_8 = []
+            outerItem = {"draft": meanDraftLadden, "speed": (velMin + velMax) / 2, "cells": []}
             for w in range(0, len(windF) - 1):
                 for s in range(0, len(swellH) - 1):
                     ladenDt7_8 = []
@@ -6654,8 +6724,11 @@ class BaseProfileGenerator:
                             elif s == 0 and w == 0:
                                 cellValue = round(centralMean + windDirWeights[i], 2)
                             elif s == 0 and w > 0:
-                                cellValue = round(centralMean + windForceWeights[w] + windDirWeights[i], 2)
+                                cellValue = round(ladenDt7801[len(ladenDt7801) - 40]  + windForceWeights[w] + windDirWeights[i], 2)
                                 # round(ladenDt7801[lastLenLadenDt7801 - (39-((i-1 if i < 5 else i-2) ))] + windForceWeights[w] + windDirWeights[i], 2)
+                            item = {"windBFT": w + 1, "windDir": i + 1, "swell": s + 1, "cons": cellValue}
+                            outerItem['cells'].append(item)
+
                         ladenDt7_8.append(cellValue)
                         ladenDt7801.append(cellValue)
                     lastLenDt_8 = len(ladenDt7_8)
@@ -6668,6 +6741,8 @@ class BaseProfileGenerator:
                         except:
                             print("Exception")
 
+            ladenSPEED1 = ladenDt7_8
+            json_decoded['ConsumptionProfile'].append(outerItem)
             ##########################################################################################END SPEED 8.5
             ##########################################################################################END SPEED 8.5
             velMin = 8.75
@@ -6699,7 +6774,7 @@ class BaseProfileGenerator:
             column = ['B', 'C', 'D', 'E', 'F', 'G', 'H', 'I']
             ladenDt7801 = []
             numberOfApp11_8 = []
-
+            outerItem = {"draft": meanDraftLadden, "speed": (velMin + velMax) / 2, "cells": []}
             for w in range(0, len(windF) - 1):
                 for s in range(0, len(swellH) - 1):
                     ladenDt7_8 = []
@@ -6746,8 +6821,10 @@ class BaseProfileGenerator:
                             elif s == 0 and w == 0:
                                 cellValue = round(centralMean + windDirWeights[i], 2)
                             elif s == 0 and w > 0:
-                                cellValue = round(centralMean + windForceWeights[w] + windDirWeights[i], 2)
+                                cellValue = round(ladenDt7801[len(ladenDt7801) - 40] + windForceWeights[w] + windDirWeights[i], 2)
                                 # round(ladenDt7801[lastLenLadenDt7801 - (39-((i-1 if i < 5 else i-2) ))] + windForceWeights[w] + windDirWeights[i], 2)
+                            item = {"windBFT": w + 1, "windDir": i + 1, "swell": s + 1, "cons": cellValue}
+                            outerItem['cells'].append(item)
                         ladenDt7_8.append(cellValue)
                         ladenDt7801.append(cellValue)
                     lastLenDt_8 = len(ladenDt7_8)
@@ -6760,11 +6837,15 @@ class BaseProfileGenerator:
                         except:
                             print("Exception")
 
+            ladenSPEED2 = ladenDt7_8
+            json_decoded['ConsumptionProfile'].append(outerItem)
+
             velMin = 9.25
             velMax = 9.75
 
+            windDirWeights = weightsWD911
             swellHeightWeights = weightsSWH911
-
+            #windForceWeights = [0, 0.35, 0.55, 0.75, 0.85, 1.25, 1.35, 1.45, 1.55]
             #FocCentral = np.array([k for k in ladenDt if
                                    #k[5] >= velMin and k[5] <= velMax and k[8] > 0])[:, 8]
 
@@ -6789,7 +6870,7 @@ class BaseProfileGenerator:
             swellH = [0, 1, 2, 3, 4, 5, 6, 7, 8]
             column = ['B', 'C', 'D', 'E', 'F', 'G', 'H', 'I']
             ladenDt7801 = []
-            numberOfApp11_8 = []
+            outerItem = {"draft": meanDraftLadden, "speed": (velMin + velMax) / 2, "cells": []}
             for w in range(0, len(windF) - 1):
                 for s in range(0, len(swellH) - 1):
                     ladenDt7_8 = []
@@ -6835,8 +6916,11 @@ class BaseProfileGenerator:
                             elif s == 0 and w == 0:
                                 cellValue = round(centralMean + windDirWeights[i], 2)
                             elif s == 0 and w > 0:
-                                cellValue = round(centralMean + windForceWeights[w] + windDirWeights[i], 2)
+                                cellValue = round(ladenDt7801[len(ladenDt7801) - 40]  + windForceWeights[w] + windDirWeights[i], 2)
                                 # round(ladenDt7801[lastLenLadenDt7801 - (39-((i-1 if i < 5 else i-2) ))] + windForceWeights[w] + windDirWeights[i], 2)
+                            item = {"windBFT": w + 1, "windDir": i + 1, "swell": s + 1, "cons": cellValue}
+                            outerItem['cells'].append(item)
+
                         ladenDt7_8.append(cellValue)
                         ladenDt7801.append(cellValue)
                     lastLenDt_8 = len(ladenDt7_8)
@@ -6848,6 +6932,9 @@ class BaseProfileGenerator:
                                 horizontal='right')
                         except:
                             print("Exception")
+
+            ladenSPEED3 = ladenDt7_8
+            json_decoded['ConsumptionProfile'].append(outerItem)
 
             velMin = 9.75
             velMax = 10.25
@@ -6876,7 +6963,7 @@ class BaseProfileGenerator:
             swellH = [0, 1, 2, 3, 4, 5, 6, 7, 8]
             column = ['B', 'C', 'D', 'E', 'F', 'G', 'H', 'I']
             ladenDt7801 = []
-            numberOfApp11_8 = []
+            outerItem = {"draft": meanDraftLadden, "speed": (velMin + velMax) / 2, "cells": []}
             for w in range(0, len(windF) - 1):
                 for s in range(0, len(swellH) - 1):
                     ladenDt7_8 = []
@@ -6923,8 +7010,11 @@ class BaseProfileGenerator:
                             elif s == 0 and w == 0:
                                 cellValue = round(centralMean + windDirWeights[i], 2)
                             elif s == 0 and w > 0:
-                                cellValue = round(centralMean + windForceWeights[w] + windDirWeights[i], 2)
+                                cellValue = round(ladenDt7801[len(ladenDt7801) - 40]  + windForceWeights[w] + windDirWeights[i], 2)
                                 # round(ladenDt7801[lastLenLadenDt7801 - (39-((i-1 if i < 5 else i-2) ))] + windForceWeights[w] + windDirWeights[i], 2)
+                            item = {"windBFT": w + 1, "windDir": i + 1, "swell": s + 1, "cons": cellValue}
+                            outerItem['cells'].append(item)
+
                         ladenDt7_8.append(cellValue)
                         ladenDt7801.append(cellValue)
                     lastLenDt_8 = len(ladenDt7_8)
@@ -6936,6 +7026,9 @@ class BaseProfileGenerator:
                                 horizontal='right')
                         except:
                             print("Exception")
+
+            json_decoded['ConsumptionProfile'].append(outerItem)
+            ladenSPEED4 = ladenDt7_8
 
             velMin = 10.25
             velMax = 10.75
@@ -6964,7 +7057,7 @@ class BaseProfileGenerator:
             swellH = [0, 1, 2, 3, 4, 5, 6, 7, 8]
             column = ['B', 'C', 'D', 'E', 'F', 'G', 'H', 'I']
             ladenDt7801 = []
-            numberOfApp11_8 = []
+            outerItem = {"draft": meanDraftLadden, "speed": (velMin + velMax) / 2, "cells": []}
             for w in range(0, len(windF) - 1):
                 for s in range(0, len(swellH) - 1):
                     ladenDt7_8 = []
@@ -7011,8 +7104,11 @@ class BaseProfileGenerator:
                             elif s == 0 and w == 0:
                                 cellValue = round(centralMean + windDirWeights[i], 2)
                             elif s == 0 and w > 0:
-                                cellValue = round(centralMean + windForceWeights[w] + windDirWeights[i], 2)
+                                cellValue = round(ladenDt7801[len(ladenDt7801) - 40]  + windForceWeights[w] + windDirWeights[i], 2)
                                 # round(ladenDt7801[lastLenLadenDt7801 - (39-((i-1 if i < 5 else i-2) ))] + windForceWeights[w] + windDirWeights[i], 2)
+                            item = {"windBFT": w + 1, "windDir": i + 1, "swell": s + 1, "cons": cellValue}
+                            outerItem['cells'].append(item)
+
                         ladenDt7_8.append(cellValue)
                         ladenDt7801.append(cellValue)
                     lastLenDt_8 = len(ladenDt7_8)
@@ -7024,6 +7120,9 @@ class BaseProfileGenerator:
                                 horizontal='right')
                         except:
                             print("Exception")
+
+            json_decoded['ConsumptionProfile'].append(outerItem)
+            ladenSPEED5= ladenDt7_8
 
             velMin = 10.75
             velMax = 11.25
@@ -7054,7 +7153,7 @@ class BaseProfileGenerator:
             swellH = [0, 1, 2, 3, 4, 5, 6, 7, 8]
             column = ['B', 'C', 'D', 'E', 'F', 'G', 'H', 'I']
             ladenDt7801 = []
-            numberOfApp11_8 = []
+            outerItem = {"draft": meanDraftLadden, "speed": (velMin + velMax) / 2, "cells": []}
             for w in range(0, len(windF) - 1):
                 for s in range(0, len(swellH) - 1):
                     ladenDt7_8 = []
@@ -7101,8 +7200,11 @@ class BaseProfileGenerator:
                             elif s == 0 and w == 0:
                                 cellValue = round(centralMean + windDirWeights[i], 2)
                             elif s == 0 and w > 0:
-                                cellValue = round(centralMean + windForceWeights[w] + windDirWeights[i], 2)
+                                cellValue = round(ladenDt7801[len(ladenDt7801) - 40] + windForceWeights[w] + windDirWeights[i], 2)
                                 # round(ladenDt7801[lastLenLadenDt7801 - (39-((i-1 if i < 5 else i-2) ))] + windForceWeights[w] + windDirWeights[i], 2)
+                            item = {"windBFT": w + 1, "windDir": i + 1, "swell": s + 1, "cons": cellValue}
+                            outerItem['cells'].append(item)
+
                         ladenDt7_8.append(cellValue)
                         ladenDt7801.append(cellValue)
                     lastLenDt_8 = len(ladenDt7_8)
@@ -7115,10 +7217,15 @@ class BaseProfileGenerator:
                         except:
                             print("Exception")
 
+            json_decoded['ConsumptionProfile'].append(outerItem)
+            ladenSPEED6 = ladenDt7_8
+
+
             velMin = 11.25
             velMax = 11.75
             swellHeightWeights = weightsSWH1114
-
+            windDirWeights = weightsWD1114
+            #windForceWeights = [0, 0.35, 0.55, 0.75, 0.85, 1.25, 1.35, 1.45, 1.55]
             #FocCentral = np.array([k for k in ladenDt if
                                    #k[5] >= velMin and k[5] <= velMax and k[8] > 0])[:, 8]
 
@@ -7143,7 +7250,7 @@ class BaseProfileGenerator:
             swellH = [0, 1, 2, 3, 4, 5, 6, 7, 8]
             column = ['B', 'C', 'D', 'E', 'F', 'G', 'H', 'I']
             ladenDt7801 = []
-            numberOfApp11_8 = []
+            outerItem = {"draft": meanDraftLadden, "speed": (velMin + velMax) / 2, "cells": []}
             for w in range(0, len(windF) - 1):
                 for s in range(0, len(swellH) - 1):
                     ladenDt7_8 = []
@@ -7190,8 +7297,10 @@ class BaseProfileGenerator:
                             elif s == 0 and w == 0:
                                 cellValue = round(centralMean + windDirWeights[i], 2)
                             elif s == 0 and w > 0:
-                                cellValue = round(centralMean + windForceWeights[w] + windDirWeights[i], 2)
+                                cellValue = round(ladenDt7801[len(ladenDt7801) - 40]  + windForceWeights[w] + windDirWeights[i], 2)
                                 # round(ladenDt7801[lastLenLadenDt7801 - (39-((i-1 if i < 5 else i-2) ))] + windForceWeights[w] + windDirWeights[i], 2)
+                            item = {"windBFT": w + 1, "windDir": i + 1, "swell": s + 1, "cons": cellValue}
+                            outerItem['cells'].append(item)
                         ladenDt7_8.append(cellValue)
                         ladenDt7801.append(cellValue)
                     lastLenDt_8 = len(ladenDt7_8)
@@ -7203,6 +7312,9 @@ class BaseProfileGenerator:
                                 horizontal='right')
                         except:
                             print("Exception")
+
+            json_decoded['ConsumptionProfile'].append(outerItem)
+            ladenSPEED7 = ladenDt7_8
 
             velMin = 12.25
             velMax = 12.75
@@ -7231,7 +7343,7 @@ class BaseProfileGenerator:
             swellH = [0, 1, 2, 3, 4, 5, 6, 7, 8]
             column = ['B', 'C', 'D', 'E', 'F', 'G', 'H', 'I']
             ladenDt7801 = []
-            numberOfApp11_8 = []
+            outerItem = {"draft": meanDraftLadden, "speed": (velMin + velMax) / 2, "cells": []}
             for w in range(0, len(windF) - 1):
                 for s in range(0, len(swellH) - 1):
                     ladenDt7_8 = []
@@ -7278,8 +7390,11 @@ class BaseProfileGenerator:
                             elif s == 0 and w == 0:
                                 cellValue = round(centralMean + windDirWeights[i], 2)
                             elif s == 0 and w > 0:
-                                cellValue = round(centralMean + windForceWeights[w] + windDirWeights[i], 2)
+                                cellValue = round(ladenDt7801[len(ladenDt7801) - 40]  + windForceWeights[w] + windDirWeights[i], 2)
                                 # round(ladenDt7801[lastLenLadenDt7801 - (39-((i-1 if i < 5 else i-2) ))] + windForceWeights[w] + windDirWeights[i], 2)
+                            item = {"windBFT": w + 1, "windDir": i + 1, "swell": s + 1, "cons": cellValue}
+                            outerItem['cells'].append(item)
+
                         ladenDt7_8.append(cellValue)
                         ladenDt7801.append(cellValue)
                     lastLenDt_8 = len(ladenDt7_8)
@@ -7291,6 +7406,9 @@ class BaseProfileGenerator:
                                 horizontal='right')
                         except:
                             print("Exception")
+
+            json_decoded['ConsumptionProfile'].append(outerItem)
+            ladenSPEED8 = ladenDt7_8
 
             velMin = 12.75
             velMax = 13.25
@@ -7319,7 +7437,7 @@ class BaseProfileGenerator:
             swellH = [0, 1, 2, 3, 4, 5, 6, 7, 8]
             column = ['B', 'C', 'D', 'E', 'F', 'G', 'H', 'I']
             ladenDt7801 = []
-            numberOfApp11_8 = []
+            outerItem = {"draft": meanDraftLadden, "speed": (velMin + velMax) / 2, "cells": []}
             for w in range(0, len(windF) - 1):
                 for s in range(0, len(swellH) - 1):
                     ladenDt7_8 = []
@@ -7366,8 +7484,10 @@ class BaseProfileGenerator:
                             elif s == 0 and w == 0:
                                 cellValue = round(centralMean + windDirWeights[i], 2)
                             elif s == 0 and w > 0:
-                                cellValue = round(centralMean + windForceWeights[w] + windDirWeights[i], 2)
+                                cellValue = round(ladenDt7801[len(ladenDt7801) - 40]  + windForceWeights[w] + windDirWeights[i], 2)
                                 # round(ladenDt7801[lastLenLadenDt7801 - (39-((i-1 if i < 5 else i-2) ))] + windForceWeights[w] + windDirWeights[i], 2)
+                            item = {"windBFT": w + 1, "windDir": i + 1, "swell": s + 1, "cons": cellValue}
+                            outerItem['cells'].append(item)
                         ladenDt7_8.append(cellValue)
                         ladenDt7801.append(cellValue)
                     lastLenDt_8 = len(ladenDt7_8)
@@ -7379,6 +7499,9 @@ class BaseProfileGenerator:
                                 horizontal='right')
                         except:
                             print("Exception")
+
+            json_decoded['ConsumptionProfile'].append(outerItem)
+            ladenSPEED9 = ladenDt7_8
 
             velMin = 13.25
             velMax = 13.75
@@ -7407,7 +7530,7 @@ class BaseProfileGenerator:
             swellH = [0, 1, 2, 3, 4, 5, 6, 7, 8]
             column = ['B', 'C', 'D', 'E', 'F', 'G', 'H', 'I']
             ladenDt7801 = []
-            numberOfApp11_8 = []
+            outerItem = {"draft": meanDraftLadden, "speed": (velMin + velMax) / 2, "cells": []}
             for w in range(0, len(windF) - 1):
                 for s in range(0, len(swellH) - 1):
                     ladenDt7_8 = []
@@ -7454,8 +7577,11 @@ class BaseProfileGenerator:
                             elif s == 0 and w == 0:
                                 cellValue = round(centralMean + windDirWeights[i], 2)
                             elif s == 0 and w > 0:
-                                cellValue = round(centralMean + windForceWeights[w] + windDirWeights[i], 2)
+                                cellValue = round(ladenDt7801[len(ladenDt7801) - 40]  + windForceWeights[w] + windDirWeights[i], 2)
                                 # round(ladenDt7801[lastLenLadenDt7801 - (39-((i-1 if i < 5 else i-2) ))] + windForceWeights[w] + windDirWeights[i], 2)
+                            item = {"windBFT": w + 1, "windDir": i + 1, "swell": s + 1, "cons": cellValue}
+                            outerItem['cells'].append(item)
+
                         ladenDt7_8.append(cellValue)
                         ladenDt7801.append(cellValue)
                     lastLenDt_8 = len(ladenDt7_8)
@@ -7468,8 +7594,11 @@ class BaseProfileGenerator:
                         except:
                             print("Exception")
 
+            json_decoded['ConsumptionProfile'].append(outerItem)
+            ladenSPEED11 = ladenDt7_8
+
             velMin = 13.75
-            velMax = 14.75
+            velMax = 14.25
 
             #FocCentral = np.array([k for k in ladenDt if
                                    #k[5] >= velMin and k[5] <= velMax and k[8] > 0])[:, 8]
@@ -7495,7 +7624,7 @@ class BaseProfileGenerator:
             swellH = [0, 1, 2, 3, 4, 5, 6, 7, 8]
             column = ['B', 'C', 'D', 'E', 'F', 'G', 'H', 'I']
             ladenDt7801 = []
-            numberOfApp11_8 = []
+            outerItem = {"draft": meanDraftLadden, "speed": (velMin + velMax) / 2, "cells": []}
             for w in range(0, len(windF) - 1):
                 for s in range(0, len(swellH) - 1):
                     ladenDt7_8 = []
@@ -7542,8 +7671,11 @@ class BaseProfileGenerator:
                             elif s == 0 and w == 0:
                                 cellValue = round(centralMean + windDirWeights[i], 2)
                             elif s == 0 and w > 0:
-                                cellValue = round(centralMean + windForceWeights[w] + windDirWeights[i], 2)
+                                cellValue = round(ladenDt7801[len(ladenDt7801) - 40]  + windForceWeights[w] + windDirWeights[i], 2)
                                 # round(ladenDt7801[lastLenLadenDt7801 - (39-((i-1 if i < 5 else i-2) ))] + windForceWeights[w] + windDirWeights[i], 2)
+                            item = {"windBFT": w + 1, "windDir": i + 1, "swell": s + 1, "cons": cellValue}
+                            outerItem['cells'].append(item)
+
                         ladenDt7_8.append(cellValue)
                         ladenDt7801.append(cellValue)
                     lastLenDt_8 = len(ladenDt7_8)
@@ -7555,6 +7687,13 @@ class BaseProfileGenerator:
                                 horizontal='right')
                         except:
                             print("Exception")
+
+            json_decoded['ConsumptionProfile'].append(outerItem)
+            ladenSPEEDMax = ladenDt7_8
+
+
+            with open('./consProfile.json', 'w') as json_file:
+                json.dump(json_decoded, json_file)
 
         workbook.save(filename=pathToexcel.split('.')[0] + '_1.' + pathToexcel.split('.')[1])
         return

@@ -570,7 +570,7 @@ class BaseSeriesReader:
                     day = '0' + day if day.__len__() == 1 else day
                     newDate = year + '-' + month + '-' + day
                     newDate1 = year + '-' + month + '-' + day + " " + ":".join(hhMMss.split(":")[0:2])
-                    print(str(newDate1))
+                    #print(str(newDate1))
                     telegramRow = np.array([row for row in telegrams if str(row[0]).split(" ")[0] == newDate])
                     foc = newDataSet[i, 8]
 
@@ -1653,7 +1653,6 @@ class BaseSeriesReader:
 
 
         return windSpeed ,relWindDir ,swellSWH, relSwelldir , wavesSWH , relWavesdDir ,combSWH , relCombWavesdDir
-
 
     def readExtractNewDataset(self, company,vessel,pathToexcel,separator=None):
         ####################

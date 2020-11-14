@@ -692,6 +692,7 @@ class TensorFlowW1(BasePartitionModeler):
 
             #model.add(keras.layers.Dense(2 + genModelKnots-1, input_shape=(2,)))
             model.add(keras.layers.Dense(genModelKnots - 1, input_shape=(2,)))
+
             #model.add(keras.layers.Dense(genModelKnots - 1, input_shape=(2,)))
 
             #model.add(keras.layers.Dense(2))
@@ -1865,7 +1866,7 @@ class TensorFlowW(BasePartitionModeler):
             vector = extractFunctionsFromSplines(X[i][0],X[i][1])
 
             #vectorNew = np.array(self.intercepts) * vector
-            #vectorNew = np.array([i + self.interceptsGen for i in vectorNew])
+            #vectorNew = np.array([i + self.interceptsGen for i in vector])
 
             XSplineVector.append(np.append(X[i],vector))
 
@@ -1905,7 +1906,7 @@ class TensorFlowW(BasePartitionModeler):
                         vector = extractFunctionsFromSplines(partitionsX[idx][ i ][ 0 ], partitionsX[idx][ i ][ 1 ])
 
                         #vectorNew = np.array(self.intercepts) * vector
-                        #vectorNew = np.array([i + self.interceptsGen for i in vectorNew])
+                        #vectorNew = np.array([i + self.interceptsGen for i in vector])
 
                         XSplineClusterVector.append(np.append(partitionsX[idx][i], vector))
 
@@ -1920,7 +1921,9 @@ class TensorFlowW(BasePartitionModeler):
                     #estimatorCl.add(keras.layers.LSTM(2 + numOfNeurons -1 ,input_shape=(2+numOfNeurons-1,1)))
                     estimatorCl.add(keras.layers.Dense(2 + numOfNeurons - 1, input_shape=(2 + numOfNeurons - 1, )))
                     estimatorCl.add(keras.layers.Dense(numOfNeurons - 1,))
-                    #estimatorCl.add(keras.layers.Dense(2))
+                    #estimatorCl.add(keras.layers.Dense(numOfNeurons - 1, ))
+                    #estimatorCl.add(keras.layers.Dense(numOfNeurons - 1, ))
+                    estimatorCl.add(keras.layers.Dense(2))
                     estimatorCl.add(keras.layers.Dense(1, ))
                     estimatorCl.compile(loss=keras.losses.mean_squared_error, optimizer=keras.optimizers.Adam(), )
                     #try:
@@ -1959,7 +1962,9 @@ class TensorFlowW(BasePartitionModeler):
         trainedWeights=None
         estimatorW = keras.models.Sequential()
         estimatorW.add(keras.layers.Dense(len(partition_labels)+1, input_shape=(len(partition_labels)+1,)))
-        #estimatorW.add(keras.layers.Dense(len(partition_labels) + 1,))
+        #estimatorW.add(keras.layers.Dense(len(partition_labels) ,))
+        #estimatorW.add(keras.layers.Dense(len(partition_labels)-1, ))
+        #estimatorW.add(keras.layers.Dense(len(partition_labels) - 2, ))
         estimatorW.add(keras.layers.Dense(1, ))
         estimatorW.compile(loss=custom_loss, optimizer=keras.optimizers.Adam(), )
         if len(partition_labels) > 1:
@@ -2032,21 +2037,20 @@ class TensorFlowWLSTM(BasePartitionModeler):
         # Init model to partition map
         self._partitionsPerModel = {}
 
-        n_steps =5
+        n_steps =1
         def baseline_model():
             #create model
             model = keras.models.Sequential()
 
 
-
             #model.add(keras.layers.Dense(2+genModelKnots-1, input_shape=(2+genModelKnots-1,)))
             model.add(keras.layers.LSTM(2+genModelKnots - 1, input_shape=(n_steps,2+genModelKnots - 1)))
 
-            model.add(keras.layers.Dense(genModelKnots - 1,))
+            #model.add(keras.layers.Dense(genModelKnots - 1,))
             #model.add(keras.layers.Dense(genModelKnots - 2, ))
             #model.add(keras.layers.Dense(genModelKnots - 3, ))
                                          #
-            #model.add(keras.layers.Dense(5, ))
+            model.add(keras.layers.Dense(5, ))
             model.add(keras.layers.Dense(2, ))
 
             model.add(keras.layers.Dense(1,))
@@ -3687,7 +3691,7 @@ class TensorFlowWLSTM2(BasePartitionModeler):
         # Init model to partition map
         self._partitionsPerModel = {}
 
-        n_steps=5
+        n_steps=15
         def baseline_model():
             #create model
             model = keras.models.Sequential()
@@ -3699,7 +3703,7 @@ class TensorFlowWLSTM2(BasePartitionModeler):
             #model.add(keras.layers.Dense(genModelKnots - 2, ))
             #model.add(keras.layers.Dense(genModelKnots - 3, ))
                                          #
-            #model.add(keras.layers.Dense(5, ))
+            model.add(keras.layers.Dense(5, ))
             model.add(keras.layers.Dense(2, ))
 
             model.add(keras.layers.Dense(1,))

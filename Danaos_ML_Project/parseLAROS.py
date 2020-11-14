@@ -3,7 +3,7 @@ from datetime import datetime
 import numpy as np
 import csv
 
-data = pd.read_csv('./data/DANAOS/ZIM LUANDA/luanda.csv', delimiter=',', skiprows=0)
+data = pd.read_csv('./data/LAROS/leo_c.csv', delimiter=',', skiprows=0)
 
 # data = data.drop(["blFlags"], axis=1)
 # data = data.drop(["wind_speed", "wind_dir","trim"], axis=1)
@@ -13,22 +13,25 @@ data = pd.read_csv('./data/DANAOS/ZIM LUANDA/luanda.csv', delimiter=',', skiprow
 # y_train = pd.DataFrame({
 # 'FOC': foc,
 # })
-vslHeading = data['RudderAngle'].values
+
+vslHeading = data['TrueHeading'].values
 for i in range(0,len(vslHeading)):
     if vslHeading[i]<0:
         vslHeading[i]=vslHeading[i]+180
+
+emptyColumn = np.array([0] * len(vslHeading)).reshape(-1)
 data = np.append(data['ttime'].values.reshape(-1, 1),
                  np.asmatrix([
                      vslHeading,
                      data['Latitude'].values,
                      data['Longitude'].values,
                      data['WindAngle'].values,
-                     data['Wind Speed (m/s) '].values,
-                     data['STW'].values,
-                     (data['DraftAfter'].values + data['DraftFore'].values) / 2,
-                     data['M/EFOFlow'].values,
+                     data['WindSpeed'].values,
+                     data['SpeedOverGroundKnots'].values,
+                     (emptyColumn) / 2,
+                     ((data['ME FO flow (lt/min)'].values * 790 ) / 1000000 )* 1440,
                  ]).T, axis=1)
-
+#data['DraftAfter'].values + data['DraftFore'].values) / 2
 # data = pd.read_csv(sFile, delimiter=';')
 # data = data.drop(["wind_speed", "wind_dir"], axis=1)
 # data = data[data['stw']>7].values
@@ -37,8 +40,8 @@ data = np.array(data)  # .astype(float)
 ##################################################
 trData = data
 company = 'DANAOS'
-vessel = 'ZIM LUANDA'
-with open('./data/' + company + '/' + vessel + '/ZIM_LUANDAdata.csv', mode='w') as data:
+vessel = 'LEO C'
+with open('./data/' + company + '/' + vessel + '/LEO_Cdata.csv', mode='w') as data:
     data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
     for i in range(0, len(trData)):
         data_writer.writerow(
@@ -48,8 +51,8 @@ with open('./data/' + company + '/' + vessel + '/ZIM_LUANDAdata.csv', mode='w') 
 
 
 '''dictionary = pd.read_excel("/home/dimitris/Downloads/LarosMap.xlsx")
-dictionary = dictionary[dictionary["SITE_ID"]==341][["STATUS_PARAMETER_ID","NAME"]]
-l = pd.read_csv("/home/dimitris/Desktop/LUANDA.csv",names=["id","sensor","ship_id","txt","bin","value","time"])[["sensor","time","value"]]
+dictionary = dictionary[dictionary["SITE_ID"]==359][["STATUS_PARAMETER_ID","NAME"]]
+l = pd.read_csv("/home/dimitris/Desktop/LEO_C.csv",names=["id","sensor","ship_id","txt","bin","value","time"])[["sensor","time","value"]]
 l["ttime"] = list(map(lambda x: datetime.strptime(x, '%Y-%m-%d %H:%M:%S.%f').replace(second=0, microsecond=0), l["time"]))
 l = l.drop(columns=["time"])
 ll = l.groupby(["ttime","sensor"])["value"].mean().reset_index()
@@ -66,7 +69,7 @@ col_names = pd.merge(helper, dictionary, how='left', on=['STATUS_PARAMETER_ID'])
 #change of column names:
 vector.columns = list(col_names["NAME"])
 dvector = pd.concat([dates,vector],axis=1, sort=False)
-dvector.to_csv('./data/LAROS/luanda.csv', index=False)'''
+dvector.to_csv('./data/LAROS/leo_c.csv', index=False)'''
 
 
 '''company = 'DANAOS'

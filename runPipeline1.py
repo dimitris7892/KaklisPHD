@@ -46,7 +46,44 @@ def main():
     #plotRes.computeMeansStd()
     #plotRes.generateGraphVRPM()
 
-    ####
+
+    '''results={}
+    dataset = 0
+    results['EstimatorResults'] = []
+    #outerItem = {"estimator": , "speed": (velMin + velMax) / 2, "cells": []}
+    dataRes = pd.read_csv('/home/dimitris/Desktop/dkaklis/NEWres_4.csv').values
+    for i in range(0,len(dataRes)):
+        if (i % 33 ==0 and i > 0) :
+            dataset =dataset+1
+        cluster = dataRes[i][0]
+        error = dataRes[i][1]
+        est = dataRes[i][2]
+        item = {"dataset":dataset,"estimator":est, "error": float(error), "cluster": int(cluster)}
+        results['EstimatorResults'].append(item)
+
+    minErrors=[]
+    minClusters=[]
+    for i in range(0,5):
+        listOfDict = [k for k in results['EstimatorResults'] if k['dataset'] == i and k['estimator'] == 'TensorFlowCA' and k['cluster']==1]
+        listOfErrors = [x['error'] for x in listOfDict]
+        listOfClusters = [x['cluster'] for x in listOfDict]
+        minIndex = listOfErrors.index(min([x['error'] for x in listOfDict]))
+        minErrors.append(listOfErrors[minIndex])
+        minClusters.append(listOfClusters[minIndex])
+        ####
+
+    meanError = np.mean(minErrors)
+    stdError =np.std(minErrors)
+    print("Mean absolute error on unseen data: %4.2f (+/- %4.2f standard error)" % (meanError, stdError / sqrt(len(minErrors))))
+
+    listOfDict = [k for k in results['EstimatorResults'] if  k['estimator'] == 'TensorFlowWLSTM']
+    listOfErrors1 = [x['error'] for x in listOfDict]
+    print(np.mean(listOfErrors))
+
+    listOfDict = [k for k in results['EstimatorResults'] if  k['estimator'] == 'TensorFlowWLSTM2']
+    listOfErrors2 = [x['error'] for x in listOfDict]
+    print(np.mean(listOfErrors))'''
+
     num_lines = sum(1 for l in open(sFile))
     num_linesx = num_lines
 
@@ -144,8 +181,8 @@ def main():
 
     K = range(1,12)
     print("Number of Statistically ind. subsets for training: " + str(len(subsetsX)))
-    subsetsX=[subsetsX[0:5]] if len(subsetsX) > 5 else subsetsX
-    subsetsY = [ subsetsY[ 0:5 ] ] if len(subsetsY) > 5 else subsetsY
+    subsetsX=[subsetsX[0:5]] if len(subsetsX) > 5 else [subsetsX[4]]
+    subsetsY = [ subsetsY[ 0:5 ] ] if len(subsetsY) > 5 else [subsetsY[4]]
     #K=[10]
     subsetsCounter=0
 
@@ -163,7 +200,7 @@ def main():
            if modeler.__class__.__name__ == 'TriInterpolantModeler' or modeler.__class__.__name__ == 'TensorFlow':
                 t=0
            if partitioner.__class__.__name__=='DelaunayTriPartitioner':
-                 partK=np.linspace(0.1,1,12)#[0.5]
+                 partK=np.linspace(0.08,1.2,11)#[0.5]
 
            elif partitioner.__class__.__name__=='KMeansPartitioner':
                if modeler.__class__.__name__=='TriInterpolantModeler' or modeler.__class__.__name__ == 'TensorFlow':
@@ -423,7 +460,7 @@ def initParameters():
     startU = 30000
     endU = 31000
 
-    algs=['NNW','NNW1','NNWCA','NNWLSTM','NNWLSTM2']
+    algs=['NNW1','NNWCA']
         #`['SR','LR','RF','NNW','NNW1','NNWCA','NNWE','NNWLSTM','NNWLSTM2']`
     #algs= ['SR','LR','RF','NNW','NNW1','NNWCA','NNWE','NNWLSTM']
         #['SR','LR','RF','NNW','NNW1','NNWCA','TRI']
@@ -431,7 +468,7 @@ def initParameters():
 
 
         #['SR','LR','RF','NN','NNW','TRI']
-    cls=['KM','DC']
+    cls=['DC']
         #['KM','DC','NNCL']
     #['SR','LR','RF','NN'] algs
     #['KM','DC'] clusterers / cls

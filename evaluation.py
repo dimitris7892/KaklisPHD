@@ -1533,7 +1533,7 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
                     # XSplineVector = XSplineVector.reshape(-1, XSplineVector.shape[ 0 ])
 
                     #XSplinevectorNew = np.array(self.intercepts) * vector
-                    #XSplinevectorNew = np.array([i + self.interceptsGen for i in XSplinevectorNew])
+                    #XSplinevectorNew = np.array([i + self.interceptsGen for i in vector])
 
                     XSplinevectorNew = np.append(pPoint, vector)
                     XSplinevectorNew = XSplinevectorNew.reshape(-1, XSplinevectorNew.shape[0])
@@ -1601,7 +1601,7 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
                     data_writer.writerow(
                         [errorStwArr[i][0], errorStwArr[i][1]])
         else:
-            with open('./TESTerrorPercRPMxiNN' + str(len(partitionsX)) + '_' + str(0) + '.csv',
+            with open('./testError/TESTerrorPercRPMxiNN' + str(len(partitionsX)) + '_' + str(0) + '.csv',
                       mode='w') as data:
                 data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
                 data_writer.writerow(
@@ -1670,7 +1670,7 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
 
         raw_seq = np.array(XSplineGenvectorNews)
 
-        n_steps = 5
+        n_steps = 1
         # split into samples
         unseenXlstm, unseenYlstm = split_sequence(raw_seq, n_steps)
 
@@ -1752,7 +1752,7 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
                     data_writer.writerow(
                         [errorStwArr[i][0], errorStwArr[i][1]])
         else:
-            with open('./TESTerrorPercRPMxiLSTM' + str(len(partitionsX)) + '_' + str(0) + '.csv',
+            with open('./testError//TESTerrorPercRPMxiLSTM' + str(len(partitionsX)) + '_' + str(0) + '.csv',
                       mode='w') as data:
                 data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
                 data_writer.writerow(
@@ -1894,7 +1894,7 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
 
         raw_seq = np.array(unseenX)
 
-        n_steps = 5
+        n_steps = 15
         # split into samples
         unseenXlstm, unseenYlstm = split_sequence(raw_seq, n_steps)
 
@@ -1904,7 +1904,7 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
             #pPoint = pPoint.reshape(-1, unseenX.shape[1])
 
             # try:
-            trueVal = unseenY[iCnt]
+            trueVal = unseenYlstm[iCnt]
 
             ind, fit = modeler.getBestPartitionForPoint(pPoint, partitionsX)
 
@@ -1949,7 +1949,7 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
                     data_writer.writerow(
                         [errorStwArr[i][0], errorStwArr[i][1]])
         else:
-            with open('./TESTerrorPercRPMLSTM' + str(len(partitionsX)) + '_' + str(0) + '.csv',
+            with open('./testError//TESTerrorPercRPMLSTM' + str(len(partitionsX)) + '_' + str(0) + '.csv',
                       mode='w') as data:
                 data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
                 data_writer.writerow(

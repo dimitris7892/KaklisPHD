@@ -191,10 +191,10 @@ def main():
 
 
     
-    DANreader.GenericParserForDataExtraction('LEMAG', 'DANAOS', 'ZIM LUANDA', driver='ORACLE',
+    DANreader.GenericParserForDataExtraction('LEMAG', 'DANAOS', 'LEO C', driver='ORACLE',
                                              server='10.2.5.80',
                                              sid='OR12', usr='shipping', password='shipping',
-                                             rawData=True, telegrams=True, companyTelegrams=False,
+                                                 rawData=True, telegrams=True, companyTelegrams=False,
                                              pathOfRawData='/home/dimitris/Desktop/SEEAMAG')
     #trData = np.array(np.append(data[:,1].reshape(-1,1),np.asmatrix([data[:,2],data[:,3],data[:,4],data[:,12],data[:,13],data[:,7],data[:,5]]).T,axis=1))
     #y_train = np.array(np.mean(data[:,5:6],axis=1))
