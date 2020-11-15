@@ -136,7 +136,7 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
         flagedVertices=[]
         '''DELETE ALL TRIANGLES WITH CORRESPONDING VARIANCE OF RPM of their points belonging in their adjacency list BIGGER  THAN A PREDEFINED TRESHOLD = > MORE stable triangulation'''
         '''????'''
-        '''for i in range(0, len(dataXnew)):
+        for i in range(0, len(dataXnew)):
             simplex = triNew.find_simplex(dataXnew[ i ])
             # for k in range(0, len(triNew.vertices)):
             k = triNew.vertices[ simplex ]
@@ -184,10 +184,10 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
 
                     else:
                         if (dataXnew[ i ] == V3).all() == True:
-                            delIndexes.append(i)'''
+                            delIndexes.append(i)
         ##################################3
-        #dataXnew = np.delete(dataXnew,delIndexes,axis=0)
-        #dataYnew = np.delete(dataYnew, delIndexes)
+        dataXnew = np.delete(dataXnew,delIndexes,axis=0)
+        dataYnew = np.delete(dataYnew, delIndexes)
         '''END OF PRE - PROCESSING STEP'''
 
 
@@ -364,7 +364,7 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
 
                     if len(vs) < 3:
                         flgV = True
-                        vs.append([np.array([0,0])])
+                        vs.append(np.array([0,0]))
 
                     v12 = vs[0][0]
                     v23 = vs[1][0]
@@ -446,8 +446,8 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
                         predictions.append(ypredS)
                         yTrue.append(trueVal)
 
-                    except :
-                        #print(str(e))
+                    except Exception as e:
+                        print(str(e))
                         x=0
 
                     #############################
@@ -484,7 +484,7 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
                                 2 * W1 * W2 *rpm12 + 2 * W2 * W3 * rpm23 + 2 * W1 * W3 * rpm31
 
 
-                            if iu in np.arange(0,40):
+                            '''if iu in np.arange(0,40):
                                 plt.clf()
                                 plt.plot(candidatePoint[0], candidatePoint[1], 'o', markersize=10)  ####
 
@@ -841,7 +841,7 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
                                 #ax.set_ylabel(r'\bar{V}_N', fontsize=16)
                                 #ax.set_zlabel(r'RPM', fontsize=16)
 
-                            plt.show()
+                            plt.show()'''
                             #list(neighboringTri1rpm[1]).index([k for k in neighboringTri1rpm[1] if k not in  [rpm1,rpm2,rpm3]  ])
                             x=0
 
@@ -929,49 +929,57 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
                     rpm2 = dataYnew[ triNew.vertices[ k ] ][ 1 ]
                     rpm3 = dataYnew[ triNew.vertices[ k ] ][ 2 ]
 
-                    distV1 = math.sqrt(
+                    b = triNew.transform[k, :2].dot(candidatePoint - triNew.transform[k, 2])
+                    W1 = b[0]
+                    W2 = b[1]
+                    W3 = 1 - np.sum(b)
+                    distFromCenter = np.linalg.norm(np.array([W1,W2,W3])-np.array([1/3,1/3,1/3]))
+
+                    '''distV1 = math.sqrt(
                         math.pow(candidatePoint[ 0 ] - V1[ 0 ], 2) + math.pow(candidatePoint[ 1 ] - V1[ 1 ], 2))
                     distV2 = math.sqrt(
                         math.pow(candidatePoint[ 0 ] - V2[ 0 ], 2) + math.pow(candidatePoint[ 1 ] - V2[ 1 ], 2))
                     distV3 = math.sqrt(
-                        math.pow(candidatePoint[ 0 ] - V3[ 0 ], 2) + math.pow(candidatePoint[ 1 ] - V3[ 1 ], 2))
+                        math.pow(candidatePoint[ 0 ] - V3[ 0 ], 2) + math.pow(candidatePoint[ 1 ] - V3[ 1 ], 2))'''
 
-                    distList.append(np.mean([ distV1, distV2, distV3 ]))
+                    #distList.append(np.mean([ distV1, distV2, distV3 ]))
+                    distList.append(distFromCenter)
 
+                minIndexDist = distList.index(np.min(distList))
                 minIndexDist = distList.index(np.min(distList))
                 k = minIndexDist
                 neighboringVertices1 = [ ]
                 #####################################
                 for u in range(0, 2):
                     try:
-                        neighboringVertices1.append(triNew.vertex_neighbor_vertices[ 1 ][
-                                                    triNew.vertex_neighbor_vertices[ 0 ][
-                                                        triNew.vertices[ k ][ u ] ]:
-                                                    triNew.vertex_neighbor_vertices[ 0 ][
-                                                        triNew.vertices[ k ][ u ] + 1 ] ])
+                        neighboringVertices1.append(triNew.vertex_neighbor_vertices[1][
+                                                    triNew.vertex_neighbor_vertices[0][
+                                                        triNew.vertices[k][u]]:
+                                                    triNew.vertex_neighbor_vertices[0][
+                                                        triNew.vertices[k][u] + 1]])
                     except:
                         break
                     neighboringTri = triNew.vertices[
-                        triNew.find_simplex(dataXnew[ np.concatenate(np.array(neighboringVertices1)) ]) ]
+                        triNew.find_simplex(dataXnew[np.concatenate(np.array(neighboringVertices1))])]
                     # simplex = triNew.vertices[ triNew.find_simplex(
                     # [ dataXnew[ triNew.vertices[ k ] ][ 0 ], dataXnew[ triNew.vertices[ k ] ][ 1 ],
                     # dataXnew[ triNew.vertices[ k ] ][ 2 ] ]) ]
 
                 for s in neighboringTri:
-                    V1 = dataXnew[ s ][ 0 ]
-                    V2 = dataXnew[ s ][ 1 ]
-                    V3 = dataXnew[ s ][ 2 ]
+                    V1 = dataXnew[s][0]
+                    V2 = dataXnew[s][1]
+                    V3 = dataXnew[s][2]
 
-                    rpm1 = dataYnew[ s ][ 0 ]
-                    rpm2 = dataYnew[ s ][ 1 ]
-                    rpm3 = dataYnew[ s ][ 2 ]
+                    rpm1 = dataYnew[s][0]
+                    rpm2 = dataYnew[s][1]
+                    rpm3 = dataYnew[s][2]
 
                     distV1 = math.sqrt(
-                        math.pow(candidatePoint[ 0 ] - V1[ 0 ], 2) + math.pow(candidatePoint[ 1 ] - V1[ 1 ], 2))
+                        math.pow(candidatePoint[0] - V1[0], 2) + math.pow(candidatePoint[1] - V1[1], 2))
                     distV2 = math.sqrt(
-                        math.pow(candidatePoint[ 0 ] - V2[ 0 ], 2) + math.pow(candidatePoint[ 1 ] - V2[ 1 ], 2))
+                        math.pow(candidatePoint[0] - V2[0], 2) + math.pow(candidatePoint[1] - V2[1], 2))
                     distV3 = math.sqrt(
-                        math.pow(candidatePoint[ 0 ] - V3[ 0 ], 2) + math.pow(candidatePoint[ 1 ] - V3[ 1 ], 2))
+                        math.pow(candidatePoint[0] - V3[0], 2) + math.pow(candidatePoint[1] - V3[1], 2))
 
                     W1x = 1 / distV1 if distV1 != 0 else 0
                     W2x = 1 / distV2 if distV2 != 0 else 0
@@ -979,35 +987,35 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
 
                     ##Barycentric coordinates
 
-                    W1 = (V2[ 1 ] - V3[ 1 ]) * (candidatePoint[ 0 ] - V3[ 0 ]) + (V3[ 0 ] - V2[ 0 ]) * (
-                            candidatePoint[ 1 ] - V3[ 1 ]) \
-                         / (V2[ 1 ] - V3[ 1 ]) * (V1[ 0 ] - V3[ 0 ]) + (V3[ 0 ] - V2[ 0 ]) * (V1[ 1 ] - V3[ 1 ])
+                    W1 = (V2[1] - V3[1]) * (candidatePoint[0] - V3[0]) + (V3[0] - V2[0]) * (
+                            candidatePoint[1] - V3[1]) \
+                         / (V2[1] - V3[1]) * (V1[0] - V3[0]) + (V3[0] - V2[0]) * (V1[1] - V3[1])
 
-                    W2 = (V3[ 1 ] - V1[ 1 ]) * (candidatePoint[ 0 ] - V3[ 0 ]) + (V1[ 0 ] - V3[ 0 ]) * (
-                            candidatePoint[ 1 ] - V3[ 1 ]) \
-                         / (V2[ 1 ] - V3[ 1 ]) * (V1[ 0 ] - V3[ 0 ]) + (V3[ 0 ] - V2[ 0 ]) * (V1[ 1 ] - V3[ 1 ])
+                    W2 = (V3[1] - V1[1]) * (candidatePoint[0] - V3[0]) + (V1[0] - V3[0]) * (
+                            candidatePoint[1] - V3[1]) \
+                         / (V2[1] - V3[1]) * (V1[0] - V3[0]) + (V3[0] - V2[0]) * (V1[1] - V3[1])
 
                     W3 = 1 - W1 - W2
                     ##############################################################
                     prediction = (W1 * rpm1 + W2 * rpm2 + W3 * rpm3) / (W1 + W2 + W3)
                     pred1S = (W1x * rpm1 + W2x * rpm2 + W3x * rpm3) / (W1x + W2x + W3x)
                     preds.append(pred1S)
-                #################################################################################
-                #########################################
-                V1 = dataXnew[ triNew.vertices[ k ] ][ 0 ]
-                V2 = dataXnew[ triNew.vertices[ k ] ][ 1 ]
-                V3 = dataXnew[ triNew.vertices[ k ] ][ 2 ]
+                    #################################################################################
+                    #########################################
+                V1 = dataXnew[triNew.vertices[k]][0]
+                V2 = dataXnew[triNew.vertices[k]][1]
+                V3 = dataXnew[triNew.vertices[k]][2]
 
-                rpm1 = dataYnew[ triNew.vertices[ k ] ][ 0 ]
-                rpm2 = dataYnew[ triNew.vertices[ k ] ][ 1 ]
-                rpm3 = dataYnew[ triNew.vertices[ k ] ][ 2 ]
+                rpm1 = dataYnew[triNew.vertices[k]][0]
+                rpm2 = dataYnew[triNew.vertices[k]][1]
+                rpm3 = dataYnew[triNew.vertices[k]][2]
 
                 distV1 = math.sqrt(
-                    math.pow(candidatePoint[ 0 ] - V1[ 0 ], 2) + math.pow(candidatePoint[ 1 ] - V1[ 1 ], 2))
+                    math.pow(candidatePoint[0] - V1[0], 2) + math.pow(candidatePoint[1] - V1[1], 2))
                 distV2 = math.sqrt(
-                    math.pow(candidatePoint[ 0 ] - V2[ 0 ], 2) + math.pow(candidatePoint[ 1 ] - V2[ 1 ], 2))
+                    math.pow(candidatePoint[0] - V2[0], 2) + math.pow(candidatePoint[1] - V2[1], 2))
                 distV3 = math.sqrt(
-                    math.pow(candidatePoint[ 0 ] - V3[ 0 ], 2) + math.pow(candidatePoint[ 1 ] - V3[ 1 ], 2))
+                    math.pow(candidatePoint[0] - V3[0], 2) + math.pow(candidatePoint[1] - V3[1], 2))
 
                 W1x = 1 / distV1 if distV1 != 0 else 0
                 W2x = 1 / distV2 if distV2 != 0 else 0
@@ -1015,13 +1023,13 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
 
                 ##Barycentric coordinates
 
-                W1 = (V2[ 1 ] - V3[ 1 ]) * (candidatePoint[ 0 ] - V3[ 0 ]) + (V3[ 0 ] - V2[ 0 ]) * (
-                        candidatePoint[ 1 ] - V3[ 1 ]) \
-                     / (V2[ 1 ] - V3[ 1 ]) * (V1[ 0 ] - V3[ 0 ]) + (V3[ 0 ] - V2[ 0 ]) * (V1[ 1 ] - V3[ 1 ])
+                W1 = (V2[1] - V3[1]) * (candidatePoint[0] - V3[0]) + (V3[0] - V2[0]) * (
+                        candidatePoint[1] - V3[1]) \
+                     / (V2[1] - V3[1]) * (V1[0] - V3[0]) + (V3[0] - V2[0]) * (V1[1] - V3[1])
 
-                W2 = (V3[ 1 ] - V1[ 1 ]) * (candidatePoint[ 0 ] - V3[ 0 ]) + (V1[ 0 ] - V3[ 0 ]) * (
-                        candidatePoint[ 1 ] - V3[ 1 ]) \
-                     / (V2[ 1 ] - V3[ 1 ]) * (V1[ 0 ] - V3[ 0 ]) + (V3[ 0 ] - V2[ 0 ]) * (V1[ 1 ] - V3[ 1 ])
+                W2 = (V3[1] - V1[1]) * (candidatePoint[0] - V3[0]) + (V1[0] - V3[0]) * (
+                        candidatePoint[1] - V3[1]) \
+                     / (V2[1] - V3[1]) * (V1[0] - V3[0]) + (V3[0] - V2[0]) * (V1[1] - V3[1])
 
                 W3 = 1 - W1 - W2
                 #############################
@@ -1033,14 +1041,14 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
                 LinearPred = W1 * rpm1 + W2 * rpm2 + W3 * rpm3
                 pred = (math.pow(W2, 2) * rpm2 + math.pow(W1, 2) * rpm1 + math.pow(W3, 2) * rpm3)
                 #####################################################################
+                #####################################################################
 
             #if flg==False and all(i >= 0 for i in preds):
                 #meanPreds=np.mean(preds) #if flg==False else pred
             if flg==True:
-                try:
-                    meanPreds = Xpred
-                except:
-                    d=0
+
+                meanPreds = Xpred
+
                 errorsTue.append(abs(meanPreds - trueVal))
                 if abs(meanPreds-trueVal)>2 :
                     print("Index of point : "+ str(iu)+" "+ "Index of vertice"+ str(k))
@@ -1062,7 +1070,7 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
              +" Count False " +str(countFalse))
         print(np.mean(np.nan_to_num(errors)))
 
-        plt.plot(np.linspace(0, len(predictions), len(predictions)), predictions, '-', c='blue',
+        '''plt.plot(np.linspace(0, len(predictions), len(predictions)), predictions, '-', c='blue',
                  label='RPM Predictions with triangulation, acc: %')
 
         plt.plot(np.linspace(0, len(yTrue), len(yTrue)), yTrue, '-', c='red', label='Actual RPM')
@@ -1073,7 +1081,7 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
         # plt.title('Performance comparison of top 3 methods')
         plt.legend()
         plt.grid()
-        plt.show()
+        plt.show()'''
 
         return errors, np.mean(errors), np.std(lErrors)
 

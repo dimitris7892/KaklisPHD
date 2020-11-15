@@ -51,7 +51,7 @@ def main():
     dataset = 0
     results['EstimatorResults'] = []
     #outerItem = {"estimator": , "speed": (velMin + velMax) / 2, "cells": []}
-    dataRes = pd.read_csv('/home/dimitris/Desktop/dkaklis/NEWres_4.csv').values
+    dataRes = pd.read_csv('/home/dimitris/Desktop/dkaklis/NEWres_3.csv').values
     for i in range(0,len(dataRes)):
         if (i % 33 ==0 and i > 0) :
             dataset =dataset+1
@@ -64,7 +64,7 @@ def main():
     minErrors=[]
     minClusters=[]
     for i in range(0,5):
-        listOfDict = [k for k in results['EstimatorResults'] if k['dataset'] == i and k['estimator'] == 'TensorFlowCA' and k['cluster']==1]
+        listOfDict = [k for k in results['EstimatorResults'] if k['dataset'] == i and k['estimator'] == 'TensorFlowW']
         listOfErrors = [x['error'] for x in listOfDict]
         listOfClusters = [x['cluster'] for x in listOfDict]
         minIndex = listOfErrors.index(min([x['error'] for x in listOfDict]))
@@ -165,7 +165,7 @@ def main():
         #subsetsB.append(targetB)
         var.append(np.var(seriesX))
 
-        if len(subsetsX)>=5:
+        if len(subsetsX)>=10:
             break
 
     rangeSubs = k
@@ -181,8 +181,8 @@ def main():
 
     K = range(1,12)
     print("Number of Statistically ind. subsets for training: " + str(len(subsetsX)))
-    subsetsX=[subsetsX[0:5]] if len(subsetsX) > 5 else [subsetsX[4]]
-    subsetsY = [ subsetsY[ 0:5 ] ] if len(subsetsY) > 5 else [subsetsY[4]]
+    subsetsX=   subsetsX[5:10] if len(subsetsX) > 5 else subsetsX[0:5]
+    subsetsY =  subsetsY[5:10]  if len(subsetsY) > 5 else subsetsY[0:5]
     #K=[10]
     subsetsCounter=0
 
@@ -460,7 +460,7 @@ def initParameters():
     startU = 30000
     endU = 31000
 
-    algs=['NNW1','NNWCA']
+    algs=['TRI','NNW','NNWLSTM']
         #`['SR','LR','RF','NNW','NNW1','NNWCA','NNWE','NNWLSTM','NNWLSTM2']`
     #algs= ['SR','LR','RF','NNW','NNW1','NNWCA','NNWE','NNWLSTM']
         #['SR','LR','RF','NNW','NNW1','NNWCA','TRI']
@@ -468,7 +468,7 @@ def initParameters():
 
 
         #['SR','LR','RF','NN','NNW','TRI']
-    cls=['DC']
+    cls=['KM']
         #['KM','DC','NNCL']
     #['SR','LR','RF','NN'] algs
     #['KM','DC'] clusterers / cls
