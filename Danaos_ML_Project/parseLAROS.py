@@ -2,9 +2,31 @@ import pandas as pd
 from datetime import datetime
 import numpy as np
 import csv
+from global_land_mask import globe
+import Danaos_ML_Project.dataReading as dRead
+from mpl_toolkits.basemap import Basemap
+import matplotlib.pyplot as plt
+data = pd.read_csv('/home/dimitris/Desktop/LAROS/EXPRESS ATHENSdata_new2.csv', delimiter=',', skiprows=0)
+from shapely.geometry import Point
+import geopandas as gpd
+from geopandas import GeoDataFrame
 
-data = pd.read_csv('./data/LAROS/leo_c.csv', delimiter=',', skiprows=0)
 
+
+'''lats, lons,names,altitude = [],[],[],[]
+
+# the asos_stations file can be found here:
+# https://engineersportal.com/s/asos_stations.csv
+
+df = pd.read_csv("./data/DANAOS/EXPRESS ATHENS/EXPRESS ATHENSCoor.csv", delimiter=',', skiprows=0, low_memory=False)
+
+geometry = [Point(xy) for xy in zip(df['Longitude'],df['Latitude'])]
+gdf = GeoDataFrame(df, geometry=geometry)
+
+#this is a simple map that goes with geopandas
+world = gpd.read_file(gpd.datasets.get_path('naturalearth_lowres'))
+gdf.plot(ax=world.plot(figsize=(10, 6)), marker='o', color='red', markersize=15);'''
+#plt.show()
 # data = data.drop(["blFlags"], axis=1)
 # data = data.drop(["wind_speed", "wind_dir","trim"], axis=1)
 # x_train = data.drop(["blFlags","focs","tlgsFocs"], axis=1)
@@ -13,23 +35,84 @@ data = pd.read_csv('./data/LAROS/leo_c.csv', delimiter=',', skiprows=0)
 # y_train = pd.DataFrame({
 # 'FOC': foc,
 # })
+'''dataR = dRead.BaseSeriesReader()
+keys = np.array([k for k in data.keys() if "draft" in k])
+keys.sort()
+notinOcean=[]
+latD = []
+lonD = []
 
-vslHeading = data['TrueHeading'].values
+for i in range(0,len(data['Latitude'].values)):
+    lat = str(data['Latitude'].values[i])
+    latDir = 'S' if float(lat) < 0 else 'N'
+    lat = lat.split('-')[1] if float(lat) < 0 else lat
+
+    lon = str(data['Longitude'].values[i])
+    lonDir = 'W' if float(lon) < 0 else 'E'
+    lon = lon.split('-')[1] if float(lon) < 0 else lon
+
+    LAT, LON = dataR.convertLATLONfromDegMinSec(lat, lon, latDir, lonDir)
+    is_in_ocean = globe.is_ocean(LAT, LON)
+    if is_in_ocean==False:
+
+        fig = plt.figure(figsize=(8, 8))
+        m = Basemap(projection='lcc', resolution=None,
+                    width=8E6, height=8E6,
+                    lat_0=LAT, lon_0=LON, )
+        m.etopo(scale=0.7, alpha=0.7)
+
+        # Map (long, lat) to (x, y) for plotting
+        x = LAT
+        Y = LON
+        x, y = m(*np.meshgrid(LON,LAT))
+        #m.drawcoastlines()
+        plt.plot(x, y, 'ok', markersize=5)
+        plt.text(x, y, '', fontsize=12)
+        plt.savefig('/home/dimitris/Desktop/NoInOcean/LATLON_'+str(i))
+        plt.show()
+        latD.append(LAT)
+        lonD.append(LON)
+        notinOcean.append(i)
+        #print("FALSE")
+company = 'DANAOS'
+vessel = 'EXPRESS ATHENS'
+with open('./data/' + company + '/' + vessel + '/EXPRESS ATHENSCoor.csv', mode='w') as data:
+    data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+    data_writer.writerow(['Latitude','Longitude'])
+    for i in range(0, len(latD)):
+        data_writer.writerow(
+            [latD[i], lonD[i]])
+with open('./data/' + company + '/' + vessel + '/EXPRESS ATHENSSpeedNIO.csv', mode='w') as data:
+    data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+
+    for i in range(0, len(latD)):
+        data_writer.writerow(
+            [notinOcean[i]])'''
+
+#plt.show()
+#print(len(notinOcean))
+vslHeading = data['VesselHeading'].values
 for i in range(0,len(vslHeading)):
     if vslHeading[i]<0:
         vslHeading[i]=vslHeading[i]+180
 
-emptyColumn = np.array([0] * len(vslHeading)).reshape(-1)
+foc = data['M/EFOFlow'].values
+#foc = (foc /1000) * 1440
+draft = (data['AP_DRAFT AFT'].values + data['AP_DRAFT FORE'].values)/2
+draftMid = data['AP_DRAFT MIDP'].values
+draftArray = np.array(np.append(draft.reshape(-1,1),np.asmatrix([draftMid]).T, axis=1))
+emptyColumn = np.array(['nan'] * len(vslHeading)).reshape(-1)
+
 data = np.append(data['ttime'].values.reshape(-1, 1),
                  np.asmatrix([
                      vslHeading,
                      data['Latitude'].values,
                      data['Longitude'].values,
                      data['WindAngle'].values,
-                     data['WindSpeed'].values,
-                     data['SpeedOverGroundKnots'].values,
-                     (emptyColumn) / 2,
-                     ((data['ME FO flow (lt/min)'].values * 790 ) / 1000000 )* 1440,
+                     data['WindBF'].values,
+                     data['STW'].values,
+                     draft,
+                     foc,
                  ]).T, axis=1)
 #data['DraftAfter'].values + data['DraftFore'].values) / 2
 # data = pd.read_csv(sFile, delimiter=';')
@@ -40,8 +123,8 @@ data = np.array(data)  # .astype(float)
 ##################################################
 trData = data
 company = 'DANAOS'
-vessel = 'LEO C'
-with open('./data/' + company + '/' + vessel + '/LEO_Cdata.csv', mode='w') as data:
+vessel = 'EXPRESS ATHENS'
+with open('./data/' + company + '/' + vessel + '/EXPRESS ATHENSdata1.csv', mode='w') as data:
     data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
     for i in range(0, len(trData)):
         data_writer.writerow(
@@ -51,8 +134,11 @@ with open('./data/' + company + '/' + vessel + '/LEO_Cdata.csv', mode='w') as da
 
 
 '''dictionary = pd.read_excel("/home/dimitris/Downloads/LarosMap.xlsx")
-dictionary = dictionary[dictionary["SITE_ID"]==359][["STATUS_PARAMETER_ID","NAME"]]
-l = pd.read_csv("/home/dimitris/Desktop/LEO_C.csv",names=["id","sensor","ship_id","txt","bin","value","time"])[["sensor","time","value"]]
+dictionary = dictionary[dictionary["SITE_ID"]==4][["STATUS_PARAMETER_ID","NAME"]]
+l = pd.read_csv("/home/dimitris/Desktop/TBL_STATUS_PARAMETER_VAL.csv",names=["id","sensor","ship_id","txt","bin","value","time"])[["sensor","time","value"]]
+#time = l['time'].array.to_numpy()
+#time.sort()
+#print(time)
 l["ttime"] = list(map(lambda x: datetime.strptime(x, '%Y-%m-%d %H:%M:%S.%f').replace(second=0, microsecond=0), l["time"]))
 l = l.drop(columns=["time"])
 ll = l.groupby(["ttime","sensor"])["value"].mean().reset_index()
@@ -69,7 +155,7 @@ col_names = pd.merge(helper, dictionary, how='left', on=['STATUS_PARAMETER_ID'])
 #change of column names:
 vector.columns = list(col_names["NAME"])
 dvector = pd.concat([dates,vector],axis=1, sort=False)
-dvector.to_csv('./data/LAROS/leo_c.csv', index=False)'''
+dvector.to_csv('/home/dimitris/Desktop/LAROS/EXPRESS ATHENSdata_new2.csv', index=False)'''
 
 
 '''company = 'DANAOS'

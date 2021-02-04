@@ -2,6 +2,7 @@ from sklearn.cluster import KMeans , DBSCAN
 from sklearn.decomposition import PCA
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
+import plotly
 import itertools
 import math
 import numpy as np
@@ -749,8 +750,9 @@ class KMeansPartitioner(DefaultPartitioner):
         if dataY is not None:
             #dataXcl = dataX[:,0:3]
             #dataYcl=np.append(dataX[:,3].reshape(-1,1), np.asmatrix([dataY]).T, axis=1)
-            trnslatedDatax = np.array(np.append(dataX[:,0].reshape(-1,1),np.asmatrix([dataX[:,1],dataX[:,3]]).T,axis=1))
+            trnslatedDatax = np.array(np.append(dataX[:,0].reshape(-1,1),np.asmatrix([dataX[:,3]]).T,axis=1))
             dataUpdatedX = np.append(trnslatedDatax, np.asmatrix([dataY]).T, axis=1)
+            #dataUpdatedX = trnslatedDatax
 
             # Init clustering model
         self._nClusters = nClusters
@@ -761,13 +763,13 @@ class KMeansPartitioner(DefaultPartitioner):
         #dataUpdatedX=np.
         #dataUpdatedX = [dataX, dataY]
         try:
-            dataModel = clusteringModel.fit(np.nan_to_num(trnslatedDatax))
+            dataModel = clusteringModel.fit(np.nan_to_num(dataUpdatedX))
         except:
             print ("Error in clustering")
         self._dataModel = dataModel
         # Get the cluster labels
         #labels = dataModel.labels_
-        labels = dataModel.predict(trnslatedDatax)
+        labels = dataModel.predict(dataUpdatedX)
         #labels = dataModel.labels_
         # Extract centroid values
         centroids = self.getCentroids()
@@ -849,16 +851,15 @@ class KMeansPartitioner(DefaultPartitioner):
         print("Number of clusters: %d"%(self._nClusters))
                 # Return clusterer
         #return DBSCAN(min_samples=2,eps=1)
-        initCentroids = np.array([[7,1],[7,7],[7,21],[7,30],
-                                 [10,1],[10,7],[10,21],[10,30],
-                                 [12,1],[12,7],[12,21],[12,30],
-                                 [14,1],[14,7],[14,21],[14,30]]
-                                )
+        initCentroids = np.array([[6,10],[6,15],[6,20],
+                                 [11,10],[11,15],[11,20],
+                                 [16,10],[16,15],[16,20],
+                                 ])
         #n_custers=self._nClusters
         #return SpectralClustering(n_clusters=2, affinity='nearest_neighbors',
                            #assign_labels='kmeans')
         #return DBSCAN(eps=0.6,min_samples=30)
-        return KMeans(n_clusters=self._nClusters,random_state=self.random_state,)#init=initCentroids)
+        return KMeans(n_clusters=self._nClusters,random_state=self.random_state)
 
     def getCentroids(self):
         return self._dataModel.cluster_centers_

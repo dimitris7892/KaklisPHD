@@ -2037,7 +2037,7 @@ class TensorFlowWLSTM(BasePartitionModeler):
         # Init model to partition map
         self._partitionsPerModel = {}
 
-        n_steps =1
+        n_steps =5
         def baseline_model():
             #create model
             model = keras.models.Sequential()
@@ -2046,11 +2046,11 @@ class TensorFlowWLSTM(BasePartitionModeler):
             #model.add(keras.layers.Dense(2+genModelKnots-1, input_shape=(2+genModelKnots-1,)))
             model.add(keras.layers.LSTM(2+genModelKnots - 1, input_shape=(n_steps,2+genModelKnots - 1)))
 
-            #model.add(keras.layers.Dense(genModelKnots - 1,))
+            model.add(keras.layers.Dense(genModelKnots - 1,))
             #model.add(keras.layers.Dense(genModelKnots - 2, ))
             #model.add(keras.layers.Dense(genModelKnots - 3, ))
                                          #
-            model.add(keras.layers.Dense(5, ))
+            #model.add(keras.layers.Dense(5, ))
             model.add(keras.layers.Dense(2, ))
 
             model.add(keras.layers.Dense(1,))
@@ -2656,6 +2656,9 @@ class TensorFlowWLSTM(BasePartitionModeler):
 
 
         NNmodels.append(estimator)
+
+
+
         #estimator.save('./DeployedModels/estimatorCl_Gen.h5')
         self._models = NNmodels
 

@@ -3,8 +3,24 @@ from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
 from math import sqrt
 import pandas as pd
+import bokeh
+import dask.dataframe as dd, geoviews as gv, cartopy.crs as crs
+from colorcet import fire
+import holoviews as hv
+from datashader.utils import lnglat_to_meters
+from holoviews.operation.datashader import datashade
+from geoviews.tile_sources import EsriImagery
+import holoviews.plotting.bokeh
+import seaborn as sns
+from bokeh.plotting import show
+from beaufort_scale import beaufort_scale_kmh
+from mpl_toolkits.basemap import Basemap
+
 import matplotlib
 #matplotlib.use('TkAgg')
+import param, panel as pn
+from colorcet import palette
+hv.extension('bokeh', 'matplotlib')
 class ErrorGraphs:
 
     def ErrorGraphswithKandTrlen(self,errors,K,trSize,show,modeler):
@@ -159,21 +175,122 @@ class ErrorGraphs:
 
     def PlotTrueVsPredLine(self,):
 
-        dataErrorFoc = pd.read_csv('C:/Users/dkaklis/Desktop/TESTerrorPercFOC7_0.csv', delimiter=',', skiprows=1)
+        dataErrorFoc = pd.read_csv('./TESTerrorPercFOC1_0.csv', delimiter=',', skiprows=0)
         #dataErrorFocMA = pd.read_csv('C:/Users/dkaklis/Desktop/TESTerrorPercFOC2_0MA.csv', delimiter=',', skiprows=1)
         dataErr = dataErrorFoc.values
         #dataErrMA = dataErrorFocMA.values
         errMean = []
         errMeanMA = []
         focMean = []
+
+        errMean020=[]
+        focMean020=[]
+
+        errMean2040 = []
+        focMean2040 = []
+
+        errMean4060=[]
+        focMean4060 = []
+
+        errMean6080 = []
+        focMean6080 = []
+
+        errMean80100 = []
+        focMean80100 = []
+
+        errMean100 = []
+        focMean100 = []
+
+        i = 8.75
+        maxSpeed = np.max(dataErr[:, 3])
+        sizesSpeed = []
+        AvgactualFoc = []
+        dt = dataErr
+        speed = []
+        AvgActualFoc=[]
+        AvgPredFoc=[]
+        speedSize = []
+        while i <= maxSpeed:
+            # workbook._sheets[sheet].insert_rows(k+27)
+
+            speedArray = np.array([k for k in dataErr if float(k[3]) >= i and float(k[3]) <= i + 0.5])
+
+            if speedArray.__len__() > 0:
+                speedSize.append(len(speedArray))
+                speed.append(i+0.25)
+                AvgActualFoc.append(np.round( np.mean(speedArray[:, 1]),1))
+                AvgPredFoc.append( np.round(np.mean(speedArray[:, 0]),1))
+            i += 0.5
+
+        d = {'Speed':speed,'AvgActualFoc': AvgPredFoc, 'AvgPredFoc': AvgActualFoc}
+        df = pd.DataFrame(d)
+
+        fig = plt.figure()
+        #ax = fig.add_axes([0, 0, 1, 1])
+        speeds = speed
+        sizes = speedSize
+        plt.bar(speeds, sizes)
+        plt.plot(speeds, AvgActualFoc, '-', c='red', label='Actual FOC')
+        plt.plot(speeds, AvgPredFoc, '-', c='green', label='Pred FOC')
+        #plt.fill_between(np.linspace(0, 100, 100), errMean - mae, errMean + mae,color='gray', alpha=0.2)
+        plt.ylabel('Count')
+        plt.xlabel('Speed ranges')
+
+        plt.legend()
+        plt.grid()
+        plt.show()
+
+        df.to_csv('./data/DANAOS/EXPRESS ATHENS/AvgActualAvgPredSpeed.csv', index=False)
+        #return
         i = 0
-        while i < 2000:
-            errMean.append(np.mean(dataErr[i:i + 20, 0]))
+        size = 3500
+        for i in range(0,len(dataErr)):
+            #errMean.append(np.mean(dataErr[i:i + 20, 0]))
+            errMean.append(dataErr[i,0])
             #errMeanMA.append(np.mean(dataErrMA[i:i + 20, 0]))
-            focMean.append(np.mean(dataErr[i:i + 20, 1]))
+            focMean.append(dataErr[i, 1])
 
+        for i in range(0, len(dataErr)):
+                # errMean.append(np.mean(dataErr[i:i + 20, 0]))
+            if dataErr[i,1] >10 and dataErr[i,1]<=20:
+                    errMean020.append(dataErr[i, 0])
+                    # errMeanMA.append(np.mean(dataErrMA[i:i + 20, 0]))
+                    focMean020.append(dataErr[i, 1])
 
-            i = i + 20
+        for i in range(0, len(dataErr)):
+            # errMean.append(np.mean(dataErr[i:i + 20, 0]))
+            if dataErr[i, 1] > 20 and dataErr[i, 1] <= 30:
+                errMean2040.append(dataErr[i, 0])
+                # errMeanMA.append(np.mean(dataErrMA[i:i + 20, 0]))
+                focMean2040.append(dataErr[i, 1])
+
+        for i in range(0, len(dataErr)):
+            # errMean.append(np.mean(dataErr[i:i + 20, 0]))
+            if dataErr[i, 1] > 40 and dataErr[i, 1] <= 45:
+                errMean4060.append(dataErr[i, 0])
+                # errMeanMA.append(np.mean(dataErrMA[i:i + 20, 0]))
+                focMean4060.append(dataErr[i, 1])
+
+        for i in range(0, len(dataErr)):
+            # errMean.append(np.mean(dataErr[i:i + 20, 0]))
+            if dataErr[i, 1] > 60 and dataErr[i, 1] <= 80:
+                errMean6080.append(dataErr[i, 0])
+                # errMeanMA.append(np.mean(dataErrMA[i:i + 20, 0]))
+                focMean6080.append(dataErr[i, 1])
+
+        for i in range(0, len(dataErr)):
+            # errMean.append(np.mean(dataErr[i:i + 20, 0]))
+            if dataErr[i, 1] > 80 and dataErr[i, 1] <= 100:
+                errMean80100.append(dataErr[i, 0])
+                # errMeanMA.append(np.mean(dataErrMA[i:i + 20, 0]))
+                focMean80100.append(dataErr[i, 1])
+
+        for i in range(0, len(dataErr)):
+            # errMean.append(np.mean(dataErr[i:i + 20, 0]))
+            if dataErr[i, 1] >100:
+                errMean100.append(dataErr[i, 0])
+                # errMeanMA.append(np.mean(dataErrMA[i:i + 20, 0]))
+                focMean100.append(dataErr[i, 1])
 
         '''errMean = []
         errMeanMA = []
@@ -237,19 +354,72 @@ class ErrorGraphs:
         plt.figure(figsize=(3, 4))
         plt.show()'''
 
+        fig, (ax1, ax2, ax3,) = plt.subplots( 3)
+        #fig.suptitle('FOC ')
+        ax1.plot(np.linspace(0, len(errMean020),len(errMean020)), errMean020, '-', c='green', label='FOC Predictions')
+        ax1.plot(np.linspace(0, len(focMean020), len(focMean020)), focMean020, '-', c='red', label='Actual FOC')
+        ax1.title.set_text("Actual FOC (10-20) (MT/day)")
+        ax1.set_ylabel('FOC(lt/min)')
+        ax1.set_xlabel('Observations')
+        ax1.grid()
 
+        ax2.title.set_text("Actual FOC (20-40)  (MT/day)")
+        ax2.plot(np.linspace(0, len(errMean2040), len(errMean2040)), errMean2040, '-', c='green', label='FOC Predictions')
+        ax2.plot(np.linspace(0, len(focMean2040), len(focMean2040)), focMean2040, '-', c='red', label='Actual FOC')
+        ax2.set_ylabel('FOC(lt/min)')
+        ax2.set_xlabel('Observations')
+        ax2.grid()
 
-        plt.plot(np.linspace(0, 100, 100), errMean, '-', c='green', label='FOC Predictions')
+        ax3.title.set_text("Actual FOC (40-60)  (MT/day)")
+        ax3.plot(np.linspace(0, len(errMean4060), len(errMean4060)), errMean4060, '-', c='green',
+                 label='FOC Predictions')
+        ax3.plot(np.linspace(0, len(focMean4060), len(focMean4060)), focMean4060, '-', c='red', label='Actual FOC')
+        ax3.grid()
+        ax3.set_ylabel('FOC(lt/min)')
+        ax3.set_xlabel('Observations')
+        fig.tight_layout(pad=0.1)
+
+        fig, (ax4,ax5,ax6) = plt.subplots(3)
+        ax4.title.set_text("Actual FOC (60-80)  (MT/day)")
+        ax4.plot(np.linspace(0, len(errMean6080), len(errMean6080)), errMean6080, '-', c='green',
+                 label='FOC Predictions')
+        ax4.plot(np.linspace(0, len(focMean6080), len(focMean6080)), focMean6080, '-', c='red', label='Actual FOC')
+        ax4.set_ylabel('FOC(lt/min)')
+        ax4.set_xlabel('Observations')
+        ax4.grid()
+
+        ax5.title.set_text("Actual FOC (80-100)  (MT/day)")
+        ax5.plot(np.linspace(0, len(errMean80100), len(errMean80100)), errMean80100, '-', c='green',
+                 label='FOC Predictions')
+        ax5.plot(np.linspace(0, len(focMean80100), len(focMean80100)), focMean80100, '-', c='red', label='Actual FOC')
+        ax5.set_ylabel('FOC(lt/min)')
+        ax5.set_xlabel('Observations')
+        ax5.legend()
+        ax5.grid()
+
+        ax6.title.set_text("Actual FOC (>100)  (MT/day)")
+        ax6.plot(np.linspace(0, len(errMean100), len(errMean100)), errMean100, '-', c='green',
+                 label='FOC Predictions')
+        ax6.plot(np.linspace(0, len(focMean100), len(focMean100)), focMean100, '-', c='red', label='Actual FOC')
+        ax6.set_ylabel('FOC(lt/min)')
+        ax6.set_xlabel('Observations')
+        ax6.legend()
+        ax6.grid()
+
+        fig.tight_layout(pad=0.1)
+        #plt.plot(np.linspace(0, len(errMean),len(errMean)), errMean, '-', c='green', label='FOC Predictions')
+        #plt.plot(np.linspace(0, len(focMean), len(focMean)), focMean, '-', c='red', label='Actual FOC')
         #plt.scatter(np.linspace(0, 100, 100), errMean, s=stwMean,c='red', alpha=0.5)
         #plt.scatter(np.linspace(0, 100, 100), errMean, s=draftMean, c='blue', alpha=0.5)
 
         #plt.plot(np.linspace(0, 100, 100), errMeanMA, '-', c='blue', label='FOC Predictions with moving avg')
-        plt.plot(np.linspace(0, 100, 100), focMean, '-', c='red', label='Actual FOC')
+        #plt.plot(np.linspace(0, len(focMean), len(focMean)), focMean, '-', c='red', label='Actual FOC')
         #plt.fill_between(np.linspace(0, 100, 100), errMean - mae, errMean + mae,color='gray', alpha=0.2)
-        plt.ylabel('FOC')
+        #plt.ylabel('FOC(lt/min)')
+        #plt.xlabel('Observations')
 
-        plt.legend()
-        plt.grid()
+        #plt.legend()
+        #plt.grid()
         plt.show()
 
         x=0
@@ -295,3 +465,157 @@ class ErrorGraphs:
         plt.xticks(range(x_train.shape[1]), x_train.columns[indices], rotation=90)
         plt.xlim([-1, x_train.shape[1]])
         # plt.show()
+
+    def PLotTrajectory(self,df,vesselName):
+
+        class VesselTrajectory(param.Parameterized):
+            alpha = param.Magnitude(default=0.9, doc="Map tile opacity")
+            cmap = param.ObjectSelector('fire', objects=['fire', 'bgy', 'bgyw', 'bmy', 'gray', 'kbc'])
+            location = param.ObjectSelector(default='dropoff', objects=['dropoff', 'pickup'])
+
+            def make_view(self, **kwargs):
+                df.to_parquet('./data/'+vesselName+'CoorTest.parquet')
+                topts = dict(width=1000, height=800, bgcolor='black', xaxis=None, yaxis=None, show_grid=True)
+                tiles = EsriImagery.clone(crs=crs.GOOGLE_MERCATOR).options(**topts)
+                dopts = dict(width=2000, height=800, x_sampling=0.5, y_sampling=0.5)
+
+                route = dd.read_parquet('./data/'+vesselName+'CoorTest.parquet').persist()
+                pts = hv.Points(route, ['x', 'y'])
+
+                trips = datashade(pts, cmap=palette[self.cmap], **dopts)
+                return tiles.options(alpha=self.alpha) * trips
+
+
+
+        #df = pd.read_csv('./data/EXPRESS ATHENSCoorTest.csv')
+        df.loc[:, 'x'], df.loc[:, 'y'] = lnglat_to_meters(df.Longitude, df.Latitude)
+        #df.to_csv('./data/EXPRESS ATHENSCoor1.csv')
+        '''df.to_parquet('./data/EXPRESS ATHENSCoorTest.parquet')
+        topts = dict(width=700, height=600, bgcolor='black', xaxis=None, yaxis=None, show_grid=False)
+        tiles = EsriImagery.clone(crs=crs.GOOGLE_MERCATOR).options(**topts)
+        dopts = dict(width=2000, height=600, x_sampling=0.5, y_sampling=0.5)
+
+        taxi = dd.read_parquet('./data/EXPRESS ATHENSCoorTest.parquet').persist()
+        pts = hv.Points(taxi, ['x', 'y'])
+        trips = datashade(pts, cmap=fire, **dopts)
+        layout = tiles * trips'''
+
+        explorer = VesselTrajectory(name=vesselName)
+        pn.Row(explorer.param, explorer.make_view).show()
+
+        #show(hv.render(layout))
+
+    def PLotDists(self,data):
+
+        #data[:, 15] = ((data[:, 15]) / 1000) * 1440
+
+        foc1 = data[27000:86000, :]#.astype(float)
+        
+        foc1_912 = np.array([k for k in foc1 if k[3]>=9 and k[3]<=12])[:,5]
+        foc1_1215 = np.array([k for k in foc1 if k[3] > 12 and k[3] <= 15])[:, 5]
+        foc1_1518 = np.array([k for k in foc1 if k[3] > 15 and k[3] <= 18])[:, 5]
+        foc1_1821 = np.array([k for k in foc1 if k[3] > 18 and k[3] <= 21])[:, 5]
+        
+        foc2 = data[86000:145115, :]#.astype(float)
+
+        foc2_912 = np.array([k for k in foc2 if k[3] >= 9 and k[3] <= 12])[:, 5]
+        foc2_1215 = np.array([k for k in foc2 if k[3] > 12 and k[3] <= 15])[:, 5]
+        foc2_1518 = np.array([k for k in foc2 if k[3] > 15 and k[3] <= 18])[:, 5]
+        foc2_1821 = np.array([k for k in foc2 if k[3] > 18 and k[3] <= 21])[:, 5]
+
+        i=9
+        maxSpeed = 20
+        speed = []
+        focs1 = []
+        focs2 = []
+        speed1 = []
+        speed2 = []
+        sizes1 = []
+        sizes2 = []
+        draft1=[]
+        draft2 = []
+        AvgPredFoc = []
+        speedSize1 = []
+        speedSize2 = []
+
+
+
+        while i <= maxSpeed:
+            # workbook._sheets[sheet].insert_rows(k+27)
+
+            speedArray1 = np.array([k for k in foc1 if float(k[3]) >= i and float(k[3]) <= i + 1])
+            speedArray2 = np.array([k for k in foc2 if float(k[3]) >= i and float(k[3]) <= i + 1])
+
+
+            if speedArray1.__len__() > 0:
+                #sizes1.append(len(speedArray1))
+                sizes1.append(np.mean(speedArray1[:,2]))
+                draft1.append(np.mean(speedArray1[:,0]))
+                speed1.append(i)
+                speedSize1.append(len(speedArray1))
+
+                focs1.append(np.mean(speedArray1[:, 5]))
+            if speedArray2.__len__() > 0:
+                #sizes2.append(len(speedArray2))
+                sizes2.append(np.mean(speedArray2[:, 2]))
+                draft2.append(np.mean(speedArray2[:, 0]))
+                speed2.append(i)
+                speedSize2.append(len(speedArray2))
+
+                focs2.append(np.mean(speedArray2[:, 5]))
+            i +=1
+
+
+        fig = plt.figure()
+        # ax = fig.add_axes([0, 0, 1, 1])
+
+        #sizes = speedSize
+        plt.bar(speed1, sizes1,color='red',width=0.25,label='windSpeed1',)
+        plt.bar(np.array(speed2) + 0.25, sizes2,color='green',width=0.25,label='windSpeed2',)
+        '''foc1Arr = np.column_stack((speed1[0], focs1[0]))
+        foc2Arr = np.column_stack((speed1[0], focs1[0]))
+
+        foc1Arr =   foc1Arr[foc1Arr[:, 0].argsort()]
+        foc2Arr = foc2Arr[foc2Arr[:, 0].argsort()]'''
+        plt.scatter(speed1, focs1, s=np.array(draft1)*10, c="red", alpha=0.4, linewidth=4,label='dradt1',marker='o')
+        plt.scatter(speed2, focs2, s=np.array(draft2)*10, c="green", alpha=0.4, linewidth=4,label='dradt2',marker='o')
+
+        plt.plot(speed1, focs1, '-', c='red', label='FOC1 (2019-10-18) - (2019-12-11)',)
+        plt.plot(speed2, focs2, '-', c='green', label='FOC2 (2019-12-12) - (2020-02-05)',)
+        # plt.fill_between(np.linspace(0, 100, 100), errMean - mae, errMean + mae,color='gray', alpha=0.2)
+        plt.ylabel('FOC')
+        plt.xlabel('Speed ranges')
+
+        plt.legend()
+        plt.grid()
+        #plt.show()
+
+        foc12 = [(itm, '(2019-10-18) - (2019-12-11)') for itm in foc1[:,5]]
+        foc23 = [(itm, '(2019-12-12) - (2020-02-05)') for itm in foc2[:,5]]
+
+        joinedFoc = foc12 + foc23
+
+        df = pd.DataFrame(data=joinedFoc,
+                          columns=['foc', 'period'])
+        # df.Zip = df.Zip.astype(str).str.zfill(5)
+
+        #plt.title('FOC distributions')
+
+        sns.displot(df, x="foc", hue='period')
+
+        #################################################
+        ws12 = [(itm, '(2019-10-18) - (2019-12-11)') for itm in foc1[:, 2]]
+        ws23 = [(itm, '(2019-12-12) - (2020-02-05)') for itm in foc2[:, 2]]
+
+        joinedFoc = ws12 + ws23
+
+        df = pd.DataFrame(data=joinedFoc,
+                          columns=['WindSpeed', 'period'])
+        # df.Zip = df.Zip.astype(str).str.zfill(5)
+
+        # plt.title('FOC distributions')
+
+        sns.displot(df, x="WindSpeed", hue='period')
+
+
+        plt.show()

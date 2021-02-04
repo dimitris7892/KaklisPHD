@@ -39,7 +39,7 @@ def main():
     reader = dRead.BaseSeriesReader()
     plotRes = plRes.ErrorGraphs()
 
-    #plotRes.PlotTrueVsPredLine()
+    plotRes.PlotTrueVsPredLine()
     #plotRes.PlotExpRes()
     #plotRes.boxPLotsKMDT()
     #plotRes.boxPLots()
@@ -51,20 +51,24 @@ def main():
     dataset = 0
     results['EstimatorResults'] = []
     #outerItem = {"estimator": , "speed": (velMin + velMax) / 2, "cells": []}
-    dataRes = pd.read_csv('/home/dimitris/Desktop/dkaklis/NEWres_3.csv').values
+    dataRes = pd.read_csv('/home/dimitris/Desktop/LAROS/NEWres_1.csv').values
+    initVar = []
     for i in range(0,len(dataRes)):
-        if (i % 33 ==0 and i > 0) :
+        #if (i % 33 ==0 and i > 0) :
+        initVar.append(dataRes[i][4])
+        if i > 0 and initVar[i]!=initVar[i-1]:
             dataset =dataset+1
         cluster = dataRes[i][0]
         error = dataRes[i][1]
         est = dataRes[i][2]
-        item = {"dataset":dataset,"estimator":est, "error": float(error), "cluster": int(cluster)}
+        part = dataRes[i][3]
+        item = {"dataset":dataset,"estimator":est, "error": float(error), "cluster": int(cluster),'partitioner':part}
         results['EstimatorResults'].append(item)
 
     minErrors=[]
     minClusters=[]
     for i in range(0,5):
-        listOfDict = [k for k in results['EstimatorResults'] if k['dataset'] == i and k['estimator'] == 'TensorFlowW']
+        listOfDict = [k for k in results['EstimatorResults'] if k['dataset'] == i and k['estimator'] == 'TensorFlowCA' and k['partitioner']=='DelaunayTriPartitioner']
         listOfErrors = [x['error'] for x in listOfDict]
         listOfClusters = [x['cluster'] for x in listOfDict]
         minIndex = listOfErrors.index(min([x['error'] for x in listOfDict]))
@@ -74,7 +78,7 @@ def main():
 
     meanError = np.mean(minErrors)
     stdError =np.std(minErrors)
-    print("Mean absolute error on unseen data: %4.2f (+/- %4.2f standard error)" % (meanError, stdError / sqrt(len(minErrors))))
+    print("Mean absolute error on unseen data: %4.2f (+/- %4.2f standard error)" % (meanError, stdError / sqrt(len(minErrors))) +" Mean clusters: "+ str(np.mean(minClusters)))
 
     listOfDict = [k for k in results['EstimatorResults'] if  k['estimator'] == 'TensorFlowWLSTM']
     listOfErrors1 = [x['error'] for x in listOfDict]
@@ -165,7 +169,7 @@ def main():
         #subsetsB.append(targetB)
         var.append(np.var(seriesX))
 
-        if len(subsetsX)>=10:
+        if len(subsetsX)>=1:
             break
 
     rangeSubs = k
@@ -181,8 +185,8 @@ def main():
 
     K = range(1,12)
     print("Number of Statistically ind. subsets for training: " + str(len(subsetsX)))
-    subsetsX=   subsetsX[5:10] if len(subsetsX) > 5 else subsetsX[0:5]
-    subsetsY =  subsetsY[5:10]  if len(subsetsY) > 5 else subsetsY[0:5]
+    subsetsX=   subsetsX[0:5] if len(subsetsX) > 5 else subsetsX[0:5]
+    subsetsY =  subsetsY[0:5]  if len(subsetsY) > 5 else subsetsY[0:5]
     #K=[10]
     subsetsCounter=0
 
@@ -200,7 +204,7 @@ def main():
            if modeler.__class__.__name__ == 'TriInterpolantModeler' or modeler.__class__.__name__ == 'TensorFlow':
                 t=0
            if partitioner.__class__.__name__=='DelaunayTriPartitioner':
-                 partK=np.linspace(0.08,1.2,11)#[0.5]
+                 partK=np.linspace(0.05,1.5,11)#[0.5]
 
            elif partitioner.__class__.__name__=='KMeansPartitioner':
                if modeler.__class__.__name__=='TriInterpolantModeler' or modeler.__class__.__name__ == 'TensorFlow':
@@ -217,7 +221,8 @@ def main():
            for k in partK:
 
                 #try:
-
+                    if k == partK[len(partK)-1]:
+                        np.append(partK, 6)
                     print(modeler.__class__.__name__)
                     print("Reading data...")
                     if (modeler.__class__.__name__ == 'TensorFlowWLSTM' or modeler.__class__.__name__ == 'TensorFlowWLSTM2') and k > 1:
@@ -270,7 +275,7 @@ def main():
 
 
                     print("Partitioning training set... Done.")
-                    if len(partitionsX) in clustersGeneratedByDC: break
+                    if len(partitionsX) in clustersGeneratedByDC: continue
                     clustersGeneratedByDC.append(len(partitionsX))
                     # For each partition create model
                     print("Creating models per partition...")
@@ -432,8 +437,9 @@ def main():
                     err["error"] = meanError
                     err["k"]=k
                     error["errors"].append(err)
-                    if modeler.__class__.__name__ == 'TriInterpolantModeler' and numOfclusters==1 or modeler.__class__.__name__ == 'TriInterpolantModeler' \
-                            and partitioner.__class__.__name__ == 'DelaunayTriPartitioner':
+                    if modeler.__class__.__name__ == 'TriInterpolantModeler' and numOfclusters==1 :
+                    #or modeler.__class__.__name__ == 'TriInterpolantModeler' \
+                            #and partitioner.__class__.__name__ == 'DelaunayTriPartitioner':
                         break
                     #if partitioner.__class__.__name__ == 'DelaunayTriPartitioner' and numOfclusters==1:
                         #break
@@ -460,7 +466,8 @@ def initParameters():
     startU = 30000
     endU = 31000
 
-    algs=['TRI','NNW','NNWLSTM']
+    algs=['NNW']
+        #['SR','LR','RF','NNW','NNW1','NNWCA']
         #`['SR','LR','RF','NNW','NNW1','NNWCA','NNWE','NNWLSTM','NNWLSTM2']`
     #algs= ['SR','LR','RF','NNW','NNW1','NNWCA','NNWE','NNWLSTM']
         #['SR','LR','RF','NNW','NNW1','NNWCA','TRI']

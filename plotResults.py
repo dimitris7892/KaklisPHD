@@ -6,6 +6,10 @@ import pandas as pd
 from sklearn.cluster import KMeans
 from pylab import figure,axes
 from pylab import plot, show, savefig, xlim, figure, ylim, legend, boxplot, setp, axes
+import latex
+plt.rcParams.update({
+    "text.usetex": True,
+})
 
 class ErrorGraphs:
 
@@ -169,24 +173,27 @@ class ErrorGraphs:
 
         font = {'family': 'normal',
                 'weight': 'bold',
-                'size': 14}
+                'size': 16}
 
         plt.rc('font', **font)
 
-        dataErrorxiNN = pd.read_csv('/home/dimitris/Desktop/resultsNEW/TESTerrorPercRPMxiNN1_0.csv', delimiter=',', skiprows=1)
-        dataErrorxiLSTM = pd.read_csv('/home/dimitris/Desktop/resultsNEW/TESTerrorPercRPMxiLSTM1_0.csv', delimiter=',', skiprows=1)
-        dataErrorLSTM = pd.read_csv('/home/dimitris/Desktop/resultsNEW/TESTerrorPercRPMLSTM1_0.csv', delimiter=',', skiprows=1)
+        dataErrorxiNN = pd.read_csv('./testError/TESTerrorPercRPMxiNN1_0.csv', delimiter=',', skiprows=1)
+        #dataErrorxiLSTM = pd.read_csv('/home/dimitris/Desktop/resultsNEW/TESTerrorPercRPMxiLSTM1_0.csv', delimiter=',', skiprows=1)
+        dataErrorxiLSTM = pd.read_csv('./testError/TESTerrorPercRPMxiLSTM1_0.csv', delimiter=',',skiprows=1)
+        dataErrorAM = pd.read_csv('./testError/TESTerrorPercRPM_AM_0.csv', delimiter=',',skiprows=1)
 
         dataErrxiNN = dataErrorxiNN.values
-        dataErrorLSTM = dataErrorLSTM.values
+        #dataErrorLSTM = dataErrorLSTM.values
+        dataErrorAM = dataErrorAM.values
         dataErrorxiLSTM = dataErrorxiLSTM.values
 
         errMeanxiNN = []
         errMeanLSTM = []
         errMeanxiLSTM = []
+        errMeanAM=[]
         rpmMean = []
         i = 0
-        xAxisSize =int(len(dataErrxiNN)/12)
+        xAxisSize =int(len(dataErrorxiLSTM)/12)
         while i < xAxisSize:
             #errMeanxiNN.append(np.mean(dataErrxiNN[i:i + 1, 1]))
             #errMeanLSTM.append(np.mean(dataErrorLSTM[i:i + 1, 1]))
@@ -195,10 +202,10 @@ class ErrorGraphs:
             #rpmMean.append(np.mean(dataErrxiNN[i:i + 1, 0]))
 
             errMeanxiNN.append(dataErrxiNN[i, 1])
-            errMeanLSTM.append(dataErrorLSTM[i, 1])
+            errMeanAM.append(dataErrorAM[i, 1])
             errMeanxiLSTM.append(dataErrorxiLSTM[i, 1])
 
-            rpmMean.append(dataErrxiNN[i, 0])
+            rpmMean.append(dataErrorxiLSTM[i, 0])
 
 
             i = i + 1
@@ -267,17 +274,17 @@ class ErrorGraphs:
         fig = figure()
 
 
-        plt.plot(np.linspace(0, len(rpmMean), len(rpmMean)), errMeanxiNN, '-', c='green', label='RPM Predictions with Sequential enriched input Network, acc: 96.8% acc')
+        plt.plot(np.linspace(0, len(rpmMean), len(rpmMean)), errMeanxiNN, '-', c='green', label=r'\textbf{RPM Predictions with ExtendedSpace Network, acc: 97.05\% acc}')
         #plt.scatter(np.linspace(0, 100, 100), errMean, s=stwMean,c='red', alpha=0.5)
         #plt.scatter(np.linspace(0, 100, 100), errMean, s=draftMean, c='blue', alpha=0.5)
 
-        plt.plot(np.linspace(0, len(rpmMean), len(rpmMean)), errMeanxiLSTM, '-', c='blue', label='RPM Predictions with LSTM enriched input Network, acc: 97.7%')
-        plt.plot(np.linspace(0, len(rpmMean), len(rpmMean)), errMeanLSTM, '-', c='yellow', label='RPM Predictions with simple LSTM Network, acc: 97.06%')
-        plt.plot(np.linspace(0, len(rpmMean), len(rpmMean)), rpmMean, '-', c='red', label='Actual RPM')
+        plt.plot(np.linspace(0, len(rpmMean), len(rpmMean)), errMeanxiLSTM, '-', c='blue', label=r'\textbf{RPM Predictions with SplineLSTM Network, acc: 97.93\%}')
+        plt.plot(np.linspace(0, len(rpmMean), len(rpmMean)), errMeanAM, '-', c='yellow', label=r'\textbf{RPM Predictions with Analytical Method, acc: 97.86\%}')
+        plt.plot(np.linspace(0, len(rpmMean), len(rpmMean)), rpmMean, '-', c='red', label=r'\textbf{Actual RPM}')
         #plt.fill_between(np.linspace(0, len(rpmMean), len(rpmMean)), abs(np.array(rpmMean) - 1.434),abs(np.array(rpmMean) + 1.434),color='gray', alpha=0.2)
 
-        plt.ylabel('RPM',fontsize=19)
-        plt.xlabel('Observations',fontsize=19)
+        plt.ylabel(r'\textbf{RPM}',fontsize=19)
+        plt.xlabel(r'\textbf{Observations}',fontsize=19)
         #plt.title('Performance comparison of top 3 methods')
         plt.legend()
         plt.grid()
@@ -294,12 +301,50 @@ class ErrorGraphs:
         ax = axes()
         font = {'family': 'normal',
                 'weight': 'bold',
-                'size': 15}
+                'size': 18}
 
         plt.rc('font', **font)
 
-        #dataErrorFoc = pd.read_csv('/home/dimitris/Desktop/resultsNEW/DTC.csv', delimiter=',')
-        dataErrorFoc = pd.read_csv('/home/dimitris/Desktop/resultsNEW/kmeans.csv', delimiter=',')
+        results={}
+        dataset = 0
+        results['EstimatorResults'] = []
+        #outerItem = {"estimator": , "speed": (velMin + velMax) / 2, "cells": []}
+        #dataRes = pd.read_csv('/home/dimitris/Desktop/LAROS/NEWres_1.csv').values
+        '''dataRes = pd.read_csv('/home/dimitris/Desktop/resultsNEW/kmeansNEW.csv', delimiter=',').values
+        initVar = []
+        for i in range(0,len(dataRes)):
+              #if (i % 33 ==0 and i > 0) :
+              initVar.append(dataRes[i][4])
+              if i > 0 and initVar[i]!=initVar[i-1]:
+                  dataset =dataset+1
+              cluster = dataRes[i][0]
+              error = dataRes[i][1]
+              est = dataRes[i][2]
+              part = dataRes[i][3]
+              item = {"dataset":dataset,"estimator":est, "error": float(error), "cluster": int(cluster),'partitioner':part}
+              results['EstimatorResults'].append(item)
+
+        minErrors=[]
+        minClusters=[]
+        Errors = []
+        Clusters = []
+
+        for i in range(0,5):
+              listOfDict = [k for k in results['EstimatorResults'] if k['dataset'] == i  and k['partitioner']=='KMeansPartitioner']
+              listOfErrors = [x['error'] for x in listOfDict]
+              listOfClusters = [x['cluster'] for x in listOfDict]
+              minIndex = listOfErrors.index(min([x['error'] for x in listOfDict]))
+              minErrors.append(listOfErrors[minIndex])
+              minClusters.append(listOfClusters[minIndex])
+              Errors.append(listOfErrors)
+              Clusters.append(listOfClusters)
+              ####
+        from scipy.stats import spearmanr
+        meanListOfClusters = np.mean(Clusters,axis=0)
+        meanListOfErrors = np.mean(Errors, axis=0)
+        print(spearmanr(meanListOfClusters,meanListOfErrors))'''
+        dataErrorFoc = pd.read_csv('/home/dimitris/Desktop/___RES/DTC.csv', delimiter=',')
+        #dataErrorFoc = pd.read_csv('/home/dimitris/Desktop/resultsNEW/kmeansNEW.csv', delimiter=',')
 
         errSR = []
         errWINN = []
@@ -319,32 +364,34 @@ class ErrorGraphs:
 
 
 
+        #np.linspace(1, 10, len(errSR))
+        #[1, 2, 3, 4, 5, 8]
+        xAxis = np.linspace(1, 10, len(errSR))
 
-
-        plt.plot(np.linspace(1, 10, 10), errSR, '-', c='green', label='SR')
-        plt.plot(np.linspace(1, 10, 10), errRF, '-', c='red',
+        plt.plot(xAxis, errSR, '-o', c='green', label='SR')
+        plt.plot(xAxis, errRF, '-o', c='red',
                  label='RF')
-        plt.plot(np.linspace(1, 10, 10), errLR, '-', c='blue',
+        plt.plot(xAxis, errLR, '-o', c='blue',
                  label='LR')
-        plt.plot(np.linspace(1, 10, 10), errWINN, '-', c='orange',
-                 label='wavg-wiBSpNN')
-        plt.plot(np.linspace(1, 10, 10), errBSPNN, '-', c='yellow',
-                 label='wavg-BSpNN')
+        plt.plot(xAxis, errWINN, '-o', c='orange',
+                 label='wavg-SplineWeightInitNN')
+        plt.plot(xAxis, errBSPNN, '-o', c='yellow',
+                 label='wavg-BSpliNNet')
         #plt.scatter(np.linspace(0, 100, 100), errMean, s=stwMean,c='red', alpha=0.5)
         #plt.scatter(np.linspace(0, 100, 100), errMean, s=draftMean, c='blue', alpha=0.5)
 
-        plt.plot(np.linspace(1, 10, 10), errXINN, '-', c='black', label='wavg-xiBSpNN')
+        plt.plot(xAxis, errXINN, '-o', c='black', label='wavg-ExtendedSpace')
         #plt.plot(np.linspace(0, 197, 197), focMean, '-', c='red', label='Actual RPM')
         #plt.fill_between(np.linspace(0, 100, 100), errMean - mae, errMean + mae,color='gray', alpha=0.2)
-        plt.ylabel('MAE',fontsize=19)
-        plt.xlabel('# of clusters',fontsize=19)
+        plt.ylabel('$MAE$',fontsize=21)
+        plt.xlabel(r'\textbf{\# of clusters}',fontsize=21)
         #plt.title('Model convergence using K-Means clustering')
         plt.legend()
         plt.grid()
         #plt.rc('axes', labelsize=41)
         plt.show()
         fig.set_size_inches([17.375, 8.375])
-        plt.savefig('/home/dimitris/Desktop/resultsNEW/kmeanserror.eps', format='eps')
+        #plt.savefig('/home/dimitris/Desktop/kmeanserror.eps', format='eps')
         x=0
 
     def boxPLots(self):
@@ -371,7 +418,7 @@ class ErrorGraphs:
         # Some fake data to plot
         font = {'family': 'normal',
                 'weight': 'normal',
-                'size': 19}
+                'size': 23}
 
         plt.rc('font', **font)
 
@@ -417,49 +464,49 @@ class ErrorGraphs:
         setBoxColors(bp)
 
         # first boxplot pair
-        bp = boxplot(SR, positions=[4, 5], widths=0.6)
+        bp = boxplot(SR, positions=[6, 7], widths=0.6)
         setBoxColors(bp)
 
         # second boxplot pair
-        bp = boxplot(LR, positions=[7, 8], widths=0.6)
+        bp = boxplot(LR, positions=[11, 12], widths=0.6)
         setBoxColors(bp)
 
         # thrid boxplot pair
-        bp = boxplot(RF, positions=[10, 11], widths=0.6)
+        bp = boxplot(RF, positions=[16, 17], widths=0.6)
         setBoxColors(bp)
 
         # thrid boxplot pair
-        bp = boxplot(BSPNN, positions=[14, 15], widths=0.6)
+        bp = boxplot(BSPNN, positions=[24, 25], widths=0.6)
         setBoxColors(bp)
 
         # thrid boxplot pair
-        bp = boxplot(wiBSPNN, positions=[21, 22], widths=0.6)
+        bp = boxplot(wiBSPNN, positions=[41, 42], widths=0.6)
         setBoxColors(bp)
 
         # thrid boxplot pair
-        bp = boxplot(xiBSPNN, positions=[28, 29], widths=0.6)
+        bp = boxplot(xiBSPNN, positions=[60, 61], widths=0.6)
         setBoxColors(bp)
 
         # thrid boxplot pair
-        bp = boxplot(xiLSTMNN, positions=[35.5, 36], widths=0.6)
+        bp = boxplot(xiLSTMNN, positions=[74.5, 75], widths=0.6)
         setBoxColors(bp)
 
-        bp = boxplot(LSTMNN, positions=[41.5, 42], widths=0.6)
+        bp = boxplot(LSTMNN, positions=[87.5, 88], widths=0.6)
         setBoxColors(bp)
 
         # set axes limits and labels
-        xlim(0, 43)
+        xlim(0, 90)
         ylim(0, 5)
-        ax.set_ylabel('MAE',fontsize=19)
-        ax.set_xticklabels(['AN','SR', 'LR', 'RF','wavg-BSpNN','wavg-wiBSpNN','wavg-xiBSpNN','xiBSpLSTMNN','LSTMNN'])
-        ax.set_xticks([1, 4.5, 7.5, 10.5, 14.5, 21.5,28.5,35.5,41.5])
+        ax.set_ylabel('$MAE$',fontsize=25)
+        ax.set_xticklabels([r'\textbf{AN}',r'\textbf{SR}', r'\textbf{LR}', r'\textbf{RF}',r'\textbf{B-SpliNNet}',r'\textbf{SplineWeightInitNN}',r'\textbf{ExtendedSpace}',r'\textbf{SplineLSTM}',r'\textbf{BaseLSTM}'])
+        ax.set_xticks([1.5, 6.5, 11.5, 16.5, 24.5, 41.5,60,74.5,87.5])
 
         #ax.set_ylabel('MAE', )
 
         # draw temporary red and blue lines and use them to create a legend
         hB, = plot([1, 1], 'b-')
         hR, = plot([1, 1], 'r-')
-        legend((hB, hR), ('Without Clustering', 'With Clustering'))
+        legend((hB, hR), (r'\textbf{Without Clustering}', r'\textbf{With Clustering}'))
         hB.set_visible(False)
         hR.set_visible(False)
 
@@ -554,30 +601,30 @@ class ErrorGraphs:
         setBoxColors(bp)
 
         # thrid boxplot pair
-        bp = boxplot(wiBSPNN, positions=[20, 21], widths=0.6)
+        bp = boxplot(wiBSPNN, positions=[20.5, 21.5], widths=0.6)
         setBoxColors(bp)
 
         # thrid boxplot pair
-        bp = boxplot(xiBSPNN, positions=[27, 28], widths=0.6)
+        bp = boxplot(xiBSPNN, positions=[29, 30], widths=0.6)
         setBoxColors(bp)
 
         # set axes limits and labels
-        xlim(0, 29.5)
+        xlim(0, 32.5)
         ylim(0, 4.5)
-        ax.set_ylabel('MAE')
+        ax.set_ylabel('$MAE$')
         ax.set_xticklabels(
-            ['SR', 'LR', 'RF', 'wavg-BSpNN', 'wavg-wiBSpNN', 'wavg-xiBSpNN'])
-        ax.set_xticks([1, 5.5, 9.5, 13.5, 20.5, 27.5])
+            [r'$\textbf{SR}$', r'$\textbf{LR}$', r'$\textbf{RF}$', r'$\textbf{B-SpliNNet}$', r'$\textbf{SplineWeightInitNN}$', r'$\textbf{ExtendedSpace}$'])
+        ax.set_xticks([1, 5.5, 9.5, 13.5, 21, 29.5])
 
         # draw temporary red and blue lines and use them to create a legend
         hB, = plot([1, 1], 'b-')
         hR, = plot([1, 1], 'r-')
-        legend((hB, hR), ('K-Means', 'DTC'))
+        legend((hB, hR), (r'\textbf{K-Means}', r'\textbf{DTC}'))
         hB.set_visible(False)
         hR.set_visible(False)
 
         fig.set_size_inches([17.375, 8.375])
-        plt.savefig('/home/dimitris/Desktop/resultsNEW/boxcompareKMDTC.eps', format='eps')
+        #plt.savefig('/home/dimitris/Desktop/resultsNEW/boxcompareKMDTC.eps', format='eps')
         show()
         x = 0
 
@@ -589,41 +636,68 @@ class ErrorGraphs:
     
     def generateGraphVRPM(self):
 
+        # Some fake data to plot
+        font = {'family': 'normal',
+                'weight': 'normal',
+                'size': 23}
+
+        plt.rc('font', **font)
+
         data = pd.read_csv('./kaklis.csv')
         data = data.values[0:20000]
-        data = np.array([k for k in data[0:, 2:23] if k[3] > 3 and k[5] > 0])  #
+        data = np.array([k for k in data[0:, 2:23] if k[3] > 3 and k[5] > 10])  #
 
-        #for i in range(0, len(data)):
-            #data[i] = np.mean(data[i:i + 5], axis=0)
+        '''for i in range(0, len(data)):
+            data[i] = np.mean(data[i:i +15], axis=0)'''
 
         stw = np.asarray([np.nan_to_num(np.float(x)) for x in data[:, 3]])
         rpm = np.asarray([np.nan_to_num(np.float(y)) for y in data[:, 5]])
+
+        xi = np.array(stw)
+        yi = np.array(rpm)
+
+        # Change color with c and alpha
+        p2 = np.poly1d(np.polyfit(xi, yi, 2))
+        xp = np.linspace(min(xi), max(xi), 100)
+        #plt.plot([], [], '.', xp, p2(xp))
+
+        plt.scatter(xi, yi, linewidth=2,c="red", alpha=0.3)
+        plt.xticks(np.arange(np.floor(min(xi)) - 1, np.ceil(max(xi)) + 1, 2))
+        plt.xlabel(r"\textbf{Speed (knots)}")
+        plt.ylabel(r"\textbf{RPM}")
+        plt.grid()
+        plt.show()
         minrpm = np.min(rpm)
         maxrpm = np.max(rpm)
+
+        minstw = np.min(stw)
+        maxstw = np.max(stw)
 
         rpmsApp = []
         meanSpeeds = []
         stdSpeeds = []
         ranges = []
         k = 0
-        i = minrpm if minrpm > 0 else 1
+        #i = minrpm if minrpm > 0 else 1
+        i = minstw if minstw > 0 else 1
 
         
         rpmsPLot = []
         speedsPlot = []
      
-        while i <= maxrpm:
+        while i <= maxstw:
             # workbook._sheets[sheet].insert_rows(k+27)
          
-            rpmArray = np.array([k for k in data if float(k[5]) >= i and float(k[5]) <= i +1])
+            rpmArray = np.array([k for k in data if float(k[3]) >= i and float(k[3]) <= i +1])
             #rpmsApp.append(str(np.round(rpmArray.__len__() / rpmAmount * 100, 2)) + '%')
 
 
            
-            if rpmArray.__len__() > 10:
+            if rpmArray.__len__() > 5:
                 rpmsPLot.append(rpmArray.__len__())
-                speedsPlot.append(np.round((np.min(np.nan_to_num(rpmArray[:, 3].astype(float)))), 2))
-                ranges.append(i)
+                #speedsPlot.append(np.round((np.min(np.nan_to_num(rpmArray[:, 3].astype(float)))), 2))
+                speedsPlot.append(i)
+                ranges.append(np.round((np.mean(np.nan_to_num(rpmArray[:, 5].astype(float)))), 2))
             i += 1
             k += 1
 
@@ -633,7 +707,7 @@ class ErrorGraphs:
 
         plt.clf()
         # Change color with c and alpha
-        p2 = np.poly1d(np.polyfit(xi, yi, 2))
+        p2 = np.poly1d(np.polyfit(xi, yi, 2,w=zi))
         xp = np.linspace(min(xi), max(xi), 100)
         plt.plot([], [], '.', xp, p2(xp))
 
@@ -663,4 +737,4 @@ class ErrorGraphs:
 
         plt.show()
         #fig.savefig('/home/dimitris/Desktop/newResults/v_rpm.eps',)
-        
+        f=0

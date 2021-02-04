@@ -4,7 +4,7 @@ from sklearn.decomposition import PCA
 class BaseFeatureExtractor:
     # Get a series of tuples, where the i-th tuple contains the current sample value X_i and the average X values over the previous 30 samples before i
     def extractFeatures(self, modeler,X, Y,W,B,history):
-        HISTORY_SIZE = 15
+        HISTORY_SIZE = 30
 
         Xnew = []
         Yt=[]

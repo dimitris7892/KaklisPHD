@@ -6,7 +6,10 @@ import dataPartitioning as dPart
 import dataModeling as dModel
 import Danaos_ML_Project.evaluation as eval
 import numpy as np
+import json
 import seaborn as sns
+import datetime
+from sklearn.cluster import KMeans
 from math import sqrt
 from tensorflow import keras
 import sys
@@ -22,18 +25,27 @@ import datetime
 import  matplotlib.pyplot as plt
 from sklearn import svm
 import csv
+from datetime import date
+import ctypes
+import clr
+import clr_loader
+import os
+import requests
 import Danaos_ML_Project.plotResults as pltRes
-from sklearn.ensemble import RandomForestRegressor
-import tensorflow as tf
-from matplotlib import rc
+import Danaos_ML_Project.generateProfile as genProf
+from fastapi import APIRouter
+import urllib.request
+import asyncio
+gener = genProf.BaseProfileGenerator()
 #import latex
 #rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
 #rc('text', usetex=True)
+from tensorflow.python.client import device_lib
+#print(device_lib.list_local_devices())
+from tensorflow.keras import backend as K
+#K.tensorflow_backend._get_available_gpus()
+
 def main():
-    # Init parameters based on command line
-
-
-    #NNrep.BaseReportExtraction.BuildPdfReport(NNrep.BaseReportExtraction,'MILLENIA','METEORA')
 
     end, endU, history, future,sFile, start, startU , algs , cls = initParameters()
     # Load data
@@ -57,39 +69,11 @@ def main():
     subsetsX=[]
     subsetsY = []
     subsetsB=[]
-    reader = dRead.BaseSeriesReader()
 
-    DANreader = DANdRead.BaseSeriesReader()
+
+
 
     plRes = pltRes.ErrorGraphs()
-
-    #plRes.PlotTrueVsPredLine()
-
-    evluation = eval.MeanAbsoluteErrorEvaluation()
-    #evluation.fillExcelWithNeural()
-    #DANreader.GenericParserForDataExtraction('LAROS', 'MARMARAS', 'MT_DELTA_MARIA')
-    #DANreader = DANRead.BaseSeriesReader()
-    #DANreader.readLarosDAta(datetime.datetime(2018,1,1),datetime.datetime(2019,1,1))
-    '''DANreader.GenericParserForDataExtraction('LEMAG', 'DANAOS', 'DOMINIA', driver='ORACLE', server='10.2.5.80',
-                                             sid='OR12', usr='goldenport', password='goldenport',
-                                             rawData=True,telegrams=True,companyTelegrams=False,pathOfRawData='/home/dimitris/Desktop/SEEAMAG')'''
-    #DANreader.GenericParserForDataExtraction('LAROS','MARMARAS','MT_DELTA_MARIA')
-    #DANreader.GenericParserForDataExtraction('LEMAG', 'MILLENIA', 'MAGNIFICA',driver='ORACLE',server='10.2.5.80',sid='OR11',usr='millenia',password='millenia',
-                                             #rawData=[],telegrams=True,companyTelegrams=False,pathOfRawData='C:/Users/dkaklis/Desktop/danaos')
-
-    #DANreader.GenericParserForDataExtraction('LEMAG', 'OCEAN_GOLD', 'PENELOPE',driver='ORACLE',server='10.2.5.80',sid='OR11',usr='oceangold',password='oceangold',
-        #rawData=True,telegrams=True,companyTelegrams=True,seperator='\t',pathOfRawData='C:/Users/dkaklis/Desktop/danaos')
-
-    #DANreader.GenericParserForDataExtraction('LEMAG', 'MARMARAS', 'MT_DELTA_MARIA',driver='ORACLE',server='10.2.5.80',sid='OR11',usr='oceangold',password='oceangold',
-    #rawData=True,telegrams=False,companyTelegrams=False,seperator='\t',pathOfRawData='C:/Users/dkaklis/Desktop/danaos')
-
-    #DANreader.readExtractNewDataset('MILLENIA','FANTASIA',';')
-    #return
-    #DANreader.ExtractLAROSDataset("",'2017-06-01 00:00:00','2019-10-09 15:10:00')
-    #return
-    ####
-    num_lines = sum(1 for l in open(sFile))
-    num_linesx = num_lines
 
     # Sample size - in this case ~10%
     size = 5000
@@ -121,89 +105,427 @@ def main():
 
     print(modelers)
     ###########################################################################
+    #plRes.PlotTrueVsPredLine()
+
+    #plRes.PLotTrajectory(df,'Express Athens')
+    # 2nd place BALLAST FLAG
+    # 8th place DRAFT
+    # 10th place rel WD
+    # 11th place WF
+    # 12th place SPEED
+    # 15th place ME FOC 24H
+    # 16th place ME FOC 24H TLGS
+    # 17th place TRIM
+    # 19th place SteamHours
+    # 18th place STW_TLG
+    # 20st place swellSWH
+    # 21st place  rel swellSW Dir
+    # 26th place  lat
+    # 27th place  lon
+    # 28th place  wsWS
+
+    # 0 draft
+    # 1 wd
+    # 2 wf
+    # 3 stw
+    # 4 trim
+    # 5 swh
+    # 6 swd
+    # 7 foc (MT/day)
+    '''from datetime import datetime
+    path = "/home/dimitris/Desktop/KaklisPHD/Danaos_ML_Project/data/OCEAN_GOLD/PENELOPE/"
+    telegrams = pd.read_csv(path+'/TELEGRAMS/PENELOPE.csv',sep=';').values
+    dataSet = []
+    for infile in sorted(glob.glob(path + '*.csv')):
+            data = pd.read_csv(infile, sep=',', decimal='.', skiprows=1)
+            dataSet.append(data.values)
+            print(str(infile))
+        # if len(dataSet)>1:
+    dataSet = np.concatenate(dataSet)
+    dataSet[:,0] = list(map(lambda x: datetime.strptime(x, '%Y-%m-%d %H:%M:%S.%f').replace(second=0, microsecond=0), dataSet[:,0]))
+    trackReport = pd.read_csv('./data/OCEAN_GOLD/Penelope TrackReport.csv').values
+
+    speeds = []
+    focs = []
+    windSpeeds = []
+    drafts=[]
+    for i in range(0,len(trackReport)):
+
+            if trackReport[i, 7] == 'No data' or trackReport[i, 6] == 'Unknown': continue
+
+            date = trackReport[i,1]
+            dt = date.split(" ")[0]
+            time = date.split(" ")[1]
+            day = dt.split(".")[0]
+            month = dt.split(".")[1]
+            year = dt.split(".")[2]
+            hours = time.split(":")[0]
+            minutes = int(time.split(":")[1])
+            mod = minutes % 5
+            minutes = minutes - mod if mod <=2 else minutes + (mod - (mod-1))
+            minutes = str(minutes) if len(str(minutes))>1 else "0"+str(minutes)
+            newTime = hours + ":" + minutes
 
 
-    #random.seed(1)
-    stdInU=[]
+            newDate = year + "-" + month + "-" + day + " " + newTime
+            foc = -1
+            for k in range(0,len(dataSet)):
+                dateTimeRaw = str(dataSet[k,0])[:-3]
+                if dateTimeRaw == newDate:
+                    foc = dataSet[k,11]
+                    break
+            if foc == -1 : continue
+            speeds.append(float(trackReport[i,6].split(" ")[0]))
+            windSpeeds.append(float(trackReport[i, 7].split("m/s")[0]))
+            focs.append(foc)
+
+            ##map with tlgs for draft
+            draft = -1
+            for n in range(0,len(telegrams)):
+                dateTlg = str(telegrams[n,0].split(" ")[0])
+                if dateTlg == newDate.split(" ")[0]:
+                    draft = telegrams[n,8]
+                    break
+            drafts.append(draft)
 
 
-    #dataV = pd.read_csv('/home/dimitris/Desktop/errorSTW25.csv', delimiter=',')
-    #dataV =np.array(dataV.values.astype(float))
-    #minV =np.min(dataV[:,0])
-    #maxV =np.max(dataV[:, 0])
-    #i=minV
-    #with open('./meanErrorStw.csv', mode='w') as data:
-        #data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-        #data_writer.writerow(['MAE', 'STW'])
-        #while i <=maxV:
-            #meanErr =np.mean(np.array([k for k in dataV if k[0]>=i and k[0]<=i+0.5])[:,1])
-            #data_writer.writerow([meanErr,i])
-            #i=i+0.5
+    df = {'speed':speeds,"ws":windSpeeds,"foc":focs,'draft':drafts}
+    df = pd.DataFrame(df).to_csv("./data/OCEAN_GOLD/PENELOPE/trackRepMapped.csv",index=False)'''
+
+    '''trdata = pd.read_csv('./data/GOLDENPORT/TRAMMO LAOURA/mappedData.csv').values
+    with open('./data/TRAMMOCoor.csv', mode='w') as data:
+                    data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+                    data_writer.writerow(['Latitude', 'Longitude'])
+                    for i in range(0,len(trdata)):
+                        data_writer.writerow(
+                            [trdata[i][26], trdata[i][27]])
+
+    df1 = pd.read_csv('./data/TRAMMOCoor.csv')
+
+    plRes.PLotTrajectory(df1,'TRAMMO LAOURA ')'''
 
 
-
-    ####################################################################################################
-    ####################################################################################################
-
-
-
-    #####################################################################################################
-    #####################################################################################################
-
-
-    #############################################################################################################
-    #############################################################################################################
-
-
-    # subsets=[]
-    # for i in range(1,5):
-    # subsetsX.append(trData[(k+kInit):(n+k+kInit),0:7])
-    # subsetsY.append(trData[(k+kInit):(n+k+kInit), 7])
-    # k=n*i#+1000
-
-    # subsetsX.append(trData[0:20000, 0:7])
-    # subsetsY.append(trData[0:20000, 7])
-
-    # subsetsX.append(trData[20000:40000, 0:7])
-    # subsetsY.append(trData[20000:40000, 7])
-
-    # subsetsX.append(trData[50000:70000, 0:7])
-    # subsetsY.append(trData[50000:70000, 7])
-
-    # subsetsX.append(trData[70000:90000, 0:7])
-    # subsetsY.append(trData[70000:90000, 7])
-    # indSubsets = []
-    # for i in range(0,len(subsets)):
-    # X = DANreader.readStatDifferentSubsets(subsets[i],subsets,i)
-    # indSubsets.append(X)
-    # n = 1000
-    # kInit=90000
-    # k=0
-    # unseensX=[]
-    # unseensY = []
-    # for i in range(1,6):
-    #     # unseensX.append(data[(k+kInit):(n+k+kInit) , 0:7])
-    #     # unseensY.append(data[(k+kInit):(n+k+kInit), 7])
-    # k = n * i + 10
-    #errorPerc = pd.read_csv('C:/Users/dkaklis/Desktop/TESTerrorPercFOC4_0.csv', delimiter=',')
-    #errorPerc = errorPerc.drop(["wind_speed", "wind_dir"], axis=1)
-
-
-
-    
-    DANreader.GenericParserForDataExtraction('LEMAG', 'DANAOS', 'LEO C', driver='ORACLE',
+    DANreader = dRead.BaseSeriesReader()
+    '''DANreader.GenericParserForDataExtraction('LEMAG', 'OCEAN_GOLD', 'PENELOPE', driver='ORACLE',
                                              server='10.2.5.80',
-                                             sid='OR12', usr='shipping', password='shipping',
-                                                 rawData=True, telegrams=True, companyTelegrams=False,
-                                             pathOfRawData='/home/dimitris/Desktop/SEEAMAG')
-    #trData = np.array(np.append(data[:,1].reshape(-1,1),np.asmatrix([data[:,2],data[:,3],data[:,4],data[:,12],data[:,13],data[:,7],data[:,5]]).T,axis=1))
-    #y_train = np.array(np.mean(data[:,5:6],axis=1))
+                                             sid='OR11', usr='oceangold', password='oceangold',
+                                             rawData=False, telegrams=True, companyTelegrams=False,
+                                             pathOfRawData='/home/dimitris/Desktop/SEEAMAG')'''
 
+    '''DANreader.GenericParserForDataExtraction('LEMAG', 'GOLDENPORT', 'TRAMMO LAOURA', driver='ORACLE',
+                                             server='10.2.5.80',
+                                             sid='OR12', usr='goldenport', password='goldenport',
+                                             rawData=False, telegrams=True, companyTelegrams=False,
+                                             pathOfRawData='/home/dimitris/Desktop/SEEAMAG')'''
+
+    #return
+
+    indices = []
+    data = pd.read_csv(sFile,sep=',').values
+    #data=data[:2000]
+
+
+
+    wfS = data[:, 11].astype(float) / (1.944)
+    wsSen = []
+    '''for i in range(0, len(wfS)):
+        wsSen.append(gener.ConvertMSToBeaufort(float(float(wfS[i]))))
+    data[:, 11] = wsSen'''
+
+    '''df = pd.DataFrame({
+        'wfSensor': wfS,
+    })
+    sns.displot(df, x="wfSensor")'''
+    ########################################################################
+    wfWS = data[:, 28]
+    wfws = []
+    '''for i in range(0, len(wfS)):
+        wf.append(gener.ConvertMSToBeaufort(float(float(wfWS[i]))))'''
+
+    '''df = pd.DataFrame({
+        'wfWeatherService': wfWS,
+    })
+    sns.displot(df, x="wfWeatherService")'''
+    #plt.show()
+
+    '''wfWS = data[:, 28]
+    wfws = []
+    for i in range(0, len(wfS)):
+        wfws.append(gener.ConvertMSToBeaufort(float(float(wfWS[i]))))
+    data[:, 28] = wfws'''
+
+    '''i=0
+    LAT = 49.31665
+    LON = -4.08136
+    datetimeV='2019-12-08 10:31:00'
+    dateV = datetimeV.split(" ")[0]
+    hhMMss = datetimeV.split(" ")[1]
+    month = dateV.split("-")[1]
+    day = dateV.split("-")[2]
+    year = dateV.split("-")[0]
+    month = '0' + month if month.__len__() == 1 else month
+    day = '0' + day if day.__len__() == 1 else day
+    newDate = year + '-' + month + '-' + day
+    newDate1 = year + '-' + month + '-' + day + " " + ":".join(hhMMss.split(":")[0:2])
+    windSpeed ,relWindDir ,swellSWH, relSwelldir , wavesSWH , relWavesdDir ,combSWH , relCombWavesdDir =\
+        DANreader.mapWeatherData(
+                        data[i,1], newDate1, np.round(LAT), np.round(LON))'''
 
     '''for i in range(0,len(data)):
-        data[i] = np.mean(data[i:i+10],axis=0)
+        lat = data[i,26]
+        lon = data[i, 27]
+        is_in_ocean = globe.is_ocean(lat,lon)
+        if is_in_ocean:
+            indices.append(i)
 
-    for i in range(1,len(data)):
+    data = np.array([data[k] for k in indices])'''
+
+
+    #data =np.array([k for k in data if k[2]=='B' or k[2]=='L'])
+    wfS = data[:, 11].astype(float) / (1.944)
+    wsSen = []
+    for i in range(0, len(wfS)):
+        wsSen.append(gener.ConvertMSToBeaufort(float(float(wfS[i]))))
+    data[:, 11] = wsSen
+
+    data[:, 11] = wfS
+
+    data[:, 15] = ((data[:, 15]) / 1000)* 1440
+    ##################################################
+    trData = np.array(np.append(data[:,8].reshape(-1,1),np.asmatrix([data[:,10],data[:,11],data[:,12],data[:,22],(data[:,15]),]).T,axis=1)).astype(float)#data[:,26],data[:,27]
+    #trData = np.array(np.append(data[:, 0].reshape(-1, 1),
+                                #np.asmatrix([data[:, 1], data[:, 3], data[:, 4], data[:, 5]]).T,
+                                #axis=1)).astype(float)
+    #np.array(np.append(data[:,0].reshape(-1,1),np.asmatrix([data[:,1],data[:,2],data[:,3],data[:,4],data[:,7],data[:,8],data[:,9]]).T,axis=1)).astype(float)
+    #np.array(np.append(data[:,8].reshape(-1,1),np.asmatrix([data[:,10],data[:,11],data[:,12],data[:,20],data[:,21],data[:,15]]).T,axis=1)).astype(float)
+
+
+
+    trData = np.array([k for k in trData if   float(k[2])>=0 and float(k[4])>=0 and (float(k[3])>10 and k[3]<=21) and float(k[5])>0  ])
+
+
+
+    #plRes.PLotDists(trData)
+    e=0
+    #X_train, X_test, y_train, y_test = train_test_split(trData[:, 0:5], trData[:, 5:], test_size=0.26, random_state=42)
+    trData1 =  trData[27000:86000, :]
+    trData2 =  trData[86000:145115,:] #HAMBURG - MUMBAI - #HAMBURG
+    '''with open('./data/EXPRESS ATHENSCoor1.csv', mode='w') as data:
+            data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+            data_writer.writerow(['Latitude', 'Longitude'])
+            for i in range(0,len(trData1)):
+                data_writer.writerow(
+                    [trData1[i][6], trData1[i][7]])
+
+    with open('./data/EXPRESS ATHENSCoor2.csv', mode='w') as data:
+            data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+            data_writer.writerow(['Latitude', 'Longitude'])
+            for i in range(0,len(trData2)):
+                data_writer.writerow(
+                    [trData2[i][6], trData2[i][7]])'''
+
+    df1 = pd.read_csv('./data/EXPRESS ATHENSCoor1.csv')
+    df2 = pd.read_csv('./data/EXPRESS ATHENSCoor2.csv')
+    #plRes.PLotTrajectory(df1,'EXPRESS ATHENS (2019-10-18) - (2019-12-11)')
+    #plRes.PLotTrajectory(df2, 'EXPRESS ATHENS (2019-12-12) - (2020-02-05)')
+    #return
+    #trData = np.array([k for k in trData if k[0] >=6 and k[4] > 0])
+
+        #np.array([k for k in trData if float(k[0])>5 and k[6]>0 and k[7]>0])
+
+    '''meanFoc = np.mean(trData[:, :],axis=0)
+    stdFoc = np.std(trData[:, :],axis=0)
+    trData = np.array([k for k in trData if (k >= (meanFoc - (3 * stdFoc))).all() and (k <= (meanFoc + (3 * stdFoc))).all()])'''
+
+
+    wd = np.array([k for k in trData])[:, 1]
+    for i in range(0, len(wd)):
+        if float(wd[i]) > 180:
+            wd[i] = float(wd[i]) - 180  # and  float(k[8])<20
+
+    trData[:, 1] = wd
+
+    '''wf = np.array([k for k in trData])[:, 2]
+    for i in range(0, len(wf)):
+        wf[i] = gener.ConvertMSToBeaufort(float(float(wf[i])))
+    trData[:, 2] = wf'''
+
+
+
+
+    size = 3000
+
+    #trData = trData[trData[:, 3].argsort()]
+
+    #trData = trData[:20000]
+    #X_train, X_test, y_train, y_test = trData[:len(trData) - size, 0:5], trData[len(trData) - size:len(trData), 0:5], \
+                                       #trData[:len(trData) - size, 5], trData[len(trData) - size:len(trData),5]
+    '''trData1 = trData[20000:100000,5]
+    #trData2 = trData[9500:20000,5]
+    df = pd.DataFrame({
+        'tr1': trData1,
+    })
+    sns.displot(df, x="tr1")'''
+    trData = trData[:44000]
+
+
+    for i in range(0, len(trData)):
+        trData[i] = np.mean(trData[i:i + 15], axis=0)
+    #plt.show()
+
+    #X_train, y_train = trData[:135000, 0:5], trData[:135000,5]
+    #X_test, y_test = trData[135000:,0:5] , trData[135000:,5]
+    X_train, X_test, y_train, y_test = train_test_split(trData[:, 0:5], trData[:, 5], test_size=0.1, random_state=42)
+
+    test = np.append(X_test,y_test.reshape(-1,1),axis=1)
+    df = pd.DataFrame(test,)
+    df.to_csv('./testRaw.csv',index=False,)
+
+    '''train = np.append(X_train, y_train.reshape(-1, 1), axis=1)
+
+    for i in range(0, len(train)):
+        train[i] = np.mean(train[i:i + 15], axis=0)
+
+    for i in range(0, len(test)):
+        test[i] = np.mean(test[i:i + 15], axis=0)
+
+    X_train, X_test, y_train, y_test = train[:,0:5] , test[:,0:5] , train[:,5] ,test[:,5]'''
+
+    i = 8.75
+    maxSpeed = np.max(X_train[:,3])
+    sizesSpeed = []
+    AvgactualFoc = []
+    dt = X_train
+    speed=[]
+    #dt[:, :-1] = y_train
+    dt = np.hstack((dt, y_train.reshape(-1,1)))
+    while i <= maxSpeed:
+        # workbook._sheets[sheet].insert_rows(k+27)
+
+        speedArray = np.array([k for k in dt if float(k[3]) >= i and float(k[3]) <= i + 0.5])
+
+        if speedArray.__len__() > 1:
+            sizesSpeed.append(speedArray.__len__())
+            speed.append(i+0.25)
+            AvgActualFoc = np.mean(speedArray[:,5])
+        i += 0.5
+
+    d = {'Speed': speed, 'Size': sizesSpeed}
+    df  = pd.DataFrame(d)
+    df.to_csv('./data/DANAOS/EXPRESS ATHENS/SpeedTrain.csv',index=False)
+
+    with open('./data/DANAOS/EXPRESS ATHENS/mappedDataTest.csv', mode='w') as data:
+        data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+        #data_writer.writerow(['Latitude', 'Longitude'])
+        for i in range(0, len(X_test)):
+            data_writer.writerow(
+                [X_test[i][0], X_test[i][1],X_test[i][2],X_test[i][3],X_test[i][4],y_test[i]])
+
+    with open('./data/DANAOS/EXPRESS ATHENS/mappedDataTrain.csv', mode='w') as data:
+        data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+        # data_writer.writerow(['Latitude', 'Longitude'])
+        for i in range(0, len(X_train)):
+            data_writer.writerow(
+                [0, 0, 0, 0, 0, 0, 0, 0, X_train[i][0], 0,
+                 X_train[i][1],
+                 X_train[i][2], X_train[i][3], 0, 0, y_train[i], 0, 0,
+                 0, 0,
+                 X_train[i][4], 0, 0, 0, 0,
+                 0,
+                 0, 0])
+
+    '''imo = "9484948"
+    vessel = "EXPRESS ATHENS"
+    laddenJSON = '{}'
+    json_decoded = json.loads(laddenJSON)
+    json_decoded['ConsumptionProfile_Dataset'] = {"vessel_code": str(imo), 'vessel_name': vessel,
+                                                  "dateCreated": date.today().strftime("%d/%m/%Y"), "data": []}
+    for i in range(0, len(X_test)):
+        item = {"draft": np.round(X_test[i][0], 2), 'stw': np.round(X_test[i][3], 2),
+                "windBFT": np.round(X_test[i][2], 2),
+                "windDir": np.round(X_test[i][1], 2), "swell": np.round(X_test[i][4], 2),
+                "cons": np.round(y_test[i], 2)}
+        json_decoded['ConsumptionProfile_Dataset']["data"].append(item)
+        # json_decoded['ConsumptionProfile']['consProfile'].append(outerItem)
+
+    with open('./consProfileJSON/TestData_' + vessel + '_.json', 'w') as json_file:
+        json.dump(json_decoded, json_file)'''
+
+    DANreader.GenericParserForDataExtraction('LEMAG', 'DANAOS', 'EXPRESS ATHENS', driver='ORACLE',
+                                             server='10.2.5.80',
+                                             sid='OR12', usr='shipping', password='shipping',
+                                             rawData=False, telegrams=True, companyTelegrams=False,
+                                             pathOfRawData='/home/dimitris/Desktop/SEEAMAG')
+
+
+    return
+    subsetsX.append(X_train.astype(float))
+    subsetsY.append(y_train.astype(float))
+
+    unseenX = X_test.astype(float)
+    unseenY = y_test.astype(float)
+
+    '''with open('./data/EXPRESS ATHENSCoorTrain.csv', mode='w') as data:
+            data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+            data_writer.writerow(['Latitude', 'Longitude'])
+            for i in range(0,1000):
+                data_writer.writerow(
+                    [y_train[i][1], y_train[i][2]])
+
+    with open('./data/EXPRESS ATHENSCoorTest.csv', mode='w') as data:
+            data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+            data_writer.writerow(['Latitude', 'Longitude'])
+            for i in range(0,1000):
+                data_writer.writerow(
+                    [y_test[i][1], y_test[i][2]])'''
+
+
+
+
+    print(str(len(X_train)))
+    print(str(len(unseenX)))
+    #unseenX = []
+    #unseenY = []
+
+    '''
+
+    return'''
+    '''trDataSwellImpact = np.array([k for k in trData if k[2] > 0 and k[2]<=2 and k[4] > 0])
+    trDataWSImpact = np.array([k for k in trData if k[4] > 0 and k[4] <= 1.5 and k[2] > 0])
+    trDataSTWImpact = np.array([k for k in trData if k[4] > 0 and k[4] <= 1.5 and k[2] > 0 and k[2]<=2])
+    trDataWDImpact = np.array([k for k in trData if k[4] > 0 and k[4] <= 1.5 and k[2] >= 3 and k[3]>10])'''
+
+    #trData = np.concatenate((trDataSwellImpact, trDataWSImpact, trDataSTWImpact, trDataWDImpact), axis=0)
+    #X_train, y_train = trData[:,0:5] , trData[:,5]
+    '''dm = dModel.BasePartitionModeler()
+    currModeler = keras.models.load_model('./DeployedModels/estimatorCl_Gen.h5')
+
+    #X_test,  y_test = trData[:, 0:5] , trData[:, 5]
+
+    size = 0
+    #X_train, X_test, y_train, y_test = trData[:len(trData)-size, 0:5],  trData[len(trData)-size:len(trData), 0:5], trData[:len(trData)-size, 5], trData[len(trData)-size:len(trData), 5]
+    # train_test_split(trData[:, 0:5], trData[:, 5], test_size=0.05, random_state=42)
+    # This is the size of our encoded representations
+    #subsetsX.append(X_train.astype(float))
+    #subsetsY.append(y_train.astype(float))
+
+    unseenX = X_test.astype(float)
+    unseenY = y_test.astype(float)'''
+
+
+    '''_, meanError, sdError = eval.MeanAbsoluteErrorEvaluation.evaluateKerasNN1(
+        eval.MeanAbsoluteErrorEvaluation(), unseenX,
+        unseenY,
+        currModeler, None, None, None, [1], None, 0, 'test')
+
+    print("Mean absolute error on unseen data: %4.2f (+/- %4.2f standard error)" % (
+    meanError, sdError / sqrt(unseenY.shape[0])))
+    print("Evaluating on unseen data... Done.")
+
+    #print("Standard Deviation of training Data: %4.2f" % (np.std(seriesX)))
+    print("Standard Deviation of unseen Data: %4.2f" % (np.std(unseenX)))'''
+
+    '''for i in range(1,len(data)):
 
         data[i,7] =np.abs( data[i,7] - data[i-1,7])'''
 
@@ -216,151 +538,6 @@ def main():
                     data['rpm'].values]).T, axis=1)'''
 
     ##################################################
-
-    #data = data[data[:,0]>7 ]
-    #data = data[data[:, 5] > 0]
-    #trData = np.array(data[0:100000])
-    #trData = np.array(data)
-    #trData = np.array(np.append(trData[:,0:4],np.asmatrix([trData[:,7],np.mean(trData[:,5:6],axis=1)]).T,axis=1))
-    #windDirection = trData[:,4]
-    #waveDirection = trData[:, 6]
-    '''for i in range(0,len(windDirection)):
-        if windDirection[i] > 180:
-            windDirection[i] = windDirection[i] - 180'''
-
-    '''for i in range(0, len(windDirection)):
-        if windDirection[i] >=0 and windDirection[i] <=22.5:
-                windDirection[i] = 1
-        if windDirection[i] >22.5 and windDirection[i] <=67.5:
-                windDirection[i] = 2
-        if windDirection[i] > 67.5 and windDirection[i] <=112.5:
-                windDirection[i] = 3
-        if windDirection[i] > 112.5 and windDirection[i] <=157.5:
-                windDirection[i] = 4
-        if windDirection[i] > 157.5 and windDirection[i] <=180:
-                windDirection[i] = 5
-
-        if windDirection[i] >= 180 and windDirection[i] <= 202.5:
-            windDirection[i] = 5
-        if windDirection[i] > 202.5 and windDirection[i] <= 247.5:
-            windDirection[i] = 4
-        if windDirection[i] > 247.5 and windDirection[i] <= 292.5:
-            windDirection[i] = 3
-        if windDirection[i] > 292.5 and windDirection[i] <= 337.5:
-            windDirection[i] = 2
-        if windDirection[i] > 337.5 and windDirection[i] <= 360:
-            windDirection[i] = 1
-    
-
-    for i in range(0, len(waveDirection)):
-        if waveDirection[i] > 180:
-            waveDirection[i] = waveDirection[i] - 180
-
-    for i in range(0, len(waveDirection)):
-        if waveDirection[i] >= 0 and waveDirection[i] <= 22.5:
-            waveDirection[i] = 1
-        if waveDirection[i] > 22.5 and waveDirection[i] <= 67.5:
-            waveDirection[i] = 2
-        if waveDirection[i] > 67.5 and waveDirection[i] <= 112.5:
-            waveDirection[i] = 3
-        if waveDirection[i] > 112.5 and waveDirection[i] <= 157.5:
-            waveDirection[i] = 4
-        if waveDirection[i] > 157.5 and waveDirection[i] <= 180:
-            waveDirection[i] = 5
-
-        if waveDirection[i] >= 180 and waveDirection[i] <= 202.5:
-            waveDirection[i] = 5
-        if waveDirection[i] > 202.5 and waveDirection[i] <= 247.5:
-            waveDirection[i] = 4
-        if waveDirection[i] > 247.5 and waveDirection[i] <= 292.5:
-            waveDirection[i] = 3
-        if waveDirection[i] > 292.5 and waveDirection[i] <= 337.5:
-            waveDirection[i] = 2
-        if waveDirection[i] > 337.5 and waveDirection[i] <= 360:
-            waveDirection[i] = 1
-
-    trData[:,4] = windDirection
-    trData[:,6] = waveDirection'''
-    HISTORY_SIZE = 10
-    #stws =[]
-    #for i in range(HISTORY_SIZE,len(trData)):
-        #MeanStwPrevSteps = np.mean(trData[ i - HISTORY_SIZE:i , 0 ])
-        #stws.append(MeanStwPrevSteps)
-    #trData = np.array(np.append(trData[HISTORY_SIZE:], np.asmatrix([stws]).T, axis=1))
-
-    #clf = svm.SVR()
-    #clf.fit(trData[:,0:7], trData[:,7])
-
-    k=0
-    kInit =0
-    n=20000
-
-
-    x=0
-    #subsets=[]
-    #for i in range(1,5):
-        #subsetsX.append(trData[(k+kInit):(n+k+kInit),0:7])
-        #subsetsY.append(trData[(k+kInit):(n+k+kInit), 7])
-        #k=n*i#+1000
-
-    #subsetsX.append(trData[0:20000, 0:7])
-    #subsetsY.append(trData[0:20000, 7])
-
-    #subsetsX.append(trData[20000:40000, 0:7])
-    #subsetsY.append(trData[20000:40000, 7])
-
-    #subsetsX.append(trData[50000:70000, 0:7])
-    #subsetsY.append(trData[50000:70000, 7])
-
-    #subsetsX.append(trData[70000:90000, 0:7])
-    #subsetsY.append(trData[70000:90000, 7])
-    #indSubsets = []
-    #for i in range(0,len(subsets)):
-       #X = DANreader.readStatDifferentSubsets(subsets[i],subsets,i)
-       #indSubsets.append(X)
-    #n = 1000
-    #kInit=90000
-    #k=0
-    #unseensX=[]
-    #unseensY = []
-    #for i in range(1,6):
-        #unseensX.append(data[(k+kInit):(n+k+kInit) , 0:7])
-        #unseensY.append(data[(k+kInit):(n+k+kInit), 7])
-        #k = n * i + 10
-
-    windDirection = trData[:,1]
-
-    for i in range(0,len(windDirection)):
-        if windDirection[i] > 180:
-            windDirection[i] = windDirection[i] - 180
-
-    trData[:,1]=windDirection
-    #subsetsX.append(data[:,0:7][0:1000].astype(float))
-    #subsetsY.append(data[:, 7][0:1000].astype(float))
-    #unseenX = data[:, 0:7][90000:].astype(float)
-    #unseenY = data[:, 7][90000:].astype(float)
-    ##MOVING ANVERAGE
-    for i in range(0,len(trData)):
-        trData[i] = np.mean(trData[i:i+10],axis=0)
-    ######end moving average
-
-
-
-    X_train, X_test, y_train, y_test = train_test_split(trData[:,0:7], trData[:,7], test_size=0.2,random_state=42)
-
-
-    #dataTrain = np.array(np.append(X_train, np.asmatrix([y_train.reshape(-1)]).T, axis=1))
-    #DANreader.GenericParserForDataExtraction('LEMAG', 'MILLENIA', 'METEORA',driver='ORACLE',server='10.2.5.80',sid='OR11',usr='millenia',password='millenia',
-    #rawData=False,telegrams=True,companyTelegrams=False,seperator='\t',pathOfRawData='C:/Users/dkaklis/Desktop/danaos' ,comparisonTest=False,dataTrain = None )
-
-
-
-
-    subsetsX.append(X_train.astype(float))
-    subsetsY.append(y_train.astype(float))
-
-    unseenX=X_test.astype(float)
-    unseenY=y_test.astype(float)
 
     print("Number of Statistically ind. subsets for training: " + str(len(subsetsX)))
 
@@ -388,7 +565,7 @@ def main():
                elif modeler.__class__.__name__=='TriInterpolantModeler' or modeler.__class__.__name__ == 'TensorFlow':
                  partK =[1]
                else:
-                 partK=[1]
+                 partK=[9]
            else:
                partK=[1]
            error = {"errors": []}
@@ -503,7 +680,7 @@ def main():
 
                 # Predict and evaluate on seen data
                 print("Evaluating on seen data...")
-                if modeler.__class__.__name__ == 'TensorFlowW1':
+                '''if modeler.__class__.__name__ == 'TensorFlowW1':
                     _, meanErrorTr, sdError = eval.MeanAbsoluteErrorEvaluation.evaluateKerasNN1(
                         eval.MeanAbsoluteErrorEvaluation(), seriesX,
                         targetY,
@@ -520,7 +697,7 @@ def main():
                         modeler, None, None, None, partitionsX, None, subsetInd,'train')
 
                 print("Mean absolute error on seen data: %4.2f (+/- %4.2f standard error)" % (
-                meanErrorTr, sdError / sqrt(unseenY.shape[0])))
+                meanErrorTr, sdError / sqrt(unseenY.shape[0])))'''
                 print("Evaluating on seen data... Done.")
 
                 #Predict and evaluate on unseen data
@@ -532,11 +709,11 @@ def main():
                             eval.MeanAbsoluteErrorEvaluation(), unseenX,
                             unseenY,
                             modeler, output, None, None, partitionsX, scores,subsetInd,'test')
-                elif modeler.__class__.__name__ == 'TensorFlowW3' or modeler.__class__.__name__ == 'TensorFlowW2':
-                    _, meanError, sdError = eval.MeanAbsoluteErrorEvaluation.evaluateKerasNN(
+                elif modeler.__class__.__name__ == 'TensorFlowW' or modeler.__class__.__name__ == 'TensorFlowW2':
+                    _, meanError, sdError = eval.MeanAbsoluteErrorEvaluation.evaluateKerasNNAvg(
                         eval.MeanAbsoluteErrorEvaluation(), unseenX,
                         unseenY,
-                        modeler, output, None, None, partitionsX, scores,subsetInd,'test')
+                        modeler, output, None, None, partitionsX, genericModel,subsetInd,'test')
                 elif modeler.__class__.__name__=='PavlosInterpolation':
                     _, meanError, sdError = eval.MeanAbsoluteErrorEvaluation.evaluatePavlosInterpolation(
                         eval.MeanAbsoluteErrorEvaluation(), unseenX,
@@ -568,7 +745,7 @@ def main():
                 #meanVTr.append(np.mean(s ubsetX))
                 #meanBTr.append(np.mean(X[:,2]))
                 errors.append(meanError)
-                trErrors.append(meanErrorTr)
+                trErrors.append(meanError)
 
                 err={}
                 err["model"] =modeler.__class__.__name__
@@ -587,10 +764,8 @@ def main():
 
 def initParameters():
 
-    sFile = '/home/dimitris/Desktop/new.csv'
-        #"/home/dimitris/Desktop/mappedData/filteredDataNew.csv"
-        #"/home/dimitris/Desktop/mappedData_.csv"
-        #"./neural_data/marmaras_data.csv"
+    sFile = './data/DANAOS/EXPRESS ATHENS/mappedDataNew.csv'
+        #'./data/DANAOS/EXPRESS ATHENS/mappedData.csv'
         #"./neural_data/marmaras_data.csv"
     # Get file name
     history = 20
@@ -599,7 +774,7 @@ def initParameters():
     end = 17000
     startU = 30000
     endU = 31000
-    algs=['NNW1']
+    algs=['NNW']
     # ['SR','LR','RF','NN','NNW','TRI']
 
 

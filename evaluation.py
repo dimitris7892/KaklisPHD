@@ -207,7 +207,7 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
             #plt.plot(dataXnew[ simplex, 0 ], dataXnew[ simplex, 1 ], 'k-', linewidth=3)
         ######################
 
-        for i in range(0, len(triNew.vertices)):
+        '''for i in range(0, len(triNew.vertices)):
             k = triNew.vertices[ i ]
             # if simplex == 8901:
             # x = 0
@@ -230,7 +230,7 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
                 #triangulationsClusters.append(Delaunay(trainX[ i ]))
             #except Exception,e:
                 #print(str(e))
-                #x=0
+                #x=0'''
 
 
 
@@ -239,7 +239,10 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
         errorsFalse=[]
         countTrue = 0
         countFalse = 0
-        predictions=[]
+        predictionsTri=[]
+        predictions = []
+        percErrors=[]
+        rpmsTrue=[]
         yTrue=[]
         for iu in range(0,len(unseenX)):
 
@@ -366,15 +369,15 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
                         flgV = True
                         vs.append(np.array([0,0]))
 
-                    v12 = vs[0][0]
-                    v23 = vs[1][0]
-                    v31 =  vs[2][0]
+                    #v12 = vs[0][0]
+                    #v23 = vs[1][0]
+                    #v31 =  vs[2][0]
 
                     ##barycenters (W12,W23,W13) of neighboring triangles and solutions of linear 3x3 sustem in order to find gammas.
                     try:
 
                         ###################################################
-                        eq1 = np.array([ [ (V1[ 0 ] - V3[ 0 ]), (V2[ 0 ] - V3[ 0 ]) ],
+                        '''eq1 = np.array([ [ (V1[ 0 ] - V3[ 0 ]), (V2[ 0 ] - V3[ 0 ]) ],
                                          [ (V1[ 1 ] - V3[ 1 ]), (V2[ 1 ] - V3[ 1 ]) ] ])
 
                         eq2 = np.array([ v12 - V3[ 0 ], v12 - V3[ 1 ] ])
@@ -408,7 +411,7 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
                         W31_1 = solutions[ 0 ]
                         W31_2 = solutions[ 1 ]
                         W31_3 = 1 - solutions[ 0 ] - solutions[ 1 ]
-                        cond_numer3 = np.linalg.cond(eq1)
+                        cond_numer3 = np.linalg.cond(eq1)'''
                     ####################################
                     ####################################
                         b = triNew.transform[k, :2].dot(vs[0] - triNew.transform[k, 2])
@@ -945,7 +948,7 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
                     #distList.append(np.mean([ distV1, distV2, distV3 ]))
                     distList.append(distFromCenter)
 
-                minIndexDist = distList.index(np.min(distList))
+
                 minIndexDist = distList.index(np.min(distList))
                 k = minIndexDist
                 neighboringVertices1 = [ ]
@@ -1050,8 +1053,8 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
                 meanPreds = Xpred
 
                 errorsTue.append(abs(meanPreds - trueVal))
-                if abs(meanPreds-trueVal)>2 :
-                    print("Index of point : "+ str(iu)+" "+ "Index of vertice"+ str(k))
+                #if abs(meanPreds-trueVal)>2 :
+                #print("Index of point : "+ str(iu)+" "+ "Index of vertice"+ str(k))
                 countTrue+=1
             else:
                 #meanPreds = modeler.getBestModelForPoint(candidatePoint.reshape(-1,2)).predict(candidatePoint.reshape(-1,2))
@@ -1060,8 +1063,10 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
                 countFalse+=1
                     #np.mean(preds)
             lErrors.append(abs(meanPreds - trueVal))
-            if abs(meanPreds - trueVal) > 10:
-                x= 0
+            rpmsTrue.append(trueVal)
+            predictionsTri.append(meanPreds)
+            percErrors.append( abs((meanPreds - trueVal) / trueVal) * 100)
+
 
         errors = np.asarray(lErrors)
         print(np.mean(np.nan_to_num(errors)))
@@ -1070,6 +1075,15 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
              +" Count False " +str(countFalse))
         print(np.mean(np.nan_to_num(errors)))
 
+        with open('./testError/TESTerrorPercRPM_AM' + '_' + str(0) + '.csv',
+                  mode='w') as data:
+            data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+            data_writer.writerow(
+                ['FOC', 'PRED', 'PERC'])
+            for i in range(0, len(percErrors)):
+                data_writer.writerow([rpmsTrue[i], predictionsTri[i], percErrors[i]])
+
+        print('Accuracy: ' + str(np.round(100 - np.mean(percErrors), 2)) +' %')
         '''plt.plot(np.linspace(0, len(predictions), len(predictions)), predictions, '-', c='blue',
                  label='RPM Predictions with triangulation, acc: %')
 
@@ -1513,7 +1527,7 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
     def evaluateKerasNN(self, unseenX, unseenY, modeler,output,xs,genericModel,partitionsX , scores):
         lErrors = []
         self.intercepts = []
-        preds=[]
+        predsXiBSpNN=[]
         self.count = 0
         errorStwArr = []
         rpm = []
@@ -1531,9 +1545,9 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
 
             #fits = modeler.getFitForEachPartitionForPoint(pPoint, partitionsX)
 
-
+            preds = []
             if len(modeler._models) > 1:
-                preds = []
+
                 for n in range(0,len(partitionsX)):
                     self.intercepts = []
                     vector = self.extractFunctionsFromSplines(pPoint[0][0], pPoint[0][1], n)
@@ -1583,7 +1597,7 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
                 #np.append(np.asmatrix(pPoint[0][0]).reshape(-1, 1), np.asmatrix([percError[0]]).T, axis=1)))
             errorRpm.append(percError)
             rpm.append(trueVal)
-            preds.append(prediction[0][0])
+            predsXiBSpNN.append(prediction[0][0])
 
             error = abs(prediction - trueVal)
             lErrors.append(error)
@@ -1615,8 +1629,8 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
                 data_writer.writerow(
                     ['FOC', 'PRED','PERC'])
                 for i in range(0, len(errorRpm)):
-                    data_writer.writerow([])
-                        #[rpm[i],preds[i] ,errorRpm[i][0][0]])
+                    data_writer.writerow([rpm[i],predsXiBSpNN[i] ,errorRpm[i][0][0]])
+
 
 
         #prediction =modeler._models[ 0 ].predict(unseenX.reshape(2,2860))
@@ -1638,6 +1652,8 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
         subsetInd=0
         type='test'
         XSplineGenvectorNews=[]
+        n_steps = 15
+
         for iCnt in range(np.shape(unseenX)[0]):
             pPoint =unseenX[iCnt]
             pPoint= pPoint.reshape(-1,unseenX.shape[1])
@@ -1678,7 +1694,7 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
 
         raw_seq = np.array(XSplineGenvectorNews)
 
-        n_steps = 1
+
         # split into samples
         unseenXlstm, unseenYlstm = split_sequence(raw_seq, n_steps)
 

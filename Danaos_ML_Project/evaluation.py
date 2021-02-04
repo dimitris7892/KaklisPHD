@@ -20,6 +20,7 @@ import csv
 import pyearth as sp
 import sklearn.svm as svr
 #import latex
+from numpy import array
 from matplotlib import rc
 from tensorflow import keras
 import random
@@ -69,174 +70,215 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
 
         return errors, np.mean(errors), np.std(lErrors)
 
+    def evaluateKerasNNAvg(self, unseenX, unseenY, modeler, output, xs, genericModel, partitionsX, scores,subsetInd,type):
+        lErrors = []
+        self.intercepts = []
+        predsXiBSpNN = []
+        self.count = 0
+        errorStwArr = []
+        rpm = []
+        errorRpm = []
+
+        for iCnt in range(np.shape(unseenX)[0]):
+            pPoint = unseenX[iCnt]
+            pPoint = pPoint.reshape(-1, unseenX.shape[1])
+
+            trueVal = unseenY[iCnt]
+
+            # ind, fit = modeler.getBestPartitionForPoint(pPoint, partitionsX)
+
+            # fits = modeler.getFitForEachPartitionForPoint(pPoint, partitionsX)
+
+            preds = []
+            if len(modeler._models) > 1:
+
+                for n in range(0, len(partitionsX)):
+                    self.intercepts = []
+                    vector = self.extractFunctionsFromSplines(pPoint[0][0], pPoint[0][1],pPoint[0][2], pPoint[0][3], pPoint[0][4], n)
+                    # XSplineVector = np.append(pPoint, vector)
+                    # XSplineVector = XSplineVector.reshape(-1, XSplineVector.shape[ 0 ])
+
+                    # XSplinevectorNew = np.array(self.intercepts) * vector
+                    # XSplinevectorNew = np.array([i + self.interceptsGen for i in vector])
+
+                    XSplinevectorNew = np.append(pPoint, vector)
+                    XSplinevectorNew = XSplinevectorNew.reshape(-1, XSplinevectorNew.shape[0])
+                    # try:
+                    preds.append(modeler._models[n].predict(XSplinevectorNew)[0][0])
+                    # except:
+                    # d=0
+                # weightedPreds.append(modeler._models[len(modeler._models)-1].predict(pPoint))
+                #############################
+
+                # prediction = np.average(preds ,weights=fits )
+            # else:
+
+            self.intercepts = []
+            vector = self.extractFunctionsFromSplines(pPoint[0][0], pPoint[0][1], pPoint[0][2], pPoint[0][3],pPoint[0][4],'Gen')
+
+            # XSplineGenvectorNew = np.array(self.intercepts) * vector
+            # XSplineGenvectorNew = np.array([i + self.interceptsGen for i in vector])
+
+            # XSplineGenvectorNew= np.sum(np.array(self.intercepts) * vector) + self.interceptsGen
+            XSplineGenvectorNew = np.append(pPoint, vector)
+            XSplineGenvectorNew = XSplineGenvectorNew.reshape(-1, XSplineGenvectorNew.shape[0])
+
+            prediction = abs(modeler._models[len(modeler._models) - 1].predict(XSplineGenvectorNew))
+            preds.append(prediction)
+
+            # trainedWeights = genericModel
+            if len(modeler._models) > 1:
+                prediction = scores.predict(np.array(preds).reshape(-1, len(partitionsX) + 1))
+                # prediction = (np.average(preds, weights=trainedWeights) )#+ prediction) / 2
+            else:
+                prediction = prediction
+
+            lErrors.append(abs(prediction - trueVal))
+
+            # lErrors.append(abs(prediction - trueVal))
+            percError = abs((prediction - trueVal) / trueVal) * 100
+            # errorStwArr.append(np.array(
+            # np.append(np.asmatrix(pPoint[0][0]).reshape(-1, 1), np.asmatrix([percError[0]]).T, axis=1)))
+            errorRpm.append(percError)
+            rpm.append(trueVal)
+            predsXiBSpNN.append(prediction[0][0])
+            errorStwArr.append(pPoint[0][3])
+
+            error = abs(prediction - trueVal)
+            lErrors.append(error)
+
+        errorStwArr = np.array(errorStwArr)
+        #errorStwArr = errorStwArr.reshape(-1, 2)
+
+        if type == 'train':
+            with open('./TRAINerrorPercFOC' + str(len(partitionsX)) + '_' + str(subsetInd) + '.csv',
+                      mode='w') as data:
+                data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+                data_writer.writerow(
+                    ['FOC', 'PERC'])
+                for i in range(0, len(errorFoc)):
+                    data_writer.writerow(
+                        [foc[i], errorFoc[i][0][0]])
+
+            with open('./TRAINerrorSTW' + str(len(partitionsX)) + '_' + str(subsetInd) + '.csv', mode='w') as data:
+                data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+                data_writer.writerow(
+                    ['STW', 'MAE'])
+                for i in range(0, len(errorStwArr)):
+                    data_writer.writerow(
+                        [errorStwArr[i][0], errorStwArr[i][1]])
+        else:
+            with open('./TESTerrorPercFOCEnsemble' + str(len(partitionsX)) + '_' + str(0) + '.csv',
+                      mode='w') as data:
+                data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+                data_writer.writerow(
+                    ['FOC_PRED', 'FOC_ACT', 'PERC','STW'])
+                for i in range(0, len(errorRpm)):
+                    data_writer.writerow([predsXiBSpNN[i], rpm[i],  errorRpm[i][0][0],errorStwArr[i]])
+
+        # prediction =modeler._models[ 0 ].predict(unseenX.reshape(2,2860))
+        # print np.mean(abs(prediction - unseenY))
+        # print("EXCEPTIONS :  "+str(count))
+        print('Accuracy: ' + str(np.round(100 - np.mean(errorRpm), 2)))
+        errors = np.asarray(lErrors)
+
+        return errors, np.mean(errors), np.std(lErrors)
 
     def evaluateKerasNN1(self, unseenX, unseenY, modeler,output,xs,genericModel,partitionsX , scores,subsetInd,type):
         lErrors = []
-
-        from tensorflow import keras
-        path = '.\\'
-        clusters = '30'
-
-        count = 0
         errorStwArr=[]
         errorFoc=[]
         foc=[]
         preds=[]
         candidatePoints=[]
+        n_steps = 6
+        self.intercepts = []
+        self.count = 0
 
-        '''unseenDataset = np.array(np.append(unseenX,np.asmatrix([unseenY]).T,axis=1))
-        np.random.shuffle(unseenDataset)
-        unseenX = unseenDataset[:,0:7]
-        unseenY = unseenDataset[:, 7]'''
 
+
+        ###############################################
+        ####################################
+        ###########################################
+        #############
+
+        XSplineGenvectorNews = []
         for iCnt in range(np.shape(unseenX)[0]):
-            pPoint =unseenX[iCnt]
-            pPoint= pPoint.reshape(-1,unseenX.shape[1])
+            pPoint = unseenX[iCnt]
+            pPoint = pPoint.reshape(-1, unseenX.shape[1])
 
+            # try:
             trueVal = unseenY[iCnt]
 
-            ind, fit = modeler.getBestPartitionForPoint(pPoint, partitionsX)
-            #preds=[]
-            #for i in range(0,len(partitionsX[ind])):
-                #pPointCl = partitionsX[ind][i]
-                #vector = self.extractFunctionsFromSplines(pPointCl[0], pPointCl[1], pPointCl[2], pPointCl[3],
-                                                          #pPointCl[4], pPointCl[5], pPointCl[6], ind)
-                #XSplineVector = np.append(pPointCl, vector)
-                #XSplineVector = XSplineVector.reshape(-1, XSplineVector.shape[0])
-                #pred = abs(modeler._models[ind].predict(XSplineVector))
-                #preds.append(pred)
-            #distVec = np.mean(partitionsX[ind], axis=0) - pPoint[0]
-            #pPointRefined = []
-            #for i in range(0, pPoint.shape[1]):
-                #if abs(distVec[i])>10:
-                    #pPointRefined.append((pPoint[0][i] + (distVec[i])/2))
-                #else:
-                    #pPointRefined.append(pPoint[0][i])
-            #pPointRefined = np.array(pPointRefined)
+            self.intercepts = []
+            vector = self.extractFunctionsFromSplines(pPoint[0][0], pPoint[0][1], pPoint[0][2], pPoint[0][3],pPoint[0][4],'Gen')#pPoint[0][5],pPoint[0][6])
 
-            #meanPointsOfCl = np.mean(partitionsX[ind],axis=0)
-            #meanPointsOfCl = np.mean([meanPointsOfCl,pPointRefined],axis=0)
-            #meanPointsOfCl = np.mean([meanPointsOfCl, pPoint], axis=0)
-            #####
-            #vectorPpoint = self.extractFunctionsFromSplines(pPoint[0][0], pPoint[0][1], pPoint[0][2], pPoint[0][3],
-                                                      #pPoint[0][4], pPoint[0][5], pPoint[0][6], ind)
-            #####
-            #vector = self.extractFunctionsFromSplines(meanPointsOfCl[0], meanPointsOfCl[1], meanPointsOfCl[2], meanPointsOfCl[3],
-                                                      #meanPointsOfCl[4], meanPointsOfCl[5], meanPointsOfCl[6], ind)
+            # XSplineGenvectorNew = np.array(self.intercepts) * vector
+            # XSplineGenvectorNew = np.array([i + self.interceptsGen for i in XSplineGenvectorNew])
 
-            #vector = self.extractFunctionsFromSplines(meanPointsOfCl[0][0], meanPointsOfCl[0][1], meanPointsOfCl[0][2],
-                                                      #meanPointsOfCl[0][3],
-                                                      #meanPointsOfCl[0][4], meanPointsOfCl[0][5], meanPointsOfCl[0][6],'Gen')
+            # XSplineGenvectorNew = np.append(pPoint, vector)
+            # XSplineGenvectorNews.append(XSplineGenvectorNew)
+            #vectorNew = np.array([i + self.interceptsGen for i in vector])
+            splineVector = np.append(pPoint, vector)
+            #splineVector = pPoint
 
-            #newVector = np.mean([vector,vectorPpoint],axis=0)
+            XSplineGenvectorNews.append(np.append(splineVector, unseenY[iCnt]))
+            # XSplineGenvectorNew = XSplineGenvectorNew.reshape(-1, XSplineGenvectorNew.shape[0])
 
-            #XSplineVector = np.append(meanPointsOfCl, vector)
+        def split_sequence(sequence, n_steps):
+            X, y = list(), list()
+            for i in range(0,len(sequence)):
+                # find the end of this pattern
+                end_ix = i + n_steps
+                # check if we are beyond the sequence
+                if end_ix > len(sequence) - 1:
+                    break
+                # gather input and output parts of the pattern
+                seq_x, seq_y = sequence[i:end_ix][:, 0:sequence.shape[1] - 1], sequence[end_ix-1][sequence.shape[1] - 1]
+                X.append(seq_x)
+                y.append(seq_y)
+            return array(X), array(y)
 
-            #XSplineVector = XSplineVector.reshape(-1, XSplineVector.shape[0])
-            #pred = abs(modeler._models[ind].predict(XSplineVector))
-            #pred = modeler._models[len(modeler._models) - 1].predict(XSplineVector)
-            #meanClGenpred = pred
-            #################################
+            # define input sequence
 
-            #vector = self.extractFunctionsFromSplines(meanPointsOfCl[0][0], meanPointsOfCl[0][1], meanPointsOfCl[0][2],
-                                                      #meanPointsOfCl[0][3],
-                                                      #meanPointsOfCl[0][4], meanPointsOfCl[0][5], meanPointsOfCl[0][6],
-                                                      #ind)
-
-            # newVector = np.mean([vector,vectorPpoint],axis=0)
-
-            #XSplineVector = np.append(meanPointsOfCl, vector)
-
-            #XSplineVector = XSplineVector.reshape(-1, XSplineVector.shape[0])
-            #pred = abs(modeler._models[ind].predict(XSplineVector))
-            #pred = modeler._models[ind].predict(XSplineVector)
-            #meanClpred = pred
-            ###########################################################################
-            #pred=0
-            #for i in range(0,len(partitionsX)):
-                #pred +=modeler._models[i].predict(pPoint)
-            #prediction = pred / len(partitionsX)
-
-            #vector = self.extractFunctionsFromSplines(pPoint[0][0], pPoint[0][1],pPoint[0][2],pPoint[0][3],pPoint[0][4],pPoint[0][5],pPoint[0][6], ind)
-            #vector = self.extractFunctionsFromSplines(pPoint[0][0], pPoint[0][1], pPoint[0][2], pPoint[0][3],
-                                                      #pPoint[0][4],pPoint[0][5],None, ind)
-            #vector = self.extractFunctionsFromSplines(pPoint[0][0], pPoint[0][1], pPoint[0][2], pPoint[0][3],
-                                                      #pPoint[0][4],None,None, ind)
-            vector = self.extractFunctionsFromSplines(pPoint[0][0], pPoint[0][1], pPoint[0][2], pPoint[0][3],
-            pPoint[0][4],pPoint[0][5 ],None, ind)
-            XSplineVector = np.append(pPoint, vector)
-            XSplineVector = XSplineVector.reshape(-1, XSplineVector.shape[0])
-
-            #vector = self.extractFunctionsFromSplines(pPoint[0][0], pPoint[0][1],pPoint[0][2],pPoint[0][3],pPoint[0][4],pPoint[0][5],pPoint[0][6], 'Gen')
-            vector = self.extractFunctionsFromSplines(pPoint[0][0], pPoint[0][1], pPoint[0][2], pPoint[0][3],
-                                                     pPoint[0][4], pPoint[0][5],pPoint[0][6], 'Gen')
-            XSplineGenVector = np.append(pPoint, vector)
-            XSplineGenVector = XSplineGenVector.reshape(-1, XSplineGenVector.shape[0])
+        raw_seq = np.array(XSplineGenvectorNews)
 
 
-            # prediction = abs(modeler._models[ 0 ].predict(XSplineVector))
-            # XSplineVector = XSplineGenVector if modeler._models[ind][1]=='GEN' else XSplineVector
-            #try:
-                #prediction = (abs(modeler._models[ind].predict(XSplineVector)) + modeler._models[len(modeler._models)-1].predict(XSplineGenVector))/2
-            #except:
-                #print("ERROR ON EVALUATION")
-                #prediction = modeler._models[len(modeler._models)-1].predict(XSplineGenVector)
-            XSplineGenVector = np.reshape(XSplineGenVector, (XSplineGenVector.shape[0], XSplineGenVector.shape[1], 1))
-            Genpred = modeler._models[len(modeler._models) - 1].predict(XSplineGenVector)
-            #XSplineVector = np.reshape(XSplineVector, (XSplineVector.shape[0], XSplineVector.shape[1], 1))
-            #CLpred = modeler._models[ind].predict(XSplineVector)
-
-            '''predsCl=[]
-            weights =[]
-            for i in range(0,len(partitionsX)):
-                fit = modeler.getFitnessOfPoint(partitionsX,i ,pPoint)
-                weights.append(fit)
-                vectorCl = self.extractFunctionsFromSplines(pPoint[0][0], pPoint[0][1], pPoint[0][2], pPoint[0][3],
-                                                          pPoint[0][4], pPoint[0][5], pPoint[0][6], i)
 
 
-                XSplineVectorCl = np.append(pPoint, vectorCl)
-                XSplineVectorCl = XSplineVectorCl.reshape(-1, XSplineVectorCl.shape[0])
-                predsCl.append(modeler._models[i].predict(XSplineVectorCl)[0][0])
+        # split into samples
+        unseenXlstm, unseenYlstm = split_sequence(raw_seq, n_steps)
+        if type =='test' : print("Shape of unseen data: " +str(unseenXlstm.shape))
+        else: print("Shape of seen data: " +str(unseenXlstm.shape))
+        for iCnt in range(np.shape(unseenXlstm)[0]):
+            pPoint = unseenXlstm[iCnt]
+            #pPoint =unseenX[iCnt]
+            #pPoint= pPoint.reshape(-1,unseenX.shape[1])
 
-            #prediction = np.mean(preds)
-            weighted_avg = np.average(predsCl, weights=weights)'''
-            #print("MEAN PRED: " + str(prediction))
-            #print("WEIGHTED MEAN PRED: " + str(weighted_avg))
-            #print("TRUE VAL: " + str(trueVal))
-            #prediction = (weighted_avg + Genpred) / 2
-            #if abs(CLpred - Genpred) >7:
-                #if abs(meanClpred - Genpred) > 5:
-                    #prediction = Genpred
-                #else:
-                    #prediction = (meanClpred + Genpred )/2
-            #else:
-                #prediction = ( Genpred  + CLpred)/ 2
+            trueVal = unseenYlstm[iCnt]
 
-            #if abs(CLpred - Genpred) >5:
+            pPoint = np.reshape(pPoint, (1, pPoint.shape[0], pPoint.shape[1]))
+            #print("  "+str(pPoint.shape))
+            Genpred = modeler._models[len(modeler._models) - 1].predict(pPoint)
 
-                #prediction = Genpred
 
-            #else:
-                #prediction = ( Genpred  + CLpred)/ 2
-            #prediction = (CLpred + Genpred) / 2
             prediction =  Genpred
 
-            #prediction = (abs(modeler._models[ind].predict(pPoint)))
-            #prediction =  modeler._models[len(modeler._models) - 1].predict(pPoint)
-            #prediction = (abs(modeler._models[ind].predict(pPoint)) + modeler._models[len(modeler._models) - 1].predict(pPoint) )/ 2
+
             error = abs(prediction - trueVal)
             preds.append(prediction)
             lErrors.append(error)
             percError = abs((prediction - trueVal) / trueVal) * 100
-            errorStwArr.append(np.array(np.append(np.asmatrix(pPoint[0][0]).reshape(-1,1), np.asmatrix([percError[0] ]).T, axis=1)))
+            if percError > 20 :
+                r=0
+            #errorStwArr.append(np.array(np.append(np.asmatrix(pPoint[0][0]).reshape(-1,1), np.asmatrix([percError[0] ]).T, axis=1)))
             errorFoc.append(percError)
             foc.append(trueVal)
             candidatePoints.append(pPoint)
-
+            errorStwArr.append(pPoint[0][len(pPoint[0])-1][3])
 
         errorStwArr = np.array(errorStwArr)
-        errorStwArr = errorStwArr.reshape(-1, 2)
+        #errorStwArr = errorStwArr.reshape(-1, 2)
         errors = np.asarray(lErrors)
 
         if type == 'train':
@@ -262,15 +304,15 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
                     ['FOC_pred','FOC_act' ,'PERC','stw','draft','trim','sensor_wind_speed','sensor_wind_dir','comb_waves_height','comb_waves_dir'])
                 for i in range(0, len(errorFoc)):
                     data_writer.writerow(
-                        [np.round(preds[i][0][0],2),np.round(foc[i],2), errorFoc[i][0][0]])#,candidatePoints[i][0][0], candidatePoints[i][0][1],candidatePoints[i][0][2],candidatePoints[i][0][3],candidatePoints[i][0][4],candidatePoints[i][0][5],candidatePoints[i][0][6]])
+                        [np.round(preds[i][0][0],2),np.round(foc[i],2), errorFoc[i][0][0],errorStwArr[i]])#,candidatePoints[i][0][0], candidatePoints[i][0][1],candidatePoints[i][0][2],candidatePoints[i][0][3],candidatePoints[i][0][4],candidatePoints[i][0][5],candidatePoints[i][0][6]])
 
-            with open('./TESTerrorSTW' + str(len(partitionsX)) + '_' + str(subsetInd) + '.csv', mode='w') as data:
+            '''with open('./TESTerrorSTW' + str(len(partitionsX)) + '_' + str(subsetInd) + '.csv', mode='w') as data:
                 data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
                 data_writer.writerow(
                     ['STW', 'MAE'])
                 for i in range(0, len(errorStwArr)):
                     data_writer.writerow(
-                        [errorStwArr[i][0], errorStwArr[i][1]])
+                        [errorStwArr[i][0], errorStwArr[i][1]])'''
 
             dataErrorFoc = pd.read_csv('./TESTerrorPercFOC' + str(len(partitionsX)) + '_' + str(subsetInd) +'.csv', delimiter=',', skiprows=1)
             percError = dataErrorFoc.values
@@ -359,12 +401,11 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
 
         return errors, np.mean(errors), np.std(lErrors)
 
-    def extractFunctionsFromSplines(self,x0, x1, x2, x3, x4, x5=None, x6=None,modelId=None):
+    def extractFunctionsFromSplines(self,x0, x1, x2, x3, x4, modelId):
         piecewiseFunc = []
-        csvModels=['./trainedModels/model_'+str(modelId)+'_.csv']
+        self.count = self.count + 1
+        csvModels = ['./trainedModels/model_' + str(modelId) + '_.csv']
         for csvM in csvModels:
-            if csvM != './trainedModels/model_' + str(modelId) + '_.csv':
-                continue
             # id = csvM.split("_")[ 1 ]
             # piecewiseFunc = [ ]
 
@@ -497,13 +538,13 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
                                                 split = "x10"
 
                                             if split == "x0":
-                                                piecewiseFunc.append(x0 * (x0 - nums[0]) * float(row[1]))
+                                                piecewiseFunc.append(x0 * (x0 - nums[0]) )#* float(row[1]))
                                             elif split == "x1":
-                                                piecewiseFunc.append(x1 * (x1 - nums[0]) * float(row[1]))
+                                                piecewiseFunc.append(x1 * (x1 - nums[0]))# * float(row[1]))
                                             elif split == "x01":
-                                                piecewiseFunc.append(x0 * (x1 - nums[0]) * float(row[1]))
+                                                piecewiseFunc.append(x0 * (x1 - nums[0]))# * float(row[1]))
                                             elif split == "x10":
-                                                piecewiseFunc.append(x1 * (x0 - nums[0]) * float(row[1]))
+                                                piecewiseFunc.append(x1 * (x0 - nums[0]))# * float(row[1]))
                                             # piecewiseFunc.append(tf.math.multiply(tf.cast(x, tf.float32),
                                             # (inputs) * (
                                             # inputs - nums[ 0 ])))
@@ -533,13 +574,13 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
                                                 split = "x10"
 
                                             if split == "x0":
-                                                piecewiseFunc.append(x0 * (nums[0] - x0) * float(row[1]))
+                                                piecewiseFunc.append(x0 * (nums[0] - x0))# * float(row[1]))
                                             elif split == "x1":
-                                                piecewiseFunc.append(x1 * (nums[0] - x1) * float(row[1]))
+                                                piecewiseFunc.append(x1 * (nums[0] - x1) )#* float(row[1]))
                                             elif split == "x01":
-                                                piecewiseFunc.append(x0 * (nums[0] - x1) * float(row[1]))
+                                                piecewiseFunc.append(x0 * (nums[0] - x1))# * float(row[1]))
                                             elif split == "x10":
-                                                piecewiseFunc.append(x1 * (nums[0] - x0) * float(row[1]))
+                                                piecewiseFunc.append(x1 * (nums[0] - x0))# * float(row[1]))
 
                                             # piecewiseFunc.append(tf.math.multiply(tf.cast(x, tf.float32),
                                             # (inputs) * (
@@ -583,13 +624,13 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
                                         split = "x10"
 
                                     if split == "x0":
-                                        piecewiseFunc.append((nums[0] - x0) * (nums[1] - x0) * float(row[1]))
+                                        piecewiseFunc.append((nums[0] - x0) * (nums[1] - x0))# * float(row[1]))
                                     elif split == "x1":
-                                        piecewiseFunc.append((nums[0] - x1) * (nums[1] - x1) * float(row[1]))
+                                        piecewiseFunc.append((nums[0] - x1) * (nums[1] - x1))# * float(row[1]))
                                     elif split == "x01":
-                                        piecewiseFunc.append((nums[0] - x0) * (nums[1] - x1) * float(row[1]))
+                                        piecewiseFunc.append((nums[0] - x0) * (nums[1] - x1))# * float(row[1]))
                                     elif split == "x10":
-                                        piecewiseFunc.append((nums[0] - x1) * (nums[1] - x0) * float(row[1]))
+                                        piecewiseFunc.append((nums[0] - x1) * (nums[1] - x0))# * float(row[1]))
 
                                     # piecewiseFunc.append(tf.math.multiply(tf.cast(
                                     # tf.math.logical_and(tf.math.less(x, nums[ 0 ]),
@@ -620,13 +661,13 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
                                         split = "x10"
 
                                     if split == "x0":
-                                        piecewiseFunc.append((x0 - nums[0]) * (x0 - nums[1]) * float(row[1]))
+                                        piecewiseFunc.append((x0 - nums[0]) * (x0 - nums[1]))# * float(row[1]))
                                     elif split == "x1":
-                                        piecewiseFunc.append((x1 - nums[0]) * (x1 - nums[1]) * float(row[1]))
+                                        piecewiseFunc.append((x1 - nums[0]) * (x1 - nums[1]))# * float(row[1]))
                                     elif split == "x01":
-                                        piecewiseFunc.append((x0 - nums[0]) * (x1 - nums[1]) * float(row[1]))
+                                        piecewiseFunc.append((x0 - nums[0]) * (x1 - nums[1]))# * float(row[1]))
                                     elif split == "x10":
-                                        piecewiseFunc.append((x1 - nums[0]) * (x0 - nums[1]) * float(row[1]))
+                                        piecewiseFunc.append((x1 - nums[0]) * (x0 - nums[1]))# * float(row[1]))
                                     # inputs = tf.where(x > nums[ 0 ] and x > nums[ 1 ],
                                     # float(row[ 1 ]) * (inputs - nums[ 0 ]) * (
                                     # inputs - nums[ 1 ]), inputs)
@@ -653,16 +694,16 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
 
                                                 if split == "x0":
                                                     piecewiseFunc.append(
-                                                        (x0 - nums[0]) * (nums[1] - x0) * float(row[1]))
+                                                        (x0 - nums[0]) * (nums[1] - x0) )#* float(row[1]))
                                                 elif split == "x1":
                                                     piecewiseFunc.append(
-                                                        (x1 - nums[0]) * (nums[1] - x1) * float(row[1]))
+                                                        (x1 - nums[0]) * (nums[1] - x1))# * float(row[1]))
                                                 elif split == "x01":
                                                     piecewiseFunc.append(
-                                                        (x0 - nums[0]) * (nums[1] - x1) * float(row[1]))
+                                                        (x0 - nums[0]) * (nums[1] - x1) )#* float(row[1]))
                                                 elif split == "x10":
                                                     piecewiseFunc.append(
-                                                        (x1 - nums[0]) * (nums[1] - x0) * float(row[1]))
+                                                        (x1 - nums[0]) * (nums[1] - x0))# * float(row[1]))
 
 
 
@@ -688,7 +729,7 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
                                                     1].__contains__("x0"):
                                                     split = "x10"
 
-                                                piecewiseFunc.append((x0 - nums[0]) * float(row[1]))
+                                                piecewiseFunc.append((x0 - nums[0]))# * float(row[1]))
 
                                                 # inputs = tf.where(x > nums[0],
                                                 # float(row[ 1 ]) * (inputs - nums[ 0 ]), inputs)
@@ -713,16 +754,16 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
 
                                                 if split == "x0":
                                                     piecewiseFunc.append(
-                                                        (nums[0] - x0) * (x0 - nums[1]) * float(row[1]))
+                                                        (nums[0] - x0) * (x0 - nums[1]))# * float(row[1]))
                                                 elif split == "x1":
                                                     piecewiseFunc.append(
-                                                        (nums[0] - x1) * (x1 - nums[1]) * float(row[1]))
+                                                        (nums[0] - x1) * (x1 - nums[1]))# * float(row[1]))
                                                 elif split == "x01":
                                                     piecewiseFunc.append(
-                                                        (nums[0] - x0) * (x1 - nums[1]) * float(row[1]))
+                                                        (nums[0] - x0) * (x1 - nums[1]))# * float(row[1]))
                                                 elif split == "x10":
                                                     piecewiseFunc.append(
-                                                        (nums[0] - x1) * (x0 - nums[1]) * float(row[1]))
+                                                        (nums[0] - x1) * (x0 - nums[1]) )#* float(row[1]))
                                                 # inputs = tf.where(x < nums[ 0 ] and x > nums[1],
                                                 # float(row[ 1 ]) * (nums[ 0 ] - inputs) * (
                                                 # inputs - nums[ 1 ]), inputs)
@@ -746,9 +787,9 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
                                                     split = "x10"
 
                                                 if split == "x0":
-                                                    piecewiseFunc.append((x0 - nums[0]) * float(row[1]))
+                                                    piecewiseFunc.append((x0 - nums[0]))# * float(row[1]))
                                                 elif split == "x1":
-                                                    piecewiseFunc.append((x1 - nums[0]) * float(row[1]))
+                                                    piecewiseFunc.append((x1 - nums[0]))# * float(row[1]))
                                                 # piecewiseFunc.append(tf.math.multiply(tf.cast(
                                                 # tf.math.less(x, nums[ 0 ]), tf.float32),
                                                 # (
