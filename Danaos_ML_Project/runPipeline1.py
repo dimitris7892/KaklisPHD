@@ -47,6 +47,9 @@ from tensorflow.keras import backend as K
 
 def main():
 
+
+
+
     end, endU, history, future,sFile, start, startU , algs , cls = initParameters()
     # Load data
     if len(sys.argv) >1:
@@ -70,7 +73,26 @@ def main():
     subsetsY = []
     subsetsB=[]
 
+    '''sFile = './data/GOLDENPORT/TRAMMO LAOURA/mappedData.csv'
+    data = pd.read_csv(sFile, sep=',').values
 
+
+    ##Build training data array
+
+    # draftD = data[:,8]
+    # draftD = np.where(data[:,8]==0, None, data[:,8])
+    # draftDf = pd.DataFrame({'draft':draftD.astype(float)})
+    # draftDf = draftDf.interpolate()
+    # data[:,8] = draftDf.values.reshape(-1)
+
+    trData = np.array(np.append(data[:, 8].reshape(-1, 1), np.asmatrix(
+        [data[:, 10], data[:, 11], data[:, 12], data[:, 22], (data[:, 15]), data[:, 26], data[:, 27], data[:, 2],
+         data[:, 28]]).T, axis=1))  # .astype(float)#data[:,26],data[:,27]
+    trData = np.array(
+        [k for k in trData if float(k[2]) >= 0 and float(k[4]) >= 0 and float(k[3]) > 2 and float(k[5]) > 0])
+
+    timestampsWithoutMappedTlgs = np.array([k for k in trData if str(k[8]) == 'nan'])[:, 9]
+    print(timestampsWithoutMappedTlgs.shape)'''
 
 
     plRes = pltRes.ErrorGraphs()
@@ -105,6 +127,7 @@ def main():
 
     print(modelers)
     ###########################################################################
+
     #plRes.PlotTrueVsPredLine()
 
     #plRes.PLotTrajectory(df,'Express Athens')
@@ -132,9 +155,10 @@ def main():
     # 5 swh
     # 6 swd
     # 7 foc (MT/day)
+
     '''from datetime import datetime
-    path = "/home/dimitris/Desktop/KaklisPHD/Danaos_ML_Project/data/OCEAN_GOLD/PENELOPE/"
-    telegrams = pd.read_csv(path+'/TELEGRAMS/PENELOPE.csv',sep=';').values
+    path = "/home/dimitris/Desktop/KaklisPHD/Danaos_ML_Project/data/OCEAN_GOLD/PERSEFONE/"
+    telegrams = pd.read_csv(path+'/TELEGRAMS/PERSEFONE.csv',sep=';').values
     dataSet = []
     for infile in sorted(glob.glob(path + '*.csv')):
             data = pd.read_csv(infile, sep=',', decimal='.', skiprows=1)
@@ -143,13 +167,77 @@ def main():
         # if len(dataSet)>1:
     dataSet = np.concatenate(dataSet)
     dataSet[:,0] = list(map(lambda x: datetime.strptime(x, '%Y-%m-%d %H:%M:%S.%f').replace(second=0, microsecond=0), dataSet[:,0]))
-    trackReport = pd.read_csv('./data/OCEAN_GOLD/Penelope TrackReport.csv').values
+    trackReport = pd.read_csv('./data/OCEAN_GOLD/Persefone TrackReport.csv').values
 
+
+    ### list of times for each day for track report
+    json_decoded={'dates':[]}
+    dts=[]
+    for i in range(0, len(trackReport)):
+
+        if trackReport[i, 7] == 'No data' or trackReport[i, 6] == 'Unknown': continue
+
+        date = trackReport[i, 1]
+        dt = date.split(" ")[0]
+        time = date.split(" ")[1]
+        day = dt.split(".")[0]
+        month = dt.split(".")[1]
+        year = dt.split(".")[2]
+        hours = time.split(":")[0]
+        minutes = int(time.split(":")[1])
+        mod = minutes % 5
+        minutes = minutes - mod if mod <= 2 else minutes + (mod - (mod - 1))
+        minutes = str(minutes) if len(str(minutes)) > 1 else "0" + str(minutes)
+        #######
+        hours = str(int(hours) + 1) if minutes == '60' else hours
+        hours = '00' if hours == '24' else hours
+        minutes = '00' if minutes=='60' else minutes
+
+        newTime = hours + ":" + minutes
+
+        newDateTime = year + "-" + month + "-" + day + " " + newTime
+        newDate = year + "-" + month + "-" + day
+        try:
+            dts.append(datetime.strptime(newDateTime, '%Y-%m-%d %H:%M'))
+        except:
+            print("exception")
+
+        #speed = float(trackReport[i, 6].split(" ")[0])
+        windSpeed = float(trackReport[i, 7].split("m/s")[0])
+        swh = float(trackReport[i, 12].split("m")[0])
+        wd = float(trackReport[i, 8].split("°")[0])
+        #40° 07' 34.64"
+        latDegrees = float(trackReport[i, 2].split("°")[0])
+        latMinSec = trackReport[i, 2].split("°")[1]
+        latMin = float(latMinSec.split("'")[0])
+        latSec = float(latMinSec.split("'")[1])
+        decimalLat = latDegrees + latMin /60 + latSec/3600
+
+
+        timeItem = {'datetime':datetime.strptime(newDateTime, '%Y-%m-%d %H:%M'),'ws':windSpeed,'swh':swh,'wd':wd}
+        json_decoded['dates'].append(timeItem)
+
+
+
+
+    #with open('./data/OCEAN_GOLD/PENELOPE/' 'trackDates.json', 'w') as json_file:
+        #json.dump(json_decoded, json_file)
+    #return
     speeds = []
     focs = []
     windSpeeds = []
+    swhs = []
+    wds = []
     drafts=[]
-    for i in range(0,len(trackReport)):
+    timestamps = []
+    print(len(dataSet))
+    for k in range(0, len(dataSet)):
+        foc = -1
+        print(k)
+        dateTimeRaw = str(dataSet[k, 0])[:-3]
+        dateRaw = str(dataSet[k, 0]).split(" ")[0]
+        dtraw = datetime.strptime(dateTimeRaw, '%Y-%m-%d %H:%M')
+        for i in range(0,len(trackReport)):
 
             if trackReport[i, 7] == 'No data' or trackReport[i, 6] == 'Unknown': continue
 
@@ -167,30 +255,45 @@ def main():
             newTime = hours + ":" + minutes
 
 
-            newDate = year + "-" + month + "-" + day + " " + newTime
-            foc = -1
-            for k in range(0,len(dataSet)):
-                dateTimeRaw = str(dataSet[k,0])[:-3]
-                if dateTimeRaw == newDate:
-                    foc = dataSet[k,11]
-                    break
-            if foc == -1 : continue
-            speeds.append(float(trackReport[i,6].split(" ")[0]))
-            windSpeeds.append(float(trackReport[i, 7].split("m/s")[0]))
-            focs.append(foc)
-
-            ##map with tlgs for draft
-            draft = -1
-            for n in range(0,len(telegrams)):
-                dateTlg = str(telegrams[n,0].split(" ")[0])
-                if dateTlg == newDate.split(" ")[0]:
-                    draft = telegrams[n,8]
-                    break
-            drafts.append(draft)
+            newDateTime = year + "-" + month + "-" + day + " " + newTime
+            newDate = year + "-" + month + "-" + day
 
 
-    df = {'speed':speeds,"ws":windSpeeds,"foc":focs,'draft':drafts}
+
+            if dateRaw == newDate:
+                #print("found")
+                keyDateTimeInTrackRep = min(dts, key=lambda x: abs(x - datetime.strptime(dateTimeRaw, '%Y-%m-%d %H:%M')))
+
+                foc = dataSet[k, 10]
+                stw=dataSet[k, 2]
+                trackRepvalues = [l for l in json_decoded['dates'] if l['datetime'] == keyDateTimeInTrackRep][0]
+                ws = trackRepvalues['ws']
+                wd = trackRepvalues['wd']
+                swh = trackRepvalues['swh']
+
+                break
+
+        if foc == -1 : continue
+        draft = -1
+        for n in range(0, len(telegrams)):
+            dateTlg = str(telegrams[n, 0].split(" ")[0])
+            if dateTlg == newDate.split(" ")[0]:
+                draft = telegrams[n, 8]
+                break
+
+        speeds.append(stw)
+        windSpeeds.append(ws)
+        swhs.append(swh)
+        wds.append(wd)
+        timestamps.append(dateTimeRaw)
+        focs.append(foc)
+        ##map with tlgs for draft
+        drafts.append(draft)
+
+
+    df = {'speed':speeds,"ws":windSpeeds,"wd":wds,"swh":swhs,"foc":focs,'draft':drafts,'timestamp':timestamps}
     df = pd.DataFrame(df).to_csv("./data/OCEAN_GOLD/PENELOPE/trackRepMapped.csv",index=False)'''
+    #return
 
     '''trdata = pd.read_csv('./data/GOLDENPORT/TRAMMO LAOURA/mappedData.csv').values
     with open('./data/TRAMMOCoor.csv', mode='w') as data:
@@ -206,19 +309,21 @@ def main():
 
 
     DANreader = dRead.BaseSeriesReader()
-    '''DANreader.GenericParserForDataExtraction('LEMAG', 'OCEAN_GOLD', 'PENELOPE', driver='ORACLE',
+    DANreader.GenericParserForDataExtraction('LEMAG', 'OCEAN_GOLD', 'PENELOPE', driver='ORACLE',
                                              server='10.2.5.80',
                                              sid='OR11', usr='oceangold', password='oceangold',
                                              rawData=False, telegrams=True, companyTelegrams=False,
-                                             pathOfRawData='/home/dimitris/Desktop/SEEAMAG')'''
+                                             pathOfRawData='/home/dimitris/Desktop/SEEAMAG')
+
+    return
 
     '''DANreader.GenericParserForDataExtraction('LEMAG', 'GOLDENPORT', 'TRAMMO LAOURA', driver='ORACLE',
                                              server='10.2.5.80',
                                              sid='OR12', usr='goldenport', password='goldenport',
-                                             rawData=False, telegrams=True, companyTelegrams=False,
-                                             pathOfRawData='/home/dimitris/Desktop/SEEAMAG')'''
+                                             rawData=True, telegrams=True, companyTelegrams=False,
+                                             pathOfRawData='/home/dimitris/Desktop/SEEAMAG')
 
-    #return
+    return'''
 
     indices = []
     data = pd.read_csv(sFile,sep=',').values
@@ -280,8 +385,61 @@ def main():
 
     data = np.array([data[k] for k in indices])'''
 
+    def ConvertMSToBeaufort(ws):
+        wsB = 0
+        if ws >= 0 and ws < 0.2:
+            wsB = 0
+        elif ws >= 0.3 and ws < 1.5:
+            wsB = 1
+        elif ws >= 1.6 and ws < 3.3:
+            wsB = 2
+        elif ws >= 3.4 and ws < 5.4:
+            wsB = 3
+        elif ws >= 5.5 and ws < 7.9:
+            wsB = 4
 
-    #data =np.array([k for k in data if k[2]=='B' or k[2]=='L'])
+        elif ws >= 8 and ws < 10.7:
+            wsB = 5
+        elif ws >= 10.8 and ws < 13.8:
+            wsB = 6
+        elif ws >= 13.9 and ws < 17.1:
+            wsB = 7
+        elif ws >= 17.2 and ws < 20.7:
+            wsB = 8
+        elif ws >= 20.8 and ws < 24.4:
+            wsB = 9
+        elif ws >= 24.5 and ws < 28.4:
+            wsB = 10
+        elif ws >= 28.5 and ws < 32.6:
+            wsB = 11
+        elif ws >= 32.7:
+            wsB = 12
+        return wsB
+    ###########PENELOPE
+    sFile = './data/OCEAN_GOLD/PENELOPE/trackRepMappedPENELOPE.csv'
+    data = pd.read_csv(sFile, sep=',').values
+    print(data.shape)
+
+    data[:, 4] = data[:, 4] * 24
+
+    wd = data[:, 2]
+    for i in range(0, len(wd)):
+        if float(wd[i]) > 180:
+            wd[i] = float(wd[i]) - 180  # and  float(k[8])<20
+
+    wfS = data[:, 1]
+    for i in range(0, len(wfS)):
+        wfS[i] = ConvertMSToBeaufort(float(float(wfS[i])))
+    data[:, 1] = wfS
+
+    trData = np.array(np.append(data[:, 5].reshape(-1, 1), np.asmatrix([data[:, 2], data[:, 1], data[:, 0], data[:, 3], (data[:, 4])]).T,axis=1))  # .astype(float)#data[:,26],data[:,27]
+    trData = np.array([k for k in trData if
+                       float(k[0]) >= 0 and float(k[2]) >= 0 and float(k[4]) >= 0 and float(k[3]) > 0 and float(
+                           k[5]) > 0])
+
+    ###################PENELOPE##################PENELOPE
+
+    ''''#data =np.array([k for k in data if k[2]=='B' or k[2]=='L'])
     wfS = data[:, 11].astype(float) / (1.944)
     wsSen = []
     for i in range(0, len(wfS)):
@@ -301,7 +459,7 @@ def main():
 
 
 
-    trData = np.array([k for k in trData if   float(k[2])>=0 and float(k[4])>=0 and (float(k[3])>10 and k[3]<=21) and float(k[5])>0  ])
+    trData = np.array([k for k in trData if   float(k[2])>=0 and float(k[4])>=0 and (float(k[3])>10 and k[3]<=21) and float(k[5])>0  ])'''
 
 
 
@@ -338,12 +496,12 @@ def main():
     trData = np.array([k for k in trData if (k >= (meanFoc - (3 * stdFoc))).all() and (k <= (meanFoc + (3 * stdFoc))).all()])'''
 
 
-    wd = np.array([k for k in trData])[:, 1]
+    '''wd = np.array([k for k in trData])[:, 1]
     for i in range(0, len(wd)):
         if float(wd[i]) > 180:
             wd[i] = float(wd[i]) - 180  # and  float(k[8])<20
 
-    trData[:, 1] = wd
+    trData[:, 1] = wd'''
 
     '''wf = np.array([k for k in trData])[:, 2]
     for i in range(0, len(wf)):
@@ -351,35 +509,17 @@ def main():
     trData[:, 2] = wf'''
 
 
+    #trData = trData[:44000]
 
 
-    size = 3000
+    #for i in range(0, len(trData)):
+        #trData[i] = np.mean(trData[i:i + 15], axis=0)
 
-    #trData = trData[trData[:, 3].argsort()]
-
-    #trData = trData[:20000]
-    #X_train, X_test, y_train, y_test = trData[:len(trData) - size, 0:5], trData[len(trData) - size:len(trData), 0:5], \
-                                       #trData[:len(trData) - size, 5], trData[len(trData) - size:len(trData),5]
-    '''trData1 = trData[20000:100000,5]
-    #trData2 = trData[9500:20000,5]
-    df = pd.DataFrame({
-        'tr1': trData1,
-    })
-    sns.displot(df, x="tr1")'''
-    trData = trData[:44000]
-
-
-    for i in range(0, len(trData)):
-        trData[i] = np.mean(trData[i:i + 15], axis=0)
-    #plt.show()
-
-    #X_train, y_train = trData[:135000, 0:5], trData[:135000,5]
-    #X_test, y_test = trData[135000:,0:5] , trData[135000:,5]
     X_train, X_test, y_train, y_test = train_test_split(trData[:, 0:5], trData[:, 5], test_size=0.1, random_state=42)
 
-    test = np.append(X_test,y_test.reshape(-1,1),axis=1)
-    df = pd.DataFrame(test,)
-    df.to_csv('./testRaw.csv',index=False,)
+    #test = np.append(X_test,y_test.reshape(-1,1),axis=1)
+    #df = pd.DataFrame(test,)
+    #df.to_csv('./testRaw.csv',index=False,)
 
     '''train = np.append(X_train, y_train.reshape(-1, 1), axis=1)
 
@@ -391,7 +531,7 @@ def main():
 
     X_train, X_test, y_train, y_test = train[:,0:5] , test[:,0:5] , train[:,5] ,test[:,5]'''
 
-    i = 8.75
+    '''i = 8.75
     maxSpeed = np.max(X_train[:,3])
     sizesSpeed = []
     AvgactualFoc = []
@@ -432,30 +572,24 @@ def main():
                  0, 0,
                  X_train[i][4], 0, 0, 0, 0,
                  0,
-                 0, 0])
+                 0, 0])'''
 
-    '''imo = "9484948"
-    vessel = "EXPRESS ATHENS"
+    imo = "9379301"
+    vessel = "PENELOPE"
     laddenJSON = '{}'
     json_decoded = json.loads(laddenJSON)
     json_decoded['ConsumptionProfile_Dataset'] = {"vessel_code": str(imo), 'vessel_name': vessel,
                                                   "dateCreated": date.today().strftime("%d/%m/%Y"), "data": []}
     for i in range(0, len(X_test)):
         item = {"draft": np.round(X_test[i][0], 2), 'stw': np.round(X_test[i][3], 2),
-                "windBFT": np.round(X_test[i][2], 2),
+                "windBFT": float(np.round(X_test[i][2], 2)),
                 "windDir": np.round(X_test[i][1], 2), "swell": np.round(X_test[i][4], 2),
                 "cons": np.round(y_test[i], 2)}
         json_decoded['ConsumptionProfile_Dataset']["data"].append(item)
         # json_decoded['ConsumptionProfile']['consProfile'].append(outerItem)
 
     with open('./consProfileJSON/TestData_' + vessel + '_.json', 'w') as json_file:
-        json.dump(json_decoded, json_file)'''
-
-    DANreader.GenericParserForDataExtraction('LEMAG', 'DANAOS', 'EXPRESS ATHENS', driver='ORACLE',
-                                             server='10.2.5.80',
-                                             sid='OR12', usr='shipping', password='shipping',
-                                             rawData=False, telegrams=True, companyTelegrams=False,
-                                             pathOfRawData='/home/dimitris/Desktop/SEEAMAG')
+        json.dump(json_decoded, json_file)
 
 
     return

@@ -253,6 +253,7 @@ class BaseSeriesReader:
         windSpeedsWS=[]
         windSpeedsTlg=[]
         windDirsTlg = []
+        timestamps=[]
 
         if company=='MARMARAS':
             #sFile =  "./neural_data/marmaras_data.csv"
@@ -380,6 +381,7 @@ class BaseSeriesReader:
                 tlgSpeeds.append(tlgSpeed)
                 trims.append(trim)
                 steamHours.append(steamHour)
+                timestamps.append(newDate1)
 
 
                 # filteredDTWs = [d for d in dateTimesW if month == str(d).split('/')[1] and day ==
@@ -402,6 +404,7 @@ class BaseSeriesReader:
             swellDs = np.nan_to_num(swellDs).reshape(-1)
             waveHs = np.nan_to_num(waveHs).reshape(-1)
             waveDs = np.nan_to_num(waveDs).reshape(-1)
+            timestamps = np.array(timestamps).reshape(-1)
 
             windSpeeds = np.nan_to_num(windSpeeds).reshape(-1)
             windDirs = np.nan_to_num(windDirs).reshape(-1)
@@ -418,7 +421,7 @@ class BaseSeriesReader:
                     [bearings, blFlags, otherColumns, otherColumns, otherColumns, otherColumns, otherColumns, drafts,
                      otherColumns, windDirs, windSpeeds, stws,
                      otherColumns, otherColumns, focs, tlgsFocs, trims, tlgSpeeds, steamHours,
-                     combSWHs, combWDs, swellSWHs, swellDs, waveHs, waveDs,lats,lons]).T, axis=1))
+                     combSWHs, combWDs, swellSWHs, swellDs, waveHs, waveDs,lats,lons,timestamps]).T, axis=1))
 
 
         if company=='MILLENIA':
@@ -917,8 +920,8 @@ class BaseSeriesReader:
 
                     telegrams = tlgs#.values
 
-                if Path('./data/' + company + '/' + vessel + '/mappedDataTrain.csv').is_file():
-                    data = pd.read_csv('./data/' + company +'/'+vessel +'/mappedDataTrain.csv')
+                if Path('./data/' + company + '/' + vessel + '/trackRepMappedPENELOPE.csv').is_file():
+                    data = pd.read_csv('./data/' + company +'/'+vessel +'/trackRepMappedPENELOPE.csv')
                     newDataSet = data.values
 
 
@@ -935,7 +938,7 @@ class BaseSeriesReader:
                         shutil.copytree(pathOfRawData, path)
                     dataSet = []
                     for infile in  sorted(glob.glob(path+'*.csv')):
-                        data = pd.read_csv(infile, sep=',', decimal='.',skiprows=1)
+                        data = pd.read_csv(infile, sep=';', decimal='.',skiprows=1)
                         dataSet.append(data.values)
                         print(str(infile))
                     #if len(dataSet)>1:
@@ -957,7 +960,7 @@ class BaseSeriesReader:
             #
             #newDataSetBDD = self.extractRawData(dataSet, tlgsBDD, companyTelegrams, company, vessel)
             #newDataSetADD = self.extractRawData(dataSet, tlgsADD, companyTelegrams, company, vessel)
-            if Path('./data/' + company + '/' + vessel + '/mappedDataTrain.csv').is_file()==False:
+            if Path('./data/' + company + '/' + vessel + '/mappedData.csv').is_file()==True:
                 #dataSet=dataSet[:5,:]
                 newDataSet = self.extractRawData(dataSet, telegrams, companyTelegrams, company, vessel)
                 with open('./data/' + company +'/'+vessel+'/mappedData.csv', mode='w') as data:
@@ -967,7 +970,7 @@ class BaseSeriesReader:
                             [newDataSet[i][0], newDataSet[i][1], newDataSet[i][2], 0, 0, 0, 0, 0, newDataSet[i][8], 0 ,newDataSet[i][10],
                              newDataSet[i][11], newDataSet[i][12], 0, 0, newDataSet[i][15], newDataSet[i][16],newDataSet[i][17],newDataSet[i][18],newDataSet[i][19],
                              newDataSet[i][20],newDataSet[i][21],newDataSet[i][22],newDataSet[i][23],newDataSet[i][24],newDataSet[i][25],
-                             newDataSet[i][26],newDataSet[i][27],])
+                             newDataSet[i][26],newDataSet[i][27],newDataSet[i][28]])
 
             #if boolTlg==False and rawData==True:
                 #tlgDataset=[]
@@ -995,6 +998,48 @@ class BaseSeriesReader:
                 imo = row[0]
                 print(str(imo))
             #newDataSet[:5000]
+
+            #speed, ws, wd, swh, foc, draft, timestamp
+
+
+            # foc = np.array([k for k in newDataSet])[:,8].astype(float).reshape(-1)
+
+            ttimes = np.nan_to_num(newDataSet[:,6]).reshape(-1, 1)
+
+            drafts = np.nan_to_num(newDataSet[:, 5]).reshape(-1)
+            stws = np.nan_to_num(newDataSet[:,0]).reshape(-1)
+            focs = np.nan_to_num(newDataSet[:,4]).reshape(-1)
+
+            windSpeeds = np.nan_to_num(newDataSet[:,1]).reshape(-1)
+            windSpeedsWS = np.nan_to_num(newDataSet[:,1]).reshape(-1)
+            lats = np.array([0] * len(stws)).reshape(-1)
+            lons = np.array([0] * len(stws)).reshape(-1)
+            windDirs = np.nan_to_num(newDataSet[:,2]).reshape(-1)
+
+            blFlags = np.array([0] * len(stws)).reshape(-1)
+            combSWHs = np.array([0] * len(stws)).reshape(-1)
+            combWDs = np.array([0] * len(stws)).reshape(-1)
+            swellSWHs = np.nan_to_num(newDataSet[:, 3]).reshape(-1)
+            swellDs = np.array([0] * len(stws)).reshape(-1)
+            waveHs =np.array([0] * len(stws)).reshape(-1)
+            waveDs = np.array([0] * len(stws)).reshape(-1)
+
+            vCourses = np.array([0] * len(stws)).reshape(-1)
+            tlgSpeeds = np.array([0] * len(stws)).reshape(-1)
+            tlgsFocs = np.array([0] * len(stws)).reshape(-1)
+            steamHours = np.array([0] * len(stws)).reshape(-1)
+            trims = np.array([0] * len(stws)).reshape(-1)
+            firstColumn = np.array([0] * len(stws)).reshape(-1)
+            otherColumns = np.array([0] * len(stws)).reshape(-1)
+
+            newDataSet = np.array(
+                np.append(ttimes, np.asmatrix(
+                    [vCourses, blFlags, otherColumns, otherColumns, otherColumns, otherColumns, otherColumns, drafts,
+                     otherColumns, windDirs, windSpeeds, stws,
+                     otherColumns, otherColumns, focs, tlgsFocs, trims, tlgSpeeds, steamHours, swellSWHs, swellDs,
+                     combSWHs, combWDs, waveHs, waveDs,
+                     lats, lons, windSpeedsWS]).T, axis=1))
+
             generateExcel.fillDetailedExcelProfCons(company, vessel, pathExcel, newDataSet, rawData, tlgDataset, [], [], imo)
             return
 
@@ -1023,7 +1068,7 @@ class BaseSeriesReader:
                             vessel_code = row[0]
                             print(str(vessel_code))
 
-                    vessel_code='T003'
+                    #vessel_code='T003'
                     if usr =='shipping':
                         cursor_myserver.execute(
                             'SELECT  TELEGRAM_DATE , TELEGRAM_TYPE,BALAST_FLAG,LATITUDE_DEGREES , LATITUDE_SECONDS'

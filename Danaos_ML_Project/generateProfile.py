@@ -4669,7 +4669,7 @@ class BaseProfileGenerator:
         n_steps = 6
         #COVNERT kg/min to MT/day
         #dataSet[:,15]= ( (dataSet[:,15]  ) * 1000 )/ 1440
-        #dataSet[:, 15] = ((dataSet[:, 15]) ) * 24
+        dataSet[:, 15] = ((dataSet[:, 15]) ) * 24
         # COVNERT kg/min to MT/day
 
         #COVNERT kg/h to MT/day
@@ -4692,7 +4692,6 @@ class BaseProfileGenerator:
 
         wf = np.array([k for k in dataSet])[:, 11]
         for i in range(0, len(wf)):
-
               wf[i] = self.ConvertMSToBeaufort(float(float(wf[i])))
         dataSet[:, 11] = wf
 
@@ -4832,7 +4831,7 @@ class BaseProfileGenerator:
         workbook._sheets[1].add_image(img, 'F' + str(490))
 
         ladenFlag = True
-        ballastFlag = False
+        ballastFlag = True
         print("Min Draft: " + str(minDraft))
         print("Mean Draft: " +str(meanDraft))
         print("Max Draft: " + str(maxDraft))
@@ -5091,6 +5090,64 @@ class BaseProfileGenerator:
 
                 plt.show()'''
                 d=0
+                speedRange1 = np.array([k for k in ladenDt if k[5] >= 11 and k[5] <= 14])
+                sizesSwell = []
+                swell = []
+                avgActualFoc = []
+                minActualFoc = []
+                maxActualFoc = []
+                stdActualFoc = []
+                maxSwell = 8
+                minSwell = 0
+                i = 0
+                rawSwell = np.array([k for k in speedRange1 if float(k[4]) >= 0 and float(k[4]) <= 3])
+                while i <= maxSwell:
+
+                    speedArray = np.array([k for k in rawSwell if float(k[13]) >= i and float(k[13]) <= i + 1])
+
+                    if speedArray.__len__() > 0:
+                        sizesSwell.append(speedArray.__len__())
+                        swell.append(i)
+                        avgActualFoc.append(np.mean(speedArray[:, 8]))
+                        minActualFoc.append(np.min(speedArray[:, 8]))
+                        maxActualFoc.append(np.max(speedArray[:, 8]))
+                        stdActualFoc.append(np.std(speedArray[:, 8]))
+                    i += 1
+
+                xi = np.array(swell)
+                yi = np.array(avgActualFoc)
+                zi = np.array(sizesSwell)
+
+                p2 = np.poly1d(np.polyfit(xi, yi, 1))
+
+                xp = np.arange(0, 8)
+
+                swell01 = np.array([random.uniform(0, 1) for p in range(0, 100)])
+                swell12 = np.array([random.uniform(1, 2) for p in range(0, 100)])
+
+                swell23 = np.array([random.uniform(2, 3) for p in range(0, 100)])
+                swell34 = np.array([random.uniform(3, 4) for p in range(0, 100)])
+                swell45 = np.array([random.uniform(4, 5) for p in range(0, 100)])
+                swell56 = np.array([random.uniform(5, 6) for p in range(0, 100)])
+                swell67 = np.array([random.uniform(6, 7) for p in range(0, 100)])
+                swell78 = np.array([random.uniform(7, 8) for p in range(0, 100)])
+                
+                p2_01 = p2(swell01)
+                p2_12 = p2(swell12)
+                p2_23 = p2(swell23)
+                p2_34 = p2(swell34)
+                p2_45 = p2(swell45)
+                p2_56 = p2(swell56)
+                p2_67 = p2(swell67)
+                p2_78 = p2(swell78)
+
+                factorSWH = [0, abs((np.mean(p2_12) - np.mean(p2_01)) / np.mean(p2_01)),
+                             abs((np.mean(p2_23) - np.mean(p2_12)) / np.mean(p2_12)),
+                             abs((np.mean(p2_34) - np.mean(p2_23)) / np.mean(p2_23)),
+                             abs((np.mean(p2_45) - np.mean(p2_34)) / np.mean(p2_34)),
+                             abs((np.mean(p2_56) - np.mean(p2_45)) / np.mean(p2_45)),
+                             abs((np.mean(p2_67) - np.mean(p2_56)) / np.mean(p2_56)),
+                             abs((np.mean(p2_78) - np.mean(p2_67)) / np.mean(p2_67))]
             except:
                 print('EXCEPTION IN WEIGHTS SWELL LADDEN')
                 weightsSWH79 = [0, 0.0043, 0.0023, 0.0024, 0.0025, 0.0046, 0.0057, 0.0058, 0.0059]
@@ -5243,6 +5300,68 @@ class BaseProfileGenerator:
                  abs((np.mean(si) - np.mean(ci))/ np.mean(ci)),
                  abs((np.mean(si) - np.mean(di))/ np.mean(di)),
                  abs((np.mean(di) - np.mean(ri))/ np.mean(ri))]
+                
+                
+                ###############################
+                speedRange1 = np.array([k for k in ladenDt if k[5] >= 11 and k[5] <= 14])
+                sizesWS = []
+                ws = []
+                avgActualFoc = []
+                minActualFoc = []
+                maxActualFoc = []
+                stdActualFoc = []
+                maxWS = 8
+                minWS = 0
+                i = 0
+                rawWS = np.array([k for k in speedRange1 if float(k[13]) >= 0 and float(k[13]) <= 2])
+                while i <= maxWS:
+
+                    speedArray = np.array([k for k in rawWS if float(k[4]) >= i and float(k[4]) <= i + 1])
+
+                    if speedArray.__len__() > 0:
+                        sizesWS.append(speedArray.__len__())
+                        ws.append(i)
+                        avgActualFoc.append(np.mean(speedArray[:, 8]))
+                        minActualFoc.append(np.min(speedArray[:, 8]))
+                        maxActualFoc.append(np.max(speedArray[:, 8]))
+                        stdActualFoc.append(np.std(speedArray[:, 8]))
+                    i += 1
+
+                xi = np.array(ws)
+                yi = np.array(avgActualFoc)
+                zi = np.array(sizesWS)
+
+                p2 = np.poly1d(np.polyfit(xi, yi, 1))
+
+                xp = np.arange(0, 8)
+
+                ws01 = np.array([random.uniform(0, 1) for p in range(0, 100)])
+                ws12 = np.array([random.uniform(1, 2) for p in range(0, 100)])
+
+                ws23 = np.array([random.uniform(2, 3) for p in range(0, 100)])
+                ws34 = np.array([random.uniform(3, 4) for p in range(0, 100)])
+                ws45 = np.array([random.uniform(4, 5) for p in range(0, 100)])
+                ws56 = np.array([random.uniform(5, 6) for p in range(0, 100)])
+                ws67 = np.array([random.uniform(6, 7) for p in range(0, 100)])
+                ws78 = np.array([random.uniform(7, 8) for p in range(0, 100)])
+
+                p2_01 = p2(ws01)
+                p2_12 = p2(ws12)
+                p2_23 = p2(ws23)
+                p2_34 = p2(ws34)
+                p2_45 = p2(ws45)
+                p2_56 = p2(ws56)
+                p2_67 = p2(ws67)
+                p2_78 = p2(ws78)
+
+                factorSWS = [0, abs((np.mean(p2_12) - np.mean(p2_01)) / np.mean(p2_01)),
+                             abs((np.mean(p2_23) - np.mean(p2_12)) / np.mean(p2_12)),
+                             abs((np.mean(p2_34) - np.mean(p2_23)) / np.mean(p2_23)),
+                             abs((np.mean(p2_45) - np.mean(p2_34)) / np.mean(p2_34)),
+                             abs((np.mean(p2_56) - np.mean(p2_45)) / np.mean(p2_45)),
+                             abs((np.mean(p2_67) - np.mean(p2_56)) / np.mean(p2_56)),
+                             abs((np.mean(p2_78) - np.mean(p2_67)) / np.mean(p2_67))]
+                
             except:
                 print('EXCEPTION IN WEIGHTS WS LADDEN')
                 weightsWS79 = [0, 0.0043, 0.0023, 0.0024, 0.0025, 0.0046, 0.0057, 0.0058, 0.0059]
@@ -5334,10 +5453,69 @@ class BaseProfileGenerator:
                 ci = ci[:, 8] if ci.__len__() > wdLen else lr3.predict(
                     np.array([random.uniform(157.5, 180) for p in range(0, 100)]).reshape(-1, 1)).reshape(-1)
 
-                weightsWD1114 = [ abs((np.mean(xi) - np.mean(ci)) / np.mean(ci)), abs((np.mean(yi) - np.mean(fi)) / np.mean(fi)) ,
+                weightsWD1114 = [ abs((np.mean(xi) - np.mean(ci)) / np.mean(ci)),
+                                  abs((np.mean(yi) - np.mean(fi)) / np.mean(fi)) ,
                                  abs((np.mean(fi) - np.mean(zi)) /np.mean(zi) ) ,
                                  abs((np.mean(yi) - np.mean(zi))/np.mean(zi)),
                                  abs((np.mean(fi) - np.mean(ci)) /  np.mean(ci)), 0 ]
+
+
+                ##################################################################################
+                speedRange1 = np.array([k for k in ladenDt if k[5] >= 11 and k[5] <= 14])
+                sizesWD = []
+                wd = []
+                avgActualFoc = []
+                minActualFoc = []
+                maxActualFoc = []
+                stdActualFoc = []
+                maxWD = 8
+                minWD = 0
+                i = 0
+                listWD = [0, 22.5, 67.5, 112.5, 157.5, 180]
+                rawWD = np.array([k for k in speedRange1 if float(k[4]) >= 0 and float(k[4]) <= 3])
+                while i <= len(listWD)-1:
+
+                    speedArray = np.array([k for k in rawWD if float(k[3]) >= listWD[i] and float(k[3]) <= listWD[i + 1]])
+
+                    if speedArray.__len__() > 0:
+                        sizesWD.append(speedArray.__len__())
+                        wd.append(np.mean(listWD[i:i+1]))
+                        avgActualFoc.append(np.mean(speedArray[:, 8]))
+                        minActualFoc.append(np.min(speedArray[:, 8]))
+                        maxActualFoc.append(np.max(speedArray[:, 8]))
+                        stdActualFoc.append(np.std(speedArray[:, 8]))
+                    i += 1
+
+                xi = np.array(wd)
+                yi = np.array(avgActualFoc)
+                zi = np.array(sizesWD)
+
+                p2 = np.poly1d(np.polyfit(xi, yi, 1))
+
+                xp = np.arange(0, 180)
+
+                wd01 = np.array([random.uniform(0, 22.5) for p in range(0, 100)])
+                wd12 = np.array([random.uniform(22.5, 67.5) for p in range(0, 100)])
+                wd23 = np.array([random.uniform(67.5, 112.5) for p in range(0, 100)])
+                wd34 = np.array([random.uniform(112.5, 157.5) for p in range(0, 100)])
+                wd45 = np.array([random.uniform(157.5, 180) for p in range(0, 100)])
+
+
+                p2_01 = p2(wd01)
+                p2_12 = p2(wd12)
+                p2_23 = p2(wd23)
+                p2_34 = p2(wd34)
+                p2_45 = p2(wd45)
+
+
+                factorSWD = [ abs((np.mean(p2_01) - np.mean(p2_45)) / np.mean(p2_45)),
+                             abs((np.mean(p2_12) - np.mean(p2_34)) / np.mean(p2_34)),
+                             abs((np.mean(p2_23) - np.mean(p2_34)) / np.mean(p2_34)),
+                             abs((np.mean(p2_45) - np.mean(p2_34)) / np.mean(p2_34)),
+                             0]
+
+
+
 
             except:
                 print('EXCEPTION IN WEIGHTS WD LADDEN')
@@ -5350,7 +5528,7 @@ class BaseProfileGenerator:
             ###############################################################################################
 
             speedFoc = np.array(
-                [k for k in dtNew if (k[5] >= consVelocities[0] and k[5] <=maxLaddenSpeedn)and (k[4] >= 0 and k[4] <=2) and k[8] > 1])
+                [k for k in dtNew if (k[5] >= consVelocities[0] and k[5] <=maxLaddenSpeedn)and (k[4] >= 0 and k[4] <=3)  and k[8] > 1])
 
             '''meanFoc = np.mean(speedFoc[:, 8])
             stdFoc = np.std(speedFoc[:, 8])
@@ -5369,7 +5547,7 @@ class BaseProfileGenerator:
 
             #lrSpeedFoc = LinearRegression()
             #lrSpeedFoc = RandomForestRegressor()
-            lrSpeedFoc = SplineRegression.Earth(max_degree=2,)
+            lrSpeedFoc = SplineRegression.Earth(max_degree=1,)
 
 
 
@@ -5474,9 +5652,9 @@ class BaseProfileGenerator:
             consVelocities = np.arange(np.round(minspeed), np.ceil(maxspeed), )
 
             #row = [10, 19, 28, 37, 46, 55, 64, 73]
-            windForceWeightsList = [weightsWS79, weightsWS911, weightsWS1114]
-            windDirWeightsList = [weightsWD79,weightsWD911,weightsWD1114]
-            swellHeightWeightsList = [weightsSWH79,weightsSWH911,weightsSWH1114]
+            windForceWeightsList = [factorSWS, factorSWS, factorSWS]
+            windDirWeightsList = [factorSWD,factorSWD,factorSWD]
+            swellHeightWeightsList = [factorSWH,factorSWH,factorSWH]
             wind = [0, 22.5, 67.5, 112.5, 157.5, 180]
             
             windF = [0, 1, 2, 3, 4, 5, 6, 7, 8]
@@ -5523,7 +5701,7 @@ class BaseProfileGenerator:
 
 
 
-                centralMean = p2(consVelocitiesJSON[vel])
+                centralMean = lrSpeedFoc.predict(np.array([consVelocitiesJSON[vel]]).reshape(-1,1))[0]
                 stw = consVelocitiesJSON[vel]
                     #lrSpeedFoc.predict(np.array([consVelocitiesJSON[vel]]).reshape(-1,1))[0]
                 #lrSpeedFoc.predict(np.array([consVelocities[vel]]).reshape(-1,1))[0]
@@ -5668,124 +5846,225 @@ class BaseProfileGenerator:
             print(consVelocitiesRanges)
 
             lr1 = LinearRegression()
-            lr1.fit(speedFoc1[:, 15].reshape(-1, 1), speedFoc1[:, 8].reshape(-1, 1))
+            lr1.fit(speedFoc1[:, 13].reshape(-1, 1), speedFoc1[:, 8].reshape(-1, 1))
+            p1Swell = np.poly1d(np.polyfit(speedFoc1[:, 13], speedFoc1[:, 8], 1, ), )
+
 
             lr2 = LinearRegression()
-            lr2.fit(speedFoc2[:, 15].reshape(-1, 1), speedFoc2[:, 8].reshape(-1, 1))
+            lr2.fit(speedFoc2[:, 13].reshape(-1, 1), speedFoc2[:, 8].reshape(-1, 1))
+            p2Swell = np.poly1d(np.polyfit(speedFoc2[:, 13], speedFoc2[:, 8], 1, ), )
 
             lr3 = LinearRegression()
-            lr3.fit(speedFoc3[:, 15].reshape(-1, 1), speedFoc3[:, 8].reshape(-1, 1))
+            lr3.fit(speedFoc3[:, 13].reshape(-1, 1), speedFoc3[:, 8].reshape(-1, 1))
+            p3Swell = np.poly1d(np.polyfit(speedFoc3[:, 13], speedFoc3[:, 8], 1, ), )
+
+            swellLen = 10000000000
             try:
-                xi = np.array([k for k in ballastDt if k[15] > 0 and k[15] <= 1 and
+                xi = np.array([k for k in ballastDt if k[13] > 0 and k[13] <= 1 and
                                (k[5] > consVelocitiesRanges[0] and k[5] <= consVelocitiesRanges[1])])
-                xi = xi[:, 8] if xi.__len__() > 0 else lr1.predict(
+                xi = xi[:, 8] if xi.__len__() > swellLen else p1Swell(
                     np.array([random.uniform(0, 1) for p in range(0, 100)]).reshape(-1, 1)).reshape(-1)
-                yi = np.array([k for k in ballastDt if k[15] > 1 and k[15] <= 2 and
+                yi = np.array([k for k in ballastDt if k[13] > 1 and k[13] <= 2 and
                                (k[5] > consVelocitiesRanges[0] and k[5] <= consVelocitiesRanges[1])])
-                yi = yi[:, 8] if yi.__len__() > 0 else lr1.predict(
+                yi = yi[:, 8] if yi.__len__() > swellLen else p1Swell(
                     np.array([random.uniform(1, 2) for p in range(0, 100)]).reshape(-1, 1)).reshape(-1)
-                zi = np.array([k for k in ballastDt if k[15] > 2 and k[15] <= 3 and
+                zi = np.array([k for k in ballastDt if k[13] > 2 and k[13] <= 3 and
                                (k[5] > consVelocitiesRanges[0] and k[5] <= consVelocitiesRanges[1])])
-                zi = zi[:, 8] if zi.__len__() > 0 else lr1.predict(
+                zi = zi[:, 8] if zi.__len__() > swellLen else p1Swell(
                     np.array([random.uniform(2, 3) for p in range(0, 100)]).reshape(-1, 1)).reshape(-1)
-                fi = np.array([k for k in ballastDt if k[15] > 3 and k[15] <= 4 and
+                fi = np.array([k for k in ballastDt if k[13] > 3 and k[13] <= 4 and
                                (k[5] > consVelocitiesRanges[0] and k[5] <= consVelocitiesRanges[1])])
-                fi = fi[:, 8] if fi.__len__() > 0 else lr1.predict(
+                fi = fi[:, 8] if fi.__len__() > swellLen else p1Swell(
                     np.array([random.uniform(3, 4) for p in range(0, 100)]).reshape(-1, 1)).reshape(-1)
-                ci = np.array([k for k in ballastDt if k[15] > 4 and k[15] <= 5 and
+                ci = np.array([k for k in ballastDt if k[13] > 4 and k[13] <= 5 and
                                (k[5] > consVelocitiesRanges[0] and k[5] <= consVelocitiesRanges[1])])
-                ci = ci[:, 8] if ci.__len__() > 0 else lr1.predict(
+                ci = ci[:, 8] if ci.__len__() > swellLen else p1Swell(
                     np.array([random.uniform(4, 5) for p in range(0, 100)]).reshape(-1, 1)).reshape(-1)
-                si = np.array([k for k in ballastDt if k[15] > 5 and k[15] <= 6 and
+                si = np.array([k for k in ballastDt if k[13] > 5 and k[13] <= 6 and
                                (k[5] > consVelocitiesRanges[0] and k[5] <= consVelocitiesRanges[1])])
-                si = si[:, 8] if si.__len__() > 0 else lr1.predict(
+                si = si[:, 8] if si.__len__() > swellLen else p1Swell(
                     np.array([random.uniform(5, 6) for p in range(0, 100)]).reshape(-1, 1)).reshape(-1)
-                di = np.array([k for k in ballastDt if k[15] > 6 and k[15] <= 7 and
+                di = np.array([k for k in ballastDt if k[13] > 6 and k[13] <= 7 and
                                (k[5] > consVelocitiesRanges[0] and k[5] <= consVelocitiesRanges[1])])
-                di = di[:, 8] if di.__len__() > 0 else lr1.predict(
+                di = di[:, 8] if di.__len__() > swellLen else p1Swell(
                     np.array([random.uniform(6, 7) for p in range(0, 100)]).reshape(-1, 1)).reshape(-1)
-                ri = np.array([k for k in ballastDt if k[15] > 7 and k[15] <= 8 and
+                ri = np.array([k for k in ballastDt if k[13] > 7 and k[13] <= 8 and
                                (k[5] > consVelocitiesRanges[0] and k[5] <= consVelocitiesRanges[1])])
-                ri = ri[:, 8] if ri.__len__() > 0 else lr1.predict(
+                ri = ri[:, 8] if ri.__len__() > swellLen else p1Swell(
                     np.array([random.uniform(7, 8) for p in range(0, 100)]).reshape(-1, 1)).reshape(-1)
 
-                weightsSWH79 = [0, ks_2samp(xi, yi)[0] / 10, ks_2samp(yi, zi)[0] / 10, ks_2samp(zi, fi)[0] / 10,
+                weightsSWH79 =  [0, abs((np.mean(yi) - np.mean(xi)) / np.mean(xi)),
+                                  abs((np.mean(zi) - np.mean(yi)) / np.mean(yi)),
+                                  abs((np.mean(fi) - np.mean(zi)) / np.mean(zi)),
+                                  abs((np.mean(ci) - np.mean(fi)) / np.mean(fi)),
+                                  abs((np.mean(si) - np.mean(ci)) / np.mean(ci)),
+                                  abs((np.mean(di) - np.mean(si)) / np.mean(si)),
+                                  abs((np.mean(ri) - np.mean(di)) / np.mean(di))]
+
+                '''[0, 1/(1+ np.linalg.norm(xi - yi) ), 1/(1 +  np.linalg.norm(yi - zi)) , 1/(1+  np.linalg.norm(zi- fi)) ,
+                                 1/(1+ np.linalg.norm(fi - ci) ), 1/(1+ np.linalg.norm(ci - si) ), 1/(1+ np.linalg.norm(di - si)) ,
+                                 1/(1+ np.linalg.norm(ri - di)) ]'''
+
+                '''[0, ks_2samp(xi, yi)[0] / 10, ks_2samp(yi, zi)[0] / 10, ks_2samp(zi, fi)[0] / 10,
                                 ks_2samp(fi, ci)[0] / 10, ks_2samp(ci, si)[0] / 10, ks_2samp(di, si)[0] / 10,
-                                (ks_2samp(ri, di)[0] / 10)]
+                                (ks_2samp(ri, di)[0] / 10)]'''
 
-                xi = np.array([k for k in ballastDt if k[15] > 0 and k[15] <= 1 and
+                xi = np.array([k for k in ballastDt if k[13] > 0 and k[13] <= 1 and
                                (k[5] > consVelocitiesRanges[1] and k[5] <= consVelocitiesRanges[2])])
-                xi = xi[:, 8] if xi.__len__() > 0 else lr2.predict(
+                xi = xi[:, 8] if xi.__len__() > swellLen else p2Swell(
                     np.array([random.uniform(0, 1) for p in range(0, 100)]).reshape(-1, 1)).reshape(-1)
-                yi = np.array([k for k in ballastDt if k[15] > 1 and k[15] <= 2 and
+                yi = np.array([k for k in ballastDt if k[13] > 1 and k[13] <= 2 and
                                (k[5] > consVelocitiesRanges[1] and k[5] <= consVelocitiesRanges[2])])
-                yi = yi[:, 8] if yi.__len__() > 0 else lr2.predict(
+                yi = yi[:, 8] if yi.__len__() > swellLen else p2Swell(
                     np.array([random.uniform(1, 2) for p in range(0, 100)]).reshape(-1, 1)).reshape(-1)
-                zi = np.array([k for k in ballastDt if k[15] > 2 and k[15] <= 3 and
+                zi = np.array([k for k in ballastDt if k[13] > 2 and k[13] <= 3 and
                                (k[5] > consVelocitiesRanges[1] and k[5] <= consVelocitiesRanges[2])])
-                zi = zi[:, 8] if zi.__len__() > 0 else lr2.predict(
+                zi = zi[:, 8] if zi.__len__() > swellLen else p2Swell(
                     np.array([random.uniform(2, 3) for p in range(0, 100)]).reshape(-1, 1)).reshape(-1)
-                fi = np.array([k for k in ballastDt if k[15] > 3 and k[15] <= 4 and
+                fi = np.array([k for k in ballastDt if k[13] > 3 and k[13] <= 4 and
                                (k[5] > consVelocitiesRanges[1] and k[5] <= consVelocitiesRanges[2])])
-                fi = fi[:, 8] if fi.__len__() > 0 else lr2.predict(
+                fi = fi[:, 8] if fi.__len__() > swellLen else p2Swell(
                     np.array([random.uniform(3, 4) for p in range(0, 100)]).reshape(-1, 1)).reshape(-1)
-                ci = np.array([k for k in ballastDt if k[15] > 4 and k[15] <= 5 and
+                ci = np.array([k for k in ballastDt if k[13] > 4 and k[13] <= 5 and
                                (k[5] > consVelocitiesRanges[1] and k[5] <= consVelocitiesRanges[2])])
-                ci = ci[:, 8] if ci.__len__() > 0 else lr2.predict(
+                ci = ci[:, 8] if ci.__len__() > swellLen else p2Swell(
                     np.array([random.uniform(4, 5) for p in range(0, 100)]).reshape(-1, 1)).reshape(-1)
-                si = np.array([k for k in ballastDt if k[15] > 5 and k[15] <= 6 and
+                si = np.array([k for k in ballastDt if k[13] > 5 and k[13] <= 6 and
                                (k[5] > consVelocitiesRanges[1] and k[5] <= consVelocitiesRanges[2])])
-                si = si[:, 8] if si.__len__() > 0 else lr2.predict(
+                si = si[:, 8] if si.__len__() > swellLen else p2Swell(
                     np.array([random.uniform(5, 6) for p in range(0, 100)]).reshape(-1, 1)).reshape(-1)
-                di = np.array([k for k in ballastDt if k[15] > 6 and k[15] <= 7 and
+                di = np.array([k for k in ballastDt if k[13] > 6 and k[13] <= 7 and
                                (k[5] > consVelocitiesRanges[1] and k[5] <= consVelocitiesRanges[2])])
-                di = di[:, 8] if di.__len__() > 0 else lr2.predict(
+                di = di[:, 8] if di.__len__() > swellLen else p2Swell(
                     np.array([random.uniform(6, 7) for p in range(0, 100)]).reshape(-1, 1)).reshape(-1)
-                ri = np.array([k for k in ballastDt if k[15] > 7 and k[15] <= 8 and
+                ri = np.array([k for k in ballastDt if k[13] > 7 and k[13] <= 8 and
                                (k[5] > consVelocitiesRanges[1] and k[5] <= consVelocitiesRanges[2])])
-                ri = ri[:, 8] if ri.__len__() > 0 else lr2.predict(
+                ri = ri[:, 8] if ri.__len__() > swellLen else p2Swell(
                     np.array([random.uniform(7, 8) for p in range(0, 100)]).reshape(-1, 1)).reshape(-1)
 
-                weightsSWH911 = [0, ks_2samp(xi, yi)[0] / 10, ks_2samp(yi, zi)[0] / 10, ks_2samp(zi, fi)[0] / 10,
-                                 ks_2samp(fi, ci)[0] / 10, ks_2samp(ci, si)[0] / 10, ks_2samp(di, si)[0] / 10,
-                                 (ks_2samp(ri, di)[0] / 10)]
+                weightsSWH911 = [0, abs((np.mean(yi) - np.mean(xi)) / np.mean(xi)),
+                                  abs((np.mean(zi) - np.mean(yi)) / np.mean(yi)),
+                                  abs((np.mean(fi) - np.mean(zi)) / np.mean(zi)),
+                                  abs((np.mean(ci) - np.mean(fi)) / np.mean(fi)),
+                                  abs((np.mean(si) - np.mean(ci)) / np.mean(ci)),
+                                  abs((np.mean(di) - np.mean(si)) / np.mean(si)),
+                                  abs((np.mean(ri) - np.mean(di)) / np.mean(di))]
 
-                xi = np.array([k for k in ballastDt if k[15] > 0 and k[15] <= 1 and
+                xi = np.array([k for k in ballastDt if k[13] > 0 and k[13] <= 1 and
                                (k[5] > consVelocitiesRanges[2] and k[5] <= consVelocitiesRanges[3])])
-                xi = xi[:, 8] if xi.__len__() > 0 else lr3.predict(
+                xi = xi[:, 8] if xi.__len__() > swellLen else p3Swell(
                     np.array([random.uniform(0, 1) for p in range(0, 100)]).reshape(-1, 1)).reshape(-1)
-                yi = np.array([k for k in ballastDt if k[15] > 1 and k[15] <= 2 and
+                yi = np.array([k for k in ballastDt if k[13] > 1 and k[13] <= 2 and
                                (k[5] > consVelocitiesRanges[2] and k[5] <= consVelocitiesRanges[3])])
-                yi = yi[:, 8] if yi.__len__() > 0 else lr3.predict(
+                yi = yi[:, 8] if yi.__len__() > swellLen else p3Swell(
                     np.array([random.uniform(1, 2) for p in range(0, 100)]).reshape(-1, 1)).reshape(-1)
-                zi = np.array([k for k in ballastDt if k[15] > 2 and k[15] <= 3 and
+                zi = np.array([k for k in ballastDt if k[13] > 2 and k[13] <= 3 and
                                (k[5] > consVelocitiesRanges[2] and k[5] <= consVelocitiesRanges[3])])
-                zi = zi[:, 8] if zi.__len__() > 0 else lr3.predict(
+                zi = zi[:, 8] if zi.__len__() > swellLen else p3Swell(
                     np.array([random.uniform(2, 3) for p in range(0, 100)]).reshape(-1, 1)).reshape(-1)
-                fi = np.array([k for k in ballastDt if k[15] > 3 and k[15] <= 4 and
+                fi = np.array([k for k in ballastDt if k[13] > 3 and k[13] <= 4 and
                                (k[5] > consVelocitiesRanges[2] and k[5] <= consVelocitiesRanges[3])])
-                fi = fi[:, 8] if fi.__len__() > 0 else lr3.predict(
+                fi = fi[:, 8] if fi.__len__() > swellLen else p3Swell(
                     np.array([random.uniform(3, 4) for p in range(0, 100)]).reshape(-1, 1)).reshape(-1)
-                ci = np.array([k for k in ballastDt if k[15] > 4 and k[15] <= 5 and
+                ci = np.array([k for k in ballastDt if k[13] > 4 and k[13] <= 5 and
                                (k[5] > consVelocitiesRanges[2] and k[5] <= consVelocitiesRanges[3])])
-                ci = ci[:, 8] if ci.__len__() > 0 else lr3.predict(
+                ci = ci[:, 8] if ci.__len__() > swellLen else p3Swell(
                     np.array([random.uniform(4, 5) for p in range(0, 100)]).reshape(-1, 1)).reshape(-1)
-                si = np.array([k for k in ballastDt if k[15] > 5 and k[15] <= 6 and
+                si = np.array([k for k in ballastDt if k[13] > 5 and k[13] <= 6 and
                                (k[5] > consVelocitiesRanges[2] and k[5] <= consVelocitiesRanges[3])])
-                si = si[:, 8] if si.__len__() > 0 else lr3.predict(
+                si = si[:, 8] if si.__len__() > swellLen else p3Swell(
                     np.array([random.uniform(5, 6) for p in range(0, 100)]).reshape(-1, 1)).reshape(-1)
-                di = np.array([k for k in ballastDt if k[15] > 6 and k[15] <= 7 and
+                di = np.array([k for k in ballastDt if k[13] > 6 and k[13] <= 7 and
                                (k[5] > consVelocitiesRanges[2] and k[5] <= consVelocitiesRanges[3])])
-                di = di[:, 8] if di.__len__() > 0 else lr3.predict(
+                di = di[:, 8] if di.__len__() > swellLen else p3Swell(
                     np.array([random.uniform(6, 7) for p in range(0, 100)]).reshape(-1, 1)).reshape(-1)
-                ri = np.array([k for k in ballastDt if k[15] > 7 and k[15] <= 8 and
+                ri = np.array([k for k in ballastDt if k[13] > 7 and k[13] <= 8 and
                                (k[5] > consVelocitiesRanges[2] and k[5] <= consVelocitiesRanges[3])])
-                ri = ri[:, 8] if ri.__len__() > 0 else lr3.predict(
+                ri = ri[:, 8] if ri.__len__() > swellLen else p3Swell(
                     np.array([random.uniform(7, 8) for p in range(0, 100)]).reshape(-1, 1)).reshape(-1)
 
-                weightsSWH1114 = [0, ks_2samp(xi, yi)[0] / 10, ks_2samp(yi, zi)[0] / 10, ks_2samp(zi, fi)[0] / 10,
-                                  ks_2samp(fi, ci)[0] / 10, ks_2samp(ci, si)[0] / 10, ks_2samp(di, si)[0] / 10,
-                                  (ks_2samp(ri, di)[0] / 10)]
+                weightsSWH1114 =  [0, abs((np.mean(yi) - np.mean(xi)) / np.mean(xi)),
+                                  abs((np.mean(zi) - np.mean(yi)) / np.mean(yi)),
+                                  abs((np.mean(fi) - np.mean(zi)) / np.mean(zi)),
+                                  abs((np.mean(ci) - np.mean(fi)) / np.mean(fi)),
+                                  abs((np.mean(si) - np.mean(ci)) / np.mean(ci)),
+                                  abs((np.mean(di) - np.mean(si)) / np.mean(si)),
+                                  abs((np.mean(ri) - np.mean(di)) / np.mean(di))]
+
+
+                '''[0, abs((np.mean(yi) - np.mean(xi)) / np.mean(xi)),
+                                  abs((np.mean(zi) - np.mean(yi)) / np.mean(yi)),
+                                  abs((np.mean(fi) - np.mean(zi)) / np.mean(zi)),
+                                  abs((np.mean(ci) - np.mean(fi)) / np.mean(fi)),
+                                  abs((np.mean(si) - np.mean(ci)) / np.mean(ci)),
+                                  abs((np.mean(di) - np.mean(si)) / np.mean(si)),
+                                  abs((np.mean(ri) - np.mean(di)) / np.mean(di))]
+'''
+                foc01 = [(itm, '0-1') for itm in xi]
+                foc12 = [(itm, '1-2') for itm in yi]
+                foc23 = [(itm, '2-3') for itm in zi]
+                foc34 = [(itm, '3-4') for itm in fi]
+                foc45 = [(itm, '4-5') for itm in ci]
+                joinedFoc = foc12 + foc23
+
+                speedRange1 = np.array([k for k in ladenDt if k[5] >= 11 and k[5] <= 14])
+                sizesSwell = []
+                swell = []
+                avgActualFoc = []
+                minActualFoc = []
+                maxActualFoc = []
+                stdActualFoc = []
+                maxSwell = 8
+                minSwell = 0
+                i = 0
+                rawSwell = np.array([k for k in speedRange1 if float(k[4]) >= 0 and float(k[4]) <= 3])
+                while i <= maxSwell:
+
+                    speedArray = np.array([k for k in rawSwell if float(k[13]) >= i and float(k[13]) <= i + 1])
+
+                    if speedArray.__len__() > 0:
+                        sizesSwell.append(speedArray.__len__())
+                        swell.append(i)
+                        avgActualFoc.append(np.mean(speedArray[:, 8]))
+                        minActualFoc.append(np.min(speedArray[:, 8]))
+                        maxActualFoc.append(np.max(speedArray[:, 8]))
+                        stdActualFoc.append(np.std(speedArray[:, 8]))
+                    i += 1
+
+                xi = np.array(swell)
+                yi = np.array(avgActualFoc)
+                zi = np.array(sizesSwell)
+
+                p2 = np.poly1d(np.polyfit(xi, yi, 1))
+
+                xp = np.arange(0, 8)
+
+                swell01 = np.array([random.uniform(0, 1) for p in range(0, 100)])
+                swell12 = np.array([random.uniform(1, 2) for p in range(0, 100)])
+
+                swell23 = np.array([random.uniform(2, 3) for p in range(0, 100)])
+                swell34 = np.array([random.uniform(3, 4) for p in range(0, 100)])
+                swell45 = np.array([random.uniform(4, 5) for p in range(0, 100)])
+                swell56 = np.array([random.uniform(5, 6) for p in range(0, 100)])
+                swell67 = np.array([random.uniform(6, 7) for p in range(0, 100)])
+                swell78 = np.array([random.uniform(7, 8) for p in range(0, 100)])
+
+                p2_01 = p2(swell01)
+                p2_12 = p2(swell12)
+                p2_23 = p2(swell23)
+                p2_34 = p2(swell34)
+                p2_45 = p2(swell45)
+                p2_56 = p2(swell56)
+                p2_67 = p2(swell67)
+                p2_78 = p2(swell78)
+
+                factorSWH = [0, abs((np.mean(p2_12) - np.mean(p2_01)) / np.mean(p2_01)),
+                             abs((np.mean(p2_23) - np.mean(p2_12)) / np.mean(p2_12)),
+                             abs((np.mean(p2_34) - np.mean(p2_23)) / np.mean(p2_23)),
+                             abs((np.mean(p2_45) - np.mean(p2_34)) / np.mean(p2_34)),
+                             abs((np.mean(p2_56) - np.mean(p2_45)) / np.mean(p2_45)),
+                             abs((np.mean(p2_67) - np.mean(p2_56)) / np.mean(p2_56)),
+                             abs((np.mean(p2_78) - np.mean(p2_67)) / np.mean(p2_67))]
             except:
                 print('EXCEPTION IN WEIGHTS SWELL BALLAST')
                 weightsSWH79 = [0, 0.0043, 0.0023, 0.0024, 0.0025, 0.0046, 0.0057, 0.0058, 0.0059]
@@ -5794,51 +6073,375 @@ class BaseProfileGenerator:
                 ############################################################################################################################
                 ############################################################################################################################
 
+            lr1 = LinearRegression()
+            lr1.fit(speedFoc1[:, 4].reshape(-1, 1), speedFoc1[:, 8].reshape(-1, 1))
 
+            lr2 = LinearRegression()
+            lr2.fit(speedFoc2[:, 4].reshape(-1, 1), speedFoc2[:, 8].reshape(-1, 1))
+
+            lr3 = LinearRegression()
+            lr3.fit(speedFoc3[:, 4].reshape(-1, 1), speedFoc3[:, 8].reshape(-1, 1))
+            wsLen = 1000000000000000000
+            try:
+                xi = np.array([k for k in ballastDt if k[4] > 0 and k[4] <= 1 and
+                               (k[5] > consVelocitiesRanges[0] and k[5] <= consVelocitiesRanges[1])])
+                xi = xi[:, 8] if xi.__len__() > wsLen else lr1.predict(
+                    np.array([random.uniform(0, 1) for p in range(0, 100)]).reshape(-1, 1)).reshape(-1)
+                yi = np.array([k for k in ballastDt if k[4] > 1 and k[4] <= 2 and
+                               (k[5] > consVelocitiesRanges[0] and k[5] <= consVelocitiesRanges[1])])
+                yi = yi[:, 8] if yi.__len__() > wsLen else lr1.predict(
+                    np.array([random.uniform(1, 2) for p in range(0, 100)]).reshape(-1, 1)).reshape(-1)
+                zi = np.array([k for k in ballastDt if k[4] > 2 and k[4] <= 3 and
+                               (k[5] > consVelocitiesRanges[0] and k[5] <= consVelocitiesRanges[1])])
+                zi = zi[:, 8] if zi.__len__() > wsLen else lr1.predict(
+                    np.array([random.uniform(2, 3) for p in range(0, 100)]).reshape(-1, 1)).reshape(-1)
+                fi = np.array([k for k in ballastDt if k[4] > 3 and k[4] <= 4 and
+                               (k[5] > consVelocitiesRanges[0] and k[5] <= consVelocitiesRanges[1])])
+                fi = fi[:, 8] if fi.__len__() > wsLen else lr1.predict(
+                    np.array([random.uniform(3, 4) for p in range(0, 100)]).reshape(-1, 1)).reshape(-1)
+                ci = np.array([k for k in ballastDt if k[4] > 4 and k[4] <= 5 and
+                               (k[5] > consVelocitiesRanges[0] and k[5] <= consVelocitiesRanges[1])])
+                ci = ci[:, 8] if ci.__len__() > wsLen else lr1.predict(
+                    np.array([random.uniform(4, 5) for p in range(0, 100)]).reshape(-1, 1)).reshape(-1)
+                si = np.array([k for k in ballastDt if k[4] > 5 and k[4] <= 6 and
+                               (k[5] > consVelocitiesRanges[0] and k[5] <= consVelocitiesRanges[1])])
+                si = si[:, 8] if si.__len__() > wsLen else lr1.predict(
+                    np.array([random.uniform(5, 6) for p in range(0, 100)]).reshape(-1, 1)).reshape(-1)
+                di = np.array([k for k in ballastDt if k[4] > 6 and k[4] <= 7 and
+                               (k[5] > consVelocitiesRanges[0] and k[5] <= consVelocitiesRanges[1])])
+                di = di[:, 8] if di.__len__() > wsLen else lr1.predict(
+                    np.array([random.uniform(6, 7) for p in range(0, 100)]).reshape(-1, 1)).reshape(-1)
+                ri = np.array([k for k in ballastDt if k[4] > 7 and k[4] <= 8 and
+                               (k[5] > consVelocitiesRanges[0] and k[5] <= consVelocitiesRanges[1])])
+                ri = ri[:, 8] if ri.__len__() > wsLen else lr1.predict(
+                    np.array([random.uniform(7, 8) for p in range(0, 100)]).reshape(-1, 1)).reshape(-1)
+
+                weightsWS79 = [0, 1 / (1 + np.linalg.norm(xi - yi)),
+                 1 / (1 + np.linalg.norm(yi - zi)),
+                 1 / (1 + np.linalg.norm(zi - fi)),
+                 1 / (1 + np.linalg.norm(fi - ci)),
+                 1 / (1 + np.linalg.norm(ci - si)),
+                 1 / (1 + np.linalg.norm(di - si)),
+                 1 / (1 + np.linalg.norm(ri - di))]
+
+                '''[0, abs((np.mean(yi) - np.mean(xi)) / np.mean(xi)),
+                               abs((np.mean(zi) - np.mean(yi)) / np.mean(yi)),
+                               abs((np.mean(fi) - np.mean(zi)) / np.mean(zi)),
+                               abs((np.mean(ci) - np.mean(fi)) / np.mean(fi)),
+                               abs((np.mean(si) - np.mean(ci)) / np.mean(ci)),
+                               abs((np.mean(si) - np.mean(di)) / np.mean(di)),
+                               abs((np.mean(di) - np.mean(ri)) / np.mean(ri))]'''
+
+                '''[0, 1 / (1 + np.linalg.norm(np.mean(xi) - np.mean(yi))),
+                 1 / (1 + np.linalg.norm(np.mean(yi) - np.mean(zi))),
+                 1 / (1 + np.linalg.norm(np.mean(zi) - np.mean(fi))),
+                 1 / (1 + np.linalg.norm(np.mean(fi) - np.mean(ci))),
+                 1 / (1 + np.linalg.norm(np.mean(ci) - np.mean(si))),
+                 1 / (1 + np.linalg.norm(np.mean(di) - np.mean(si))),
+                 1 / (1 + np.linalg.norm(np.mean(ri) - np.mean(di)))]'''
+
+                '''[0, ks_2samp(xi, yi)[0] / 10, ks_2samp(yi, zi)[0] / 10, ks_2samp(zi, fi)[0] / 10,
+                                ks_2samp(fi, ci)[0] / 10, ks_2samp(ci, si)[0] / 10, ks_2samp(di, si)[0] / 10,
+                                (ks_2samp(ri, di)[0] / 10)]'''
+
+                xi = np.array([k for k in ballastDt if k[4] > 0 and k[4] <= 1 and
+                               (k[5] > consVelocitiesRanges[1] and k[5] <= consVelocitiesRanges[2])])
+                xi = xi[:, 8] if xi.__len__() > wsLen else lr2.predict(
+                    np.array([random.uniform(0, 1) for p in range(0, 100)]).reshape(-1, 1)).reshape(-1)
+                yi = np.array([k for k in ballastDt if k[4] > 1 and k[4] <= 2 and
+                               (k[5] > consVelocitiesRanges[1] and k[5] <= consVelocitiesRanges[2])])
+                yi = yi[:, 8] if yi.__len__() > wsLen else lr2.predict(
+                    np.array([random.uniform(1, 2) for p in range(0, 100)]).reshape(-1, 1)).reshape(-1)
+                zi = np.array([k for k in ballastDt if k[4] > 2 and k[4] <= 3 and
+                               (k[5] > consVelocitiesRanges[1] and k[5] <= consVelocitiesRanges[2])])
+                zi = zi[:, 8] if zi.__len__() > wsLen else lr2.predict(
+                    np.array([random.uniform(2, 3) for p in range(0, 100)]).reshape(-1, 1)).reshape(-1)
+                fi = np.array([k for k in ballastDt if k[4] > 3 and k[4] <= 4 and
+                               (k[5] > consVelocitiesRanges[1] and k[5] <= consVelocitiesRanges[2])])
+                fi = fi[:, 8] if fi.__len__() > wsLen else lr2.predict(
+                    np.array([random.uniform(3, 4) for p in range(0, 100)]).reshape(-1, 1)).reshape(-1)
+                ci = np.array([k for k in ballastDt if k[4] > 4 and k[4] <= 5 and
+                               (k[5] > consVelocitiesRanges[1] and k[5] <= consVelocitiesRanges[2])])
+                ci = ci[:, 8] if ci.__len__() > wsLen else lr2.predict(
+                    np.array([random.uniform(4, 5) for p in range(0, 100)]).reshape(-1, 1)).reshape(-1)
+                si = np.array([k for k in ballastDt if k[4] > 5 and k[4] <= 6 and
+                               (k[5] > consVelocitiesRanges[1] and k[5] <= consVelocitiesRanges[2])])
+                si = si[:, 8] if si.__len__() > wsLen else lr2.predict(
+                    np.array([random.uniform(5, 6) for p in range(0, 100)]).reshape(-1, 1)).reshape(-1)
+                di = np.array([k for k in ballastDt if k[4] > 6 and k[4] <= 7 and
+                               (k[5] > consVelocitiesRanges[1] and k[5] <= consVelocitiesRanges[2])])
+                di = di[:, 8] if di.__len__() > wsLen else lr2.predict(
+                    np.array([random.uniform(6, 7) for p in range(0, 100)]).reshape(-1, 1)).reshape(-1)
+                ri = np.array([k for k in ballastDt if k[4] > 7 and k[4] <= 8 and
+                               (k[5] > consVelocitiesRanges[1] and k[5] <= consVelocitiesRanges[2])])
+                ri = ri[:, 8] if ri.__len__() > wsLen else lr2.predict(
+                    np.array([random.uniform(7, 8) for p in range(0, 100)]).reshape(-1, 1)).reshape(-1)
+
+                weightsWS911 = [0, 1 / (1 + np.linalg.norm(xi - yi)),
+                                 1 / (1 + np.linalg.norm(yi - zi)),
+                                 1 / (1 + np.linalg.norm(zi - fi)),
+                                 1 / (1 + np.linalg.norm(fi - ci)),
+                                 1 / (1 + np.linalg.norm(ci - si)),
+                                 1 / (1 + np.linalg.norm(di - si)),
+                                 1 / (1 + np.linalg.norm(ri - di))]
+
+                xi = np.array([k for k in ballastDt if k[4] > 0 and k[4] <= 1 and
+                               (k[5] > consVelocitiesRanges[2] and k[5] <= consVelocitiesRanges[3])])
+                xi = xi[:, 8] if xi.__len__() > wsLen else lr3.predict(
+                    np.array([random.uniform(0, 1) for p in range(0, 100)]).reshape(-1, 1)).reshape(-1)
+                yi = np.array([k for k in ballastDt if k[4] > 1 and k[4] <= 2 and
+                               (k[5] > consVelocitiesRanges[2] and k[5] <= consVelocitiesRanges[3])])
+                yi = yi[:, 8] if yi.__len__() > wsLen else lr3.predict(
+                    np.array([random.uniform(1, 2) for p in range(0, 100)]).reshape(-1, 1)).reshape(-1)
+                zi = np.array([k for k in ballastDt if k[4] > 2 and k[4] <= 3 and
+                               (k[5] > consVelocitiesRanges[2] and k[5] <= consVelocitiesRanges[3])])
+                zi = zi[:, 8] if zi.__len__() > wsLen else lr3.predict(
+                    np.array([random.uniform(2, 3) for p in range(0, 100)]).reshape(-1, 1)).reshape(-1)
+                fi = np.array([k for k in ballastDt if k[4] > 3 and k[4] <= 4 and
+                               (k[5] > consVelocitiesRanges[2] and k[5] <= consVelocitiesRanges[3])])
+                fi = fi[:, 8] if fi.__len__() > wsLen else lr3.predict(
+                    np.array([random.uniform(3, 4) for p in range(0, 100)]).reshape(-1, 1)).reshape(-1)
+                ci = np.array([k for k in ballastDt if k[4] > 4 and k[4] <= 5 and
+                               (k[5] > consVelocitiesRanges[2] and k[5] <= consVelocitiesRanges[3])])
+                ci = ci[:, 8] if ci.__len__() > wsLen else lr3.predict(
+                    np.array([random.uniform(4, 5) for p in range(0, 100)]).reshape(-1, 1)).reshape(-1)
+                si = np.array([k for k in ballastDt if k[4] > 5 and k[4] <= 6 and
+                               (k[5] > consVelocitiesRanges[2] and k[5] <= consVelocitiesRanges[3])])
+                si = si[:, 8] if si.__len__() > wsLen else lr3.predict(
+                    np.array([random.uniform(5, 6) for p in range(0, 100)]).reshape(-1, 1)).reshape(-1)
+                di = np.array([k for k in ballastDt if k[4] > 6 and k[4] <= 7 and
+                               (k[5] > consVelocitiesRanges[2] and k[5] <= consVelocitiesRanges[3])])
+                di = di[:, 8] if di.__len__() > wsLen else lr3.predict(
+                    np.array([random.uniform(6, 7) for p in range(0, 100)]).reshape(-1, 1)).reshape(-1)
+                ri = np.array([k for k in ballastDt if k[4] > 7 and k[4] <= 8 and
+                               (k[5] > consVelocitiesRanges[2] and k[5] <= consVelocitiesRanges[3])])
+                ri = ri[:, 8] if ri.__len__() > wsLen else lr3.predict(
+                    np.array([random.uniform(7, 8) for p in range(0, 100)]).reshape(-1, 1)).reshape(-1)
+
+                weightsWS1114 = [0, 1 / (1 + np.linalg.norm(xi - yi)),
+                                 1 / (1 + np.linalg.norm(yi - zi)),
+                                 1 / (1 + np.linalg.norm(zi - fi)),
+                                 1 / (1 + np.linalg.norm(fi - ci)),
+                                 1 / (1 + np.linalg.norm(ci - si)),
+                                 1 / (1 + np.linalg.norm(di - si)),
+                                 1 / (1 + np.linalg.norm(ri - di))]
+
+                speedRange1 = np.array([k for k in ballastDt if k[5] >= 11 and k[5] <= 14])
+                sizesWS = []
+                ws = []
+                avgActualFoc = []
+                minActualFoc = []
+                maxActualFoc = []
+                stdActualFoc = []
+                maxWS = 8
+                minWS = 0
+                i = 0
+                rawWS = np.array([k for k in speedRange1 if float(k[13]) >= 0 and float(k[13]) <= 2])
+                while i <= maxWS:
+
+                    speedArray = np.array([k for k in rawWS if float(k[4]) >= i and float(k[4]) <= i + 1])
+
+                    if speedArray.__len__() > 0:
+                        sizesWS.append(speedArray.__len__())
+                        ws.append(i)
+                        avgActualFoc.append(np.mean(speedArray[:, 8]))
+                        minActualFoc.append(np.min(speedArray[:, 8]))
+                        maxActualFoc.append(np.max(speedArray[:, 8]))
+                        stdActualFoc.append(np.std(speedArray[:, 8]))
+                    i += 1
+
+                xi = np.array(ws)
+                yi = np.array(avgActualFoc)
+                zi = np.array(sizesWS)
+
+                p2 = np.poly1d(np.polyfit(xi, yi, 1))
+
+                xp = np.arange(0, 8)
+
+                ws01 = np.array([random.uniform(0, 1) for p in range(0, 100)])
+                ws12 = np.array([random.uniform(1, 2) for p in range(0, 100)])
+
+                ws23 = np.array([random.uniform(2, 3) for p in range(0, 100)])
+                ws34 = np.array([random.uniform(3, 4) for p in range(0, 100)])
+                ws45 = np.array([random.uniform(4, 5) for p in range(0, 100)])
+                ws56 = np.array([random.uniform(5, 6) for p in range(0, 100)])
+                ws67 = np.array([random.uniform(6, 7) for p in range(0, 100)])
+                ws78 = np.array([random.uniform(7, 8) for p in range(0, 100)])
+
+                p2_01 = p2(ws01)
+                p2_12 = p2(ws12)
+                p2_23 = p2(ws23)
+                p2_34 = p2(ws34)
+                p2_45 = p2(ws45)
+                p2_56 = p2(ws56)
+                p2_67 = p2(ws67)
+                p2_78 = p2(ws78)
+
+                factorSWS = [0, abs((np.mean(p2_12) - np.mean(p2_01)) / np.mean(p2_01)),
+                             abs((np.mean(p2_23) - np.mean(p2_12)) / np.mean(p2_12)),
+                             abs((np.mean(p2_34) - np.mean(p2_23)) / np.mean(p2_23)),
+                             abs((np.mean(p2_45) - np.mean(p2_34)) / np.mean(p2_34)),
+                             abs((np.mean(p2_56) - np.mean(p2_45)) / np.mean(p2_45)),
+                             abs((np.mean(p2_67) - np.mean(p2_56)) / np.mean(p2_56)),
+                             abs((np.mean(p2_78) - np.mean(p2_67)) / np.mean(p2_67))]
+
+            except:
+                print('EXCEPTION IN WEIGHTS WS BALLAST')
+                weightsWS79 = [0, 0.0043, 0.0023, 0.0024, 0.0025, 0.0046, 0.0057, 0.0058, 0.0059]
+                weightsWS911 = [0, 0.0043, 0.0023, 0.0024, 0.0025, 0.0046, 0.0057, 0.0058, 0.0059]
+                weightsWS1114 = [0, 0.0043, 0.0023, 0.0024, 0.0025, 0.0046, 0.0057, 0.0058, 0.0059]
                 ##########################################WIND DIRECTION ###############################################
                 ##########################################WIND DIRECTION ###############################################
+
+            lr1 = LinearRegression()
+            lr1.fit(speedFoc1[:, 3].reshape(-1, 1), speedFoc1[:, 8].reshape(-1, 1))
+
+            lr2 = LinearRegression()
+            lr2.fit(speedFoc2[:, 3].reshape(-1, 1), speedFoc2[:, 8].reshape(-1, 1))
+
+            lr3 = LinearRegression()
+            lr3.fit(speedFoc3[:, 3].reshape(-1, 1), speedFoc3[:, 8].reshape(-1, 1))
+            wdLen = 1000000000000000000
             try:
                 xi = np.array([k for k in ballastDt if k[3] > 0 and k[3] <= 22.5 if
-                               (k[5] > consVelocitiesRanges[0] and k[5] <= consVelocitiesRanges[1])])[:, 8]
+                               (k[5] > consVelocitiesRanges[1] and k[5] <= consVelocitiesRanges[2])])
+                xi = xi[:, 8] if xi.__len__() > wdLen else lr1.predict(
+                    np.array([random.uniform(0, 22.5) for p in range(0, 100)]).reshape(-1, 1)).reshape(-1)
                 yi = np.array([k for k in ballastDt if k[3] > 22.5 and k[3] <= 67.5 if
-                               (k[5] > consVelocitiesRanges[0] and k[5] <= consVelocitiesRanges[1])])[:,8]
+                               (k[5] > consVelocitiesRanges[1] and k[5] <= consVelocitiesRanges[2])])
+                yi = yi[:, 8] if yi.__len__() > wdLen else lr1.predict(
+                    np.array([random.uniform(22.5, 67.5) for p in range(0, 100)]).reshape(-1, 1)).reshape(-1)
                 zi = np.array([k for k in ballastDt if k[3] > 67.5 and k[3] <= 112.5 if
-                               (k[5] > consVelocitiesRanges[0] and k[5] <= consVelocitiesRanges[1])])[:,8]
+                               (k[5] > consVelocitiesRanges[1] and k[5] <= consVelocitiesRanges[2])])
+                zi = zi[:, 8] if zi.__len__() > wdLen else lr1.predict(
+                    np.array([random.uniform(67.5, 112.5) for p in range(0, 100)]).reshape(-1, 1)).reshape(-1)
                 fi = np.array([k for k in ballastDt if k[3] > 112.5 and k[3] <= 157.5 if
-                               (k[5] > consVelocitiesRanges[0] and k[5] <= consVelocitiesRanges[1])])[:,8]
+                               (k[5] > consVelocitiesRanges[1] and k[5] <= consVelocitiesRanges[2])])
+                fi = fi[:, 8] if fi.__len__() > wdLen else lr1.predict(
+                    np.array([random.uniform(112.5, 157.5) for p in range(0, 100)]).reshape(-1, 1)).reshape(-1)
                 ci = np.array([k for k in ballastDt if k[3] > 157.5 and k[3] <= 180 if
-                               (k[5] > consVelocitiesRanges[0] and k[5] <= consVelocitiesRanges[1])])[:,8]
+                               (k[5] > consVelocitiesRanges[1] and k[5] <= consVelocitiesRanges[2])])
+                ci = ci[:, 8] if ci.__len__() > wdLen else lr1.predict(
+                    np.array([random.uniform(157.5, 180) for p in range(0, 100)]).reshape(-1, 1)).reshape(-1)
 
-                weightsWD79 = [ks_2samp(xi, ci)[0], ks_2samp(yi, fi)[0],
-                               (ks_2samp(fi, zi)[0] + ks_2samp(yi, zi)[0]) / 2, ks_2samp(fi, ci)[0], 0]
+                weightsWD79 = [abs((np.mean(xi) - np.mean(ci)) / np.mean(ci)),
+                               abs((np.mean(yi) - np.mean(fi)) / np.mean(fi)),
+                               abs((np.mean(fi) - np.mean(zi)) / np.mean(zi)),
+                               abs((np.mean(yi) - np.mean(zi)) / np.mean(zi)),
+                               abs((np.mean(fi) - np.mean(ci)) / np.mean(ci)), 0]
+
+                '''[ 1/(1+ np.linalg.norm(np.mean(xi) - np.mean(ci)) ), 1/(1 +  np.linalg.norm(np.mean(yi) - fi)) , 1/(1+  np.linalg.norm(fi)- np.mean(zi)) ,
+                                 1/(1+ np.linalg.norm(np.mean(yi) - np.mean(zi)) ), 1/(1+ np.linalg.norm(np.mean(fi) - np.mean(ci)) ),0 ]'''
 
                 xi = np.array([k for k in ballastDt if k[3] > 0 and k[3] <= 22.5 if
-                               (k[5] > consVelocitiesRanges[1] and k[5] <= consVelocitiesRanges[2])])[:, 8]
+                               (k[5] > consVelocitiesRanges[1] and k[5] <= consVelocitiesRanges[2])])
+                xi = xi[:, 8] if xi.__len__() > wdLen else lr2.predict(
+                    np.array([random.uniform(0, 22.5) for p in range(0, 100)]).reshape(-1, 1)).reshape(-1)
                 yi = np.array([k for k in ballastDt if k[3] > 22.5 and k[3] <= 67.5 if
-                               (k[5] > consVelocitiesRanges[1] and k[5] <= consVelocitiesRanges[2])])[:,8]
+                               (k[5] > consVelocitiesRanges[1] and k[5] <= consVelocitiesRanges[2])])
+                yi = yi[:, 8] if yi.__len__() > wdLen else lr2.predict(
+                    np.array([random.uniform(22.5, 67.5) for p in range(0, 100)]).reshape(-1, 1)).reshape(-1)
                 zi = np.array([k for k in ballastDt if k[3] > 67.5 and k[3] <= 112.5 if
-                               (k[5] > consVelocitiesRanges[1] and k[5] <= consVelocitiesRanges[2])])[:,8]
+                               (k[5] > consVelocitiesRanges[1] and k[5] <= consVelocitiesRanges[2])])
+                zi = zi[:, 8] if zi.__len__() > wdLen else lr2.predict(
+                    np.array([random.uniform(67.5, 112.5) for p in range(0, 100)]).reshape(-1, 1)).reshape(-1)
                 fi = np.array([k for k in ballastDt if k[3] > 112.5 and k[3] <= 157.5 if
-                               (k[5] > consVelocitiesRanges[1] and k[5] <= consVelocitiesRanges[2])])[:, 8]
+                               (k[5] > consVelocitiesRanges[1] and k[5] <= consVelocitiesRanges[2])])
+                fi = fi[:, 8] if fi.__len__() > wdLen else lr2.predict(
+                    np.array([random.uniform(112.5, 157.5) for p in range(0, 100)]).reshape(-1, 1)).reshape(-1)
                 ci = np.array([k for k in ballastDt if k[3] > 157.5 and k[3] <= 180 if
-                               (k[5] > consVelocitiesRanges[1] and k[5] <= consVelocitiesRanges[2])])[:,8]
+                               (k[5] > consVelocitiesRanges[1] and k[5] <= consVelocitiesRanges[2])])
+                ci = ci[:, 8] if ci.__len__() > wdLen else lr2.predict(
+                    np.array([random.uniform(157.5, 180) for p in range(0, 100)]).reshape(-1, 1)).reshape(-1)
 
-                weightsWD911 = [ks_2samp(xi, ci)[0], ks_2samp(yi, fi)[0],
-                                (ks_2samp(fi, zi)[0] + ks_2samp(yi, zi)[0]) / 2, ks_2samp(fi, ci)[0], 0]
+                weightsWD911 = [abs((np.mean(xi) - np.mean(ci)) / np.mean(ci)),
+                                abs((np.mean(yi) - np.mean(fi)) / np.mean(fi)),
+                                abs((np.mean(fi) - np.mean(zi)) / np.mean(zi)),
+                                abs((np.mean(yi) - np.mean(zi)) / np.mean(zi)),
+                                abs((np.mean(fi) - np.mean(ci)) / np.mean(ci)), 0]
 
                 xi = np.array([k for k in ballastDt if k[3] > 0 and k[3] <= 22.5 if
-                               (k[5] > consVelocitiesRanges[2] and k[5] <= consVelocitiesRanges[3])])[:, 8]
+                               (k[5] > consVelocitiesRanges[1] and k[5] <= consVelocitiesRanges[2])])
+                xi = xi[:, 8] if xi.__len__() > wdLen else lr3.predict(
+                    np.array([random.uniform(0, 22.5) for p in range(0, 100)]).reshape(-1, 1)).reshape(-1)
                 yi = np.array([k for k in ballastDt if k[3] > 22.5 and k[3] <= 67.5 if
-                               (k[5] > consVelocitiesRanges[2] and k[5] <= consVelocitiesRanges[3])])[:, 8]
+                               (k[5] > consVelocitiesRanges[1] and k[5] <= consVelocitiesRanges[2])])
+                yi = yi[:, 8] if yi.__len__() > wdLen else lr3.predict(
+                    np.array([random.uniform(22.5, 67.5) for p in range(0, 100)]).reshape(-1, 1)).reshape(-1)
                 zi = np.array([k for k in ballastDt if k[3] > 67.5 and k[3] <= 112.5 if
-                               (k[5] > consVelocitiesRanges[2] and k[5] <= consVelocitiesRanges[3])])[:, 8]
+                               (k[5] > consVelocitiesRanges[1] and k[5] <= consVelocitiesRanges[2])])
+                zi = zi[:, 8] if zi.__len__() > wdLen else lr3.predict(
+                    np.array([random.uniform(67.5, 112.5) for p in range(0, 100)]).reshape(-1, 1)).reshape(-1)
                 fi = np.array([k for k in ballastDt if k[3] > 112.5 and k[3] <= 157.5 if
-                               (k[5] > consVelocitiesRanges[2] and k[5] <= consVelocitiesRanges[3])])[:, 8]
+                               (k[5] > consVelocitiesRanges[1] and k[5] <= consVelocitiesRanges[2])])
+                fi = fi[:, 8] if fi.__len__() > wdLen else lr3.predict(
+                    np.array([random.uniform(112.5, 157.5) for p in range(0, 100)]).reshape(-1, 1)).reshape(-1)
                 ci = np.array([k for k in ballastDt if k[3] > 157.5 and k[3] <= 180 if
-                               (k[5] > consVelocitiesRanges[2] and k[5] <= consVelocitiesRanges[3])])[:,8]
+                               (k[5] > consVelocitiesRanges[1] and k[5] <= consVelocitiesRanges[2])])
+                ci = ci[:, 8] if ci.__len__() > wdLen else lr3.predict(
+                    np.array([random.uniform(157.5, 180) for p in range(0, 100)]).reshape(-1, 1)).reshape(-1)
 
-                weightsWD1114 = [ks_2samp(xi, ci)[0], ks_2samp(yi, fi)[0],
-                                 (ks_2samp(fi, zi)[0] + ks_2samp(yi, zi)[0]) / 2, ks_2samp(fi, ci)[0] - 0.13, 0]
+                weightsWD1114 = [abs((np.mean(xi) - np.mean(ci)) / np.mean(ci)),
+                                 abs((np.mean(yi) - np.mean(fi)) / np.mean(fi)),
+                                 abs((np.mean(fi) - np.mean(zi)) / np.mean(zi)),
+                                 abs((np.mean(yi) - np.mean(zi)) / np.mean(zi)),
+                                 abs((np.mean(fi) - np.mean(ci)) / np.mean(ci)), 0]
+
+                speedRange1 = np.array([k for k in ballastDt if k[5] >= 11 and k[5] <= 14])
+                sizesWD = []
+                wd = []
+                avgActualFoc = []
+                minActualFoc = []
+                maxActualFoc = []
+                stdActualFoc = []
+                maxWD = 8
+                minWD = 0
+                i = 0
+                listWD = [0, 22.5, 67.5, 112.5, 157.5, 180]
+                rawWD = np.array([k for k in speedRange1 if float(k[4]) >= 0 and float(k[4]) <= 3])
+                while i <= len(listWD)-1:
+
+                    speedArray = np.array(
+                        [k for k in rawWD if float(k[3]) >= listWD[i] and float(k[3]) <= listWD[i + 1]])
+
+                    if speedArray.__len__() > 0:
+                        sizesWD.append(speedArray.__len__())
+                        wd.append(np.mean(listWD[i:i + 1]))
+                        avgActualFoc.append(np.mean(speedArray[:, 8]))
+                        minActualFoc.append(np.min(speedArray[:, 8]))
+                        maxActualFoc.append(np.max(speedArray[:, 8]))
+                        stdActualFoc.append(np.std(speedArray[:, 8]))
+                    i += 1
+
+                xi = np.array(wd)
+                yi = np.array(avgActualFoc)
+                zi = np.array(sizesWD)
+
+                p2 = np.poly1d(np.polyfit(xi, yi, 1))
+
+                xp = np.arange(0, 180)
+
+                wd01 = np.array([random.uniform(0, 22.5) for p in range(0, 100)])
+                wd12 = np.array([random.uniform(22.5, 67.5) for p in range(0, 100)])
+                wd23 = np.array([random.uniform(67.5, 112.5) for p in range(0, 100)])
+                wd34 = np.array([random.uniform(112.5, 157.5) for p in range(0, 100)])
+                wd45 = np.array([random.uniform(157.5, 180) for p in range(0, 100)])
+
+                p2_01 = p2(wd01)
+                p2_12 = p2(wd12)
+                p2_23 = p2(wd23)
+                p2_34 = p2(wd34)
+                p2_45 = p2(wd45)
+
+                factorSWD = [abs((np.mean(p2_01) - np.mean(p2_45)) / np.mean(p2_45)),
+                             abs((np.mean(p2_12) - np.mean(p2_34)) / np.mean(p2_34)),
+                             abs((np.mean(p2_23) - np.mean(p2_34)) / np.mean(p2_34)),
+                             abs((np.mean(p2_45) - np.mean(p2_34)) / np.mean(p2_34)),
+                             0]
+
+
+
+
 
             except:
                 print('EXCEPTION IN WEIGHTS WD BALLAST')
@@ -5850,7 +6453,7 @@ class BaseProfileGenerator:
             ###############################################################################################
 
             speedFoc = np.array(
-                [k for k in ballastDt if (k[5] >= consVelocities[0] and k[5] <= maxBallastSpeedn) and (k[4] >= 0 and k[4] <=2) and k[8] > 1])
+                [k for k in ballastDt if (k[5] >= consVelocities[0] and k[5] <= maxBallastSpeedn) and (k[4] >= 0 and k[4] <=3) and k[8] > 1])
 
             '''meanFoc = np.mean(speedFoc[:, 8])
             stdFoc = np.std(speedFoc[:, 8])
@@ -5866,7 +6469,7 @@ class BaseProfileGenerator:
 
             #lrSpeedFoc = LinearRegression()
             # rfSpeedFoc = RandomForestRegressor()
-            lrSpeedFoc = SplineRegression.Earth(max_degree=2,)
+            lrSpeedFoc = SplineRegression.Earth(max_degree=1,)
 
             #trainX,testX, trainY,testY = train_test_split(speed,foc, test_size=0.2,random_state=42)
             '''tscv = TimeSeriesSplit()
@@ -5958,8 +6561,9 @@ class BaseProfileGenerator:
             velMax = 8.25
 
             # row = [10, 19, 28, 37, 46, 55, 64, 73]
-            windDirWeightsList = [weightsWD79, weightsWD911, weightsWD1114]
-            swellHeightWeightsList = [weightsSWH79, weightsSWH911, weightsSWH1114]
+            windDirWeightsList = [factorSWD, factorSWD, factorSWD]
+            windForceWeightsList = [factorSWS, factorSWS, factorSWS]
+            swellHeightWeightsList = [factorSWH, factorSWH, factorSWH]
             wind = [0, 22.5, 67.5, 112.5, 157.5, 180]
             windF = [0, 1, 2, 3, 4, 5, 6, 7, 8]
             swellH = [0, 1, 2, 3, 4, 5, 6, 7, 8]
@@ -5988,17 +6592,21 @@ class BaseProfileGenerator:
                 if consVelocitiesJSON[vel] >= consVelocitiesRanges[0] and consVelocitiesJSON[vel] <= consVelocitiesRanges[1]:
                     windDirWeights = windDirWeightsList[0]
                     swellHeightWeights = swellHeightWeightsList[0]
+                    windForceWeights = windForceWeightsList[0]
                 elif consVelocitiesJSON[vel] >= consVelocitiesRanges[1] and consVelocitiesJSON[vel] <= consVelocitiesRanges[2]:
                     windDirWeights = windDirWeightsList[1]
                     swellHeightWeights = swellHeightWeightsList[1]
+                    windForceWeights = windForceWeightsList[1]
                 elif consVelocitiesJSON[vel] >= consVelocitiesRanges[2] and consVelocitiesJSON[vel] <= consVelocitiesRanges[3]:
                     windDirWeights = windDirWeightsList[2]
                     swellHeightWeights = swellHeightWeightsList[2]
+                    windForceWeights = windForceWeightsList[2]
 
                 outerItem = {"draft": meanDraftBallast, "speed": (consVelocitiesJSON[vel] ),"cells": []}
 
 
-                centralMean = lrSpeedFoc.predict(np.array([consVelocities[vel]]).reshape(-1,1))[0]
+                centralMean = lrSpeedFoc.predict(np.array([consVelocitiesJSON[vel]]).reshape(-1,1))[0]
+                    #lrSpeedFoc.predict(np.array([consVelocitiesJSON[vel]]).reshape(-1,1))[0]
                 # p2(consVelocities[vel])
                 #lrSpeedFoc.predict(np.array([consVelocities[vel]]).reshape(-1,1))[0]
 
@@ -6039,14 +6647,16 @@ class BaseProfileGenerator:
                                 # weights=steamTime) if arrayFoc.__len__() > minAccThres else centralMean
                                 # meanFoc = (weighted_avgFocArray + centralMean) / 2 if arrayFoc.__len__() > minAccThres else centralMean
                                 numberOfApp11_8.append(arrayFoc.__len__())  # + centralArray.__len__())
+
                                 if (s > 0 and w >= 0):
                                     cellValue = round(
-                                        (ballastDt7801[len(ballastDt7801) - 5] + (swellHeightWeights[s])) + windDirWeights[i],2)
+                                        (ballastDt7801[len(ballastDt7801) - 5] + (
+                                                    ballastDt7801[len(ballastDt7801) - 5] * swellHeightWeights[s])),2)
                                 elif s == 0 and w == 0:
-                                    cellValue = round(centralMean + windDirWeights[i], 2)
+                                    cellValue = round(centralMean + (centralMean * windDirWeights[i]), 2)
                                 elif s == 0 and w > 0:
-                                    cellValue = round(ballastDt7801[len(ballastDt7801) - 40] + windForceWeights[w] + windDirWeights[i], 2)
-
+                                    cellValue = round(ballastDt7801[len(ballastDt7801) - 40] +
+                                                      (ballastDt7801[len(ballastDt7801) - 40] * windForceWeights[w]), 2)
                                 '''lstmPoint=[]
 
                                 if s==0 and w==0:
