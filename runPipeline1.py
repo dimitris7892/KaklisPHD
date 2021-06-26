@@ -39,8 +39,12 @@ def main():
     reader = dRead.BaseSeriesReader()
     plotRes = plRes.ErrorGraphs()
 
-    plotRes.PlotTrueVsPredLine()
-    #plotRes.PlotExpRes()
+    #plotRes.PlotTrueVsPredLine()
+    dataErrorFocDTC = pd.read_csv('/home/dimitris/Desktop/___RES/DTC.csv', delimiter=',')
+    dataErrorFocKM = pd.read_csv('/home/dimitris/Desktop/resultsNEW/kmeansNEW.csv', delimiter=',')
+
+    #plotRes.PlotExpRes(dataErrorFocDTC,'dtc')
+    #plotRes.PlotExpRes(dataErrorFocKM,'kmeans')
     #plotRes.boxPLotsKMDT()
     #plotRes.boxPLots()
     #plotRes.computeMeansStd()
@@ -172,6 +176,7 @@ def main():
         if len(subsetsX)>=1:
             break
 
+    print(subsetsX[0].shape)
     rangeSubs = k
     stdInU = [ ]
     varTr=[]
@@ -204,7 +209,8 @@ def main():
            if modeler.__class__.__name__ == 'TriInterpolantModeler' or modeler.__class__.__name__ == 'TensorFlow':
                 t=0
            if partitioner.__class__.__name__=='DelaunayTriPartitioner':
-                 partK=np.linspace(0.05,1.5,11)#[0.5]
+                 partK=[0.4]
+                     #np.linspace(0.05,1.5,11)#[0.5]
 
            elif partitioner.__class__.__name__=='KMeansPartitioner':
                if modeler.__class__.__name__=='TriInterpolantModeler' or modeler.__class__.__name__ == 'TensorFlow':
@@ -466,7 +472,7 @@ def initParameters():
     startU = 30000
     endU = 31000
 
-    algs=['NNW']
+    algs=['NNWLSTM']
         #['SR','LR','RF','NNW','NNW1','NNWCA']
         #`['SR','LR','RF','NNW','NNW1','NNWCA','NNWE','NNWLSTM','NNWLSTM2']`
     #algs= ['SR','LR','RF','NNW','NNW1','NNWCA','NNWE','NNWLSTM']

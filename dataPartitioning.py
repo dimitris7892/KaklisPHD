@@ -21,7 +21,7 @@ sys.setrecursionlimit(1000000)
 #from utils import *
 #from dtw import dtw
 #from matplotlib import rc
-#plt.rcParams.update({'font.size':45})
+
 #rc('text', usetex=True)
 
 class DefaultPartitioner:
@@ -981,7 +981,13 @@ class DelaunayTriPartitioner:
         return np.array(self.HSVToRGB(huePartition * value, 1.0, 1.0) for value in range(0, n))
 
     def clustering(self, dataX, dataY = None,dataW=None ,cutOffvalues = None, showPlot=False,numofCl=None):
+          font = {'family': 'normal',
+                'weight': 'bold',
+                'size': 34}
+
+          plt.rc('font', **font)
           vData = dataX
+          #cutoffPoint=0.5
           points2D = np.array(vData)
           zx = range(0, len(vData[ :, 0 ]))
           tri = Delaunay(points2D,)
@@ -991,9 +997,9 @@ class DelaunayTriPartitioner:
           #self.plotly_trisurf(dataX[ tri.vertices[ 0 ] ][ :, 0 ], zx[ 0:3 ], dataX[ tri.vertices[ 0 ] ][ :, 1 ],
                               #tri.simplices)
 
-          #plt.plot(vData[ 0:, 0 ], vData[ 0:, 1 ], 'o', markersize=8)
-          #for simplex in hull.simplices:
-              #plt.plot(vData[ simplex, 0 ], vData[ simplex, 1 ], 'k-',linewidth=3)
+          plt.plot(vData[ 0:, 0 ], vData[ 0:, 1 ], 'o', markersize=5)
+          for simplex in hull.simplices:
+              plt.plot(vData[ simplex, 0 ], vData[ simplex, 1 ], 'k-',linewidth=3)
           ###hull plot and data plot
           def in_hull(p, hull):
               """
@@ -1009,15 +1015,17 @@ class DelaunayTriPartitioner:
                   hull = Delaunay(hull)
 
               return hull.find_simplex(p) >= 0
+          vertices = tri.vertices
+          for v in vertices:
+              k = np.array(dataX[v])
+              t = plt.Polygon(k, fill=False,color='red',linewidth=3)
+              plt.gca().add_patch(t)
 
-          #for v in vertices:
-              #k = np.array([ [ v[ 0 ][ 0 ], v[ 0 ][ 2 ] ], [ v[ 1 ][ 0 ], v[ 1 ][ 2 ] ], [ v[ 2 ][ 0 ], v[ 2 ][ 2 ] ] ])
-              #t = plt.Polygon(k, fill=False,color='red',linewidth=3)
-              #plt.gca().add_patch(t)
-
-          #plt.xlabel('$V(t)$')
-          #plt.ylabel(r'$\bar{\bf V}_N(t_i)$')
-          #plt.show()
+          plt.xlabel('$V(t)$')
+          plt.ylabel(r'$\bar{\bf V}_N(t_i)$')
+          plt.savefig('./tri_dt_new.eps', format='eps')
+          plt.show()
+          plt.clf()
           x=1
           ### DT plot
           ##################################
@@ -1037,14 +1045,14 @@ class DelaunayTriPartitioner:
           #dataX = Vmapped
           ##################################
 
-          #hull = ConvexHull(vData)
+          hull = ConvexHull(vData)
           history=20
           pointsy=[]
           pointsx0x1=[]
 
           #plt.plot(dataX[0:,0], dataX[0:,1], 'o',markersize=4 )
-          #for simplex in hull.simplices:
-              #plt.plot(vData[ simplex, 0 ], vData[simplex,1], 'k-')
+          for simplex in hull.simplices:
+              plt.plot(vData[ simplex, 0 ], vData[simplex,1], 'k-')
           #plt.show()
           cl=0
           graph={}
@@ -1152,12 +1160,12 @@ class DelaunayTriPartitioner:
           for i in range(0,len(clusters)):
 
               #clusters[i]=[clusters[i][ k ][ 0:2 ] for k in range(0,len(clusters[i]))]
-              if len(np.array(clusters[ i ]))>4:
+              if len(np.array(clusters[ i ]))>10:
                 trains_x_list.append(np.array(clusters[i]))
               #else:
                   #for k in range(0,len(np.array(clusters[ i ]))):
                     #outliers.append(clusters[i][k])
-              if len(np.array(clusters[ i ]))>4:
+              if len(np.array(clusters[ i ]))>10:
                 trains_y_list.append(np.array(clustersy[i]))
               #for v in clusters[i]:
                   #trData.append(v)
@@ -1171,12 +1179,17 @@ class DelaunayTriPartitioner:
               #train_x_list = [ ]
               #train_y_list = [ ]
           #colors = tuple([ numberToRGBAColor(l) for l in np.unique(trlabels) ])
-          #for i in range(0, len(trains_x_list)):
-             #t = plt.Polygon(trains_x_list[i], fill=False, color='red', linewidth=3)
-             #plt.gca().add_patch(t)
+          for i in range(0, len(trains_x_list)):
+             t = plt.Polygon(trains_x_list[i], fill=False, color='red', linewidth=3)
+             plt.gca().add_patch(t)
 
           outliers=[]
-          for l in range(0,len(vData)):
+          concat = np.concatenate(trains_x_list)
+          for i in range(0,len(vData)):
+              if vData[i] not in concat:
+                  outliers.append(vData[i])
+
+          '''for l in range(0,len(vData)):
             point = vData[l]
             flagForPoint = False
             for i in range(0, len(trains_x_list)):
@@ -1187,16 +1200,18 @@ class DelaunayTriPartitioner:
             if(flagForPoint==False):
                 outliers.append(point)
 
-          outliers=np.array(outliers)
-          vDataNew=[]
+          outliers=np.array(outliers)'''
+          vDataNew=outliers
 
-          for k in range(0,len(outliers)):
+          '''for k in range(0,len(outliers)):
              for i in range(0, len(trains_x_list)):
                 if outliers[k] not in trains_x_list[i]:
-                        vDataNew.append(outliers[k])
-          #plt.plot(vData[ 0:, 0 ], vData[ 0:, 1 ], 'o', markersize=3)
+                        vDataNew.append(outliers[k])'''
+
+
+          #plt.plot(concat[ 0:, 0 ], concat[ 0:, 1 ], 'o', markersize=1,c='b')
           vDataNew=np.array(vDataNew)
-          #plt.plot(vDataNew[ 0:, 0 ], vDataNew[ 0:, 1 ], 'o', markersize=12,c='y')
+          plt.plot(vDataNew[ 0:, 0 ], vDataNew[ 0:, 1 ], 'o', markersize=11,c='y')
 
           vDataSimple=[]
           for i in range(0,len(trains_x_list)):
@@ -1204,9 +1219,12 @@ class DelaunayTriPartitioner:
                 vDataSimple.append(trains_x_list[i][k])
 
           vDataSimple = np.array(vDataSimple)
-          # plt.plot(vDataSimple[ 0:, 0 ], vDataSimple[ 0:, 1 ], 'o', markersize=8)
+          plt.plot(vDataSimple[ :, 0 ], vDataSimple[ :, 1 ], 'o', markersize=3,c='b')
+          plt.xlabel('$V(t)$')
+          plt.ylabel(r'$\bar{\bf V}_N(t_i)$')
+          plt.savefig('./tri_dt_cl_new.eps', format='eps')
+          plt.show()
 
-          # plt.show()
           print("\n" + str(cutoffPoint))
           print(len(trains_x_list))
 

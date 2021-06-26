@@ -7,6 +7,9 @@ from sklearn.cluster import KMeans
 from pylab import figure,axes
 from pylab import plot, show, savefig, xlim, figure, ylim, legend, boxplot, setp, axes
 import latex
+import pandas as pd
+import csv
+
 plt.rcParams.update({
     "text.usetex": True,
 })
@@ -30,8 +33,7 @@ class ErrorGraphs:
         x=1
 
     def ErrorGraphsForPartioners(self):
-        import pandas as pd
-        import csv
+
         errors= {'data':[]}
         data = pd.read_csv('/home/dimitris/Desktop/models_perf.csv', delimiter=',')
         for row in data.values:
@@ -153,7 +155,7 @@ class ErrorGraphs:
         if show: plt.show()
         x = 1
 
-    def ThreeDErrorGraphwithKandTrlen(self,errors,K,trSize,show):
+    def ThreeDErrorGraphwithKandTrlen(self,errors,K,trSize,show,):
          ax = plt.axes(projection='3d')
 
          # Data for a three-dimensional line
@@ -274,7 +276,7 @@ class ErrorGraphs:
         fig = figure()
 
 
-        plt.plot(np.linspace(0, len(rpmMean), len(rpmMean)), errMeanxiNN, '-', c='green', label=r'\textbf{RPM Predictions with ExtendedSpace Network, acc: 97.05\% acc}')
+        plt.plot(np.linspace(0, len(rpmMean), len(rpmMean)), errMeanxiNN, '-', c='green', label=r'\textbf{RPM Predictions with ExtendedSpace Network, acc: 97.05\% }')
         #plt.scatter(np.linspace(0, 100, 100), errMean, s=stwMean,c='red', alpha=0.5)
         #plt.scatter(np.linspace(0, 100, 100), errMean, s=draftMean, c='blue', alpha=0.5)
 
@@ -295,15 +297,34 @@ class ErrorGraphs:
 
         x=0
 
-    def PlotExpRes(self,):
+    def PlotExpRes(self,dataErrorFoc,alg):
 
         fig = plt.figure()
-        ax = axes()
+
         font = {'family': 'normal',
                 'weight': 'bold',
-                'size': 18}
+                'size': 40}
 
         plt.rc('font', **font)
+        plt.rcParams["axes.edgecolor"] = "0.15"
+        plt.rcParams["axes.linewidth"] = 1.5
+
+        linestyle_tuple = [
+            ('loosely dotted', (0, (1, 10))),
+            ('dotted', (0, (1, 1))),
+            ('densely dotted', (0, (1, 1))),
+
+            ('loosely dashed', (0, (5, 10))),
+            ('dashed', (0, (5, 5))),
+            ('densely dashed', (0, (5, 1))),
+
+            ('loosely dashdotted', (0, (3, 10, 1, 10))),
+            ('dashdotted', (0, (3, 5, 1, 5))),
+            ('densely dashdotted', (0, (3, 1, 1, 1))),
+
+            ('dashdotdotted', (0, (3, 5, 1, 5, 1, 5))),
+            ('loosely dashdotdotted', (0, (3, 10, 1, 10, 1, 10))),
+            ('densely dashdotdotted', (0, (3, 1, 1, 1, 1, 1)))]
 
         results={}
         dataset = 0
@@ -343,7 +364,7 @@ class ErrorGraphs:
         meanListOfClusters = np.mean(Clusters,axis=0)
         meanListOfErrors = np.mean(Errors, axis=0)
         print(spearmanr(meanListOfClusters,meanListOfErrors))'''
-        dataErrorFoc = pd.read_csv('/home/dimitris/Desktop/___RES/DTC.csv', delimiter=',')
+        #dataErrorFoc = pd.read_csv('/home/dimitris/Desktop/___RES/DTC.csv', delimiter=',')
         #dataErrorFoc = pd.read_csv('/home/dimitris/Desktop/resultsNEW/kmeansNEW.csv', delimiter=',')
 
         errSR = []
@@ -368,7 +389,7 @@ class ErrorGraphs:
         #[1, 2, 3, 4, 5, 8]
         xAxis = np.linspace(1, 10, len(errSR))
 
-        plt.plot(xAxis, errSR, '-o', c='green', label='SR')
+        '''plt.plot(xAxis, errSR, '-o', c='green', label='SR')
         plt.plot(xAxis, errRF, '-o', c='red',
                  label='RF')
         plt.plot(xAxis, errLR, '-o', c='blue',
@@ -376,22 +397,33 @@ class ErrorGraphs:
         plt.plot(xAxis, errWINN, '-o', c='orange',
                  label='wavg-SplineWeightInitNN')
         plt.plot(xAxis, errBSPNN, '-o', c='yellow',
-                 label='wavg-BSpliNNet')
+                 label='wavg-BSpliNNet')'''
+
+        plt.plot(xAxis, errSR,  '-o' ,c='black', label='SR',linewidth=2)
+        plt.plot(xAxis, errRF,linestyle= linestyle_tuple[3][1],c='black',
+                 label='RF',linewidth=2)
+        plt.plot(xAxis, errLR, linestyle= 'dotted',c='black',
+                 label='LR',linewidth=2)
+        plt.plot(xAxis, errWINN, linestyle= 'dashdot',c='black',
+                 label='wavg-SplineWeightInitNN',linewidth=2)
+        plt.plot(xAxis, errBSPNN, linestyle= linestyle_tuple[9][1],c='black',
+                 label='wavg-BSpliNNet',linewidth=2)
         #plt.scatter(np.linspace(0, 100, 100), errMean, s=stwMean,c='red', alpha=0.5)
         #plt.scatter(np.linspace(0, 100, 100), errMean, s=draftMean, c='blue', alpha=0.5)
 
-        plt.plot(xAxis, errXINN, '-o', c='black', label='wavg-ExtendedSpace')
+        plt.plot(xAxis, errXINN, linestyle='solid',c='black', label='wavg-ExtendedSpace',linewidth=2)
         #plt.plot(np.linspace(0, 197, 197), focMean, '-', c='red', label='Actual RPM')
         #plt.fill_between(np.linspace(0, 100, 100), errMean - mae, errMean + mae,color='gray', alpha=0.2)
-        plt.ylabel('$MAE$',fontsize=21)
-        plt.xlabel(r'\textbf{\# of clusters}',fontsize=21)
+        plt.ylabel('MAE',)
+        plt.xlabel(r'\textbf{\# of clusters}',)
         #plt.title('Model convergence using K-Means clustering')
-        plt.legend()
+        legend_properties = {'weight': 'bold','size':17}
+        plt.legend(prop=legend_properties)
         plt.grid()
         #plt.rc('axes', labelsize=41)
-        plt.show()
-        fig.set_size_inches([17.375, 8.375])
-        #plt.savefig('/home/dimitris/Desktop/kmeanserror.eps', format='eps')
+        #plt.show()
+        fig.set_size_inches([17.375, 10])
+        plt.savefig('/home/dimitris/Desktop/'+alg+'_clusters.eps', format='eps')
         x=0
 
     def boxPLots(self):

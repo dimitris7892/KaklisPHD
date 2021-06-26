@@ -211,7 +211,7 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
             trueVal = unseenY[iCnt]
 
             self.intercepts = []
-            vector = self.extractFunctionsFromSplines(pPoint[0][0], pPoint[0][1], pPoint[0][2], pPoint[0][3],pPoint[0][4],'Gen')#pPoint[0][5],pPoint[0][6])
+            vector = self.extractFunctionsFromSplines(pPoint[0][0], pPoint[0][1], pPoint[0][2], pPoint[0][3],pPoint[0][4],pPoint[0][5],'Gen')#pPoint[0][5]
 
             # XSplineGenvectorNew = np.array(self.intercepts) * vector
             # XSplineGenvectorNew = np.array([i + self.interceptsGen for i in XSplineGenvectorNew])
@@ -268,7 +268,7 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
             error = abs(prediction - trueVal)
             preds.append(prediction)
             lErrors.append(error)
-            percError = abs((prediction - trueVal) / trueVal) * 100
+            percError = (abs(prediction - trueVal) / trueVal) * 100
             if percError > 20 :
                 r=0
             #errorStwArr.append(np.array(np.append(np.asmatrix(pPoint[0][0]).reshape(-1,1), np.asmatrix([percError[0] ]).T, axis=1)))
@@ -380,7 +380,7 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
                         data_writer.writerow(
                             [errorStwArr[i][0], errorStwArr[i][1]])
         else:
-                with open('./TESTerrorPercFOC' + str(len(partitionsX)) + '_' + str(subsetInd) + '.csv',
+                with open('./TESTerrorPercFOC_PERSEFONE' + str(len(partitionsX)) + '_' + str(subsetInd) + '.csv',
                           mode='w') as data:
                     data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
                     data_writer.writerow(
@@ -401,7 +401,7 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
 
         return errors, np.mean(errors), np.std(lErrors)
 
-    def extractFunctionsFromSplines(self,x0, x1, x2, x3, x4, modelId):
+    def extractFunctionsFromSplines(self,x0, x1, x2, x3, x4,x5, modelId):
         piecewiseFunc = []
         self.count = self.count + 1
         csvModels = ['./trainedModels/model_' + str(modelId) + '_.csv']
@@ -452,7 +452,9 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
                                         piecewiseFunc.append((num - x5))  # * float(row[ 1 ]))
                                     if split.__contains__("x6"):
                                         piecewiseFunc.append((num - x6))  # * float(row[ 1 ]))
-                                # if id ==  self.modelId:
+                                    if split.__contains__("x7"):
+                                        piecewiseFunc.append((num - x7))
+                                            # if id ==  self.modelId:
                                 # inputs = tf.where(x >= num, float(row[ 1 ]) * (inputs - num), inputs)
                                 except:
                                     dc = 0
@@ -477,6 +479,8 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
                                         piecewiseFunc.append((x5 - num))  # * float(row[ 1 ]))
                                     if split.__contains__("x6"):
                                         piecewiseFunc.append((x6 - num))  # * float(row[ 1 ]))
+                                    if split.__contains__("x7"):
+                                        piecewiseFunc.append((x7 - num))
 
                                     # piecewiseFunc.append(
                                     # tf.math.multiply(tf.cast(tf.math.greater(x, num), tf.float32),

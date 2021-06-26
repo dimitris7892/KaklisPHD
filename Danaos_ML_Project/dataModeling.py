@@ -726,7 +726,6 @@ class PavlosInterpolation(BasePartitionModeler):
 
         return y_interp
 
-
 class TensorFlowW(BasePartitionModeler):
 
 
@@ -1459,7 +1458,7 @@ class TensorFlowW1(BasePartitionModeler):
         self._partitionsPerModel = {}
 
 
-        n_steps =6
+        n_steps = 6
 
         def baseline_model():
             # create model
@@ -1472,7 +1471,7 @@ class TensorFlowW1(BasePartitionModeler):
             #activity_regularizer = tf.keras.regularizers.l2(0.01),
             #bias_regularizer = tf.keras.regularizers.l2(0.01)
 
-            model.add(keras.layers.LSTM(5+genModelKnots-1,input_shape=(n_steps,5+genModelKnots-1,),))#return_sequences=True
+            model.add(keras.layers.LSTM(6+genModelKnots-1,input_shape=(n_steps,6+genModelKnots-1,),))#return_sequences=True
             #model.add(keras.layers.LSTM(5 , input_shape=(n_steps, 5 ,), ))
             #model.add(keras.layers.LSTM( 5+genModelKnots-1, ))
             #model.add(keras.layers.Dense(30))
@@ -1580,7 +1579,7 @@ class TensorFlowW1(BasePartitionModeler):
 
         self.count = 0
 
-        def extractFunctionsFromSplines(x0, x1 , x2 , x3 ,x4=None , x5=None ,x6=None):
+        def extractFunctionsFromSplines(x0, x1 , x2 , x3 ,x4=None , x5=None ,x6=None,x7=None):
             piecewiseFunc = []
             self.count = self.count + 1
             for csvM in csvModels:
@@ -1632,6 +1631,8 @@ class TensorFlowW1(BasePartitionModeler):
                                             piecewiseFunc.append((num - x5))  # * float(row[ 1 ]))
                                         if split.__contains__("x6"):
                                             piecewiseFunc.append((num - x6))  # * float(row[ 1 ]))
+                                        if split.__contains__("x7"):
+                                            piecewiseFunc.append((num - x7))
                                     # if id ==  self.modelId:
                                     # inputs = tf.where(x >= num, float(row[ 1 ]) * (inputs - num), inputs)
                                     except:
@@ -1657,6 +1658,8 @@ class TensorFlowW1(BasePartitionModeler):
                                             piecewiseFunc.append((x5 - num))  # * float(row[ 1 ]))
                                         if split.__contains__("x6"):
                                             piecewiseFunc.append((x6 - num))  # * float(row[ 1 ]))
+                                        if split.__contains__("x7"):
+                                            piecewiseFunc.append((x7 - num))
 
                                         # piecewiseFunc.append(
                                         # tf.math.multiply(tf.cast(tf.math.greater(x, num), tf.float32),
@@ -1996,7 +1999,7 @@ class TensorFlowW1(BasePartitionModeler):
 
 
         for i in range(0, len(X)):
-            vector = extractFunctionsFromSplines(X[i][0], X[i][1], X[i][2], X[i][3],X[i][4])#X[i][5],X[i][6])
+            vector = extractFunctionsFromSplines(X[i][0], X[i][1], X[i][2], X[i][3],X[i][4],X[i][5])#X[i][5],)
             #vector = list(np.where(np.array(vector) < 0, 0, np.array(vector)))
             #vector = ([abs(k) for k in vector])
             #vector = extractFunctionsFromSplines(X[i][0], X[i][1], X[i][2], X[i][3], X[i][4])

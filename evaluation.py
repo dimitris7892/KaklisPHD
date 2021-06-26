@@ -1652,7 +1652,7 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
         subsetInd=0
         type='test'
         XSplineGenvectorNews=[]
-        n_steps = 15
+        n_steps = 5
 
         for iCnt in range(np.shape(unseenX)[0]):
             pPoint =unseenX[iCnt]
@@ -1685,7 +1685,7 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
                 if end_ix > len(sequence) - 1:
                     break
                 # gather input and output parts of the pattern
-                seq_x, seq_y = sequence[i:end_ix][:,0:sequence.shape[1]-1], sequence[i][sequence.shape[1]-1]
+                seq_x, seq_y = sequence[i:end_ix][:, 0:sequence.shape[1] - 1], sequence[end_ix-1][sequence.shape[1] - 1]
                 X.append(seq_x)
                 y.append(seq_y)
             return array(X), array(y)

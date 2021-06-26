@@ -2037,7 +2037,7 @@ class TensorFlowWLSTM(BasePartitionModeler):
         # Init model to partition map
         self._partitionsPerModel = {}
 
-        n_steps =5
+        n_steps = 5
         def baseline_model():
             #create model
             model = keras.models.Sequential()
@@ -2059,7 +2059,7 @@ class TensorFlowWLSTM(BasePartitionModeler):
             #model.add(keras.layers.Activation('linear'))  # activation=custom_activation
             # Compile model
             model.compile(loss=keras.losses.mean_squared_error, optimizer=keras.optimizers.Adam(),)#experimental_run_tf_function=False )
-            #print(model.summary())
+            print(model.summary())
             return model
 
 
@@ -2568,7 +2568,7 @@ class TensorFlowWLSTM(BasePartitionModeler):
                 if end_ix > len(sequence) - 1:
                     break
                 # gather input and output parts of the pattern
-                seq_x, seq_y = sequence[i:end_ix][:,0:XSplineVector.shape[1]-1], sequence[i][XSplineVector.shape[1]-1]
+                seq_x, seq_y =  sequence[i:end_ix][:, 0:sequence.shape[1] - 1], sequence[end_ix-1][sequence.shape[1] - 1]
                 X.append(seq_x)
                 y.append(seq_y)
             return array(X), array(y)
@@ -2586,8 +2586,10 @@ class TensorFlowWLSTM(BasePartitionModeler):
             #print(X[i], y[i])
 
         #try:
+
         #XSplineVector = np.reshape(XSplineVector, (XSplineVector.shape[0], XSplineVector.shape[1], 1))
         estimator.fit(Xlstm, Ylstm, epochs=100, validation_split=0.33,verbose=0)
+        tf.keras.utils.plot_model(estimator, to_file='./model_plot.png', show_shapes=True, show_layer_names=True)
         #score = estimator.evaluate(np.array(XSplineVector),Y, verbose=0)
         #except:
 

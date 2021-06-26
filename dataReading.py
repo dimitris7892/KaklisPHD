@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 from scipy.stats import ks_2samp,chisquare,chi2_contingency
 import math
-import pyearth as sp
+#import pyearth as sp
 import matplotlib
 import random
 import matplotlib.pyplot as plt
@@ -82,7 +82,7 @@ class BaseSeriesReader:
 
     def readRandomSeriesDataFromFile(self, data,k=None):
         # Load file
-        data = np.array([k for k in data.values[0:, 2:23] if k[3]>6  and k[5]>0 ])#
+        data = np.array([k for k in data.values[0:, 2:23] if k[3]>0  and k[5]>0 ])#
         #stw = data[:,3]
         #rpm = data[:,5]
         #stwRpm = np.array(np.append(stw.reshape(-1,1),np.asmatrix([rpm]).T,axis=1)).astype(float)
@@ -105,7 +105,8 @@ class BaseSeriesReader:
         else:
 
 
-            dt = data[k*4000:(k*4000 + 4000)]
+            dt = data[k*1000:(k*1000 + 1000)]
+                #
 
             #[0:5000]
             #dt=np.array(random.sample(dt,20000))
