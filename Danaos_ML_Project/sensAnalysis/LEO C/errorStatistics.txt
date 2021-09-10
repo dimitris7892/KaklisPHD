@@ -1,0 +1,60 @@
+Mean ABS Error: 2.43+/-0.03 on test set of (4074, 11) observations of route ./correctedLegsForTR/LEO C/ALIAGA_SINES_leg.csv
+Mean Accuracy: 96.54% on test set of (4074, 11) observations of route ./correctedLegsForTR/LEO C/ALIAGA_SINES_leg.csv
+
+Mean ABS Error: nan+/-nan on test set of (0, 11) observations of route ./correctedLegsForTR/LEO C/AMBARLI_GEMLIK_leg.csv
+Mean Accuracy: nan% on test set of (0, 11) observations of route ./correctedLegsForTR/LEO C/AMBARLI_GEMLIK_leg.csv
+
+Mean ABS Error: 2.11+/-0.03 on test set of (2137, 11) observations of route ./correctedLegsForTR/LEO C/ANTWERP_SINES_leg.csv
+Mean Accuracy: 97.28% on test set of (2137, 11) observations of route ./correctedLegsForTR/LEO C/ANTWERP_SINES_leg.csv
+
+Mean ABS Error: 2.14+/-0.07 on test set of (426, 11) observations of route ./correctedLegsForTR/LEO C/BREMERHAVEN_ANTWERP_leg.csv
+Mean Accuracy: 96.7% on test set of (426, 11) observations of route ./correctedLegsForTR/LEO C/BREMERHAVEN_ANTWERP_leg.csv
+
+Mean ABS Error: 8.54+/-0.45 on test set of (8, 11) observations of route ./correctedLegsForTR/LEO C/BREMERHAVEN_HAMBURG_leg.csv
+Mean Accuracy: 72.68% on test set of (8, 11) observations of route ./correctedLegsForTR/LEO C/BREMERHAVEN_HAMBURG_leg.csv
+
+Mean ABS Error: 1.91+/-0.13 on test set of (139, 11) observations of route ./correctedLegsForTR/LEO C/CANAKKALE_ALIAGA_leg.csv
+Mean Accuracy: 96.36% on test set of (139, 11) observations of route ./correctedLegsForTR/LEO C/CANAKKALE_ALIAGA_leg.csv
+
+Mean ABS Error: 6.71+/-0.44 on test set of (78, 11) observations of route ./correctedLegsForTR/LEO C/CANAKKALE_AMBARLI_leg.csv
+Mean Accuracy: 87.94% on test set of (78, 11) observations of route ./correctedLegsForTR/LEO C/CANAKKALE_AMBARLI_leg.csv
+
+Mean ABS Error: 3.71+/-0.2 on test set of (149, 11) observations of route ./correctedLegsForTR/LEO C/FELIXSTOWE_ANTWERP_leg.csv
+Mean Accuracy: 93.99% on test set of (149, 11) observations of route ./correctedLegsForTR/LEO C/FELIXSTOWE_ANTWERP_leg.csv
+
+Mean ABS Error: 1.69+/-0.05 on test set of (1043, 11) observations of route ./correctedLegsForTR/LEO C/FELIXSTOWE_HAMBURG_leg.csv
+Mean Accuracy: 96.4% on test set of (1043, 11) observations of route ./correctedLegsForTR/LEO C/FELIXSTOWE_HAMBURG_leg.csv
+
+Mean ABS Error: 1.96+/-0.09 on test set of (249, 11) observations of route ./correctedLegsForTR/LEO C/GELIBOLU_ALIAGA_leg.csv
+Mean Accuracy: 93.57% on test set of (249, 11) observations of route ./correctedLegsForTR/LEO C/GELIBOLU_ALIAGA_leg.csv
+
+Mean ABS Error: 0.88+/-0.12 on test set of (102, 11) observations of route ./correctedLegsForTR/LEO C/GEMLIK_TEKIRDAG_leg.csv
+Mean Accuracy: 97.14% on test set of (102, 11) observations of route ./correctedLegsForTR/LEO C/GEMLIK_TEKIRDAG_leg.csv
+
+Mean ABS Error: 6.58+/-0.5 on test set of (29, 11) observations of route ./correctedLegsForTR/LEO C/HAMBURG_BREMERHAVEN_leg.csv
+Mean Accuracy: 81.26% on test set of (29, 11) observations of route ./correctedLegsForTR/LEO C/HAMBURG_BREMERHAVEN_leg.csv
+
+Mean ABS Error: 1.56+/-0.05 on test set of (603, 11) observations of route ./correctedLegsForTR/LEO C/HAMBURG_FELIXSTOWE_leg.csv
+Mean Accuracy: 97.9% on test set of (603, 11) observations of route ./correctedLegsForTR/LEO C/HAMBURG_FELIXSTOWE_leg.csv
+
+Mean ABS Error: 3.81+/-0.11 on test set of (505, 11) observations of route ./correctedLegsForTR/LEO C/ISTANBUL_CANAKKALE_leg.csv
+Mean Accuracy: 93.3% on test set of (505, 11) observations of route ./correctedLegsForTR/LEO C/ISTANBUL_CANAKKALE_leg.csv
+
+Mean ABS Error: 1.65+/-0.05 on test set of (429, 11) observations of route ./correctedLegsForTR/LEO C/LE HAVRE_FELIXSTOWE_leg.csv
+Mean Accuracy: 94.6% on test set of (429, 11) observations of route ./correctedLegsForTR/LEO C/LE HAVRE_FELIXSTOWE_leg.csv
+
+Mean ABS Error: 2.06+/-0.18 on test set of (117, 11) observations of route ./correctedLegsForTR/LEO C/PIRAEUS_CANAKKALE_leg.csv
+Mean Accuracy: 97.2% on test set of (117, 11) observations of route ./correctedLegsForTR/LEO C/PIRAEUS_CANAKKALE_leg.csv
+
+Mean ABS Error: 2.52+/-0.05 on test set of (1320, 11) observations of route ./correctedLegsForTR/LEO C/SINES_LE HAVRE_leg.csv
+Mean Accuracy: 96.68% on test set of (1320, 11) observations of route ./correctedLegsForTR/LEO C/SINES_LE HAVRE_leg.csv
+
+Mean ABS Error: 3.19+/-0.05 on test set of (2295, 11) observations of route ./correctedLegsForTR/LEO C/SINES_PIRAEUS_leg.csv
+Mean Accuracy: 95.14% on test set of (2295, 11) observations of route ./correctedLegsForTR/LEO C/SINES_PIRAEUS_leg.csv
+
+Mean ABS Error: 1.91+/-0.25 on test set of (4, 11) observations of route ./correctedLegsForTR/LEO C/TEKIRDAG_CANAKKALE_leg.csv
+Mean Accuracy: 94.7% on test set of (4, 11) observations of route ./correctedLegsForTR/LEO C/TEKIRDAG_CANAKKALE_leg.csv
+
+Mean ABS Error: nan+/-nan on test set of (0, 11) observations of route ./correctedLegsForTR/LEO C/TEKIRDAG_GELIBOLU_leg.csv
+Mean Accuracy: nan% on test set of (0, 11) observations of route ./correctedLegsForTR/LEO C/TEKIRDAG_GELIBOLU_leg.csv
+

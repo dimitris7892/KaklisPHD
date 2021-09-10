@@ -1,62 +1,24 @@
-import sklearn.linear_model as sk
-from sklearn.linear_model import  LinearRegression
 import pyearth as sp
 import numpy as np
 import numpy.linalg
-import sklearn.ensemble as skl
-from scipy.spatial import Delaunay
-import random
-
-#from sklearn.cross_validation import train_test_split
 import csv
-from tensorflow.keras import backend
 from tensorflow.keras.callbacks import ReduceLROnPlateau
-import itertools
 import pandas as pd
-from matplotlib import pyplot as plt
 import math
-#from sklearn.model_selection import KFold as kf
-from scipy import spatial
-from sklearn.pipeline import Pipeline
-#from sklearn.model_selection import RandomizedSearchCV
-from sklearn.preprocessing import StandardScaler
-from sklearn.model_selection import train_test_split
-#from gekko import GEKKO
 import  matplotlib.pyplot as plt
 from scipy.interpolate import BivariateSpline
 import tensorflow as tf
 from tensorflow import keras
-#config = tf.ConfigProto( device_count = {'GPU': 1 , 'CPU': 8} )
-#sess = tf.Session(config=config)
-#keras.backend.set_session(sess)
-from scipy.stats import pearsonr
-#from sklearn.model_selection import KFold
-#import pydot
-#import graphviz
-import scipy.stats as st
-from scipy import *
-from scipy.interpolate import RegularGridInterpolator
 import scipy as scipy
-#from tensorflow.python.tools import inspect_checkpoint as chkp
-from time import time
-from sklearn.cluster import KMeans
-tf.compat.v1.disable_eager_execution()
-#tf.executing_eagerly()
 from tensorflow.keras.callbacks import EarlyStopping
-from tensorflow.keras.callbacks import Callback
-from sklearn import preprocessing
-from scipy.special import softmax
-#import dataReading as Dread
-from tensorflow.keras import backend as K
-#sess = tf.Session(config=tf.ConfigProto(log_device_placement=True))
-#print("Num GPUs Available: ", len(tf.config.experimental.list_physical_devices('GPU')))
-#x=0
+from datetime import date, datetime
+
 
 class BasePartitionModeler:
     def createModelsFor(self,partitionsX, partitionsY, partition_labels):
         pass
 
-    def extractFunctionsFromSplines(self, modelId ,x0, x1, x2, x3, x4, x5=None, x6=None):
+    def extractFunctionsFromSplines(self, modelId ,x0, x1, x2, x3, x4, x5=None, x6=None, vessel=None):
         piecewiseFunc = []
         # csvModels = ['../../../../../Danaos_ML_Project/trainedModels/model_' + str(modelId) + '_.csv']
         # for csvM in csvModels:
@@ -67,7 +29,7 @@ class BasePartitionModeler:
 
         # with open(csvM) as csv_file:
         # data = csv.reader(csv_file, delimiter=',')
-        csvM = './trainedModels/model_Gen_.csv'
+        csvM = './trainedModels/model_Gen_'+vessel+'.csv'
         dataCsvModels=[]
         dataCsvModel = []
         with open(csvM) as csv_file:
@@ -518,6 +480,7 @@ class BasePartitionModeler:
                 return 0,0
             else:
                 return mBest , dBestFit
+
     def getFitofPointIncluster(self,point,centroid):
         return 1.0 / (1.0 + numpy.linalg.norm(point - centroid))
 
@@ -549,7 +512,7 @@ class BasePartitionModeler:
 
 class LinearInterpolation(BasePartitionModeler):
 
-    def createModelsFor(self, partitionsX, partitionsY, partition_labels, tri, X, Y):
+    def createModelsFor(self, partitionsX, partitionsY, partition_labels, tri, X, Y, ):
         stw= np.array(X[:,0])
         ws = np.array(X[:,3])
         wd = list(X[:, 4])
@@ -1445,7 +1408,7 @@ class TensorFlowW1(BasePartitionModeler):
         else:
             return mBest, dBestFit
 
-    def createModelsFor(self, partitionsX, partitionsY, partition_labels, tri, X, Y):#,numOfLayers,numOfNeurons):
+    def createModelsFor(self, partitionsX, partitionsY, partition_labels, tri, X, Y, expansion, vessel, ):#,numOfLayers,numOfNeurons):
 
         models = []
         # partitionsX=np.array(partitionsX[0])
@@ -1457,9 +1420,95 @@ class TensorFlowW1(BasePartitionModeler):
         # Init model to partition map
         self._partitionsPerModel = {}
 
+        if expansion == True  or expansion==False:
+            seed = 7
+            numpy.random.seed(seed)
 
-        n_steps = 6
+            self.genF = None
 
+            sModel = []
+            sr = sp.Earth(max_degree=1)
+            sr.fit(X, Y)
+            sModel.append(sr)
+            import csv
+            csvModels = []
+            genModelKnots = []
+
+            self.modelId = 'Gen'
+            self.countTimes = 0
+            self.models = {"data": []}
+            self.intercepts = []
+            self.interceptsGen = 0
+            self.SelectedFuncs = 0
+            for models in sModel:
+                modelSummary = str(models.summary()).split("\n")[4:]
+
+                with open('./trainedModels/model_Gen_' + vessel + '.csv', mode='w') as data:
+                    csvModels.append('./trainedModels/model_Gen_' + vessel + '.csv')
+                    data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+                    data_writer.writerow(
+                        ['Basis', 'Coeff'])
+                    for row in modelSummary:
+                        row = np.delete(np.array(row.split(" ")), [i for i, x in enumerate(row.split(" ")) if x == ""])
+                        try:
+                            basis = row[0]
+                            pruned = row[1]
+                            coeff = row[2]
+                            # if basis=='x0' :continue
+                            if pruned == "No":
+                                data_writer.writerow([basis, coeff])
+                                genModelKnots.append(basis)
+                        except:
+                            x = 0
+
+                genModelKnots = len(genModelKnots)
+                # modelCount += 1
+                # models.append(autoencoder)
+
+            srModels = []
+            for idx, pCurLbl in enumerate(partition_labels):
+                # maxTerms = if len(DeepCLpartitionsX) > 5000
+                srM = sp.Earth(max_degree=1)
+                srM.fit(np.array(partitionsX[idx]), np.array(partitionsY[idx]))
+                srModels.append(srM)
+            modelCount = 0
+            import csv
+            # csvModels = []
+            ClModels = {"data": []}
+
+            for models in srModels:
+                modelSummary = str(models.summary()).split("\n")[4:]
+                basisM = []
+                with open('./trainedModels/model_' + str(modelCount) + '_.csv', mode='w') as data:
+                    csvModels.append('./trainedModels/model_' + str(modelCount) + '_.csv')
+                    data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+                    data_writer.writerow(
+                        ['Basis', 'Coeff'])
+                    for row in modelSummary:
+                        row = np.delete(np.array(row.split(" ")), [i for i, x in enumerate(row.split(" ")) if x == ""])
+                        try:
+                            basis = row[0]
+                            pruned = row[1]
+                            coeff = row[2]
+                            # if basis == 'x0' : continue
+                            if pruned == "No":
+                                data_writer.writerow([basis, coeff])
+                                basisM.append(basis)
+                        except:
+                            x = 0
+                    model = {}
+                    model["id"] = modelCount
+                    model["funcs"] = len(basisM)
+                    ClModels["data"].append(model)
+                modelCount += 1
+
+            self.count = 0
+
+        n_steps = 15
+        neurons = 5 + genModelKnots -1 #if expansion == True else 5
+        input_shape = 5 + genModelKnots -1 if expansion == True else 5
+        print("Neurons length: "+str(neurons))
+        
         def baseline_model():
             # create model
             model = keras.models.Sequential()
@@ -1471,24 +1520,32 @@ class TensorFlowW1(BasePartitionModeler):
             #activity_regularizer = tf.keras.regularizers.l2(0.01),
             #bias_regularizer = tf.keras.regularizers.l2(0.01)
 
-            model.add(keras.layers.LSTM(6+genModelKnots-1,input_shape=(n_steps,6+genModelKnots-1,),))#return_sequences=True
+            model.add(keras.layers.LSTM(neurons, input_shape=(n_steps, input_shape  ,),))#return_sequences=True
             #model.add(keras.layers.LSTM(5 , input_shape=(n_steps, 5 ,), ))
             #model.add(keras.layers.LSTM( 5+genModelKnots-1, ))
-            #model.add(keras.layers.Dense(30))
+            #model.add(keras.layers.Dense(30,input_shape=( 5 ,)))
             #model.add(keras.layers.Dense(20))
             #model.add(keras.layers.Dense(genModelKnots - 3,activation='relu'))
+            #model.add(keras.layers.Dropout(0.2))
 
-            model.add(keras.layers.Dense(genModelKnots -1,kernel_regularizer = tf.keras.regularizers.l1(0.01),
+            model.add(keras.layers.Dense(genModelKnots -1, kernel_regularizer = tf.keras.regularizers.l1(0.01),
             activity_regularizer = tf.keras.regularizers.l2(0.01),
-            bias_regularizer = tf.keras.regularizers.l2(0.01)))
+            bias_regularizer = tf.keras.regularizers.l2(0.01) ),)
+
+            #kernel_regularizer = tf.keras.regularizers.l1(0.01),
+            #activity_regularizer = tf.keras.regularizers.l2(0.01),
+            #bias_regularizer = tf.keras.regularizers.l2(0.01),
+
 
             #model.add(keras.layers.Dense(5,))
             model.add(keras.layers.Dense(2, ))
+
+
             #.add(keras.layers.Dense(5,kernel_regularizer = tf.keras.regularizers.l1(0.01),
             #activity_regularizer = tf.keras.regularizers.l2(0.01),
             #bias_regularizer = tf.keras.regularizers.l2(0.01)))
 
-            model.add(keras.layers.Dense(1))
+            model.add(keras.layers.Dense(1,))
 
             model.compile(loss=keras.losses.mean_squared_error,
                           optimizer=keras.optimizers.Adam() )  # experimental_run_tf_function=False )
@@ -1496,94 +1553,12 @@ class TensorFlowW1(BasePartitionModeler):
 
             return model
 
-        seed = 7
-        numpy.random.seed(seed)
-
-        self.genF = None
-
-        sModel = []
-        sr = sp.Earth(max_degree=1)
-        sr.fit(X, Y)
-        sModel.append(sr)
-        import csv
-        csvModels = []
-        genModelKnots = []
-
-        self.modelId = 'Gen'
-        self.countTimes = 0
-        self.models = {"data": []}
-        self.intercepts = []
-        self.interceptsGen = 0
-        self.SelectedFuncs = 0
-        for models in sModel:
-            modelSummary = str(models.summary()).split("\n")[4:]
-
-            with open('./trainedModels/model_Gen_.csv', mode='w') as data:
-                csvModels.append('./trainedModels/model_Gen_.csv')
-                data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-                data_writer.writerow(
-                    ['Basis', 'Coeff'])
-                for row in modelSummary:
-                    row = np.delete(np.array(row.split(" ")), [i for i, x in enumerate(row.split(" ")) if x == ""])
-                    try:
-                        basis = row[0]
-                        pruned = row[1]
-                        coeff = row[2]
-                        # if basis=='x0' :continue
-                        if pruned == "No":
-                            data_writer.writerow([basis, coeff])
-                            genModelKnots.append(basis)
-                    except:
-                        x = 0
-
-            genModelKnots = len(genModelKnots)
-            # modelCount += 1
-            # models.append(autoencoder)
-
-        srModels = []
-        for idx, pCurLbl in enumerate(partition_labels):
-            # maxTerms = if len(DeepCLpartitionsX) > 5000
-            srM = sp.Earth(max_degree=1)
-            srM.fit(np.array(partitionsX[idx]), np.array(partitionsY[idx]))
-            srModels.append(srM)
-        modelCount = 0
-        import csv
-        # csvModels = []
-        ClModels = {"data": []}
-
-        for models in srModels:
-            modelSummary = str(models.summary()).split("\n")[4:]
-            basisM = []
-            with open('./trainedModels/model_' + str(modelCount) + '_.csv', mode='w') as data:
-                csvModels.append('./trainedModels/model_' + str(modelCount) + '_.csv')
-                data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-                data_writer.writerow(
-                    ['Basis', 'Coeff'])
-                for row in modelSummary:
-                    row = np.delete(np.array(row.split(" ")), [i for i, x in enumerate(row.split(" ")) if x == ""])
-                    try:
-                        basis = row[0]
-                        pruned = row[1]
-                        coeff = row[2]
-                        # if basis == 'x0' : continue
-                        if pruned == "No":
-                            data_writer.writerow([basis, coeff])
-                            basisM.append(basis)
-                    except:
-                        x = 0
-                model = {}
-                model["id"] = modelCount
-                model["funcs"] = len(basisM)
-                ClModels["data"].append(model)
-            modelCount += 1
-
-        self.count = 0
 
         def extractFunctionsFromSplines(x0, x1 , x2 , x3 ,x4=None , x5=None ,x6=None,x7=None):
             piecewiseFunc = []
             self.count = self.count + 1
             for csvM in csvModels:
-                if csvM != './trainedModels/model_' + str(self.modelId) + '_.csv':
+                if csvM != './trainedModels/model_' + str(self.modelId) + '_'+vessel+'.csv':
                     continue
                 # id = csvM.split("_")[ 1 ]
                 # piecewiseFunc = [ ]
@@ -1997,22 +1972,24 @@ class TensorFlowW1(BasePartitionModeler):
         velocities = []
         vectorWeights = []
 
+        if expansion == True:
+            for i in range(0, len(X)):
+                vector = extractFunctionsFromSplines(X[i][0], X[i][1], X[i][2], X[i][3],X[i][4],)#X[i][5],)
+                #vector = list(np.where(np.array(vector) < 0, 0, np.array(vector)))
+                #vector = ([abs(k) for k in vector])
+                #vector = extractFunctionsFromSplines(X[i][0], X[i][1], X[i][2], X[i][3], X[i][4])
+                #vector = extractFunctionsFromSplines(X[i][0], X[i][1],X[i][2],X[i][3],X[i][4],X[i][5],X[i][6])
+                #vectorNew = np.array(self.intercepts) * vector
+                #vectorNew = np.array([i + self.interceptsGen for i in vectorNew])
+                #XSplineVector.append(np.append(X[i],vector))
+                SplineVector=np.append(X[i], vector)
+                #SplineVector = X[i]
+                XSplineVector.append(np.append(SplineVector, Y[i]))
 
-        for i in range(0, len(X)):
-            vector = extractFunctionsFromSplines(X[i][0], X[i][1], X[i][2], X[i][3],X[i][4],X[i][5])#X[i][5],)
-            #vector = list(np.where(np.array(vector) < 0, 0, np.array(vector)))
-            #vector = ([abs(k) for k in vector])
-            #vector = extractFunctionsFromSplines(X[i][0], X[i][1], X[i][2], X[i][3], X[i][4])
-            #vector = extractFunctionsFromSplines(X[i][0], X[i][1],X[i][2],X[i][3],X[i][4],X[i][5],X[i][6])
-            #vectorNew = np.array(self.intercepts) * vector
-            #vectorNew = np.array([i + self.interceptsGen for i in vectorNew])
-            #XSplineVector.append(np.append(X[i],vector))
-            SplineVector=np.append(X[i], vector)
-            #SplineVector = X[i]
-            XSplineVector.append(np.append(SplineVector, Y[i]))
-
-        XSplineVectorGen = np.array(XSplineVector)
-
+            XSplineVectorGen = np.array(XSplineVector)
+            raw_seq = XSplineVectorGen
+        else:
+            raw_seq = np.array(np.append(X, np.asmatrix([Y]).T, axis=1))
         #XSplineVectorGen = XSplineVectorGen[XSplineVectorGen[:,3].argsort()]
 
         def split_sequence(sequence, n_steps):
@@ -2027,11 +2004,12 @@ class TensorFlowW1(BasePartitionModeler):
                 seq_x, seq_y = sequence[i:end_ix][:, 0:sequence.shape[1] - 1], sequence[end_ix-1][sequence.shape[1] - 1]
                 X.append(seq_x)
                 y.append(seq_y)
-            return array(X), array(y)
+            return np.array(X), np.array(y)
 
             # define input sequence
 
-        raw_seq = XSplineVectorGen
+
+        #
 
         # split into samples
         Xlstm, Ylstm = split_sequence(raw_seq, n_steps)
@@ -2050,19 +2028,19 @@ class TensorFlowW1(BasePartitionModeler):
 
         print("Shape of training data: " + str(Xlstm.shape))
         print("GENERAL MODEL  ")
-        es = EarlyStopping(monitor='val_loss', mode='min', verbose=0,restore_best_weights=True)
+        es = EarlyStopping(monitor='val_loss', mode='min', verbose=0, restore_best_weights=True)
         rlrop = ReduceLROnPlateau(monitor='val_loss', factor=0.1,)#restore_best_weights=True
         #XSplineVectorGen = np.reshape(XSplineVectorGen, (XSplineVectorGen.shape[0],1, XSplineVectorGen.shape[1]))
         #for i in range(0,10):
         size = 3000
         #X_test, Y_test = Xlstm[len(Xlstm)-size:len(Xlstm)] , Ylstm[len(Ylstm)-size:len(Ylstm)]
         #Xlstm, Ylstm = Xlstm[:len(Xlstm) - size], Ylstm[:len(Ylstm) - size]
-        history = estimator.fit(Xlstm, Ylstm, epochs=100, verbose=0,callbacks=[rlrop],validation_split=0.05,)#shuffle=False,batch_size=120)callbacks=[rlrop]
+        history = estimator.fit(Xlstm, Ylstm, epochs=100 ,verbose=0 ,validation_split=0.05,)#shuffle=False,batch_size=120)callbacks=[rlrop]
         #XSplineVector =np.array(XSplineVector).reshape(-1,1)
         #history = estimator.fit(XSplineVectorGen, Y, epochs=50, verbose=0, callbacks=[rlrop], validation_split=0.1,batch_size=len(XSplineVectorGen),shuffle=False)
         #estimator.reset_states()
         mse =  estimator.evaluate(Xlstm,Ylstm)
-        estimator.save('./DeployedModels/estimatorExpandedInput_.h5')
+
         #mse = estimator.evaluate(XSplineVectorGen, Y)
         patiences = [10, 20, 30, 40]
         lr_list, loss_list, acc_list, = list(), list(), list()
@@ -2075,8 +2053,16 @@ class TensorFlowW1(BasePartitionModeler):
 
             lr_list.append(lr)
             loss_list.append(loss)'''
-        print("LOSS: "+str(np.round(math.sqrt(mse),2)))
-        print("VAL LOSS:  "+str(np.round(math.sqrt(np.mean(history.history['val_loss'])))))
+        loss = str(np.round(math.sqrt(mse),2))
+        valLoss = str(np.round(math.sqrt(np.mean(history.history['val_loss']))))
+
+        estimatorName = 'estimatorExpandedInput_' if expansion == True else 'estimator_'
+        estimator.save('./DeployedModels/'+estimatorName + vessel + ' ' + str(
+            datetime.now().strftime("%d_%m_%Y_%H:%M")) + ' '+loss+'_'+valLoss+'.h5')
+
+        print("LOSS: "+ loss)
+        print("VAL LOSS:  " +valLoss)
+
         def line_plots(patiences, series):
             for i in range(len(patiences)):
                 plt.subplot(220 + (i + 1))
@@ -2108,7 +2094,7 @@ class TensorFlowW1(BasePartitionModeler):
         plt.xlabel('epoch')
         #plt.ylim(0,10)
         plt.legend(['train', 'validation'], loc='upper right')
-        plt.show()
+        #plt.show()
 
 
         self.flagGen = True

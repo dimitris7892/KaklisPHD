@@ -4854,6 +4854,8 @@ class BaseProfileGenerator:
 
         #COVNERT kg/h to MT/day
         #dataSet[:,15]= ( (dataSet[:,15]  ) / 1000 )* 24
+        for i in range(0,len(dataSet)):
+            dataSet[i, 15] = (dataSet[i, 15] * 24) / dataSet[i,18] if dataSet[i,18]>0 else dataSet[i, 15]
         #COVNERT kg/h to MT/day
 
         #dataSet = dataSet[0:30000]
@@ -4924,8 +4926,8 @@ class BaseProfileGenerator:
         #workbook._sheets[1].add_image(img, 'F' + str(490))
 
         ladenFlag = True
-        ballastFlag = True
-        portsFlag = True
+        ballastFlag = False
+        portsFlag = False
         #print("Min Draft: " + str(minDraft))
         #print("Mean Draft: " +str(meanDraft))
         #print("Max Draft: " + str(maxDraft))
@@ -4941,6 +4943,12 @@ class BaseProfileGenerator:
         ballastDrft = '(' + str(np.floor(draftsSorted[0][0])-1) + ' - ' + str(np.floor(maxBalDraft)) + ')'
         ladenDrft = '(' + str(np.floor(maxBalDraft)) + ' - ' + str( np.ceil(maxDraft)) + ')'
 
+        ballastDraftMin = np.floor(draftsSorted[0][0])-1
+        ballastDraftMax = np.floor(maxBalDraft)
+
+        ladenDraftMin = np.floor(maxBalDraft)
+        ladenDraftMax = np.ceil(maxDraft)
+
         categories = ballastDrft + ' ' + ladenDrft + ' ' + thirdDrft
         categoriesDraft = [minDraft, np.floor(draftsSorted[1][0]), np.round(draftsSorted[2][0]), maxDraft]
         print("Draft categories: " + categories)
@@ -4948,8 +4956,9 @@ class BaseProfileGenerator:
         #ladenDt = np.array([k for k in dtNew if k[1] > np.floor(maxBalDraft) and k[1] <= np.ceil(maxDraft) and k[5]>=9]).astype(float)
         #ballastDt = np.array([k for k in dtNew if k[1] >= np.floor(draftsSorted[0][0] - 2) and k[1] <= np.floor(maxBalDraft) and k[5]>=9]).astype(float)
 
-        ladenDt = np.array([k for k in dtNew if k[1] > 11 and k[1] <= 17 and k[5] >= 9]).astype(float)
-        ballastDt = np.array([k for k in dtNew if k[1] >=5 and k[1] <= 11 and k[5]>=9]).astype(float)
+        #ladenDt = np.array([k for k in dtNew if k[1] > ladenDraftMin and k[1] <= ladenDraftMax and k[5] >= 9]).astype(float)
+        ladenDt = np.array([k for k in dtNew if k[1] > 6 and k[1] <= 16 and k[5] >= 0]).astype(float)
+        ballastDt = np.array([k for k in dtNew if k[1] >= ballastDraftMin and k[1] < ballastDraftMax and k[5]>=9]).astype(float)
 
         portsDt = np.array([k for k in dtNew if k[1] >= np.floor(draftsSorted[0][0] - 2) and k[1] <= np.ceil(maxDraft) and k[5] < 9]).astype(float)
 
@@ -5003,10 +5012,16 @@ class BaseProfileGenerator:
 
         consVelocities = np.arange(np.floor(velocitiesSorted[0][0]), maxVel)#velocitiesSorted[0][0] # maxVel
         #consVelocitiesJSON = np.arange(np.floor(velocitiesSorted[0][0]), maxVel,0.5)
+
+        consVelocities = [6, 8, 10, 12, 14,18,20,22,24]
+
         stepVelRanges = int(np.round(len(consVelocities)/4))
         consVelocitiesRanges=[]
         for i in range(0,len(consVelocities),stepVelRanges):
          consVelocitiesRanges.append(consVelocities[i])
+
+
+
 
         r = 10
         rows =[]
@@ -5015,11 +5030,11 @@ class BaseProfileGenerator:
             rows.append(row)
             r += 79
 
-        minDraftWF = 8
-        maxDraftWF = 15
+        minDraftWF = 6
+        maxDraftWF = 16
 
-        minSpeedWF = 11.5
-        maxSpeedWF = 12.5
+        minSpeedWF = 10
+        maxSpeedWF = 12
 
         if portsFlag == True:
 
@@ -5917,6 +5932,10 @@ class BaseProfileGenerator:
             #consVelocities[len(consVelocities) - 1]
             consVelocitiesLadden = np.arange(minLaddenSpeedn,np.round(maxLaddenSpeedn))
 
+            minLaddenSpeedn = 8
+            maxLaddenSpeedn = 14
+            consVelocitiesLadden = [8,10,12,14,]
+
             stepVelRanges = int(np.round(len(consVelocitiesLadden) / 4))
             consVelocitiesRanges = []
             for i in range(0, len(consVelocitiesLadden), stepVelRanges):
@@ -5926,9 +5945,12 @@ class BaseProfileGenerator:
             consVelocitiesRanges
             workbook._sheets[1]['B2']  = meanDraftLadden
 
+
+            #consVelocitiesRanges = [6,8,10,12,14]
+
+
+
             print(consVelocitiesRanges)
-
-
 
             laden = np.array([k for k in dtNew if k[1] > minDraftWF and k[1] <= maxDraftWF]).astype(float)
 
@@ -5947,7 +5969,7 @@ class BaseProfileGenerator:
                 maxSwell = 8
                 minSwell = 0
                 i = 0
-                rawSwell = np.array([k for k in speedRange1 if float(k[4]) >= 0 and float(k[4]) <= 3])
+                rawSwell = np.array([k for k in speedRange1 if float(k[4]) >= 0 and float(k[4]) <= 4])
                 while i <= maxSwell:
 
                     speedArray = np.array([k for k in rawSwell if float(k[13]) >= i and float(k[13]) <= i + 1])
@@ -6015,6 +6037,7 @@ class BaseProfileGenerator:
                             np.mean(abs(p2_67 - p2_56) / p2_56),
                             np.mean(abs(p2_78 - p2_67) / p2_67)]'''
                 x=0
+                factorSWH = np.array(factorSWH) / 10
             except:
                 print('EXCEPTION IN WEIGHTS SWELL LADDEN')
 
@@ -6036,7 +6059,7 @@ class BaseProfileGenerator:
                 maxWS = 8
                 minWS = 0
                 i = 0
-                rawWS = np.array([k for k in speedRange1 if float(k[13]) >= 0 and float(k[13]) <= 2  ])
+                rawWS = np.array([k for k in speedRange1 if float(k[13]) >= 0 and float(k[13]) <= 4  ])
                 while i <= maxWS:
 
                     speedArray = np.array([k for k in rawWS if float(k[4]) >= i and float(k[4]) <= i + 1])
@@ -6084,7 +6107,7 @@ class BaseProfileGenerator:
                              abs((np.mean(p2_56) - np.mean(p2_45)) / np.mean(p2_45)),
                              abs((np.mean(p2_67) - np.mean(p2_56)) / np.mean(p2_56)),
                              abs((np.mean(p2_78) - np.mean(p2_67)) / np.mean(p2_67))]
-                
+                factorSWS = np.array(factorSWS) / 5
             except:
                 print('EXCEPTION IN WEIGHTS WS LADDEN')
 
@@ -6106,7 +6129,7 @@ class BaseProfileGenerator:
                 minWD = 0
                 i = 0
                 listWD = [0, 22.5, 67.5, 112.5, 157.5, 180]
-                rawWD = np.array([k for k in speedRange1 if float(k[4]) >= 0 and float(k[4]) <= 2  ])
+                rawWD = np.array([k for k in speedRange1 if float(k[4]) >= 0 and float(k[4]) <= 4  ])
                 while i < len(listWD)-1:
 
                     speedArray = np.array([k for k in rawWD if float(k[3]) >= listWD[i] and float(k[3]) <= listWD[i + 1]])
@@ -6147,7 +6170,7 @@ class BaseProfileGenerator:
                              abs((np.mean(p2_23) - np.mean(p2_34)) / np.mean(p2_34)),
                              abs((np.mean(p2_45) - np.mean(p2_34)) / np.mean(p2_34)),
                              0]
-
+                factorSWD = np.array(factorSWD)/100
                 g=0
 
             except Exception as e:
@@ -6158,8 +6181,7 @@ class BaseProfileGenerator:
             ###############################################################################################
             ###############################################################################################
 
-            speedFoc = np.array(
-                [k for k in ladenDt if (k[5] >= consVelocities[0] and k[5] <=maxLaddenSpeedn)and (k[4] >= 0 and k[4] <=3)  and k[8] > 1 ])
+            speedFoc = np.array([k for k in ladenDt if (k[5] >= consVelocities[0] and k[5] <=maxLaddenSpeedn) and (k[4] >= 0 and k[4] <=4)  and k[8] > 1 ])
 
             '''meanFoc = np.mean(speedFoc[:, 8])
             stdFoc = np.std(speedFoc[:, 8])
@@ -6171,7 +6193,6 @@ class BaseProfileGenerator:
                   speedFoc[i] = np.mean(speedFoc[i:i + 15], axis=0)'''
 
 
-
             foc = np.round(speedFoc[:, 8],3)  #.reshape(-1,1)
             speed = np.round(speedFoc[:, 5] ,3) # .reshape(-1,1)
 
@@ -6179,13 +6200,10 @@ class BaseProfileGenerator:
             #lrSpeedFoc = LinearRegression()
             #lrSpeedFoc = RandomForestRegressor()
             #lrSpeedFoc = Ridge()
-            lrSpeedFoc = SplineRegression.Earth(max_degree=2)
+            #lrSpeedFoc = SplineRegression.Earth(max_degree=2)
 
-
-
-
-            lrSpeedFoc.fit(speed.reshape(-1,1), foc.reshape(-1,1))
-            print(lrSpeedFoc.score(speed.reshape(-1,1), foc.reshape(-1,1)))
+            #lrSpeedFoc.fit(speed.reshape(-1,1), foc.reshape(-1,1))
+            #print(lrSpeedFoc.score(speed.reshape(-1,1), foc.reshape(-1,1)))
 
 
             minfoc = np.min(foc)
@@ -6226,7 +6244,7 @@ class BaseProfileGenerator:
             yi = np.array(ranges)
             zi = np.array(focsPLot)
 
-            #p2 = np.poly1d(np.polyfit(xi, yi, 2,w=focsPLot),)
+            p2 = np.poly1d(np.polyfit(xi, yi, 1,  ),)
 
             #lrSpeedFoc.fit(xi.reshape(-1, 1), yi.reshape(-1, 1))
             #print(lrSpeedFoc.score(xi.reshape(-1, 1), yi.reshape(-1, 1)))
@@ -6234,22 +6252,23 @@ class BaseProfileGenerator:
             plt.clf()
 
             #xp = np.linspace(9, max(xi), 100)
-            xiBlue = np.linspace(9, 20, 20-9)
+            xiBlue = np.linspace(9, 14, 6)
 
             #plt.plot([], [], '.', xp, p2(xp))
             speedList = [8,9,10,11,12,13,14]
 
-            plt.plot( xiBlue, lrSpeedFoc.predict(np.array(xiBlue).reshape(-1,1)),c='blue')
-            plt.plot(xi, yi, c='red')
+            #plt.plot( xiBlue, lrSpeedFoc.predict(np.array(xiBlue).reshape(-1,1)),c='blue',label='apprx')
+            plt.plot(xiBlue, p2(xiBlue), c='blue', label='apprx')
+            plt.plot(xi, yi, c='red',label='actual')
 
             plt.scatter(xi, yi, s=zi/10, c="red", alpha=0.4, linewidth=4)
             #plt.xticks(np.arange(np.floor(min(xi)), np.ceil(max(xi)) + 1, 1))
             #plt.yticks(np.arange(min(yi), max(yi) + 1, 5))
             plt.xlabel("Speed (knots)")
             plt.ylabel("FOC (MT / day)")
-            plt.title("Density plot", loc="center")
-            #plt.show()
-            dataModel = KMeans(n_clusters=3)
+            plt.title("Mean FOC/Speed  for Draft "+ str(ladenDrft)+" for "+vessel, loc="center")
+            plt.show()
+            '''dataModel = KMeans(n_clusters=3)
             zi = zi.reshape(-1, 1)
             dataModel.fit(zi)
             # Extract centroid values
@@ -6259,12 +6278,15 @@ class BaseProfileGenerator:
             for z in ziSorted:
                 plt.scatter([], [], c='r', alpha=0.5, s=np.floor(z[0]/10),
                             label='       ' + str(int(np.floor(z[0]))) + ' obs.')
-            plt.legend(borderpad=4, scatterpoints=1, frameon=True, labelspacing=6, title='# of obs')
-
+            plt.legend(borderpad=3, scatterpoints=1, frameon=True, labelspacing=3, title='# of obs')
+            plt.grid()
             fig = matplotlib.pyplot.gcf()
             fig.set_size_inches(17.5, 9.5)
-            plt.show()
-            #fig.savefig('./Figures/' + company + '_' + vessel + '_3.png', dpi=96)
+
+            plt.show()'''
+            fig = matplotlib.pyplot.gcf()
+            fig.set_size_inches(17.5, 9.5)
+            fig.savefig('./Figures/' + company + '_' + vessel + '_3.png', dpi=96)
             # plt.clf()
             #img = Image('./Figures/' + company + '_' + vessel + '_3.png')
 
@@ -6291,13 +6313,13 @@ class BaseProfileGenerator:
 
             maxLaddenSpeedn = maxLaddenSpeedn if maxLaddenSpeedn <= consVelocities[len(consVelocities)-1] else consVelocities[len(consVelocities)-1]-1
 
-            consVelocitiesJSON = np.arange(np.round(minLaddenSpeedn), np.round(maxLaddenSpeedn), 0.5)
+            consVelocitiesJSON = np.arange(np.round(minLaddenSpeedn), np.round(maxLaddenSpeedn)+0.5, 0.5)
             stepVelRanges = int(np.round(len(consVelocities) / 4))
             consVelocitiesRanges = []
             for i in range(0, len(consVelocities), stepVelRanges):
                 consVelocitiesRanges.append(consVelocities[i])
 
-            consVelocitiesRanges.append(consVelocitiesLadden[len(consVelocities) - 1]) if consVelocitiesRanges.__len__() < 4 else None
+            #consVelocitiesRanges.append(consVelocitiesLadden[len(consVelocities) - 1]) if consVelocitiesRanges.__len__() < 4 else None
 
             for vel in range(0, len(consVelocitiesJSON)):
 
@@ -6330,10 +6352,10 @@ class BaseProfileGenerator:
 
                 stw = consVelocitiesJSON[vel]
                 centralMeanFromData = np.array([k for k in speedFoc if k[5]>= stw-0.25 and k[5]<= stw + 0.25])
-                if len(centralMeanFromData)>10:
-                    centralMean = np.mean(centralMeanFromData[:,8])
-                else:
-                    centralMean = lrSpeedFoc.predict(np.array([consVelocitiesJSON[vel]]).reshape(-1, 1))[0]
+                #if len(centralMeanFromData)>10:
+                    #centralMean = np.mean(centralMeanFromData[:,8])
+                #else:
+                centralMean = p2(consVelocitiesJSON[vel])
                         #lrSpeedFoc.predict(np.array([consVelocitiesJSON[vel]]).reshape(-1, 1))[0]
                     #lrSpeedFoc.predict(np.array([consVelocitiesJSON[vel]]).reshape(-1,1))[0]
                     #lrSpeedFoc.predict(np.array([consVelocitiesJSON[vel]]).reshape(-1,1))[0]
@@ -6725,7 +6747,7 @@ class BaseProfileGenerator:
             ###############################################################################################
 
             speedFoc = np.array(
-                [k for k in ballastDt if (k[5] >= consVelocities[0] and k[5] <= maxBallastSpeedn) and (k[4] >= 0 and k[4] <=3) and k[8] > 1])
+                [k for k in ballastDt if (k[5] >= 9 and k[5] <= maxBallastSpeedn) and (k[4] >= 0 and k[4] <=3) and k[8] > 1])
 
             '''meanFoc = np.mean(speedFoc[:, 8])
             stdFoc = np.std(speedFoc[:, 8])
@@ -6739,9 +6761,12 @@ class BaseProfileGenerator:
             foc = speedFoc[:, 8]#.reshape(-1,1)
             speed = speedFoc[:, 5]# .reshape(-1,1)
 
+            speedFOC = np.append(speed.reshape(-1,1),foc.reshape(-1,1),axis=1)
+            speedFOC = speedFOC[speedFOC[:, 0].argsort()]
+
             #lrSpeedFoc = LinearRegression()
             # rfSpeedFoc = RandomForestRegressor()
-            lrSpeedFoc = SplineRegression.Earth(max_degree=2,)
+            lrSpeedFoc = SplineRegression.Earth(max_degree=1,)
 
             #trainX,testX, trainY,testY = train_test_split(speed,foc, test_size=0.2,random_state=42)
             '''tscv = TimeSeriesSplit()
@@ -6750,8 +6775,9 @@ class BaseProfileGenerator:
                 trainX, testX = speed[train_index], speed[test_index]
                 trainY, testY = foc[train_index], foc[test_index]'''
 
-            lrSpeedFoc.fit(speed.reshape(-1, 1), foc.reshape(-1, 1))
-            print("SR BALLST SCORE: "+str(lrSpeedFoc.score(speed.reshape(-1, 1), foc.reshape(-1, 1))))
+            lrSpeedFoc.fit(speedFOC[:,0].reshape(-1, 1), speedFOC[:,1].reshape(-1, 1))
+            scoreBallast = lrSpeedFoc.score(speed.reshape(-1, 1), foc.reshape(-1, 1))
+            print("SR BALLST SCORE: "+str(scoreBallast))
                 #print("SR SCORE: " + str(lrSpeedFoc.score(testX.reshape(-1, 1), testY.reshape(-1, 1))))
 
             minfoc = np.min(foc)
@@ -6793,21 +6819,22 @@ class BaseProfileGenerator:
             yi = np.array(ranges)
             zi = np.array(focsPLot)
 
-            #p2 = np.poly1d(np.polyfit(speed, foc, 1))
+            p2 = np.poly1d(np.polyfit(speed, foc, 2))
 
-            xiBlue = np.linspace(9, 20, 20 - 9)
+            xiBlue = np.linspace(min(xi), max(xi), int(max(xi) - min(xi)))
 
             # plt.plot([], [], '.', xp, p2(xp))
             speedList = [8, 9, 10, 11, 12, 13, 14]
 
-            '''plt.plot(xiBlue, lrSpeedFoc.predict(np.array(xiBlue).reshape(-1, 1)), c='blue')
-            plt.plot(xi, yi, c='red')
+            plt.plot(xiBlue, lrSpeedFoc.predict(np.array(xiBlue).reshape(-1, 1)), c='blue',label='apprx')
+            #plt.plot(xiBlue, p2(np.array(xiBlue)), c='blue')
+            plt.plot(xi, yi, c='red',label='actual')
             plt.scatter(xi, yi, s=zi / 10, c="red", alpha=0.4, linewidth=4)
             # plt.xticks(np.arange(np.floor(min(xi)), np.ceil(max(xi)) + 1, 1))
             # plt.yticks(np.arange(min(yi), max(yi) + 1, 5))
             plt.xlabel("Speed (knots)")
             plt.ylabel("FOC (MT / day)")
-            plt.title("Density plot", loc="center")
+            plt.title("Mean FOC/Speed for Draft "+ str(ballastDrft)+" for "+vessel, loc="center")
 
             dataModel = KMeans(n_clusters=3)
             zi = zi.reshape(-1, 1)
@@ -6819,13 +6846,17 @@ class BaseProfileGenerator:
             for z in ziSorted:
                 plt.scatter([], [], c='r', alpha=0.5, s=np.floor(z[0] / 10),
                             label='       ' + str(int(np.floor(z[0]))) + ' obs.')
-            plt.legend(borderpad=4, scatterpoints=1, frameon=True, labelspacing=6, title='# of obs')
 
+            plt.legend(borderpad=3, scatterpoints=1, frameon=True, labelspacing=3, title='# of obs')
+
+            plt.grid()
             fig = matplotlib.pyplot.gcf()
             fig.set_size_inches(17.5, 9.5)
             fig.savefig('./Figures/' + company + '_' + vessel + '_4.png', dpi=96)
+
+
             plt.show()
-            img = Image('./Figures/' + company + '_' + vessel + '_4.png')'''
+
             ###############################################################################
             #workbook._sheets[2].add_image(img, 'F' + str(490))
 
@@ -6882,10 +6913,11 @@ class BaseProfileGenerator:
 
                 stw = consVelocitiesJSON[vel]
                 centralMeanFromData = np.array([k for k in speedFoc if k[5] >= stw - 0.25 and k[5] <= stw + 0.25])
-                if len(centralMeanFromData) > 10:
-                    centralMean = np.mean(centralMeanFromData[:, 8])
-                else:
-                    centralMean = lrSpeedFoc.predict(np.array([consVelocitiesJSON[vel]]).reshape(-1, 1))[0]
+                #if len(centralMeanFromData) > 10:
+                    #centralMean = np.mean(centralMeanFromData[:, 8])
+                #else:
+                centralMean =  lrSpeedFoc.predict(np.array([consVelocitiesJSON[vel]]).reshape(-1,1))[0]
+
                 #centralMean = lrSpeedFoc.predict(np.array([consVelocitiesJSON[vel]]).reshape(-1,1))[0]
                     #lrSpeedFoc.predict(np.array([consVelocitiesJSON[vel]]).reshape(-1,1))[0]
                     #lrSpeedFoc.predict(np.array([consVelocitiesJSON[vel]]).reshape(-1,1))[0]

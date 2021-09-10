@@ -1,4 +1,6 @@
 import glob, os
+
+import dataReading
 import dataReading as dRead
 #from Danaos_ML_Project import dataReading as DANdRead ##   NEWWWW
 import dataReading as DANdRead
@@ -11,47 +13,141 @@ import seaborn as sns
 import datetime
 from sklearn.cluster import KMeans
 from math import sqrt
-from tensorflow import keras
-import sys
-import generateProfile
-import plotResults as plotRes
-import itertools
 import pandas as pd
-import Danaos_ML_Project.ExtractNeuralReport  as NNrep
-from sklearn.model_selection import train_test_split
-import random
-from sklearn.decomposition import PCA
 from pylab import *
 import datetime
-import  matplotlib.pyplot as plt
-from sklearn import svm
-import csv
-from datetime import date
-import ctypes
-import clr
-import clr_loader
-import os
-import requests
 import Danaos_ML_Project.plotResults as pltRes
 import Danaos_ML_Project.generateProfile as genProf
-from fastapi import APIRouter
-import urllib.request
-import asyncio
-gener = genProf.BaseProfileGenerator()
-#import latex
-#rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
-#rc('text', usetex=True)
-from tensorflow.python.client import device_lib
-#print(device_lib.list_local_devices())
-from tensorflow.keras import backend as K
-#K.tensorflow_backend._get_available_gpus()
-from datetime import datetime
 import mappingData_functions as mpf
+import preProcessLegs as preLegs
 
+prelegs = preLegs.preProcessLegs(False)
+gener = genProf.BaseProfileGenerator()
 mapping = mpf.Mapping()
+dread = dataReading.BaseSeriesReader()
 
-def main():
 
+
+def preProcessData(data, datatype):
+
+
+    stwInd = 12 if datatype == ' raw' else 0
+    draftInd = 8 if datatype == ' raw' else 1
+    wsInd = 11 if datatype == ' raw' else 3
+    focInd = 15 if datatype == ' raw' else 2
+    swhInd = 22 if datatype == ' raw' else 5
+    wdInd =  10 if datatype == ' raw' else 4
+    vslHeadInd = 1 if datatype == ' raw' else 9
+    # data =np.array([k for k in data if k[2]=='B' or k[2]=='L'])
+
+    '''wfS = data[:, 11].astype(float) / (1.944)
+    wsSen = []
+    for i in range(0, len(wfS)):
+        wsSen.append(gener.ConvertMSToBeaufort(float(float(wfS[i]))))
+    data[:, 11] = wsSen
+
+    # data[:, 11] = wfS
+
+    data[:, 15] = ((data[:, 15]) / 1000) * 1440'''
+
+    for i in range(0, len(data[:, wdInd])):
+        if float(data[i, wdInd]) < 0:
+            data[i, wdInd] += 360
+        data[i, wdInd] = dread.getRelativeDirectionWeatherVessel(float(data[i, vslHeadInd]), float(data[i, wdInd]))
+
+    for i in range(0, len(data[:wdInd])):
+        if float(data[i, wdInd]) > 180:
+            data[i, wdInd] = float(data[i, wdInd]) - 180  # and  float(k[8])<20
+
+    '''for i in range(0,len(data[:,10])):
+        if float(data[i,10]) >=0 and float(data[i,10]) <22.5:
+            data[i,10] = 1
+        elif float(data[i,10]) >= 22.5 and float(data[i,10]) < 67.5:
+            data[i, 10] = 2
+        elif float(data[i,10]) >= 67.5 and float(data[i,10]) < 112.5:
+            data[i, 10] = 3
+        elif float(data[i, 10]) >= 112.5 and float(data[i,10]) < 157.5:
+            data[i, 10] = 4
+        elif float(data[i,10]) >= 157.5 and float(data[i,10]) < 180.5:
+            data[i, 10] = 5'''
+    '''for i in range(0, len(data[:,1])):
+        if float(data[i,1]) > 180:
+            data[i,1] = float(data[i,1]) - 180'''
+
+    '''for i in range(0, len(vslHeadingTD)):
+        if float(vslHeadingTD[i]) > 180:
+            vslHeadingTD[i] = float(vslHeadingTD[i]) - 180'''
+
+    '''for i in range(0, len(currentDirTD)):
+        if float(currentDirTD[i]) > 180:
+            currentDirTD[i] = float(currentDirTD[i]) - 180'''
+
+    '''for i in range(0, len(data[:,30])):
+        if float(data[i,30]) > 180:
+            data[i,30] = float(data[i,30]) - 180'''
+    ##################################################
+    trData = np.array(
+        np.append(data[:, draftInd].reshape(-1, 1), np.asmatrix([data[:, wdInd], data[:, wsInd], data[:, stwInd], data[:, swhInd],
+                                                           data[:, focInd]]).T, axis=1)).astype(float)  # data[:,26],data[:,27]
+    # trData = np.nan_to_num(trData)
+    # trData = np.array(np.append(data[:, 0].reshape(-1, 1),
+
+    # np.asmatrix([data[:, 1], data[:, 3], data[:, 4], data[:, 5]]).T,
+    # axis=1)).astype(float)
+    # np.array(np.append(data[:,0].reshape(-1,1),np.asmatrix([data[:,1],data[:,2],data[:,3],data[:,4],data[:,7],data[:,8],data[:,9]]).T,axis=1)).astype(float)
+    # np.array(np.append(data[:,8].reshape(-1,1),np.asmatrix([data[:,10],data[:,11],data[:,12],data[:,20],data[:,21],data[:,15]]).T,axis=1)).astype(float)
+
+    '''meanFoc = np.mean(trData[:,5 ], axis=0)
+    stdFoc = np.std(trData[:, 5], axis=0)
+    trData = np.array(
+        [k for k in trData if (k[5] >= (meanFoc - (3 * stdFoc))) and (k[5] <= (meanFoc + (3 * stdFoc)))])
+
+    trData = np.array([k for k in trData if  str(k[0])!='nan' and  float(k[2])>=0 and float(k[4])>=0 and (float(k[3])>=9 ) and float(k[5])>0  ]).astype(float)'''
+    #trData = np.array([k for k in trData if (float(k[3]) >= 9) ]).astype(float)
+    # trData = np.nan_to_num(trData)
+
+    '''genprf = generateProfile.BaseProfileGenerator()
+    trDataPorts, trDataNoInPorts = genprf.findCloseToLandDataPoints(trData)
+    trData = trDataNoInPorts
+
+    trData = np.array(np.append(trData[:, 0:5], np.asmatrix(trData[:, 7]).T, axis=1))'''
+    #######################################################################################
+    # np.concatenate([trDataNoInPorts,trDataPorts])
+    # plRes.PLotDists(trData)
+    e = 0
+    # X_train, X_test, y_train, y_test = train_test_split(trData[:, 0:5], trData[:, 5:], test_size=0.26, random_state=42)
+    # trData1 =  trData[27000:86000, :]
+    # trData2 =  trData[86000:145115,:] #HAMBURG - MUMBAI - #HAMBURG
+
+    # for i in range(0, len(trData)):
+    # trData[i] = np.mean(trData[i:i + 15], axis=0)
+
+    '''wd = np.array([k for k in trData])[:, 1]
+    for i in range(0, len(wd)):
+        if float(wd[i]) > 180:
+            wd[i] = float(wd[i]) - 180  # and  float(k[8])<20
+
+    trData[:, 1] = wd'''
+
+    '''wf = np.array([k for k in trData])[:, 2]
+    for i in range(0, len(wf)):
+        wf[i] = gener.ConvertMSToBeaufort(float(float(wf[i])))
+    trData[:, 2] = wf'''
+
+    # trData = trData[:40000]
+
+    for i in range(0, len(trData)):
+        trData[i] = np.mean(trData[i:i + 15], axis=0)
+
+    return trData
+
+
+def main(vessel):
+
+
+    #data = pd.read_csv('./data/MODERNA/SPETSES SPIRIT/mappedData.csv').values
+    #mapping.extractJSON_TestData_MODERNA(9543886,'SPETSES SPIRIT',data)
+    #return
     end, endU, history, future,sFile, start, startU , algs , cls = initParameters()
     # Load data
     if len(sys.argv) >1:
@@ -75,37 +171,9 @@ def main():
     subsetsY = []
     subsetsB=[]
 
-    '''sFile = './data/GOLDENPORT/TRAMMO LAOURA/mappedData.csv'
-    data = pd.read_csv(sFile, sep=',').values
 
 
-    ##Build training data array
-
-    # draftD = data[:,8]
-    # draftD = np.where(data[:,8]==0, None, data[:,8])
-    # draftDf = pd.DataFrame({'draft':draftD.astype(float)})
-    # draftDf = draftDf.interpolate()
-    # data[:,8] = draftDf.values.reshape(-1)
-
-    trData = np.array(np.append(data[:, 8].reshape(-1, 1), np.asmatrix(
-        [data[:, 10], data[:, 11], data[:, 12], data[:, 22], (data[:, 15]), data[:, 26], data[:, 27], data[:, 2],
-         data[:, 28]]).T, axis=1))  # .astype(float)#data[:,26],data[:,27]
-    trData = np.array(
-        [k for k in trData if float(k[2]) >= 0 and float(k[4]) >= 0 and float(k[3]) > 2 and float(k[5]) > 0])
-
-    timestampsWithoutMappedTlgs = np.array([k for k in trData if str(k[8]) == 'nan'])[:, 9]
-    print(timestampsWithoutMappedTlgs.shape)'''
-    data = pd.read_csv('./data/DANAOS/HYUNDAI SMART/HYUNDAI SMART.csv').values
-    originalDeptlgDate = datetime.strptime(originalDeptlgDate, '%Y-%m-%d %H:%M:%S')
-    originalArrtlgDate = datetime.strptime(originalArrtlgDate, '%Y-%m-%d %H:%M:%S')
-
-    print("Original Dep Date: " + str(originalDeptlgDate))
-    print("Original Arr Date: " + str(originalArrtlgDate))
-    rawDataLeg = np.array([k for k in rawData if
-                           datetime.strptime(k[8], '%Y-%m-%d %H:%M') >= originalDeptlgDate
-                           and datetime.strptime(k[8], '%Y-%m-%d %H:%M') <= originalArrtlgDate])
-
-    plRes = pltRes.ErrorGraphs()
+    #plRes = pltRes.ErrorGraphs()
 
     # Sample size - in this case ~10%
     size = 5000
@@ -166,118 +234,38 @@ def main():
     # 6 swd
     # 7 foc (MT/day)
 
-    #data = pd.read_csv('/home/dimitris/Desktop/EUROPE.csv')
-    #print(data.keys())
-    x=0
-
-    '''trdata = pd.read_csv('./data/GOLDENPORT/TRAMMO LAOURA/mappedData.csv').values
-    with open('./data/TRAMMOCoor.csv', mode='w') as data:
-                    data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-                    data_writer.writerow(['Latitude', 'Longitude'])
-                    for i in range(0,len(trdata)):
-                        data_writer.writerow(
-                            [trdata[i][26], trdata[i][27]])
-
-    df1 = pd.read_csv('./data/TRAMMOCoor.csv')
-
-    plRes.PLotTrajectory(df1,'TRAMMO LAOURA ')'''
-
-    #import mappingData_functions as mpf
-    #mapping = mpf.Mapping()
-    #mapping.extractLegsFromTelegrams('OCEAN_GOLD','PERSEFONE')
-    #return
 
     DANreader = dRead.BaseSeriesReader()
-    DANreader.GenericParserForDataExtraction('LEMAG', 'DANAOS', 'GENOA', driver='ORACLE',
+    '''DANreader.GenericParserForDataExtraction('LEMAG', 'MODERNA', 'SPETSES SPIRIT', driver='ORACLE',
+                                             server='10.2.5.80',
+                                             sid='OR12', usr='shipping', password='shipping',
+                                             rawData=False, telegrams=False, companyTelegrams=False,
+                                             pathOfRawData='/home/dimitris/Desktop/SEEAMAG')'''
+
+    '''DANreader.GenericParserForDataExtraction('LEMAG', 'DANAOS', 'LEO C', driver='ORACLE',
                                              server='10.2.5.80',
                                              sid='OR12', usr='shipping', password='shipping',
                                              rawData=False, telegrams=True, companyTelegrams=False,
-                                             pathOfRawData='/home/dimitris/Desktop/SEEAMAG')
+                                             pathOfRawData='/home/dimitris/Desktop/SEEAMAG')'''
 
-    return
+    '''DANreader.GenericParserForDataExtraction('LEMAG', 'OCEAN_GOLD', 'PERSEFONE', driver='ORACLE',
+                                             server='10.2.5.80',
+                                             sid='OR11', usr='oceangold', password='oceangold',
+                                             rawData=False, telegrams=True, companyTelegrams=False,
+                                             pathOfRawData='/home/dimitris/Desktop/SEEAMAG')'''
+
+    #return
 
 
 
     data = pd.read_csv(sFile,sep=',').values
 
-    '''for i in range(0, len(wfS)):
-        wsSen.append(gener.ConvertMSToBeaufort(float(float(wfS[i]))))
-    data[:, 11] = wsSen'''
 
-    '''df = pd.DataFrame({
-        'wfSensor': wfS,
-    })
-    sns.displot(df, x="wfSensor")'''
-    ########################################################################
-
-    '''for i in range(0, len(wfS)):
-        wf.append(gener.ConvertMSToBeaufort(float(float(wfWS[i]))))'''
-
-    '''df = pd.DataFrame({
-        'wfWeatherService': wfWS,
-    })
-    sns.displot(df, x="wfWeatherService")'''
-    #plt.show()
-
-    '''wfWS = data[:, 28]
-    wfws = []
-    for i in range(0, len(wfS)):
-        wfws.append(gener.ConvertMSToBeaufort(float(float(wfWS[i]))))
-    data[:, 28] = wfws'''
-
-    '''i=0
-    LAT = 49.31665
-    LON = -4.08136
-    datetimeV='2019-12-08 10:31:00'
-    dateV = datetimeV.split(" ")[0]
-    hhMMss = datetimeV.split(" ")[1]
-    month = dateV.split("-")[1]
-    day = dateV.split("-")[2]
-    year = dateV.split("-")[0]
-    month = '0' + month if month.__len__() == 1 else month
-    day = '0' + day if day.__len__() == 1 else day
-    newDate = year + '-' + month + '-' + day
-    newDate1 = year + '-' + month + '-' + day + " " + ":".join(hhMMss.split(":")[0:2])
-    windSpeed ,relWindDir ,swellSWH, relSwelldir , wavesSWH , relWavesdDir ,combSWH , relCombWavesdDir =\
-        DANreader.mapWeatherData(
-                        data[i,1], newDate1, np.round(LAT), np.round(LON))'''
-
-    '''for i in range(0,len(data)):
-        lat = data[i,26]
-        lon = data[i, 27]
-        is_in_ocean = globe.is_ocean(lat,lon)
-        if is_in_ocean:
-            indices.append(i)
-
-    data = np.array([data[k] for k in indices])'''
-
-
-    ###########PENELOPE
-    '''sFile = './data/DANAOS/EUROPE/trackRepMappedPENELOPE.csv'
-    data = pd.read_csv(sFile, sep=',').values
-    print(data.shape)
-
-    data[:, 4] = data[:, 4] * 24
-
-    wd = data[:, 2]
-    for i in range(0, len(wd)):
-        if float(wd[i]) > 180:
-            wd[i] = float(wd[i]) - 180  # and  float(k[8])<20
-
-    wfS = data[:, 1]
-    for i in range(0, len(wfS)):
-        wfS[i] = ConvertMSToBeaufort(float(float(wfS[i])))
-    data[:, 1] = wfS
-
-    trData = np.array(np.append(data[:, 5].reshape(-1, 1), np.asmatrix([data[:, 2], data[:, 1], data[:, 0], data[:, 3], (data[:, 4])]).T,axis=1))  # .astype(float)#data[:,26],data[:,27]
-    trData = np.array([k for k in trData if
-                       float(k[0]) >= 0 and float(k[2]) >= 0 and float(k[4]) >= 0 and float(k[3]) > 5 and float(
-                           k[5]) > 0])'''
 
     ###################PENELOPE##################PENELOPE
 
     #stwDEITECH, vslHeadingTD , currentSpeedTD, currentDirTD = calculate_stw_TEIDETECH(data,129)
-
+    #data =data[:1000,:]
     vslDir = data[:, 1]
     #currentDir = data[:, 30]
     #currentSpeedKnots = data[:, 29]  # * 1.943
@@ -285,166 +273,52 @@ def main():
     #stwCurr, vslHeading = calculateSTW(sovg, vslDir , currentSpeedKnots, currentDir)
     #stwCurr = np.array(stwCurr)
 
-    #data =np.array([k for k in data if k[2]=='B' or k[2]=='L'])
 
-    wfS = data[:, 11].astype(float) / (1.944)
-    wsSen = []
-    for i in range(0, len(wfS)):
-        wsSen.append(gener.ConvertMSToBeaufort(float(float(wfS[i]))))
-    data[:, 11] = wsSen
-
-    #data[:, 11] = wfS
-
-    data[:, 15] = ((data[:, 15]) / 1000)* 1440
-
-    for i in range(0, len(data[:,10])):
-        if float(data[i,10]) < 0:
-            data[i,10] += 360
-
-    for i in range(0, len(data[:,10])):
-        if float(data[i,10]) > 180:
-            data[i,10] = float(data[i,10]) - 180  # and  float(k[8])<20
-
-    '''for i in range(0, len(data[:,1])):
-        if float(data[i,1]) > 180:
-            data[i,1] = float(data[i,1]) - 180'''
-
-    '''for i in range(0, len(vslHeadingTD)):
-        if float(vslHeadingTD[i]) > 180:
-            vslHeadingTD[i] = float(vslHeadingTD[i]) - 180'''
-
-    '''for i in range(0, len(currentDirTD)):
-        if float(currentDirTD[i]) > 180:
-            currentDirTD[i] = float(currentDirTD[i]) - 180'''
-
-    '''for i in range(0, len(data[:,30])):
-        if float(data[i,30]) > 180:
-            data[i,30] = float(data[i,30]) - 180'''
-    ##################################################
-    trData = np.array(np.append(data[:,8].reshape(-1,1), np.asmatrix([data[:,10], data[:,11], data[:,12], data[:,22],
-                                           data[:,1] ,data[:,26],data[:,27],data[:,15]]).T,axis=1)).astype(float)#data[:,26],data[:,27]
-    trData = np.nan_to_num(trData)
-    #trData = np.array(np.append(data[:, 0].reshape(-1, 1),
-
-                                #np.asmatrix([data[:, 1], data[:, 3], data[:, 4], data[:, 5]]).T,
-                                #axis=1)).astype(float)
-    #np.array(np.append(data[:,0].reshape(-1,1),np.asmatrix([data[:,1],data[:,2],data[:,3],data[:,4],data[:,7],data[:,8],data[:,9]]).T,axis=1)).astype(float)
-    #np.array(np.append(data[:,8].reshape(-1,1),np.asmatrix([data[:,10],data[:,11],data[:,12],data[:,20],data[:,21],data[:,15]]).T,axis=1)).astype(float)
-
-
-
-    trData = np.array([k for k in trData if  str(k[0])!='nan' and  float(k[2])>=0 and float(k[4])>=0 and (float(k[3])>=8 ) and float(k[8])>0  ]).astype(float)
-    #trData = np.nan_to_num(trData)
-    meanFoc = np.mean(trData[:, ], axis=0)
-    stdFoc = np.std(trData[:, ], axis=0)
-    trData = np.array(
-        [k for k in trData if (k >= (meanFoc - (3 * stdFoc))).all() and (k <= (meanFoc + (3 * stdFoc))).all()])
-
-
-
-
-    genprf = generateProfile.BaseProfileGenerator()
-    trDataPorts , trDataNoInPorts = genprf.findCloseToLandDataPoints(trData)
-    trData = trDataNoInPorts
-        #np.concatenate([trDataNoInPorts,trDataPorts])
-    #plRes.PLotDists(trData)
-    e=0
-    #X_train, X_test, y_train, y_test = train_test_split(trData[:, 0:5], trData[:, 5:], test_size=0.26, random_state=42)
-    #trData1 =  trData[27000:86000, :]
-    #trData2 =  trData[86000:145115,:] #HAMBURG - MUMBAI - #HAMBURG
-
-
-    #for i in range(0, len(trData)):
-        #trData[i] = np.mean(trData[i:i + 15], axis=0)
-
-    '''wd = np.array([k for k in trData])[:, 1]
-    for i in range(0, len(wd)):
-        if float(wd[i]) > 180:
-            wd[i] = float(wd[i]) - 180  # and  float(k[8])<20
-
-    trData[:, 1] = wd'''
-
-    '''wf = np.array([k for k in trData])[:, 2]
-    for i in range(0, len(wf)):
-        wf[i] = gener.ConvertMSToBeaufort(float(float(wf[i])))
-    trData[:, 2] = wf'''
-
-
-    #trData = trData[:44000]
-
-
-    for i in range(0, len(trData)):
-        trData[i] = np.mean(trData[i:i + 15], axis=0)
-
-    #trData = trData[:500]
-    X_train, X_test, y_train, y_test = train_test_split(trData[:, 0:8], trData[:, 8], test_size=0.1, random_state=42)
-
-
-    mapping.writeTrainTestData('DANAOS','HYUNDAI SMART',X_test,y_test,X_train,y_train)
+    #trData = preProcessData(data, 'legs')
+    #correctWS_Beaufort("EXPRESS ATHENS")
     #return
 
-    mapping.extractJSON_TestData(9229312,'HYUNDAI SMART',X_test, y_test,)
-    return
+    #trData = prelegs.extractDataFromLegs(data, "EXPRESS ATHENS")
+
+    #trData = prelegs.concatLegs_PrepareForTR( vessel, './correctedLegsForTR/'+vessel+'/')
+    trData = prelegs.returnCleanedDatasetForTR('./consProfileJSON_Neural/cleaned_raw_'+vessel+'.csv', 'raw')
+    #trData = prelegs.returnCleanedDatasetForTR('./consProfileJSON_Neural/cleaned_legs_' + vessel + '.csv', 'legs')
+    #trData = prelegs.returnCleanedDatasetForTR('./data/DANAOS/'+vessel + '/mappedData.csv', 'raw')
+    expansion = False
+    #trData = prelegs.returnCleanedDatasetForTR('./consProfileJSON_Neural/cleaned_raw_'+vessel+'.csv', 'raw')
+    #vessel = 'LEO_C'
+    #return
+    #scaler = MinMaxScaler()
+    #scaledTrData = scaler.fit_transform(trData)
+    #trData = scaledTrData
+
+    #return
+    #X_train, X_test, y_train, y_test = train_test_split(trData[:, 0:5], trData[:, 5], test_size=0.1, random_state=42)
+
+    x=0
+    #mapping.writeTrainTestData('DANAOS','HYUNDAI SMART',X_test,y_test,X_train,y_train)
+    #return
+
+    #mapping.extractJSON_TestData(9484948,'EXPRESS ATHENS',X_test, y_test,)
+    #return
 
     #test = np.append(X_test,y_test.reshape(-1,1),axis=1)
     #df = pd.DataFrame(test,)
     #df.to_csv('./testRaw.csv',index=False,)
 
-    '''train = np.append(X_train, y_train.reshape(-1, 1), axis=1)
-
-    for i in range(0, len(train)):
-        train[i] = np.mean(train[i:i + 15], axis=0)
-
-    for i in range(0, len(test)):
-        test[i] = np.mean(test[i:i + 15], axis=0)
-
-    X_train, X_test, y_train, y_test = train[:,0:5] , test[:,0:5] , train[:,5] ,test[:,5]'''
-
-    '''i = 8.75
-    maxSpeed = np.max(X_train[:,3])
-    sizesSpeed = []
-    AvgactualFoc = []
-    dt = X_train
-    speed=[]
-    #dt[:, :-1] = y_train
-    dt = np.hstack((dt, y_train.reshape(-1,1)))
-    while i <= maxSpeed:
-        # workbook._sheets[sheet].insert_rows(k+27)
-
-        speedArray = np.array([k for k in dt if float(k[3]) >= i and float(k[3]) <= i + 0.5])
-
-        if speedArray.__len__() > 1:
-            sizesSpeed.append(speedArray.__len__())
-            speed.append(i+0.25)
-            AvgActualFoc = np.mean(speedArray[:,5])
-        i += 0.5
-
-    d = {'Speed': speed, 'Size': sizesSpeed}
-    df  = pd.DataFrame(d)
-    df.to_csv('./data/DANAOS/EXPRESS ATHENS/SpeedTrain.csv',index=False)'''
 
 
+    X_train = trData[:,0:5]
+    y_train = trData[:,5]
+
+    X_test = trData[:5000,0:5]
+    y_test = trData[:5000, 5]
 
     subsetsX.append(X_train.astype(float))
     subsetsY.append(y_train.astype(float))
 
     unseenX = X_test.astype(float)
     unseenY = y_test.astype(float)
-
-    '''with open('./data/EXPRESS ATHENSCoorTrain.csv', mode='w') as data:
-            data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-            data_writer.writerow(['Latitude', 'Longitude'])
-            for i in range(0,1000):
-                data_writer.writerow(
-                    [y_train[i][1], y_train[i][2]])
-
-    with open('./data/EXPRESS ATHENSCoorTest.csv', mode='w') as data:
-            data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-            data_writer.writerow(['Latitude', 'Longitude'])
-            for i in range(0,1000):
-                data_writer.writerow(
-                    [y_test[i][1], y_test[i][2]])'''
-
 
 
     print(str(len(X_train)))
@@ -579,7 +453,8 @@ def main():
 
                 if modeler.__class__.__name__!= 'TriInterpolantModeler' and modeler.__class__.__name__!= 'PavlosInterpolation' :
                             #and modeler.__class__.__name__ != 'TensorFlow':
-                    modelMap, history,scores, output,genericModel = modeler.createModelsFor(partitionsX, partitionsY, partitionLabels,None,seriesX,targetY)
+                    modelMap, history, scores, output, genericModel = modeler.createModelsFor(partitionsX, partitionsY, partitionLabels
+                                                                                            ,None,seriesX,targetY, expansion ,vessel)
                             #, genericModel , partitionsXDC
                     #if modeler.__class__.__name__ != 'TensorFlow':
                         #modelMap = dict(zip(partitionLabels, modelMap))
@@ -621,7 +496,7 @@ def main():
                     _, meanError, sdError = eval.MeanAbsoluteErrorEvaluation.evaluateKerasNN1(
                             eval.MeanAbsoluteErrorEvaluation(), unseenX,
                             unseenY,
-                            modeler, output, None, None, partitionsX, scores,subsetInd,'test')
+                            modeler, output, None, None, partitionsX, scores,subsetInd,'test', vessel, False)
                 elif modeler.__class__.__name__ == 'TensorFlowW' or modeler.__class__.__name__ == 'TensorFlowW2':
                     _, meanError, sdError = eval.MeanAbsoluteErrorEvaluation.evaluateKerasNNAvg(
                         eval.MeanAbsoluteErrorEvaluation(), unseenX,
@@ -678,7 +553,11 @@ def main():
 def initParameters():
 
 
-    sFile = './data/DANAOS/HYUNDAI SMART/mappedData.csv'
+    sFile = './data/DANAOS/EXPRESS ATHENS/mappedDataNew.csv'
+    #sFile = './consProfileJSON_Neural/cleaned_EXPRESS ATHENS.csv'
+    #sFile = './consProfileJSON_Neural/cleaned_legs_EXPRESS ATHENS.csv'
+
+    #prelegs.concatLegs_PrepareForTR( './correctedLegsForTR/EXPRESS ATHENS/')
 
     # Get file name
     history = 20
@@ -704,7 +583,7 @@ def initParameters():
 
 # # ENTRY POINT
 if __name__ == "__main__":
-    main()
+    main('LEO C')
 #     v=np.round(np.random.rand(10, 3), 1)
 #     v=np.append(v,v[1:3], axis=0)
 #     r= np.dot(np.sum(v, axis=1), np.diag(np.random.rand(v.shape[0])))

@@ -261,6 +261,24 @@ class Mapping:
       df = pd.DataFrame(df).to_csv("./data/OCEAN_GOLD/PENELOPE/trackRepMapped.csv",index=False)
       return
 
+    def extractJSON_TestData_MODERNA(self,imo,vessel, data):
+
+        laddenJSON = '{}'
+        json_decoded = json.loads(laddenJSON)
+        json_decoded['ConsumptionProfile_Dataset'] = {"vessel_code": str(imo), 'vessel_name': vessel,
+                                                         "dateCreated": date.today().strftime("%d/%m/%Y"), "data": []}
+        for i in range(0, len(data)):
+               item = {"draft": np.round(data[i][8], 2), 'stw': np.round(data[i][12], 2),
+                       "windBFT": float(np.round(data[i][11], 2)),
+                       "windDir": np.round(data[i][10], 2), "swell": np.round(data[i][20], 2),
+                       "cons": np.round(data[i][15], 2)}
+               json_decoded['ConsumptionProfile_Dataset']["data"].append(item)
+               # json_decoded['ConsumptionProfile']['consProfile'].append(outerItem)
+
+        with open('./consProfileJSON/TestData_' + vessel + '_.json', 'w') as json_file:
+               json.dump(json_decoded, json_file)
+
+
     def extractJSON_TestData(self,imo,vessel,X_test,y_test):
 
         laddenJSON = '{}'

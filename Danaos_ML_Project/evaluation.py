@@ -184,14 +184,14 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
 
         return errors, np.mean(errors), np.std(lErrors)
 
-    def evaluateKerasNN1(self, unseenX, unseenY, modeler,output,xs,genericModel,partitionsX , scores,subsetInd,type):
+    def evaluateKerasNN1(self, unseenX, unseenY, modeler,output,xs,genericModel,partitionsX , scores,subsetInd,type, vessel, expansion):
         lErrors = []
         errorStwArr=[]
         errorFoc=[]
         foc=[]
         preds=[]
         candidatePoints=[]
-        n_steps = 6
+        n_steps = 15
         self.intercepts = []
         self.count = 0
 
@@ -201,28 +201,31 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
         ####################################
         ###########################################
         #############
+        if expansion == True:
+            XSplineGenvectorNews = []
+            for iCnt in range(np.shape(unseenX)[0]):
+                pPoint = unseenX[iCnt]
+                pPoint = pPoint.reshape(-1, unseenX.shape[1])
 
-        XSplineGenvectorNews = []
-        for iCnt in range(np.shape(unseenX)[0]):
-            pPoint = unseenX[iCnt]
-            pPoint = pPoint.reshape(-1, unseenX.shape[1])
+                # try:
+                trueVal = unseenY[iCnt]
 
-            # try:
-            trueVal = unseenY[iCnt]
+                self.intercepts = []
+                vector = self.extractFunctionsFromSplines('Gen', pPoint[0][0], pPoint[0][1], pPoint[0][2], pPoint[0][3], pPoint[0][4], None, vessel)#pPoint[0][5]
 
-            self.intercepts = []
-            vector = self.extractFunctionsFromSplines(pPoint[0][0], pPoint[0][1], pPoint[0][2], pPoint[0][3],pPoint[0][4],pPoint[0][5],'Gen')#pPoint[0][5]
+                # XSplineGenvectorNew = np.array(self.intercepts) * vector
+                # XSplineGenvectorNew = np.array([i + self.interceptsGen for i in XSplineGenvectorNew])
 
-            # XSplineGenvectorNew = np.array(self.intercepts) * vector
-            # XSplineGenvectorNew = np.array([i + self.interceptsGen for i in XSplineGenvectorNew])
+                # XSplineGenvectorNew = np.append(pPoint, vector)
+                # XSplineGenvectorNews.append(XSplineGenvectorNew)
+                #vectorNew = np.array([i + self.interceptsGen for i in vector])
+                splineVector = np.append(pPoint, vector)
+                #splineVector = pPoint
 
-            # XSplineGenvectorNew = np.append(pPoint, vector)
-            # XSplineGenvectorNews.append(XSplineGenvectorNew)
-            #vectorNew = np.array([i + self.interceptsGen for i in vector])
-            splineVector = np.append(pPoint, vector)
-            #splineVector = pPoint
-
-            XSplineGenvectorNews.append(np.append(splineVector, unseenY[iCnt]))
+                XSplineGenvectorNews.append(np.append(splineVector, unseenY[iCnt]))
+            raw_seq = np.array(XSplineGenvectorNews)
+        else:
+            raw_seq = np.array(np.append(unseenX, np.asmatrix([unseenY]).T, axis=1))
             # XSplineGenvectorNew = XSplineGenvectorNew.reshape(-1, XSplineGenvectorNew.shape[0])
 
         def split_sequence(sequence, n_steps):
@@ -241,13 +244,10 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
 
             # define input sequence
 
-        raw_seq = np.array(XSplineGenvectorNews)
-
-
-
 
         # split into samples
         unseenXlstm, unseenYlstm = split_sequence(raw_seq, n_steps)
+
         if type =='test' : print("Shape of unseen data: " +str(unseenXlstm.shape))
         else: print("Shape of seen data: " +str(unseenXlstm.shape))
         for iCnt in range(np.shape(unseenXlstm)[0]):
@@ -401,10 +401,10 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
 
         return errors, np.mean(errors), np.std(lErrors)
 
-    def extractFunctionsFromSplines(self,x0, x1, x2, x3, x4,x5, modelId):
+    def extractFunctionsFromSplines(self, modelId, x0, x1, x2, x3, x4, x5=None,vessel=None):
         piecewiseFunc = []
         self.count = self.count + 1
-        csvModels = ['./trainedModels/model_' + str(modelId) + '_.csv']
+        csvModels = ['./trainedModels/model_' + str(modelId) + '_'+vessel+'.csv']
         for csvM in csvModels:
             # id = csvM.split("_")[ 1 ]
             # piecewiseFunc = [ ]

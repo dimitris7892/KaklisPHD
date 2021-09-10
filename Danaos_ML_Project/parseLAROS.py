@@ -12,7 +12,7 @@ from geopandas import GeoDataFrame
 import seaborn as sns
 
 is_in_ocean = globe.is_ocean(23,54)
-vessel = 'HYUNDAI SMART'
+vessel = 'EXPRESS ATHENS'
 def main():
     pl = ParseLaros()
     #pl.extractRAWLarosData(4, vessel+'.csv',vessel+'_data.csv')
@@ -128,7 +128,9 @@ class ParseLaros:
                              data['STW'].values,
                              emptyColumn,
                              foc,
-                             data['SpeedOverGround'].values
+                             data['SpeedOverGround'].values,
+                             data['M/ERPM'].values,
+                             data['AP_ TOTALUSEDPOWER'].values
                          ]).T, axis=1)
         # data['DraftAfter'].values + data['DraftFore'].values) / 2
         # data = pd.read_csv(sFile, delimiter=';')
@@ -145,7 +147,7 @@ class ParseLaros:
             for i in range(0, len(trData)):
                 data_writer.writerow(
                     [trData[i][0], trData[i][1], trData[i][2], trData[i][3], trData[i][4], trData[i][5], trData[i][6],
-                     trData[i][7], trData[i][8], trData[i][9]])
+                     trData[i][7], trData[i][8], trData[i][9],trData[i][10], trData[i][11]])
 
     def extractRAWLarosData(self, siteId, fileName, destinationFile):
 

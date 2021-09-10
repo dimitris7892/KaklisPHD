@@ -226,6 +226,16 @@ class BaseSeriesReader:
 
         return angle
 
+    def convertCompassToDegrees(self,direction):
+
+
+        arr = ["N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE", "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW"]
+
+        index = arr.index(direction)
+
+        degrees = index * 22.5
+        return degrees
+
     def extractRawData(self, newDataSet, telegrams,companyTlgs,company,vessel):
 
         windDirs = []
@@ -256,10 +266,153 @@ class BaseSeriesReader:
         windSpeedsTlg=[]
         windDirsTlg = []
         timestamps=[]
-
         currentsSpeed=[]
         currentsDir = []
         speedsOvg=[]
+        rpms = []
+        powers = []
+
+        if company=='MODERNA':
+
+            for i in range(0,len(newDataSet)):
+
+                datetimeV = str(newDataSet[i, 0])
+
+                foc = newDataSet[i, 7]
+
+
+                lat = str(newDataSet[i, 1])
+
+                latDegMin = lat.split(" ")[0]
+                latDir = lat.split(" ")[1]
+                if latDegMin.__contains__('-'):
+                        latDeg = int(latDegMin.split("-")[0])
+                        latMin = int(latDegMin.split("-")[1])
+
+                else:
+                        latDeg = int(latDegMin.split(".")[0])
+                        latMin = int(latDegMin.split(".")[1])
+                latDegMin = float(str(latDeg) + '.' + str(latMin))
+
+
+                lon = str(newDataSet[i, 2])
+                lonDegMin = lon.split(" ")[0]
+                lonDir = lon.split(" ")[1]
+                if lonDegMin.__contains__('-'):
+                    lonDeg = int(lonDegMin.split("-")[0])
+                    lonMin = int(lonDegMin.split("-")[1])
+                else:
+                    lonDeg = int(lonDegMin.split(".")[0])
+                    lonMin = int(lonDegMin.split(".")[1])
+                lonDegMin = float(str(lonDeg) + '.' + str(lonMin))
+
+                vCourse = newDataSet[i, 4]
+                stw = newDataSet[i, 9]
+
+                power = newDataSet[i, 22]
+                #####FIND BEARING
+                #LAT, LON = self.convertLATLONfromDegMinSec(lat, lon, latDir, lonDir)
+                lats.append(-latDegMin if latDir=='S' else latDegMin)
+                lons.append(-lonDegMin if lonDir=='W' else lonDegMin)
+
+                #prevLAT, prevLON = self.convertLATLONfromDegMinSec(prev_lat, prev_lon, prev_latDir, prev_lonDir)
+                ###########################################
+
+                #bearing = self.CalculateVesselDirection(float(LON), float(LAT), float(prevLON), float(prevLAT))
+                bearing = vCourse
+
+                vCourses.append(vCourse)
+                draft = newDataSet[i,24]
+                swellSWH = newDataSet[i,22]
+                relSwelldir = newDataSet[i,23]
+                relSwelldir = self.convertCompassToDegrees(relSwelldir)
+
+                windSpeed = newDataSet[i, 16]
+                relWindDir = newDataSet[i, 17]
+                relWindDir = self.convertCompassToDegrees(relWindDir)
+
+                speedOvg = newDataSet[i,6]
+                wavesSWH = newDataSet[i, 20]
+                relWavesDir = newDataSet[i, 21]
+                relWavesdDir = self.convertCompassToDegrees(relWavesDir)
+                currentSpeed = newDataSet[i,18]
+                currentDir = newDataSet[i, 19]
+                try:
+                    currentDir = self.convertCompassToDegrees(currentDir)
+                except:
+                    currentDir = float(currentDir)
+                #windSpeed, relWindDir, swellSWH, relSwelldir, wavesSWH, relWavesdDir, combSWH, relCombWavesdDir = self.mapWeatherData(bearing, newDate1, np.round(LAT), np.round(LON))
+                #windSpeed = self.ConvertMSToBeaufort(windSpeed)
+                #combSWHs.append(combSWH)
+                #combWDs.append(relCombWavesdDir)
+
+                swellSWHs.append(swellSWH)
+                swellDs.append(relSwelldir)
+                ttimes.append(datetimeV)
+                waveHs.append(wavesSWH)
+                waveDs.append(relWavesdDir)
+
+
+                windDirs.append(relWindDir)
+                windSpeeds.append(windSpeed)
+                currentsDir.append(currentDir)
+                currentsSpeed.append(currentSpeed)
+                drafts.append(draft)
+
+
+                stws.append(stw)
+
+                focMTd = foc
+
+
+                trim = newDataSet[i,15]
+
+                steamHour = newDataSet[i,3]
+
+
+
+                focs.append(focMTd)
+
+                trims.append(trim)
+                steamHours.append(steamHour)
+                speedsOvg.append(speedOvg)
+            drafts = np.nan_to_num(drafts).reshape(-1)
+            # foc = np.array([k for k in newDataSet])[:,8].astype(float).reshape(-1)
+
+            ttimes = np.nan_to_num(ttimes).reshape(-1, 1)
+            combSWHs = np.nan_to_num(combSWHs).reshape(-1)
+            combWDs = np.nan_to_num(combWDs).reshape(-1)
+            swellSWHs = np.nan_to_num(swellSWHs).reshape(-1)
+            swellDs = np.nan_to_num(swellDs).reshape(-1)
+            waveHs = np.nan_to_num(waveHs).reshape(-1)
+            waveDs = np.nan_to_num(waveDs).reshape(-1)
+
+            stws = np.nan_to_num(stws).reshape(-1)
+            speedsOvg = np.nan_to_num(speedsOvg).reshape(-1)
+
+            focs = np.nan_to_num(focs).reshape(-1)
+
+            windSpeeds = np.nan_to_num(windSpeeds).reshape(-1)
+            windSpeedsWS = np.nan_to_num(windSpeedsWS).reshape(-1)
+            lats = np.nan_to_num(lats).reshape(-1)
+            lons = np.nan_to_num(lons).reshape(-1)
+            windDirs = np.nan_to_num(windDirs).reshape(-1)
+            blFlags = np.array(blFlags).reshape(-1)
+            drafts = np.nan_to_num(drafts).reshape(-1)
+            vCourses = np.nan_to_num(vCourses).reshape(-1)
+            tlgSpeeds = np.nan_to_num(tlgSpeeds).reshape(-1)
+            tlgsFocs = np.nan_to_num(tlgsFocs).reshape(-1)
+            steamHours = np.array(steamHours).reshape(-1)
+            trims = np.array(trims).reshape(-1)
+            firstColumn = np.array([0] * len(stws)).reshape(-1, 1)
+            otherColumns = np.array([0] * len(stws)).reshape(-1)
+            newDataSet = np.array(
+                np.append(ttimes, np.asmatrix(
+                    [vCourses, otherColumns, otherColumns, otherColumns, otherColumns, otherColumns, otherColumns, drafts,
+                     otherColumns, windDirs, windSpeeds, stws,
+                     otherColumns, otherColumns, focs, otherColumns, trims, otherColumns, steamHours, swellSWHs, swellDs,
+                     otherColumns, otherColumns, waveHs, waveDs,
+                     lats, lons, otherColumns, currentsSpeed, currentsDir, speedsOvg]).T, axis=1))
 
         if company=='MARMARAS':
             #sFile =  "./neural_data/marmaras_data.csv"
@@ -342,8 +495,6 @@ class BaseSeriesReader:
                 #bearing = self.CalculateVesselDirection(float(LON), float(LAT), float(prevLON), float(prevLAT))
                 bearing = vCourse
                 bearings.append(vCourse)
-
-
 
                 windSpeed, relWindDir, swellSWH, relSwelldir, wavesSWH, relWavesdDir, combSWH, relCombWavesdDir = self.mapWeatherData(bearing, newDate1, np.round(LAT), np.round(LON))
                 #windSpeed = self.ConvertMSToBeaufort(windSpeed)
@@ -664,15 +815,15 @@ class BaseSeriesReader:
 
         if company=='DANAOS':
 
-            ##map weather data from telegrams
-
-            ####
-            #len(newDataSet)
 
             telegrams = telegrams.values
             if len(telegrams)>0 and len(newDataSet)>0:
                 ########## extract
                 for i in range(0, len(newDataSet)):
+
+                    rpm = newDataSet[i,10]
+                    power = newDataSet[i, 11]
+
                     datetimeV = str(newDataSet[i, 0])
                     ttime = datetimeV
                     ttimes.append(ttime)
@@ -778,7 +929,8 @@ class BaseSeriesReader:
                     tlgSpeeds.append(tlgSpeed[0] if str(tlgSpeed).__len__() > 1 else tlgSpeed)
                     trims.append(trim)
                     steamHours.append(steamHour[0] if str(tlgSpeed).__len__() > 1 else steamHour)
-
+                    rpms.append(rpm)
+                    powers.append(power)
                     # filteredDTWs = [d for d in dateTimesW if month == str(d).split('/')[1] and day ==
                     # str(d).split('/')[0] and year[2:] == str(d).split('/')[2]]
             elif newDataSet == [] and telegrams != []:
@@ -848,6 +1000,8 @@ class BaseSeriesReader:
                     steamHours.append(steamHour)
                     stws.append(tlgSpeed)
                     blFlags.append(telegrams[i,2])
+
+
                 '''return np.array(np.append(telegrams[:, :16].reshape(-1, telegrams.shape[1] - 2),
                                           np.asmatrix([telegrams[:, 15].reshape(-1),
                                                        telegrams[:, 16].reshape(-1),
@@ -879,6 +1033,9 @@ class BaseSeriesReader:
 
             focs = np.nan_to_num(focs).reshape(-1)
 
+            rpms = np.nan_to_num(rpms).reshape(-1)
+            powers = np.nan_to_num(powers).reshape(-1)
+
             windSpeeds = np.nan_to_num(windSpeeds).reshape(-1)
             windSpeedsWS = np.nan_to_num(windSpeedsWS).reshape(-1)
             lats = np.nan_to_num(lats).reshape(-1)
@@ -898,13 +1055,13 @@ class BaseSeriesReader:
                     [vCourses, blFlags, otherColumns, otherColumns, otherColumns, otherColumns, otherColumns, drafts,
                      otherColumns, windDirs, windSpeeds, stws,
                      otherColumns, otherColumns, focs, tlgsFocs,trims,tlgSpeeds,steamHours ,swellSWHs , swellDs, combSWHs, combWDs ,  waveHs , waveDs ,
-                     lats , lons , windSpeedsWS , currentsSpeed , currentsDir , speedsOvg  ]).T, axis=1))
+                     lats , lons , windSpeedsWS , currentsSpeed , currentsDir , speedsOvg, rpms , powers  ]).T, axis=1))
 
 
         return newDataSet
 
 
-    def GenericParserForDataExtraction(self,systemType, company, vessel ,driver=None,server=None,sid=None,usr=None,password=None,rawData=None,telegrams=None,companyTelegrams=None,seperator=None ,fileType=None, granularity=None, fileName=None,
+    def GenericParserForDataExtraction(self, systemType, company, vessel ,driver=None,server=None,sid=None,usr=None,password=None,rawData=None,telegrams=None,companyTelegrams=None,seperator=None ,fileType=None, granularity=None, fileName=None,
                                        pathOfRawData=None,comparisonTest=None,dataTrain=None):
 
         boolTlg = telegrams
@@ -940,8 +1097,8 @@ class BaseSeriesReader:
 
                     telegrams = tlgs#.values
 
-                if Path('./data/' + company + '/' + vessel + '/mappedDataTrain.csv').is_file():
-                    data = pd.read_csv('./data/' + company +'/'+vessel +'/mappedDataTrain.csv')
+                if Path('./data/' + company + '/' + vessel + '/mappedData.csv').is_file():
+                    data = pd.read_csv('./data/' + company +'/'+vessel +'/mappedData.csv')
 
                     newDataSet = data.values
 
@@ -959,7 +1116,7 @@ class BaseSeriesReader:
                         shutil.copytree(pathOfRawData, path)
                     dataSet = []
                     for infile in  sorted(glob.glob(path+'*.csv')):
-                        data = pd.read_csv(infile, sep=',', decimal='.',skiprows=1)
+                        data = pd.read_csv(infile, sep=',', decimal='.',skiprows=1,)
                         dataSet.append(data.values)
                         print(str(infile))
                     #if len(dataSet)>1:
@@ -981,7 +1138,7 @@ class BaseSeriesReader:
             #
             #newDataSetBDD = self.extractRawData(dataSet, tlgsBDD, companyTelegrams, company, vessel)
             #newDataSetADD = self.extractRawData(dataSet, tlgsADD, companyTelegrams, company, vessel)
-            if Path('./data/' + company + '/' + vessel + '/mappedDataTrain.csv').is_file()==False:
+            if Path('./data/' + company + '/' + vessel + '/mappedData.csv').is_file()==False:
                 #dataSet=dataSet[:5,:]
                 newDataSet = self.extractRawData(dataSet, telegrams, companyTelegrams, company, vessel)
                 with open('./data/' + company +'/'+vessel+'/mappedData.csv', mode='w') as data:
@@ -991,34 +1148,33 @@ class BaseSeriesReader:
                             [newDataSet[i][0], newDataSet[i][1], newDataSet[i][2], 0, 0, 0, 0, 0, newDataSet[i][8], 0 ,newDataSet[i][10],
                              newDataSet[i][11], newDataSet[i][12], 0, 0, newDataSet[i][15], newDataSet[i][16],newDataSet[i][17],newDataSet[i][18],newDataSet[i][19],
                              newDataSet[i][20],newDataSet[i][21],newDataSet[i][22],newDataSet[i][23],newDataSet[i][24],newDataSet[i][25],
-                             newDataSet[i][26],newDataSet[i][27],newDataSet[i][28],newDataSet[i][29],newDataSet[i][30],newDataSet[i][31]])#newDataSet[i][31]])
+                             newDataSet[i][26],newDataSet[i][27],newDataSet[i][28],newDataSet[i][29],newDataSet[i][30],newDataSet[i][31],
+                             newDataSet[i][32],newDataSet[i][33]])#newDataSet[i][31]])
 
-            #if boolTlg==False and rawData==True:
-                #tlgDataset=[]
-            #if rawData == False and boolTlg == True:
-                #tlgDataset = telegrams
-            tlgDataset=telegrams.values
-            #genExcel = genProf.BaseProfileGenerator()
-            #genExcel.fillExcelProfCons(company,vessel, pathExcel,newDataSet,rawData,tlgDataset,newDataSetBDD,newDataSetADD)
-            #self.fillExcelProfCons(company,vessel, pathExcel,newDataSet,rawData,tlgDataset,newDataSetBDD,newDataSetADD)
-            #self.fillExcelProfCons(company, vessel, pathExcel, newDataSet, rawData, tlgDataset, [],[])
-            dsn = cx_Oracle.makedsn(
-                server,
-                '1521',
-                service_name=sid
-            )
-            connection = cx_Oracle.connect(
-                user=usr,
-                password=password,
-                dsn=dsn
-            )
-            cursor_myserver = connection.cursor()
-            cursor_myserver.execute('SELECT IMO_NO FROM VESSEL_DATA WHERE VESSEL_CODE =  (SELECT VESSEL_CODE FROM VESSEL_DATA WHERE VESSEL_NAME LIKE '"'%" + vessel + "%'"'  AND ROWNUM=1)  ')
-            # if cursor_myserver.fetchall().__len__() > 0:
-            for row in cursor_myserver.fetchall():
-                imo = row[0]
-                print(str(imo))
+            if company != 'MODERNA':
+                tlgDataset=telegrams.values
+            else:
+                tlgDataset=[]
+
+            if company!='MODERNA':
+                dsn = cx_Oracle.makedsn(
+                    server,
+                    '1521',
+                    service_name=sid
+                )
+                connection = cx_Oracle.connect(
+                    user=usr,
+                    password=password,
+                    dsn=dsn
+                )
+                cursor_myserver = connection.cursor()
+                cursor_myserver.execute('SELECT IMO_NO FROM VESSEL_DATA WHERE VESSEL_CODE =  (SELECT VESSEL_CODE FROM VESSEL_DATA WHERE VESSEL_NAME LIKE '"'%" + vessel + "%'"'  AND ROWNUM=1)  ')
+                # if cursor_myserver.fetchall().__len__() > 0:
+                for row in cursor_myserver.fetchall():
+                    imo = row[0]
+                    print(str(imo))
             #newDataSet[:5000]
+            else: imo = 9543886
 
             #speed, ws, wd, swh, foc, draft, timestamp
 
@@ -1094,9 +1250,21 @@ class BaseSeriesReader:
                     #vessel_code='T003'
                     if usr =='shipping':
                         cursor_myserver.execute(
-                            'SELECT  TELEGRAM_DATE , TELEGRAM_TYPE,BALAST_FLAG,LATITUDE_DEGREES , LATITUDE_SECONDS'
-                            ' ,LONGITUDE_DEGREES , LONGITUDE_SECONDS ,vessel_course,(DRAFT_AFT + DRAFT_FORE)/2 as DRAFT , ENGINE_RPM , WIND_DIRECTION'
-                            ' , WIND_FORCE  ,AVERAGE_SPEED ,hours_slc,minutes_slc, '
+                            'SELECT  TELEGRAM_DATE , '
+                            'TELEGRAM_TYPE,'
+                            'BALAST_FLAG,'
+                            'LATITUDE_DEGREES ,'
+                            'LATITUDE_SECONDS,'
+                            'LONGITUDE_DEGREES ,'
+                            'LONGITUDE_SECONDS ,'
+                            'vessel_course,'
+                            '(DRAFT_AFT + DRAFT_FORE)/2 as DRAFT ,'
+                            ' ENGINE_RPM , '
+                            'WIND_DIRECTION,'
+                            'WIND_FORCE  ,'
+                            'AVERAGE_SPEED ,'
+                            'hours_slc,'
+                            'minutes_slc, '
                             '(( NVL(ME_FO_CONS,0)))   as ME_CONS_24h ,'
                             ' (DRAFT_AFT-DRAFT_FORE) AS TRIM, '
                             'ROUND( ((( NVL(ME_FO_CONS,0))))  / decode(MILES_SLC,0,1,MILES_SLC),2) as ME_FOC_PER_MILE,'
@@ -1111,28 +1279,30 @@ class BaseSeriesReader:
                     else:
                         cursor_myserver.execute(
                             'SELECT  TELEGRAM_DATE,'
-                            'TELEGRAM_TYPE,'
-                            'BALAST_FLAG,'
+                            'TELEGRAM_TYPE ,'
+                            'BALAST_FLAG ,'
                             'LATITUDE_DEGREES ,'
-                            'LATITUDE_SECONDS,'
-                            'LONGITUDE_DEGREES , '
+                            'LATITUDE_SECONDS ,'
+                            'LONGITUDE_DEGREES ,'
                             'LONGITUDE_SECONDS ,'
-                            'vessel_course,'
-                            '(DRAFT_AFT + DRAFT_FORE)/2 as DRAFT,'
+                            'vessel_course ,'
+                            '(DRAFT_AFT + DRAFT_FORE)/2 as DRAFT ,'
                             'ENGINE_RPM ,'
                             'WIND_DIRECTION,'
                             'WIND_FORCE  ,'
                             'AVERAGE_SPEED ,'
-                            'hours_slc,'
-                            'minutes_slc, '
+                            'hours_slc ,'
+                            'minutes_slc ,'
                             '(( NVL(ME_HSFO_CONS,0)+ NVL(ME_LSFO_CONS,0)+ NVL(ME_HSDO_CONS,0 ) + NVL(ME_LSDO_CONS,0)))   as ME_CONS_24h,'
-                            ' (DRAFT_AFT-DRAFT_FORE) AS TRIM, '
+                            '(DRAFT_AFT-DRAFT_FORE) AS TRIM, '
                             'ROUND( ((( NVL(ME_FO_CONS,0))))  / decode(MILES_SLC,0,1,MILES_SLC),2) as ME_FOC_PER_MILE,'
                             'SEA_FORCE     ,'
                             'SEA_DIRECTION   ,'
                             'SWELL_FORCE      ,'
-                            'SWELL_DIRECTION  '
-                            'FROM TELEGRAMS where vessel_code = '"'" + vessel_code + "'" 'AND (telegram_type='"'N'"' or telegram_type='"'A'"' )')
+                            'SWELL_DIRECTION ,'
+                            'PORT_NAME '
+                            'FROM TELEGRAMS where vessel_code = '"'" + vessel_code + "'" 'AND (telegram_type='"'N'"' or telegram_type='"'A'"' or  telegram_type='"'D'"' )'
+                                                                                     'ORDER BY TELEGRAM_DATE')
                         #and    telegram_date < TO_DATE('"'04/10/2019'"', '"'DD/MM/YY'"') AND telegram_date >= TO_DATE('"'04/06/2019'"', '"'DD/MM/YY'"') ')
 
                     with open('./data/'+company+'/'+vessel+'/TELEGRAMS/'+vessel+'.csv', mode='w') as data:
@@ -1299,7 +1469,7 @@ class BaseSeriesReader:
                     print("TABLE " + vessel+'_TLG' + " ON DATABASE " + str.lower(company) + " EXISTS! ")
                 else:
                     cursor_myserver.execute(
-                        'CREATE TABLE [dbo].[' + vessel+'_TLG' + ']('
+                        'CREATE TABLE [dbo].[' + vessel+ '_TLG' + ']('
                         + '[id] [int] IDENTITY(1,1) NOT NULL,'
                         + '[vdate] [date] NOT NULL,'
                         + '[time_utc] [char](10) NULL,'

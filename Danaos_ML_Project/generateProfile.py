@@ -55,36 +55,18 @@ currModeler = keras.models.load_model('./DeployedModels/estimatorCl_Gen.h5')
 
 class BaseProfileGenerator:
 
-    def ConvertMSToBeaufort(self, ws):
-        wsB = 0
-        if ws >= 0 and ws < 0.2:
-            wsB = 0
-        elif ws >= 0.3 and ws < 1.5:
-            wsB = 1
-        elif ws >= 1.6 and ws < 3.3:
-            wsB = 2
-        elif ws >= 3.4 and ws < 5.4:
-            wsB = 3
-        elif ws >= 5.5 and ws < 7.9:
-            wsB = 4
 
-        elif ws >= 8 and ws < 10.7:
-            wsB = 5
-        elif ws >= 10.8 and ws < 13.8:
-            wsB = 6
-        elif ws >= 13.9 and ws < 17.1:
-            wsB = 7
-        elif ws >= 17.2 and ws < 20.7:
-            wsB = 8
-        elif ws >= 20.8 and ws < 24.4:
-            wsB = 9
-        elif ws >= 24.5 and ws < 28.4:
-            wsB = 10
-        elif ws >= 28.5 and ws < 32.6:
-            wsB = 11
-        elif ws >= 32.7:
-            wsB = 12
-        return wsB
+    def ConvertMSToBeaufort(self, ms):
+        _bft_threshold = (
+                0.3, 1.5, 3.4, 5.4, 7.9, 10.7, 13.8, 17.1, 20.7, 24.4, 28.4, 32.6)
+        "Convert wind from metres per second to Beaufort scale"
+        if ms is None:
+            return None
+        for bft in range(len(_bft_threshold)):
+            if ms < _bft_threshold[bft]:
+                return bft
+        return len(_bft_threshold)
+
 
     def calculateExcelStatistics(self, workbook, dtNew, velocities, draft, trim, velocitiesTlg, rawData, company,
                                  vessel, tlgDataset, period):
@@ -4813,8 +4795,8 @@ class BaseProfileGenerator:
         notIncOcean = []
         inOcean = []
         for i in range(0, len(trData)):
-            lat = trData[i, 6]
-            lon = trData[i, 7]
+            lat = trData[i, 5]
+            lon = trData[i, 6]
             is_in_ocean = globe.is_ocean(lat, lon)
             if is_in_ocean == False and trData[i,3]<9:
                 notIncOcean.append(trData[i])
@@ -6634,7 +6616,7 @@ class BaseProfileGenerator:
                                                 ladenDt7801[len(ladenDt7801) - 40] * (windForceWeights[w])), 2)
 
                             # cellValue = meanRawFoc
-                            '''lstmPoint =[]
+                            lstmPoint =[]
                             pPoint = np.array([meanDraftLadden,(wind[i]), (windF[w]+windF[w+1])/2,consVelocitiesJSON[vel], (swellH[s])])
 
                             #lstmPoint.append(np.array(
@@ -6688,7 +6670,7 @@ class BaseProfileGenerator:
                             #XSplineVectors = lstmPoint
                             XSplineVector = XSplineVectors.reshape(1,XSplineVectors.shape[0], XSplineVectors.shape[1])
                             cellValue = float(currModeler.predict(XSplineVector)[0][0])
-                            cellValue = np.round((cellValue),2)'''
+                            cellValue = np.round((cellValue),2)
                             item = {"windBFT": w + 1, "windDir": i + 1, "swell": s + 1, "cons": cellValue}
                             outerItem['cells'].append(item)
                             ladenDt7_8.append(cellValue)

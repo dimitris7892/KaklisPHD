@@ -1,0 +1,27 @@
+Mean ABS Error: 3.84+/-0.05 on test set of (6417, 11) observations of route ./correctedLegsForTR/HYUNDAI SMART/CARTAGENA_NEW YORK_leg.csv
+Mean Accuracy: 91.8% on test set of (6417, 11) observations of route ./correctedLegsForTR/HYUNDAI SMART/CARTAGENA_NEW YORK_leg.csv
+
+Mean ABS Error: 5.07+/-0.2 on test set of (361, 11) observations of route ./correctedLegsForTR/HYUNDAI SMART/KWANGYANG_YOSU_leg.csv
+Mean Accuracy: 86.63% on test set of (361, 11) observations of route ./correctedLegsForTR/HYUNDAI SMART/KWANGYANG_YOSU_leg.csv
+
+Mean ABS Error: 5.65+/-1.49 on test set of (2, 11) observations of route ./correctedLegsForTR/HYUNDAI SMART/NINGBO_YANGSHAN_leg.csv
+Mean Accuracy: 93.41% on test set of (2, 11) observations of route ./correctedLegsForTR/HYUNDAI SMART/NINGBO_YANGSHAN_leg.csv
+
+Mean ABS Error: 4.29+/-0.09 on test set of (449, 11) observations of route ./correctedLegsForTR/HYUNDAI SMART/PANAMA_CARTAGENA_leg.csv
+Mean Accuracy: 94.43% on test set of (449, 11) observations of route ./correctedLegsForTR/HYUNDAI SMART/PANAMA_CARTAGENA_leg.csv
+
+Mean ABS Error: 3.03+/-0.02 on test set of (21534, 11) observations of route ./correctedLegsForTR/HYUNDAI SMART/PUSAN_PANAMA_leg.csv
+Mean Accuracy: 95.89% on test set of (21534, 11) observations of route ./correctedLegsForTR/HYUNDAI SMART/PUSAN_PANAMA_leg.csv
+
+Mean ABS Error: 2.45+/-0.03 on test set of (1529, 11) observations of route ./correctedLegsForTR/HYUNDAI SMART/QINGDAO_NINGBO_leg.csv
+Mean Accuracy: 91.49% on test set of (1529, 11) observations of route ./correctedLegsForTR/HYUNDAI SMART/QINGDAO_NINGBO_leg.csv
+
+Mean ABS Error: 3.8+/-0.05 on test set of (1174, 11) observations of route ./correctedLegsForTR/HYUNDAI SMART/YANGSHAN_PUSAN_leg.csv
+Mean Accuracy: 87.14% on test set of (1174, 11) observations of route ./correctedLegsForTR/HYUNDAI SMART/YANGSHAN_PUSAN_leg.csv
+
+Mean ABS Error: 6.31+/-0.16 on test set of (689, 11) observations of route ./correctedLegsForTR/HYUNDAI SMART/YOSU_QINGDAO_leg.csv
+Mean Accuracy: 86.98% on test set of (689, 11) observations of route ./correctedLegsForTR/HYUNDAI SMART/YOSU_QINGDAO_leg.csv
+
+Mean ABS Error: 4.94+/-0.12 on test set of (1371, 11) observations of route ./correctedLegsForTR/HYUNDAI SMART/ZHOUSHAN_YOSU_leg.csv
+Mean Accuracy: 87.42% on test set of (1371, 11) observations of route ./correctedLegsForTR/HYUNDAI SMART/ZHOUSHAN_YOSU_leg.csv
+

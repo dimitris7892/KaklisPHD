@@ -1250,7 +1250,7 @@ class TensorFlowW1(BasePartitionModeler):
 
                     #estimator = baseline_model()
                     numOfNeurons = [ x for x in ClModels[ 'data' ] if x[ 'id' ] == idx ][ 0 ][ 'funcs' ]
-                    numOfNeurons = 2 if numOfNeurons -1 ==0 else numOfNeurons
+                    numOfNeurons = 2 if numOfNeurons -1 == 0 else numOfNeurons
                     estimatorCl = keras.models.Sequential()
 
                     #estimatorCl.add(keras.layers.Dense(numOfNeurons -1 ,input_shape=(2+numOfNeurons-1,)))
@@ -3895,7 +3895,7 @@ class TensorFlowWLSTM2(BasePartitionModeler):
                     estimatorCl.add(keras.layers.Dense(numOfNeurons - 1, ))
                     #estimatorCl.add(keras.layers.Dense(2))
                     estimatorCl.add(keras.layers.Dense(1, ))
-                    estimatorCl.compile(loss=keras.losses.mean_squared_error, optimizer=keras.optimizers.Adam(), )
+                    estimatorCl.compile( loss=keras.losses.mean_squared_error, optimizer=keras.optimizers.Adam(), )
                     #try:
                     partitionsX[idx] = np.reshape(partitionsX[idx], (partitionsX[idx].shape[0], partitionsX[idx].shape[1], 1))
                     estimatorCl.fit(np.array(partitionsX[idx]),np.array(partitionsY[idx]),epochs=100,verbose=0)#validation_split=0.33
