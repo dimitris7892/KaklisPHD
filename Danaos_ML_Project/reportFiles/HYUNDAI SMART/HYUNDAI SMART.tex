@@ -1,0 +1,282 @@
+
+            \documentclass[a4paper,12pt,dvipsnames]{scrartcl}
+            
+            
+            \usepackage[
+                pdftitle={},
+                pdfsubject={},
+                pdfauthor={},
+                pdfkeywords={},
+                pdftex=true,
+                colorlinks=true,
+                breaklinks=true,
+                citecolor=black,
+                linkcolor=black,
+                menucolor=black,
+                urlcolor=black
+            ]{hyperref}
+            
+            
+            \usepackage[utf8]{inputenc}
+            \usepackage[T1]{fontenc}   			
+            
+            
+            \usepackage{subfigure}
+            \usepackage[subfigure]{tocloft}
+            \usepackage{hyperref}
+            \usepackage{pdfcomment}
+            \usepackage{todonotes}
+            \usepackage{mdwlist} 
+            
+           
+            \usepackage[normalem]{ulem}
+            \usepackage[autostyle=true,english=american]{csquotes} 
+            \renewcommand{\mkblockquote}[4]{\enquote{#1}#2\ifterm{\relax}{#3}#4} 
+            \renewcommand{\mkcitation}[1]{#1} 
+            \usepackage{ragged2e} 
+            
+            \interfootnotelinepenalty10000  
+            
+            
+            \usepackage{setspace} % Package zur Veränderung des Zeilenabstandes innerhalb des Textes
+            \expandafter\def\expandafter\quotation\expandafter{\quote\singlespacing} % Einfacher Zeilenabstand in langen Zitaten
+            \onehalfspacing % 1,5-facher Zeilenabstand im gesamten Dokument
+            %\renewcommand{\baselinestretch}{1.5} % Zeilenabstand 
+            %\setlength{\footnotesep}{10.0pt} % Abstand zwischen Fußnote und Text 
+            
+            % Schusterjungen und Hurenkinder vermeiden
+            \clubpenalty = 10000
+            \widowpenalty = 10000 
+            \displaywidowpenalty = 10000
+            
+            % Mathe-Zeugs
+            \usepackage{amsmath,amsfonts,amssymb} % Package für mathematische Umgebungen (wie Formelgestaltungen, etc.) 
+            \usepackage{array} % Package zur Erzeugung von Matrizen (legt Position und Spalten fest)
+            \usepackage{textcomp} % Package zur Generierung zusätzlicher Symbolzeichen 
+            
+            % Farben
+            \usepackage{xcolor}
+            
+            % Grafiken
+            \usepackage{graphicx} % Grafiken einfügen
+            \usepackage{svg} % .svg's einbinden
+            \usepackage{float} % Package zur Festlegung der Position von Tabellen/Abbildungen
+            \usepackage[clockwise]{rotating} % Drehung von Bildern & Tabellen
+            
+            % TikZ
+            \usepackage{tikz}
+            \usepackage{subfigure}
+            
+            % Packages für das Erstellen von Tabellen
+            \usepackage{tabularx} % Package zur Gestaltung von Tabellen (Festlegen einer Tabellenbreite, automatischen Zeilenumbruch,...)
+            \usepackage{booktabs} % Das Hauptaugenmerk von booktabs liegt dabei auf der Gestaltung der horizontalen Linien innerhalb einer Tabelle.  
+            \usepackage{multirow} % Package, dass die Zusammenführung von Zellen in einer Tabelle ermöglicht
+            \newcolumntype{L}[1]{>{\RaggedRight\arraybackslash}p{#1}}
+            \newcolumntype{C}[1]{>{\Centering\arraybackslash}p{#1}}
+            \newcolumntype{R}[1]{>{\RaggedLeft\arraybackslash}p{#1}}
+            
+            % Bild- & Tabellenunterschriften & -quellen
+            \usepackage{caption}
+            \captionsetup{format=plain,justification=RaggedRight,singlelinecheck=false}
+            \usepackage{capt-of}
+            \usepackage[labelfont=bf]{caption}			
+            \captionsetup[table]{justification=centerlast}
+            
+            % Seitenformatierung
+            \usepackage[left= 3cm, right= 2cm, bottom= 2.5cm, top= 2.5cm]{geometry} % Seitenabstände
+            \usepackage{pdflscape} % Package zur Drehung von Seiten
+            
+            % Überschriften-Schriftgröße und -art ändern
+            \addtokomafont{disposition}{\rmfamily}
+            %\setkomafont{chapter}{\rmfamily\LARGE\bfseries} % Nicht notwendig für die Klasse 'scrartcl'
+            \setkomafont{section}{\rmfamily\Large\bfseries}
+            \setkomafont{subsection}{\rmfamily\large\bfseries}
+            
+            % Deutsches Datumsformat
+            \usepackage{datetime}
+            \newdateformat{myformat}{\THEDAY{. }\monthname[\THEMONTH] \THEYEAR}
+            
+            % Kopf- & Fußzeile
+            %\usepackage{fancyhdr}
+            %\pagestyle{fancy} % Muss vor \renewcommand{\chaptermark} stehen
+            %\fancyhf{} % Bereinigt Kopf- & Fußzeile 
+            %\fancyfoot[L]{} % Links
+            %\fancyfoot[C]{\thepage} % Mitte
+            %\fancyfoot[R]{} % Rechts
+            %\renewcommand{\chaptermark}[1]{
+            %	\markboth{Kapitel \thechapter{}: #1}{}}
+            %\renewcommand{\sectionmark}[1]{
+            %	\markright{\thesection{} #1}}
+            %\renewcommand{\headrulewidth}{0pt} % Dicke der Trennlinie oben
+            
+            % Tabellen- und Abbildungsverzeichnis nach der Lehrstuhlvorlage
+            \usepackage{tocloft}
+            \renewcommand{\cftfigpresnum}{Figure }
+            \renewcommand{\cfttabpresnum}{Table }
+            
+            \renewcommand{\cftfigaftersnum}{:}
+            \renewcommand{\cfttabaftersnum}{:}
+            
+            \setlength{\cftfignumwidth}{3cm}
+            \setlength{\cfttabnumwidth}{2,5cm}
+            
+            \setlength{\cftfigindent}{0,5cm}
+            \setlength{\cfttabindent}{0,5cm}
+            
+            %  Zitation
+            \usepackage[authordate,backend=biber, doi=false, isbn=false, footmarkoff]{biblatex-chicago}
+            % Hinzufügen der Literatur
+            %\addbibresource{Literatur.bib}
+            
+            
+            %%%%%%%% Beginn Dokumentinformationen %%%%%%%%
+            
+            %========== Dokumentbeginn ==========
+            \begin{document}
+            
+            
+            % Titelseite
+             \newgeometry{left = 2.6cm, right= 2.6cm, bottom= 2.5cm, top= 2.5cm} % Modifiziert die Seitenabstände für die Titelseite
+                            
+                            
+                            \begin{titlepage}
+                            \begin{center}
+
+                            \large{Danaos Management Consultants} \\
+
+                            \vspace{1cm}
+                            \noindent\rule{\textwidth}{1.5pt}
+                            \vspace{0.3cm}
+
+                            \LARGE{\textbf{ "HYUNDAI SMART" }} \\ % Bei Masterarbeit hier den Text austauschen
+
+                            \large{\today}\\
+
+                            \vspace{1cm}
+
+
+                            \vspace{0.3cm}
+                            \noindent\rule{\textwidth}{1.5pt}
+                            \vspace{1cm}
+                            \end{center}
+
+                            \noindent\normalsize{\textbf{Vessel Basic Info:}} \hfill \normalsize{} 
+
+                            \vspace{0.5cm}
+
+                            \noindent\normalsize{} \hfill \normalsize{} \\
+                            \normalsize{IMO: 9296959 )} \\
+                            \normalsize{Vessel Type: Container} \\
+                            \normalsize{Deadweight: } \\
+                            \normalsize{Beam: } \\
+                            \normalsize{Length:  }\\
+                            \normalsize{Min Draft: 6 m} \\
+                            \normalsize{Max Draft: 12 m} \\
+                            \normalsize{Max Speed: Sea speed Ballast . Laden } \\
+                            \normalsize{
+                            Dates of last two propeller cleanings:	 }\\
+                            \normalsize{Dates of last two dry docks:  }\\
+                            \normalsize{Voyages the vessel most commonly
+                            Performs: }
+
+
+
+                            \end{titlepage}
+
+                            \restoregeometry % Stellt Seitenabstände wieder her
+                           
+            
+            % Inhaltsverzeichnis
+            \newpage % Erzeugt eine neue Seite
+            \pagenumbering{Roman} % Umschalten auf römische Seitenzahlnummerierung 
+            \tableofcontents % Erzeugt Inhaltsverzeichnis
+            
+            % Abbildungsverzeichnis
+            \newpage % Erzeugt eine neue Seite
+            \renewcommand\listfigurename{List Of Figures}
+            \listoffigures
+            %\addcontentsline{toc}{section}{List Of Figures}
+            
+            % Tabellenverzeichnis
+            %\newpage % Erzeugt eine neue Seite
+            %\renewcommand\listtablename{List of Tables}
+            %\listoftables
+            %\addcontentsline{toc}{section}{List of Tables}
+            
+            
+            % Haupttext
+            \newpage % Erzeugt eine neue Seite
+            \pagenumbering{arabic} % Umschalten auf arabische Seitenzahlen
+            \setcounter{page}{1} % Setzt die Seitenzahl auf 1 zurück		
+            
+             \section{Summary Table}
+                
+                
+                begin{table}[H]
+                                \centering
+                                  \caption{Total Actual FOC \footnotesize{(MT/day)}, Total Predicted FOC \footnotesize{(MT/day)}, Percentage Difference(Actual / Predicted), Mean STW (knt), Mean Draft (m) for each leg}
+                                    \label{tab:mae}
+                                \resizebox{\textwidth}{!}{    
+                                     \begin{tabular}{|c|c|c|c|c|c|}
+                                    \hline
+                                \multirow{1}{*}{} & \multicolumn{5}{|c|}{\textbf{Info per leg}}
+                                
+                                \\
+                                
+                                \cline{2-6}
+                                    
+                                    
+                                  
+                                        \textbf{HYUNDAI SMART} 
+                                     &  \textbf{Total Act FOC} & \textbf{Total Pred FOC} 
+                                     
+                                     & \textbf{Perc Diff} & \textbf{Mean STW}
+                                     
+                                     &  \textbf{Mean Draft} \\
+                                     \hline 
+                                     
+                                     %(templateRowTable)s   
+                                    \hline
+                                    
+                                    \hline 
+                                    \textbf{Total Avg } &  \multicolumn{1}{|c|
+                                    }{\textbf{301026 (MT/day)}} &
+                                    \multicolumn{1}{|c|}{\textbf{302142 (MT/day)}}  & 
+                                    \multicolumn{1}{|c|}{\textbf{{0,76 \% }}} &
+                                    \multicolumn{1}{|c|}{\textbf{14.8 }(knt)} &
+                                    \multicolumn{1}{|c|}{\textbf{8.8 (m)}}\\ 
+                                    \hline 
+                                  
+                                    \end{tabular}
+                                }
+                                
+                                \end{table}
+                                \raggedbottom
+
+                            
+                
+                \newpage
+                
+                \section{FOC estimation models performance on legs}
+                
+                
+                
+            
+            % Literaturverzeichnis
+            \newpage % Erzeugt eine neue Seite
+            \addcontentsline{toc}{section}{Literaturverzeichnis}
+            \printbibliography[heading=bibliography]
+            
+            % Anhang
+            \newpage % Erzeugt eine neue Seite
+            \addcontentsline{toc}{section}{Anhang}
+            
+            
+            % Eidesstattliche Erklärung (nicht notwendig bei Seminar- und Hausarbeiten)
+            \newpage % Erzeugt eine neue Seite
+            
+            
+            
+            \end{document}
+            %========== Dokumentende ==========
+                    

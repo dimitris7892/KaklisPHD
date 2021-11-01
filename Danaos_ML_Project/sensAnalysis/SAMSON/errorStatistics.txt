@@ -1,0 +1,30 @@
+Mean ABS Error: 32.44+/-0.18 on test set of (7213, 10) observations of route ./correctedLegsForTR/SAMSON/CAPE TOWN_POINTE NOIRE_leg.csv
+Mean Accuracy: 31.91% on test set of (7213, 10) observations of route ./correctedLegsForTR/SAMSON/CAPE TOWN_POINTE NOIRE_leg.csv
+
+Mean ABS Error: 14.24+/-0.09 on test set of (5324, 10) observations of route ./correctedLegsForTR/SAMSON/NANSHA_TANJUNG PELEPAS_leg.csv
+Mean Accuracy: 55.5% on test set of (5324, 10) observations of route ./correctedLegsForTR/SAMSON/NANSHA_TANJUNG PELEPAS_leg.csv
+
+Mean ABS Error: 36.23+/-0.17 on test set of (2450, 10) observations of route ./correctedLegsForTR/SAMSON/NINGBO_NANSHA_leg.csv
+Mean Accuracy: 26.9% on test set of (2450, 10) observations of route ./correctedLegsForTR/SAMSON/NINGBO_NANSHA_leg.csv
+
+Mean ABS Error: 14.46+/-0.06 on test set of (2030, 10) observations of route ./correctedLegsForTR/SAMSON/PUSAN_TIANJIN_leg.csv
+Mean Accuracy: 50.21% on test set of (2030, 10) observations of route ./correctedLegsForTR/SAMSON/PUSAN_TIANJIN_leg.csv
+
+Mean ABS Error: 26.53+/-0.18 on test set of (4663, 10) observations of route ./correctedLegsForTR/SAMSON/QINGDAO_NANSHA_leg.csv
+Mean Accuracy: 38.73% on test set of (4663, 10) observations of route ./correctedLegsForTR/SAMSON/QINGDAO_NANSHA_leg.csv
+
+Mean ABS Error: 31.93+/-0.18 on test set of (3266, 10) observations of route ./correctedLegsForTR/SAMSON/SHANGHAI_NANSHA_leg.csv
+Mean Accuracy: 31.79% on test set of (3266, 10) observations of route ./correctedLegsForTR/SAMSON/SHANGHAI_NANSHA_leg.csv
+
+Mean ABS Error: 19.92+/-0.05 on test set of (23904, 10) observations of route ./correctedLegsForTR/SAMSON/SINGAPORE_CAPE TOWN_leg.csv
+Mean Accuracy: 47.31% on test set of (23904, 10) observations of route ./correctedLegsForTR/SAMSON/SINGAPORE_CAPE TOWN_leg.csv
+
+Mean ABS Error: 14.58+/-0.04 on test set of (8276, 10) observations of route ./correctedLegsForTR/SAMSON/SINGAPORE_SHANGHAI_leg.csv
+Mean Accuracy: 49.97% on test set of (8276, 10) observations of route ./correctedLegsForTR/SAMSON/SINGAPORE_SHANGHAI_leg.csv
+
+Mean ABS Error: nan+/-nan on test set of (0, 10) observations of route ./correctedLegsForTR/SAMSON/TANJUNG PELEPAS_SINGAPORE_leg.csv
+Mean Accuracy: nan% on test set of (0, 10) observations of route ./correctedLegsForTR/SAMSON/TANJUNG PELEPAS_SINGAPORE_leg.csv
+
+Mean ABS Error: 15.83+/-0.04 on test set of (1226, 10) observations of route ./correctedLegsForTR/SAMSON/TIANJIN_QINGDAO_leg.csv
+Mean Accuracy: 47.69% on test set of (1226, 10) observations of route ./correctedLegsForTR/SAMSON/TIANJIN_QINGDAO_leg.csv
+

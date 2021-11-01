@@ -12,10 +12,12 @@ from geopandas import GeoDataFrame
 import seaborn as sns
 
 is_in_ocean = globe.is_ocean(23,54)
-vessel = 'EXPRESS ATHENS'
+
+vessel = 'SAMSON'
 def main():
     pl = ParseLaros()
-    #pl.extractRAWLarosData(4, vessel+'.csv',vessel+'_data.csv')
+    #pl.extractRAWLarosData(6, vessel+'.csv',vessel+'_data.csv')
+
     pl.extractFeaturesFromLarosData(vessel+'_data.csv', vessel)
 
 
@@ -109,7 +111,9 @@ class ParseLaros:
 
         foc = data['M/EFOFlow'].values
         focDf = pd.DataFrame({'foc':foc})
-        #sns.displot(focDf, x="foc")
+
+        sns.displot(focDf, x="foc")
+
         #plt.show()
         # foc = (foc /1000) * 1440
         #draft = (data['AP_ FORWARDDRAFTLEVEL'].values + data['AP_ AFTERDRAFTLEVEL'].values)/2
@@ -122,15 +126,23 @@ class ParseLaros:
                          np.asmatrix([
                              vslHeading,
                              data['Latitude'].values,
+
+                             data['Longtitude'].values,
+                             data['WindAngle'].values,
+                             data['WindSpeed'].values,
+
                              data['Longitude'].values,
                              data['WindAngle'].values,
                              data['WindBF'].values,
+
                              data['STW'].values,
                              emptyColumn,
                              foc,
                              data['SpeedOverGround'].values,
                              data['M/ERPM'].values,
-                             data['AP_ TOTALUSEDPOWER'].values
+
+                             data['M/EPower_Kyma'].values
+
                          ]).T, axis=1)
         # data['DraftAfter'].values + data['DraftFore'].values) / 2
         # data = pd.read_csv(sFile, delimiter=';')
@@ -142,7 +154,9 @@ class ParseLaros:
         trData = data
         company = 'DANAOS'
 
-        with open('./data/' + company + '/' + vessel + '/' + vessel + '_.csv', mode='w') as data:
+
+        with open('./data/' + company + '/' + vessel + '/' + vessel +'.csv', mode='w') as data:
+
             data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
             for i in range(0, len(trData)):
                 data_writer.writerow(
@@ -155,11 +169,16 @@ class ParseLaros:
         dictionary = dictionary[dictionary["SITE_ID"] == siteId][["STATUS_PARAMETER_ID", "NAME"]]
         l = pd.read_csv("/home/dimitris/Desktop/" + fileName,
                         names=["id", "sensor", "ship_id", "txt", "bin", "value", "time"])[["sensor", "time", "value"]]
-        # time = l['time'].array.to_numpy()
-        # time.sort()
-        # print(time)
+
+        #time = l['time'].array.to_numpy()
+        #time.sort()
+        #time.tofile("./time.csv")
+
         l["ttime"] = list(
-            map(lambda x: datetime.strptime(x, '%Y-%m-%d %H:%M:%S.%f').replace(second=0, microsecond=0), l["time"]))
+            map(lambda x: datetime.strptime(x, '%Y-%m-%d %H:%M:%S.%f').replace(second=0, microsecond=0) if str(x).__contains__('.') else
+                datetime.strptime(x, '%Y-%m-%d %H:%M:%S'), l["time"]))
+
+
         l = l.drop(columns=["time"])
         ll = l.groupby(["ttime", "sensor"])["value"].mean().reset_index()
         vector = ll.pivot(index='ttime', columns='sensor', values='value').reset_index()

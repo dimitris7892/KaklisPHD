@@ -279,7 +279,9 @@ class Mapping:
                json.dump(json_decoded, json_file)
 
 
-    def extractJSON_TestData(self,imo,vessel,X_test,y_test):
+
+    def extractJSON_TestData(self,imo,vessel,X_test,y_test, path=None):
+
 
         laddenJSON = '{}'
         json_decoded = json.loads(laddenJSON)
@@ -287,13 +289,17 @@ class Mapping:
                                                          "dateCreated": date.today().strftime("%d/%m/%Y"), "data": []}
         for i in range(0, len(X_test)):
                item = {"draft": np.round(X_test[i][0], 2), 'stw': np.round(X_test[i][3], 2),
-                       "windBFT": float(np.round(X_test[i][2], 2)),
+
+                       "windMperS": float(np.round(X_test[i][2], 2)),
+
                        "windDir": np.round(X_test[i][1], 2), "swell": np.round(X_test[i][4], 2),
                        "cons": np.round(y_test[i], 2)}
                json_decoded['ConsumptionProfile_Dataset']["data"].append(item)
                # json_decoded['ConsumptionProfile']['consProfile'].append(outerItem)
 
-        with open('./consProfileJSON/TestData_' + vessel + '_.json', 'w') as json_file:
+
+        with open(path+'/TestData_' + vessel + '_.json', 'w') as json_file:
+
                json.dump(json_decoded, json_file)
 
 

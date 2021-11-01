@@ -1,0 +1,3 @@
+Mean ABS Error: 1.93+/-0.1 on test set of (23, 10) observations of route ./correctedLegsForTR/BIANCA/PORT KELANG_SINGAPORE_leg.csv
+Mean Accuracy: 92.86% on test set of (23, 10) observations of route ./correctedLegsForTR/BIANCA/PORT KELANG_SINGAPORE_leg.csv
+

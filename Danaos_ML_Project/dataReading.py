@@ -1,43 +1,16 @@
 import numpy as np
 import pandas as pd
-from scipy.stats import ks_2samp,chisquare,chi2_contingency
 import math
-#from pyproj import Proj, transform
 import pyearth as sp
 import matplotlib
-from sklearn.cluster import KMeans
-from matplotlib.lines import Line2D
-from decimal import Decimal
 import random
-from numpy import inf
-#from coordinates.converter import CoordinateConverter, WGS84, L_Est97
 import pyodbc
 import csv
-import locale
-#locale.setlocale(locale.LC_NUMERIC, "en_DK.UTF-8")
 import datetime
 import cx_Oracle
-from dateutil.rrule import rrule, DAILY, MINUTELY
-from sympy.solvers import solve
-from sympy import Symbol
-from pathlib import Path
-import itertools
-from sympy import cos, sin , tan , exp , sqrt , E
-from openpyxl import load_workbook
 import glob, os
 from pathlib import Path
-#from openpyxl.styles.colors import YELLOW
-from openpyxl.styles import Font
-from openpyxl.styles.borders import Border, Side
 import shutil
-from openpyxl.styles import PatternFill
-from openpyxl.styles import Alignment
-#import matplotlib.pyplot as plt
-#import seaborn as sns
-from openpyxl.drawing.image import Image
-from scipy.stats import ttest_ind_from_stats
-#import seaborn as sns
-#import  generateProfile as genProf
 import generateProfile as genProf
 import generateProfileOLD as genProfOLD
 
@@ -45,6 +18,17 @@ generateExcel = genProf.BaseProfileGenerator()
 generateExcelOLD = genProfOLD.BaseProfileGenerator()
 
 class BaseSeriesReader:
+
+    def ConvertMSToBeaufort(self, ms):
+        _bft_threshold = (
+                0.3, 1.5, 3.4, 5.4, 7.9, 10.7, 13.8, 17.1, 20.7, 24.4, 28.4, 32.6)
+        "Convert wind from metres per second to Beaufort scale"
+        if ms is None:
+            return None
+        for bft in range(len(_bft_threshold)):
+            if ms < _bft_threshold[bft]:
+                return bft
+        return len(_bft_threshold)
 
     def decomposeWindVector(self,vector):
 
@@ -1241,7 +1225,10 @@ class BaseSeriesReader:
                         )
                     cursor_myserver = connection.cursor()
 
-                    cursor_myserver.execute('SELECT VESSEL_CODE FROM VESSEL_DATA WHERE VESSEL_NAME =  '"'" + vessel + "'"' OR VESSEL_SHORT_NAME = '"'" + vessel + "'"'   ')
+
+                    cursor_myserver.execute('SELECT VESSEL_CODE FROM VESSEL_DATA WHERE VESSEL_NAME =  '"'" + vessel + "'"' OR VESSEL_SHORT_NAME = '"'" + vessel + "'"' OR VESSEL_NAME '
+                                                                                                            'LIKE '"'%" + vessel + "%'"'   ')
+
                     #if cursor_myserver.fetchall().__len__() > 0:
                     for row in cursor_myserver.fetchall():
                             vessel_code = row[0]
@@ -1274,7 +1261,9 @@ class BaseSeriesReader:
                             'SWELL_DIRECTION  ,'
                             'PORT_NAME   '
                             ''
-                            'FROM TELEGRAMS where vessel_code = '"'" + vessel_code + "'" 'AND (telegram_type='"'N'"' or telegram_type='"'A'"' or  telegram_type='"'D'"')')
+
+                            'FROM TELEGRAMS where vessel_code = '"'" + vessel_code + "'" )
+
 
                     else:
                         cursor_myserver.execute(
@@ -1974,7 +1963,6 @@ class BaseSeriesReader:
         LONDegrees = strLONbeforeComma[0:pos]
         LONmin = (str(strLONbeforeComma[pos:]  + strLONafterComma))
 
-
         LAT = float(LATDegrees+'.' + LATmin) #/ 60  # + float(LATsec) / 3600
         LON = float(LONDegrees +'.' +LONmin) #/ 60  # + float(LONsec) / 3600
         OrigLAT = LAT
@@ -1989,10 +1977,9 @@ class BaseSeriesReader:
         ### end lat , lon
         return LAT , LON
 
-    def mapWeatherData(self,Vcourse,dt ,LAT , LON  ):
+    def mapWeatherData(self, Vcourse, dt ,LAT , LON  ):
 
-        #LAT , LON  = self.convertLATLONfromDegMinSec(lat, lon ,latDir , lonDir)
-
+        ##lon AND lat SHOULD BE PROVIDED WITHOUT ROUNDING
         ##FORM WEATHER HISTORY DB NAME TO SEARCH
         date = str(dt).split(" ")[0]
         day = int(date.split("-")[2])
@@ -2007,54 +1994,88 @@ class BaseSeriesReader:
             h += 1
         else:
             h = h - h % 3
-
-        day = day + 1 if h == 24 else day
+        if (h == 24):
+            if (month == '02'):  # February
+                if (year % 4 == 0):
+                    if (day == 29):
+                        month = int(month) + 1
+                        day = 1
+                    else:
+                        day = day + 1
+                else:
+                    if (day == 28):
+                        month = int(month) + 1
+                        day = 1
+                    else:
+                        day = day + 1
+            elif (month == '04' or month == '06' or month == '09' or month == '11'):
+                if (day == 30):  # months with 30 days
+                    month = int(month) + 1
+                    day = 1
+                else:
+                    day = day + 1
+            else:
+                if (day == 31):  # months with 31 days
+                    month = int(month) + 1
+                    day = 1
+                else:
+                    day = day + 1
+        month = '0' + str(month) if str(month).__len__() == 1 else str(month)
         day = '0' + str(day) if str(day).__len__() == 1 else str(day)
         h = 0 if h == 24 else h
-
         h = '0' + str(h) if str(h).__len__() == 1 else str(h)
         dbDate = year + month + day + h
         #####END WEATHER HISTORY DB NAME
-
         connWEATHERHISTORY = pyodbc.connect('DRIVER={ODBC Driver 17 for SQL Server};SERVER= 10.2.4.84;'
                                             'DATABASE=WeatherProdData;'
                                             'UID=sa;'
                                             'PWD=sa1!')
-
         cursor = connWEATHERHISTORY.cursor()
-
-
         ##INITIALIZE WEATHER HISTORY DB FIELDS
-        # relWindSpeed = 0
+
         windSpeed = -1
         windDir = -1
         relWindDir = -1
         combSWH = -1
         combDir = -1
-        relCombWavesdDir=-1
+        relCombWavesdDir = -1
         swellSWH = -1
         swellDir = -1
-        relSwelldir=-1
-        wavesSWH =-1
-        wavesDir =-1
-        relWavesdDir=-1
-        currentSpeed=-1
-        currentDir=-1
-        relCurrentDir=-1
-
+        relSwelldir = -1
+        wavesSWH = -1
+        wavesDir = -1
+        relWavesdDir = -1
+        currentSpeed = -1
+        currentDir = -1
+        relCurrentDir = -1
 
         #####################
+        maxLon = int(round(LON, 0) + 1)
+        minLon = int(round(LON, 0) - 1)
+        maxLat = int(round(LAT, 0) + 1)
+        minLat = int(round(LAT, 0) - 1)
+
+        retStr = ' WHERE '
+        if (maxLon > 180):
+            retStr = retStr + '(lon >= ' + str(minLon) + ' OR lon <= ' + str(maxLon - 360) + ') AND lat >= ' + str(
+                minLat) + ' AND lat <= ' + str(maxLat) + ' '
+        elif (minLon < -180):
+            retStr = retStr + '(lon >= ' + str(360 + minLon) + ' OR lon <= ' + str(maxLon) + ') AND lat >= ' + str(
+                minLat) + ' AND lat <= ' + str(maxLat) + ' '
+        else:
+            retStr = retStr + '(lon >= ' + str(minLon) + ' AND lon <= ' + str(maxLon) + ' AND lat >= ' + str(
+                minLat) + ' AND lat <= ' + str(maxLat) + ') '
         if cursor.tables(table='d' + dbDate, tableType='TABLE').fetchone():
-
             # IF WEATHER HISTORY TABLE EXISTS => SELECT FIELDS FROM WEATHER HISTORY DB
-            cursor.execute(
-                'SELECT * FROM d' + dbDate + ' WHERE lat=' + str(LAT) + 'and lon=' + str(
-                    LON))
-
+            # cursor.execute('SELECT * FROM d' + dbDate + ' WHERE lat=' + str(LAT) + 'and lon=' + str(LON)) # Previous Version
+            cursor.execute('SELECT TOP 1 * FROM d' + dbDate
+                           + retStr
+                           + ' AND fractional = 0 '
+                           + ' ORDER BY sea DESC, (POWER((' + str(LON) + ' - lon), 2) + POWER((' + str(
+                LAT) + ' - lat), 2)) ASC')
             for row in cursor.fetchall():
                 windSpeed = float(row.windSpeed)
                 windDir = float(row.windDir)
-
                 combSWH = float(row.combSWH)
                 combDir = float(row.combDir)
                 swellSWH = float(row.swellSWH)
@@ -2064,15 +2085,16 @@ class BaseSeriesReader:
                 currentSpeed = float(row.currentSpeed)
                 currentDir = float(row.currentDir)
 
+                relWindDir = self.getRelativeDirectionWeatherVessel(Vcourse, windDir)
 
-                relWindDir = self.getRelativeDirectionWeatherVessel(Vcourse,windDir)
                 relSwelldir = self.getRelativeDirectionWeatherVessel(Vcourse, swellDir)
                 relWavesdDir = self.getRelativeDirectionWeatherVessel(Vcourse, wavesDir)
                 relCombWavesdDir = self.getRelativeDirectionWeatherVessel(Vcourse, combDir)
                 relCurrentDir = self.getRelativeDirectionWeatherVessel(Vcourse, currentDir)
 
 
-        return windSpeed ,relWindDir ,swellSWH, relSwelldir , wavesSWH , relWavesdDir ,combSWH , relCombWavesdDir , currentSpeed , relCurrentDir
+        return windSpeed, relWindDir, swellSWH, relSwelldir, wavesSWH, relWavesdDir, combSWH, relCombWavesdDir, currentSpeed, relCurrentDir
+
 
     def readExtractNewDataset(self, company,vessel,pathToexcel,separator=None):
         ####################

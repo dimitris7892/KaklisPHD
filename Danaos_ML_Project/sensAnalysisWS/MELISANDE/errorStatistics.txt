@@ -1,0 +1,3 @@
+Mean ABS Error: 5.34+/-0.08 on test set of (3019, 14) observations of route ./correctedLegsForTR/MELISANDE/SHEKOU_NINGBO_leg.csv
+Mean Accuracy: 83.72% on test set of (3019, 14) observations of route ./correctedLegsForTR/MELISANDE/SHEKOU_NINGBO_leg.csv
+

@@ -149,7 +149,9 @@ class extractLegs:
         return df
 
     def getRawData(self, company, vessel):
-        sFile = './data/'+company+'/'+vessel+'/mappedData_.csv'
+
+        sFile = './data/'+company+'/'+vessel+'/mappedData.csv'
+
         data = pd.read_csv(sFile,sep=',').values
 
         print(data.shape)
@@ -174,12 +176,17 @@ class extractLegs:
         ##Build training data array
 
         trData = np.array(np.append(data[:,8].reshape(-1,1),np.asmatrix([data[:,10],data[:,11],data[:,12],data[:,22],(data[:,15]),
-                                                                         data[:,26],data[:,27],data[:,0], data[:,1], data[:,28]]).T,axis=1))#.astype(float)#data[:,26],data[:,27]
+
+                                                                         data[:,26],data[:,27],data[:,0], data[:,1], data[:,28],
+                                                                         ]).T,axis=1))#.astype(float)#data[:,26],data[:,27]
+
         trData = np.array([k for k in trData if  str(k[0])!='nan' and float(k[2])>=0 and float(k[4])>=0 and float(k[3])>=0 and float(k[5])>0  ])
 
         trData[:,8] = list(map(lambda s: s[:-3], trData[:,8]))
         d = {'draft': trData[:,0], 'wd': trData[:,1],'ws':trData[:,2],'stw':trData[:,3],'swh':trData[:,4],
-             'foc':(trData[:,5]),'lat':trData[:,6],'lon':trData[:,7],'timestamp':trData[:,8], 'vslHeading': trData[:,9], 'wsWS':trData[:,10] }
+
+             'foc':(trData[:,5]),'lat':trData[:,6],'lon':trData[:,7],'timestamp':trData[:,8], 'vslHeading': trData[:,9], 'wsWS':trData[:,10],  }
+
         df  = pd.DataFrame(d)
         print(trData.shape)
         return df
@@ -273,7 +280,9 @@ class extractLegs:
             os.mkdir('./legs/'+vessel+'/')
         with open('./legs/'+vessel+'/'+portDeparure+'_'+portArrival+'_leg.csv', mode='w') as dataw:
             data_writer = csv.writer(dataw, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-            data_writer.writerow(['stw', 'draft', 'foc', 'ws', 'wd', 'swh', 'lat', 'lon', 'dt', 'vslHeading', 'wsWS'])
+
+            data_writer.writerow(['stw', 'draft', 'foc', 'ws', 'wd', 'swh', 'lat', 'lon', 'dt', 'vslHeading', 'wsWS', ])
+
             for i in range(0, len(rawDataLeg)):
                 dt = str(rawDataLeg[i][8])
                 # print(dt)
@@ -288,10 +297,15 @@ class extractLegs:
                 vslDir = rawDataLeg[i][9]
                 wsWS = rawDataLeg[i][10]
 
+                #inclX =rawDataLeg[i][11]
+
+
                 data_writer.writerow([stw, draft, foc, ws, wd, swh, lat, lon, dt, vslDir, wsWS])
 
                 item = {'datetime': dt, 'ws': ws, 'swh'
-                : swh, 'wd': wd, 'stw': stw, 'foc': foc, 'lat': lat, 'lon': lon, 'draft': draft, 'vslHeading':vslDir, 'wsWS': wsWS}
+
+                : swh, 'wd': wd, 'stw': stw, 'foc': foc, 'lat': lat, 'lon': lon, 'draft': draft, 'vslHeading':vslDir, 'wsWS': wsWS, }
+
                 leg['data'].append(item)
         return leg
 
@@ -434,6 +448,8 @@ class extractLegs:
         company = self.company
         vessel  = self.vessel
 
+        print(vessel)
+
         imo = self.extractImo()
 
         candidateDts, rawData, dfFilt, tlgs, telegrams = self.filterRawWithTlgDates(company, vessel, 50)
@@ -499,7 +515,9 @@ class extractLegs:
 def main():
 
     #randomFunction()
-    vessel = 'HYUNDAI SMART'
+
+    vessel = 'MELISANDE'
+
     company = 'DANAOS'
     conn = connDetails()
     conn.sid = 'OR12'

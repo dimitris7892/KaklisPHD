@@ -1,25 +1,18 @@
-import glob, os
 
+from sklearn.model_selection import  train_test_split
 import dataReading
 import dataReading as dRead
-#from Danaos_ML_Project import dataReading as DANdRead ##   NEWWWW
-import dataReading as DANdRead
 import dataPartitioning as dPart
 import dataModeling as dModel
 import Danaos_ML_Project.evaluation as eval
-import numpy as np
-import json
-import seaborn as sns
-import datetime
-from sklearn.cluster import KMeans
 from math import sqrt
 import pandas as pd
 from pylab import *
-import datetime
-import Danaos_ML_Project.plotResults as pltRes
 import Danaos_ML_Project.generateProfile as genProf
 import mappingData_functions as mpf
 import preProcessLegs as preLegs
+import pickle
+
 
 prelegs = preLegs.preProcessLegs(False)
 gener = genProf.BaseProfileGenerator()
@@ -145,6 +138,7 @@ def preProcessData(data, datatype):
 def main(vessel):
 
 
+
     #data = pd.read_csv('./data/MODERNA/SPETSES SPIRIT/mappedData.csv').values
     #mapping.extractJSON_TestData_MODERNA(9543886,'SPETSES SPIRIT',data)
     #return
@@ -235,11 +229,12 @@ def main(vessel):
     # 7 foc (MT/day)
 
 
-    DANreader = dRead.BaseSeriesReader()
-    '''DANreader.GenericParserForDataExtraction('LEMAG', 'MODERNA', 'SPETSES SPIRIT', driver='ORACLE',
+
+    '''DANreader = dRead.BaseSeriesReader()
+    DANreader.GenericParserForDataExtraction('LEMAG', 'DANAOS', vessel, driver='ORACLE',
                                              server='10.2.5.80',
                                              sid='OR12', usr='shipping', password='shipping',
-                                             rawData=False, telegrams=False, companyTelegrams=False,
+                                             rawData=True, telegrams=True, companyTelegrams=False,
                                              pathOfRawData='/home/dimitris/Desktop/SEEAMAG')'''
 
     '''DANreader.GenericParserForDataExtraction('LEMAG', 'DANAOS', 'LEO C', driver='ORACLE',
@@ -279,39 +274,40 @@ def main(vessel):
     #return
 
     #trData = prelegs.extractDataFromLegs(data, "EXPRESS ATHENS")
-
+    #return
     #trData = prelegs.concatLegs_PrepareForTR( vessel, './correctedLegsForTR/'+vessel+'/')
-    trData = prelegs.returnCleanedDatasetForTR('./consProfileJSON_Neural/cleaned_raw_'+vessel+'.csv', 'raw')
-    #trData = prelegs.returnCleanedDatasetForTR('./consProfileJSON_Neural/cleaned_legs_' + vessel + '.csv', 'legs')
-    #trData = prelegs.returnCleanedDatasetForTR('./data/DANAOS/'+vessel + '/mappedData.csv', 'raw')
-    expansion = False
-    #trData = prelegs.returnCleanedDatasetForTR('./consProfileJSON_Neural/cleaned_raw_'+vessel+'.csv', 'raw')
-    #vessel = 'LEO_C'
-    #return
-    #scaler = MinMaxScaler()
-    #scaledTrData = scaler.fit_transform(trData)
-    #trData = scaledTrData
+    with open('./attentionWeights.pkl', 'rb') as f:
+        attWeights = pickle.load(f)
 
-    #return
+    print(vessel)
+
+    prelegs.extractLegsFromRawCleanedData(vessel, 'raw')
+    return
+    trData = prelegs.returnCleanedDatasetForTR(vessel, './consProfileJSON_Neural/cleaned_raw_'+vessel+'.csv', 'raw')
+
+    lenTestData = int(len(trData) * 0.1)
+
+    lenTrainData = len(trData) - lenTestData
+
+    #trData = trData[:100]
+
+    expansion = False
+
     #X_train, X_test, y_train, y_test = train_test_split(trData[:, 0:5], trData[:, 5], test_size=0.1, random_state=42)
 
-    x=0
+
     #mapping.writeTrainTestData('DANAOS','HYUNDAI SMART',X_test,y_test,X_train,y_train)
     #return
 
     #mapping.extractJSON_TestData(9484948,'EXPRESS ATHENS',X_test, y_test,)
     #return
 
-    #test = np.append(X_test,y_test.reshape(-1,1),axis=1)
-    #df = pd.DataFrame(test,)
-    #df.to_csv('./testRaw.csv',index=False,)
 
+    X_train = trData[:, 0:5]
+    y_train = trData[:, 5]
 
+    X_test = trData[:5000, 0:5]
 
-    X_train = trData[:,0:5]
-    y_train = trData[:,5]
-
-    X_test = trData[:5000,0:5]
     y_test = trData[:5000, 5]
 
     subsetsX.append(X_train.astype(float))
@@ -454,7 +450,9 @@ def main(vessel):
                 if modeler.__class__.__name__!= 'TriInterpolantModeler' and modeler.__class__.__name__!= 'PavlosInterpolation' :
                             #and modeler.__class__.__name__ != 'TensorFlow':
                     modelMap, history, scores, output, genericModel = modeler.createModelsFor(partitionsX, partitionsY, partitionLabels
-                                                                                            ,None,seriesX,targetY, expansion ,vessel)
+
+                                                                                            ,None, seriesX, targetY, expansion, vessel, attWeights)
+
                             #, genericModel , partitionsXDC
                     #if modeler.__class__.__name__ != 'TensorFlow':
                         #modelMap = dict(zip(partitionLabels, modelMap))
@@ -583,7 +581,9 @@ def initParameters():
 
 # # ENTRY POINT
 if __name__ == "__main__":
-    main('LEO C')
+
+    main()
+
 #     v=np.round(np.random.rand(10, 3), 1)
 #     v=np.append(v,v[1:3], axis=0)
 #     r= np.dot(np.sum(v, axis=1), np.diag(np.random.rand(v.shape[0])))

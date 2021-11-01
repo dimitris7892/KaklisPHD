@@ -12,7 +12,7 @@ from tensorflow import keras
 import scipy as scipy
 from tensorflow.keras.callbacks import EarlyStopping
 from datetime import date, datetime
-
+import pickle
 
 class BasePartitionModeler:
     def createModelsFor(self,partitionsX, partitionsY, partition_labels):
@@ -727,7 +727,6 @@ class TensorFlowW(BasePartitionModeler):
             model = keras.models.Sequential()
 
 
-
             model.add(keras.layers.Dense(5+genModelKnots-1, input_shape=(5+genModelKnots-1,)))
             #model.add(keras.layers.LSTM(2+genModelKnots - 1, input_shape=(2+ genModelKnots - 1,1)))
 
@@ -739,6 +738,7 @@ class TensorFlowW(BasePartitionModeler):
             model.add(keras.layers.Dense(2, ))
 
             model.add(keras.layers.Dense(1,))
+
 
 
             #model.add(keras.layers.Activation('linear'))  # activation=custom_activation
@@ -1408,7 +1408,8 @@ class TensorFlowW1(BasePartitionModeler):
         else:
             return mBest, dBestFit
 
-    def createModelsFor(self, partitionsX, partitionsY, partition_labels, tri, X, Y, expansion, vessel, ):#,numOfLayers,numOfNeurons):
+    def createModelsFor(self, partitionsX, partitionsY, partition_labels, tri, X, Y, expansion, vessel, attWeights):#,numOfLayers,numOfNeurons):
+
 
         models = []
         # partitionsX=np.array(partitionsX[0])
@@ -1508,7 +1509,43 @@ class TensorFlowW1(BasePartitionModeler):
         neurons = 5 + genModelKnots -1 #if expansion == True else 5
         input_shape = 5 + genModelKnots -1 if expansion == True else 5
         print("Neurons length: "+str(neurons))
-        
+
+        def baseline_attention_model():
+            # create model
+            sequence_input = keras.layers.Input(shape=(n_steps, input_shape), dtype='float32')
+            lstm, state_h, state_c = keras.layers.LSTM(units=15,
+
+                                                       return_state=True,
+
+                                                 return_sequences=True)(sequence_input)
+            print(lstm)
+            print(state_h)
+            print(state_c)
+            #state_h = keras.layers.Reshape((1,1,10))(state_h)
+
+
+
+            context_vector = keras.layers.Attention()([lstm, state_h])
+
+            print(context_vector)
+
+            output = keras.layers.Dense(units=5,activation='softmax' )(context_vector)
+
+
+            attentionModel = tf.keras.Model(inputs=sequence_input, outputs=output)
+
+            #output = keras.layers.Dense(units=5)(output)
+            output = keras.layers.Dense(units=1)(output)
+
+            model = tf.keras.Model(inputs=sequence_input, outputs=output)
+            model.compile(loss=keras.losses.mean_squared_error,
+                          optimizer=keras.optimizers.Adam() )  # experimental_run_tf_function=False )
+            #print(model.summary())
+
+            return model
+
+        print("GenModelKnots: " +str(genModelKnots))
+
         def baseline_model():
             # create model
             model = keras.models.Sequential()
@@ -1520,15 +1557,20 @@ class TensorFlowW1(BasePartitionModeler):
             #activity_regularizer = tf.keras.regularizers.l2(0.01),
             #bias_regularizer = tf.keras.regularizers.l2(0.01)
 
-            model.add(keras.layers.LSTM(neurons, input_shape=(n_steps, input_shape  ,),))#return_sequences=True
-            #model.add(keras.layers.LSTM(5 , input_shape=(n_steps, 5 ,), ))
-            #model.add(keras.layers.LSTM( 5+genModelKnots-1, ))
+
+            model.add(keras.layers.LSTM(neurons, input_shape=(n_steps, input_shape  ,)))#
+            #model.add(keras.layers.Attention())
+            #model.add(keras.layers.LSTM(neurons - 5, ))
+            #model.add(keras.layers.LSTM( 15, ))
+
+
             #model.add(keras.layers.Dense(30,input_shape=( 5 ,)))
             #model.add(keras.layers.Dense(20))
             #model.add(keras.layers.Dense(genModelKnots - 3,activation='relu'))
             #model.add(keras.layers.Dropout(0.2))
 
-            model.add(keras.layers.Dense(genModelKnots -1, kernel_regularizer = tf.keras.regularizers.l1(0.01),
+            model.add(keras.layers.Dense( neurons - 5, kernel_regularizer = tf.keras.regularizers.l1(0.01),
+
             activity_regularizer = tf.keras.regularizers.l2(0.01),
             bias_regularizer = tf.keras.regularizers.l2(0.01) ),)
 
@@ -1537,7 +1579,8 @@ class TensorFlowW1(BasePartitionModeler):
             #bias_regularizer = tf.keras.regularizers.l2(0.01),
 
 
-            #model.add(keras.layers.Dense(5,))
+            model.add(keras.layers.Dense(5,))
+
             model.add(keras.layers.Dense(2, ))
 
 
@@ -1547,11 +1590,13 @@ class TensorFlowW1(BasePartitionModeler):
 
             model.add(keras.layers.Dense(1,))
 
+
             model.compile(loss=keras.losses.mean_squared_error,
                           optimizer=keras.optimizers.Adam() )  # experimental_run_tf_function=False )
             # print(model.summary())
 
             return model
+
 
 
         def extractFunctionsFromSplines(x0, x1 , x2 , x3 ,x4=None , x5=None ,x6=None,x7=None):
@@ -2008,13 +2053,21 @@ class TensorFlowW1(BasePartitionModeler):
 
             # define input sequence
 
+        # split into samples
+        Xlstm, Ylstm = split_sequence(raw_seq, n_steps)
 
-        #
+        #if attWeights != None:
+        #Xlstm = Xlstm * attWeights
+        estimator = baseline_model()
+        #estimator = baseline_model()
+
 
         # split into samples
         Xlstm, Ylstm = split_sequence(raw_seq, n_steps)
 
         estimator = baseline_model()
+
+
         dot_img_file = '/home/dimitris/Desktop/neural.png'
         tf.keras.utils.plot_model(estimator, to_file=dot_img_file, show_shapes=True)
         #weights0 = np.mean(XSplineVector, axis=0)
@@ -2024,7 +2077,78 @@ class TensorFlowW1(BasePartitionModeler):
             #np.append(weights0.reshape(-1, 1), np.asmatrix(weights0).reshape(-1, 1), axis=1).reshape(9, -1))
 
         #estimator.layers[0].set_weights([weights, np.array([0] * (genModelKnots - 1))])
+        print(estimator.summary())
 
+        print("Shape of training data: " + str(Xlstm.shape))
+        print("GENERAL MODEL  ")
+        es = EarlyStopping(monitor='val_loss', mode='min', verbose=0, restore_best_weights=True)
+        rlrop = ReduceLROnPlateau(monitor='val_loss', factor=0.1,)#restore_best_weights=True
+        #XSplineVectorGen = np.reshape(XSplineVectorGen, (XSplineVectorGen.shape[0],1, XSplineVectorGen.shape[1]))
+        #for i in range(0,10):
+        size = 3000
+        #X_test, Y_test = Xlstm[len(Xlstm)-size:len(Xlstm)] , Ylstm[len(Ylstm)-size:len(Ylstm)]
+        #Xlstm, Ylstm = Xlstm[:len(Xlstm) - size], Ylstm[:len(Ylstm) - size]
+        history = estimator.fit(Xlstm, Ylstm, epochs=100 ,verbose=0 ,validation_split=0.1,)#shuffle=False,batch_size=120)callbacks=[rlrop]
+        #XSplineVector =np.array(XSplineVector).reshape(-1,1)
+        #history = estimator.fit(XSplineVectorGen, Y, epochs=50, verbose=0, callbacks=[rlrop], validation_split=0.1,batch_size=len(XSplineVectorGen),shuffle=False)
+        #estimator.reset_states()
+        mse =  estimator.evaluate(Xlstm,Ylstm)
+
+        #if attWeights == None:
+        #attentionModel = tf.keras.Model(inputs = estimator.layers[0].input, outputs = estimator.layers[3].output)
+        #attentionWeights = attentionModel.predict(Xlstm)
+
+
+        #output = open('./attentionWeights.pkl', 'wb')
+        #pickle.dump(attentionWeights, output)
+
+        #return
+        #mse = estimator.evaluate(XSplineVectorGen, Y)
+        patiences = [10, 20, 30, 40]
+        lr_list, loss_list, acc_list, = list(), list(), list()
+        '''for i in range(len(patiences)):
+            rlrop = ReduceLROnPlateau(monitor='val_loss', factor=0.1, patience=patiences[i], min_delta=1E-7)
+            lrm = LearningRateMonitor()
+            history = estimator.fit(Xlstm, Ylstm, epochs=20, verbose=0,callbacks=[rlrop , lrm],validation_split=0.1,batch_size=12 ,shuffle=False)
+
+            lr, loss = lrm.lrates, history.history['loss']
+
+            lr_list.append(lr)
+            loss_list.append(loss)'''
+        #loss = str(np.round(math.sqrt(mse),2))
+        listLoss = history.history['loss']
+        listValoss = history.history['val_loss']
+
+        loss = str(np.round(math.sqrt(np.mean(listLoss))))
+        valLoss = str(np.round(math.sqrt(np.mean(listValoss))))
+
+        estimatorName = 'estimatorExpandedInput_' if expansion == True else 'estimator_'
+        estimator.save('./DeployedModels/'+estimatorName + vessel + ' ' + str(
+            datetime.now().strftime("%d_%m_%Y_%H:%M")) + ' '+loss+'_'+valLoss+'.h5')
+
+        print("(MAE) loss: "+ loss)
+        print("(MAE) val loss:  " +valLoss)
+
+        print(estimator.metrics_names)
+
+
+
+
+        maeListLoss  = [math.sqrt(x) for x in listLoss]
+        maeListValLoss = [math.sqrt(x) for x in listValoss]
+
+        plt.clf()
+        fig, ax1 = plt.subplots(figsize=(15, 10))
+        plt.plot(maeListLoss)
+        plt.plot(maeListValLoss)
+        plt.title('model train vs validation loss MAE: %.2f' % (np.round(math.sqrt(mse),2)) +", "+str(np.round(math.sqrt(np.mean(history.history['val_loss'])))) )
+        plt.ylabel('loss')
+        plt.xlabel('epoch')
+        plt.grid()
+        plt.ylim(float(loss) - 1 if loss <= valLoss else float(valLoss) - 1, 10)
+        plt.legend(['train', 'validation'], loc='upper right')
+        plt.savefig('./'+estimatorName + vessel +'.eps', format = 'eps')
+        #plt.show()
 
         print("Shape of training data: " + str(Xlstm.shape))
         print("GENERAL MODEL  ")
@@ -2085,6 +2209,7 @@ class TensorFlowW1(BasePartitionModeler):
         print(estimator.summary())
 
 
+
         #print('Accuracy: %.2f' % (accuracy * 100))
 
         plt.plot(history.history['loss'])
@@ -2095,6 +2220,7 @@ class TensorFlowW1(BasePartitionModeler):
         #plt.ylim(0,10)
         plt.legend(['train', 'validation'], loc='upper right')
         #plt.show()
+
 
 
         self.flagGen = True

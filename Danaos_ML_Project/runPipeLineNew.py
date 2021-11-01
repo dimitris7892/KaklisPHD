@@ -24,14 +24,9 @@ import runPipeline1 as runPipe
 
 # vessels = ['LEO C', 'HYUNDAI SMART', 'GENOA']
 #vessels = ['LEO C']
-vessels = ['GENOA']
+#vessels = ['GENOA']
+vessels = [ 'MELISANDE']
 
-extLegs = extrctLegs.extractLegs(   company = 'DANAOS',
-                                    vessel = 'GENOA',
-                                    sid = 'OR12',
-                                    server = '10.2.5.80',
-                                    password = 'shipping',
-                                    usr = 'shipping')
 
 prelegs = preLegs.preProcessLegs(knotsFlag = False)
 gener = genProf.BaseProfileGenerator()
@@ -41,17 +36,25 @@ dread = dataReading.BaseSeriesReader()
 
 def main():
 
-   #vessel = 'HYUNDAI SMART'
+   #vessel = 'BIANCA'
 
    #1 Task extract legs
-   #extLegs.runExtractionProcess()
-   #return
-   #2 Task preprocess Legs
-   #dataRaw = prelegs.concatLegs(vessel, './legs/'+vessel+'/')
-   #prelegs.extractDataFromLegs(dataRaw, './legs/'+vessel+'/', vessel, 'legs')
-
-   #3 Train Model in cleaned dataset
    for vessel in vessels:
+        extLegs = extrctLegs.extractLegs(company='DANAOS',
+                                        vessel= vessel,
+                                        sid='OR12',
+                                        server='10.2.5.80',
+                                        password='shipping',
+                                        usr='shipping')
+
+        #extLegs.runExtractionProcess()
+        #return
+        #2 Task preprocess Legs
+        #dataRaw = prelegs.concatLegs(vessel, './legs/'+vessel+'/')
+        #prelegs.extractDataFromLegs(dataRaw, './legs/'+vessel+'/', vessel, 'legs')
+
+        #3 Train Model in cleaned dataset
+
         runPipe.main(vessel)
 # # ENTRY POINT
 if __name__ == "__main__":

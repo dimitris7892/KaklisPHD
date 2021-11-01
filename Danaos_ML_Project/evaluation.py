@@ -24,6 +24,7 @@ from numpy import array
 from matplotlib import rc
 from tensorflow import keras
 import random
+import seaborn as sns
 
 
 class Evaluation:
@@ -184,6 +185,9 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
 
         return errors, np.mean(errors), np.std(lErrors)
 
+
+
+
     def evaluateKerasNN1(self, unseenX, unseenY, modeler,output,xs,genericModel,partitionsX , scores,subsetInd,type, vessel, expansion):
         lErrors = []
         errorStwArr=[]
@@ -250,6 +254,7 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
 
         if type =='test' : print("Shape of unseen data: " +str(unseenXlstm.shape))
         else: print("Shape of seen data: " +str(unseenXlstm.shape))
+
         for iCnt in range(np.shape(unseenXlstm)[0]):
             pPoint = unseenXlstm[iCnt]
             #pPoint =unseenX[iCnt]
@@ -298,13 +303,14 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
                     data_writer.writerow(
                         [errorStwArr[i][0], errorStwArr[i][1]])
         else:
-            with open('./TESTerrorPercFOC' + str(len(partitionsX)) + '_' + str(subsetInd) + '.csv', mode='w') as data:
+            with open('./evalModelFiles/TESTerrorPercFOC' +'_'+ vessel +'.csv', mode='w') as data:
                 data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
                 data_writer.writerow(
-                    ['FOC_pred','FOC_act' ,'PERC','stw','draft','trim','sensor_wind_speed','sensor_wind_dir','comb_waves_height','comb_waves_dir'])
+                    ['FOC_pred','FOC_act' ,'PERC','stw',])#'draft','trim','sensor_wind_speed','sensor_wind_dir','comb_waves_height','comb_waves_dir'
                 for i in range(0, len(errorFoc)):
                     data_writer.writerow(
                         [np.round(preds[i][0][0],2),np.round(foc[i],2), errorFoc[i][0][0],errorStwArr[i]])#,candidatePoints[i][0][0], candidatePoints[i][0][1],candidatePoints[i][0][2],candidatePoints[i][0][3],candidatePoints[i][0][4],candidatePoints[i][0][5],candidatePoints[i][0][6]])
+
 
             '''with open('./TESTerrorSTW' + str(len(partitionsX)) + '_' + str(subsetInd) + '.csv', mode='w') as data:
                 data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
@@ -314,22 +320,87 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
                     data_writer.writerow(
                         [errorStwArr[i][0], errorStwArr[i][1]])'''
 
-            dataErrorFoc = pd.read_csv('./TESTerrorPercFOC' + str(len(partitionsX)) + '_' + str(subsetInd) +'.csv', delimiter=',', skiprows=1)
+
+            dataErrorFoc = pd.read_csv('./evalModelFiles/TESTerrorPercFOC' +'_'+ vessel +'.csv', delimiter=',', skiprows=1)
             percError = dataErrorFoc.values
 
             meanPercError = np.mean(percError[:, 2])
             meanAcc = 100 - meanPercError
             print("Mean acc: " + str(np.round(meanAcc, 2)) + "% on test set of " + str(np.shape(unseenX)) + " observations")
             ####################################################################
-        #plt.scatter(errorStwArr[:,0],errorStwArr[:,1])
-        #plt.ylim(0, 2)
-        #plt.title('Model loss with ' + str(1) + ' cluster(s)')
-        #plt.ylabel('MAE')
-        #plt.xlabel('STW')
-        #plt.show()
-        x = 0
+            self.plotValidationAccuracy("DANAOS", vessel)
 
         return errors, np.mean(errors), np.std(lErrors)
+
+
+    def plotValidationAccuracy(self, company, vessel,):
+
+        dataErrorFoc = pd.read_csv('./evalModelFiles/TESTerrorPercFOC' +'_'+ vessel +'.csv',).values
+
+
+        meanPercError = np.mean(dataErrorFoc[:, 2])
+        meanAcc = np.round(100 - meanPercError, 2)
+
+        minSpeed = np.min(dataErrorFoc[:, 3])
+        i = np.floor(minSpeed)
+        maxSpeed = np.ceil(np.max(dataErrorFoc[:, 3]))
+        sizesSpeed = []
+        speed = []
+        avgActualFoc = []
+        stdActualFoc = []
+        avgPredFoc = []
+
+
+
+        while i <= maxSpeed:
+
+            speedArray = np.array([k for k in dataErrorFoc if float(k[3]) >= i - 0.25 and float(k[3]) <= i + 0.25])
+
+            if len(speedArray) > 0:
+                sizesSpeed.append(len(speedArray))
+                speed.append(i)
+
+                avgActualFoc.append(np.mean(speedArray[:, 1]) )
+                avgPredFoc.append(np.mean(speedArray[:, 0]) )
+                stdActualFoc.append(np.std(speedArray[:, 1]) )
+            i += 0.5
+
+
+        predDf_ = pd.DataFrame(
+            {'speed': speed, 'pred_Foc': avgPredFoc, 'actual_Foc': avgActualFoc, 'size': sizesSpeed})
+
+        predDf_['speed'] = [str(k) for k in predDf_['speed'].values]
+
+        fig, ax1 = plt.subplots(figsize=(15, 10))
+        color = 'tab:green'
+        # bar plot creation
+        y_pos = [0, 1, 5, 8, 9, 11, 12, 13, 14]
+        bars = predDf_['size']
+        # plt.xticks(y_pos, bars)
+
+        ax1 = sns.barplot(x='speed', y='size', data=predDf_, palette='summer', ci="sd")
+        ax1.set_xlabel('Speed Ranges (knots)', fontsize=16)
+        ax1.set_ylabel('Size', fontsize=16)
+        # change_width(ax1, 1.5)
+        ax1.tick_params(axis='x')
+        ax1.set_xticks(np.arange(9, 15, step=15.2))
+        ax1.grid()
+        # specify we want to share the same x-axis
+        ax2 = ax1.twinx()
+        color = 'tab:red'
+
+
+        ax2 = sns.lineplot(x='speed', y='pred_Foc', data=predDf_, sort=False, color='blue',
+                           label='neural Foc Acc: ' + str(meanAcc))
+        ax2 = sns.lineplot(x='speed', y='actual_Foc', data=predDf_, sort=False, color='red', label='actual Foc')
+        ax2.set_ylabel('Foc (MT/day)', fontsize=16)
+        ax2.grid()
+        plt.title("Accuracy on "+ "{:,.0f}".format((len(dataErrorFoc)))+" test data: ")
+
+        plt.legend()
+        plt.grid()
+        plt.savefig('./Figures/' + company + '/' + vessel + '/evalPerf '+vessel+'.eps', format='eps')
+
 
     def evaluateKerasNN(self, unseenX, unseenY, modeler,output,xs,genericModel,partitionsX , scores,subsetInd,type):
         lErrors = []

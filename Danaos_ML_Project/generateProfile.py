@@ -1652,6 +1652,8 @@ class BaseProfileGenerator:
         ##### END OF FOC TLG CELLS
 
         return json_decoded
+
+
     def fillExcelProfCons(self, company, vessel, pathToexcel, dataSet, rawData, tlgDataset, dataSetBDD, dataSetADD):
         ##FEATURE SET EXACT POSITION OF COLUMNS NEEDED IN ORDER TO PRODUCE EXCEL
         # 2nd place BALLAST FLAG
@@ -6170,7 +6172,9 @@ class BaseProfileGenerator:
 
             laden = np.array([k for k in dtNew if k[1] > minDraftWF and k[1] <= maxDraftWF]).astype(float)
 
+
             speedRange1 = np.array([k for k in laden if k[5] >= minSpeedWF and k[5] <= maxSpeedWF])
+
 
             try:
 
