@@ -17,13 +17,14 @@ import cx_Oracle
 class scriptForLAROSExtraction:
 
 
-    def __init__(self, company, vessel, server, sid, password, usr):
+    def __init__(self, company, vessel, server, sid, password, usr, siteid):
         self.server = server
         self.sid = sid
         self.password = password
         self.usr = usr
         self.vessel = vessel
         self.company = company
+        self.siteid = siteid
 
 
     def extractDataForSiteID(self, vessel, siteId):
@@ -45,7 +46,7 @@ class scriptForLAROSExtraction:
         cursor_myserver.execute(
             'select * from TBL_STATUS_PARAMETER_VAL where SITE_ID = '"'" + siteId + "'"' '
                 'and DATETIME >  TO_DATE( '"'2020-01-01 12:00'"', '"'YYYY-MM-DD HH:MI'"') and '
-                'DATETIME < TO_DATE('"'2020-01-30 12:00'"', '"'YYYY-MM-DD HH:MI'"') order by DATETIME')
+                'DATETIME < TO_DATE('"'2020-01-01 13:00'"', '"'YYYY-MM-DD HH:MI'"') order by DATETIME')
         # if cursor_myserver.fetchall().__len__() > 0:
 
         rows = cursor_myserver.fetchall()
@@ -56,9 +57,9 @@ class scriptForLAROSExtraction:
 
 
 def main():
-    ext = scriptForLAROSExtraction("DANAOS", "CMA CGM TANCREDI", "10.2.5.80", "or19", "laros", "laros",)
+    ext = scriptForLAROSExtraction("DANAOS", "CMA CGM TANCREDI", "10.2.5.80", "or19", "laros", "laros", )
 
-    ext.extractDataForSiteID(ext.vessel, '20')
+    ext.extractDataForSiteID(ext.vessel, ext.siteid)
 
 if __name__ == "__main__":
     main()
