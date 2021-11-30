@@ -1,0 +1,24 @@
+Mean ABS Error: 1.94+/-0.03 on test set of (2692, 14) observations of route ./correctedLegsForTR/NERVAL/ALIAGA_MARSAXLOKK_leg.csv
+Mean Accuracy: 95.69% on test set of (2692, 14) observations of route ./correctedLegsForTR/NERVAL/ALIAGA_MARSAXLOKK_leg.csv
+
+Mean ABS Error: 2.2+/-0.02 on test set of (7379, 14) observations of route ./correctedLegsForTR/NERVAL/ANTWERP_MARSAXLOKK_leg.csv
+Mean Accuracy: 96.57% on test set of (7379, 14) observations of route ./correctedLegsForTR/NERVAL/ANTWERP_MARSAXLOKK_leg.csv
+
+Mean ABS Error: 1.55+/-0.03 on test set of (1751, 14) observations of route ./correctedLegsForTR/NERVAL/MARSAXLOKK_PIRAEUS_leg.csv
+Mean Accuracy: 97.7% on test set of (1751, 14) observations of route ./correctedLegsForTR/NERVAL/MARSAXLOKK_PIRAEUS_leg.csv
+
+Mean ABS Error: 2.36+/-0.03 on test set of (2163, 14) observations of route ./correctedLegsForTR/NERVAL/MARSAXLOKK_VALENCIA_leg.csv
+Mean Accuracy: 97.56% on test set of (2163, 14) observations of route ./correctedLegsForTR/NERVAL/MARSAXLOKK_VALENCIA_leg.csv
+
+Mean ABS Error: 2.44+/-0.06 on test set of (1228, 14) observations of route ./correctedLegsForTR/NERVAL/PIRAEUS_GEBZE_leg.csv
+Mean Accuracy: 96.02% on test set of (1228, 14) observations of route ./correctedLegsForTR/NERVAL/PIRAEUS_GEBZE_leg.csv
+
+Mean ABS Error: 2.9+/-0.02 on test set of (4592, 14) observations of route ./correctedLegsForTR/NERVAL/TANGER MED_FELIXSTOWE_leg.csv
+Mean Accuracy: 93.96% on test set of (4592, 14) observations of route ./correctedLegsForTR/NERVAL/TANGER MED_FELIXSTOWE_leg.csv
+
+Mean ABS Error: 2.02+/-0.02 on test set of (6341, 14) observations of route ./correctedLegsForTR/NERVAL/VALENCIA_FELIXSTOWE_leg.csv
+Mean Accuracy: 96.02% on test set of (6341, 14) observations of route ./correctedLegsForTR/NERVAL/VALENCIA_FELIXSTOWE_leg.csv
+
+Mean ABS Error: 2.1+/-0.03 on test set of (1618, 14) observations of route ./correctedLegsForTR/NERVAL/VALENCIA_TANGER MED_leg.csv
+Mean Accuracy: 94.34% on test set of (1618, 14) observations of route ./correctedLegsForTR/NERVAL/VALENCIA_TANGER MED_leg.csv
+

@@ -25,7 +25,7 @@ import runPipeline1 as runPipe
 # vessels = ['LEO C', 'HYUNDAI SMART', 'GENOA']
 #vessels = ['LEO C']
 #vessels = ['GENOA']
-vessels = [ 'MELISANDE']
+vessels = [ 'NERVAL']
 
 
 prelegs = preLegs.preProcessLegs(knotsFlag = False)
@@ -54,8 +54,10 @@ def main():
         #prelegs.extractDataFromLegs(dataRaw, './legs/'+vessel+'/', vessel, 'legs')
 
         #3 Train Model in cleaned dataset
-
-        runPipe.main(vessel)
+        algs = ['NNW1']
+        cls = ['KM']
+        fromFile = True
+        runPipe.main(vessel, algs, cls, fromFile, None)
 # # ENTRY POINT
 if __name__ == "__main__":
     main()

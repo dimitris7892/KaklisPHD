@@ -11,13 +11,18 @@ import cx_Oracle
 import glob, os
 from pathlib import Path
 import shutil
-import generateProfile as genProf
-import generateProfileOLD as genProfOLD
+#import generateProfile as genProf
+import insertAtDB as inDB
+#import generateProfileOLD as genProfOLD
 
-generateExcel = genProf.BaseProfileGenerator()
-generateExcelOLD = genProfOLD.BaseProfileGenerator()
+#generateExcel = genProf.BaseProfileGenerator()
+#generateExcelOLD = genProfOLD.BaseProfileGenerator()
 
 class BaseSeriesReader:
+
+    def __init__(self):
+
+        pass
 
     def ConvertMSToBeaufort(self, ms):
         _bft_threshold = (
@@ -1203,7 +1208,9 @@ class BaseSeriesReader:
 
 
             #generateExcel.fillDetailedExcelProfCons(company, vessel, pathExcel, newDataSet, rawData, tlgDataset, [], [], imo)
-            generateExcelOLD.fillDetailedExcelProfCons(company, vessel, pathExcel, newDataSet, rawData, tlgDataset, [], [], imo)
+            #
+            #
+            # generateExcelOLD.fillDetailedExcelProfCons(company, vessel, pathExcel, newDataSet, rawData, tlgDataset, [], [], imo)
             return
 
         if systemType=='TELEGRAMS':
@@ -1223,13 +1230,24 @@ class BaseSeriesReader:
                             password=password,
                             dsn=dsn
                         )
+
                     cursor_myserver = connection.cursor()
 
+                    cursor_myserver.execute(
+                        'SELECT count(*) FROM VESSEL_DATA WHERE VESSEL_NAME =  '"'" + vessel + "'"' OR VESSEL_SHORT_NAME = '"'" + vessel + "'"' OR VESSEL_NAME '
+                                                                                                                                           'LIKE '"'%" + vessel + "%'"'   ')
+                    if len(cursor_myserver.fetchall()) > 1:
 
-                    cursor_myserver.execute('SELECT VESSEL_CODE FROM VESSEL_DATA WHERE VESSEL_NAME =  '"'" + vessel + "'"' OR VESSEL_SHORT_NAME = '"'" + vessel + "'"' OR VESSEL_NAME '
-                                                                                                            'LIKE '"'%" + vessel + "%'"'   ')
+                        cursor_myserver.execute(
+                            'SELECT VESSEL_CODE, ROWNUM FROM VESSEL_DATA WHERE VESSEL_NAME =  '"'" + vessel + "'"' OR VESSEL_SHORT_NAME = '"'" + vessel + "'"'   ')
+                    else:
 
-                    #if cursor_myserver.fetchall().__len__() > 0:
+                        cursor_myserver.execute(
+                            'SELECT VESSEL_CODE FROM VESSEL_DATA WHERE VESSEL_NAME =  '"'" + vessel + "'"' OR VESSEL_SHORT_NAME = '"'" + vessel + "'"' OR VESSEL_NAME '
+                                                                                                                                                  'LIKE '"'%" + vessel + "%'"' ')
+
+                    # if cursor_myserver.fetchall().__len__() > 0:
+
                     for row in cursor_myserver.fetchall():
                             vessel_code = row[0]
                             print(str(vessel_code))
@@ -1259,9 +1277,10 @@ class BaseSeriesReader:
                             'SEA_DIRECTION   ,'
                             'SWELL_FORCE      ,'
                             'SWELL_DIRECTION  ,'
-                            'PORT_NAME   '
+                            'PORT_NAME   ,'
+                            'CURRENT_SPEED, '
+                            'CURRENT_DIRECTION '
                             ''
-
                             'FROM TELEGRAMS where vessel_code = '"'" + vessel_code + "'" )
 
 
@@ -1289,7 +1308,10 @@ class BaseSeriesReader:
                             'SEA_DIRECTION   ,'
                             'SWELL_FORCE      ,'
                             'SWELL_DIRECTION ,'
-                            'PORT_NAME '
+                            'PORT_NAME, ' 
+                            'CURRENT_SPEED, '
+                            'CURRENT_DIRECTION '
+                            
                             'FROM TELEGRAMS where vessel_code = '"'" + vessel_code + "'" 'AND (telegram_type='"'N'"' or telegram_type='"'A'"' or  telegram_type='"'D'"' )'
                                                                                      'ORDER BY TELEGRAM_DATE')
                         #and    telegram_date < TO_DATE('"'04/10/2019'"', '"'DD/MM/YY'"') AND telegram_date >= TO_DATE('"'04/06/2019'"', '"'DD/MM/YY'"') ')
@@ -1298,7 +1320,7 @@ class BaseSeriesReader:
                         data_writer = csv.writer(data, delimiter=';', quotechar='"', quoting=csv.QUOTE_MINIMAL)
                         data_writer.writerow(['TELEGRAM_DATE','TELEGRAM_TYPE','BALAST_FLAG','LATITUDE_DEGREES','LATITUDE_SECONDS','LONGITUDE_DEGREES','LONGITUDE_SECONDS',
                                               'VESSEL_COURSE','DRAFT','ENGINE_RPM','WIND_DIRECTION','WIND_FORCE','AVERAGE_SPEED','HOURS_SLC','MINUTES_SLC','ME_CONS_24H','TRIM','ME_CONS_PER_MILE',
-                                              'WAVEH','WAVED','SWELLH','SWELLD','PORT_NAME'])
+                                              'WAVEH','WAVED','SWELLH','SWELLD','PORT_NAME', 'CURRENT_SPEED', 'CURRENT_DIRECTION'])
 
                         for row in cursor_myserver.fetchall():
                             telegram_date = str(row[0])
@@ -1325,6 +1347,8 @@ class BaseSeriesReader:
                             swellH = row[20]
                             swellD = row[21]
                             port = row[22]
+                            currSpeed = row[23]
+                            currDir = row[24]
                             #imo  = self.imo
 
                             try:
@@ -1332,7 +1356,7 @@ class BaseSeriesReader:
                             except:
                                 d=0
                             data_writer.writerow(
-                                [telegram_date, telegram_type, ballast_flag, lat_deg, lat_sec, lon_deg, lon_sec, vessel_course, draft,rpm, wd, wf, speed, h_slc,m_slc,foc,trim , focPerMile,waveH,waveD,swellH,swellD,port])
+                                [telegram_date, telegram_type, ballast_flag, lat_deg, lat_sec, lon_deg, lon_sec, vessel_course, draft,rpm, wd, wf, speed, h_slc,m_slc,foc,trim , focPerMile,waveH,waveD,swellH,swellD,port, currSpeed, currDir])
 
                     '''cursor_myserver.execute(
                         'SELECT  TELEGRAM_DATE , TELEGRAM_TYPE,BALAST_FLAG,LATITUDE_DEGREES , LATITUDE_SECONDS'
@@ -1532,21 +1556,7 @@ class BaseSeriesReader:
 
                     connection.commit()
 
-                ### INSERT TLG DATA ON TLG TABLE
-                vdate = 0
-                time_utc = 0
-                actl_speed = 0
-                avg_speed = 0
-                slip = 0
-                act_rpm = 0
-                sail_time = 0
-                weather_force = 0
-                weather_wind_tv = 0
-                sea_condition = 0
-                swell_dir = 0
-                swell_lvl = 0
-                current_lvl = 0
-                current_speed = 0
+
                 ##############################################
                 for i in range(0, len(tlg_dtNew)):
                     values = np.nan_to_num(np.array(tlg_dtNew[i, :15]))
@@ -1729,25 +1739,7 @@ class BaseSeriesReader:
                 SensorwindSpeed , SensorwindDir = self.DecomposeUV(truewindVector[0],truewindVector[1])#self.decomposeVector(truewindVector)
                 relSensorWindDir = self.getRelativeDirectionWeatherVessel( Vcourse,SensorwindDir )
 
-                ##convert cartesian coordinates to polar
-                #x = np.array([x[0] * np.cos(x[1]), x[0] * np.sin(x[1])])
 
-                #y = np.array([y[0] * np.cos(y[1]), y[0] * np.sin(y[1])])
-
-                #x_norm = np.sqrt(sum(x ** 2))
-
-                # Apply the formula as mentioned above
-                # for projecting a vector onto the orthogonal vector n
-                # find dot product using np.dot()
-                #proj_of_y_on_x = (np.dot(y, x) / x_norm ** 2) * x
-
-                # vecproj =  np.dot(y, x) / np.dot(y, y) * y
-                #relSensorWindSpeed = float(proj_of_y_on_x[0] + SensorwindSpeed)
-                #relSensorWindSpeed = float('{0:.3f}'.format(relSensorWindSpeed))
-                ##wind dir
-                #relSensorWindDir = SensorwindDir - Vcourse
-                #relSensorWindDir += 360 if relSensorWindDir < 0 else relSensorWindDir
-                ####END RELATIVES
 
                 #SELECT FIELDS FROM WEATHER HISTORY DB
                 connWEATHERHISTORY = pyodbc.connect('DRIVER={SQL Server};SERVER=WEATHERSERVER_DEV;'
@@ -1795,71 +1787,7 @@ class BaseSeriesReader:
                             wavesDir =  float(row.wavesDir)
                             relWaveDir = self.getRelativeDirectionWeatherVessel(Vcourse,wavesDir)
 
-                            ##FIND RELATIVES
-                            ##wind speed
-                            ##wind dir
-                            #x = np.array([Vstw * 0.514, Vcourse])
-                            #y = np.array([windSpeed, windDir])
-                            ##convert cartesian coordinates to polar
-                            #x = np.array([x[0] * np.cos(x[1]), x[0] * np.sin(x[1])])
 
-                            #y = np.array([y[0] * np.cos(y[1]), y[0] * np.sin(y[1])])
-
-                            #x_norm = np.sqrt(sum(x ** 2))
-
-                            # Apply the formula as mentioned above
-                            # for projecting a vector onto the orthogonal vector n
-                            # find dot product using np.dot()
-                            #proj_of_y_on_x = (np.dot(y, x) / x_norm ** 2) * x
-
-                            # vecproj =  np.dot(y, x) / np.dot(y, y) * y
-                            #relWindSpeed = float(proj_of_y_on_x[0] + windSpeed)
-                            #relWindSpeed = float('{0:.3f}'.format(relWindSpeed))
-
-                            ##wind dir
-                            #relWindDir = windDir - Vcourse
-                            #relWindDir += 360 if relWindDir < 0 else relWindDir
-
-                            ##currents speed
-                            ##currents dir
-                            #x = np.array([Vstw * 0.514, Vcourse])
-                            #y = np.array([currentsSpeed, currentsDir])
-                            ##convert cartesian coordinates to polar
-                            #x = np.array([x[0] * np.cos(x[1]), x[0] * np.sin(x[1])])
-
-                            #y = np.array([y[0] * np.cos(y[1]), y[0] * np.sin(y[1])])
-
-                            #x_norm = np.sqrt(sum(x ** 2))
-
-                            # Apply the formula as mentioned above
-                            # for projecting a vector onto the orthogonal vector n
-                            # find dot product using np.dot()
-                            #proj_of_y_on_x = (np.dot(y, x) / x_norm ** 2) * x
-
-                            # vecproj =  np.dot(y, x) / np.dot(y, y) * y
-                            #relCurrentsSpeed = float(proj_of_y_on_x[0] + currentsSpeed)
-                            #relCurrentsSpeed = float('{0:.3f}'.format(relCurrentsSpeed))
-
-                            #relCurrentsDir = currentsDir - Vcourse
-                            #relCurrentsDir += 360 if relCurrentsDir < 0 else relCurrentsDir
-                            #####################
-                            #relWindDir = windDir - Vcourse
-                            #relWindDir += 360 if relWindDir < 0 else relWindDir
-
-                            #####################
-                            #relWaveDir = wavesDir - Vcourse
-                            #relWaveDir += 360 if relWaveDir < 0 else relWaveDir
-                            #########
-                            #relCombDir = combDir - Vcourse
-                            #relCombDir += 360 if relCombDir < 0 else relCombDir
-                            #########
-                            #relSwellDir = swellDir - Vcourse
-                            #relSwellDir += 360 if relSwellDir < 0 else relSwellDir
-                            #test = '''ewrwerew
-                            #ewrwerwerwe
-                            #werwerwe{1}{2}{3}'''
-                            #test.format(1,2,3)
-                            #dt =  datetime.datetime.strptime(dt, '%Y-%m-%d %H:%M:s')
                             cursor_myserver.execute(
                                 "insert into [dbo].[" + vessel + "](lat, lon, t_stamp , course , stw , s_ovg , me_foc , rpm , power , draft , trim , at_port ,daysFromLastPropClean, "
                                 + " daysFromLastDryDock , sensor_wind_speed , sensor_wind_dir , wind_speed ,wind_dir ,curr_speed ,curr_dir ,comb_waves_height ,comb_waves_dir , swell_height ,swell_dir,"
@@ -1996,7 +1924,7 @@ class BaseSeriesReader:
             h = h - h % 3
         if (h == 24):
             if (month == '02'):  # February
-                if (year % 4 == 0):
+                if (int(year) % 4 == 0):
                     if (day == 29):
                         month = int(month) + 1
                         day = 1
@@ -2026,7 +1954,8 @@ class BaseSeriesReader:
         h = '0' + str(h) if str(h).__len__() == 1 else str(h)
         dbDate = year + month + day + h
         #####END WEATHER HISTORY DB NAME
-        connWEATHERHISTORY = pyodbc.connect('DRIVER={ODBC Driver 17 for SQL Server};SERVER= 10.2.4.84;'
+        #ODBC Driver 17 for SQL Server
+        connWEATHERHISTORY = pyodbc.connect('DRIVER={ODBC Driver 17 for SQL Server};SERVER=10.2.4.84;'
                                             'DATABASE=WeatherProdData;'
                                             'UID=sa;'
                                             'PWD=sa1!')

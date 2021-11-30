@@ -6,7 +6,7 @@ from sklearn.cluster import KMeans
 import csv
 import glob, os
 from tensorflow import keras
-import Danaos_ML_Project.dataModeling as dModel
+import dataModeling as dModel
 import dataReading as dRead
 import generateProfile as genProf
 import extractLegs as exctrLegs
@@ -16,26 +16,29 @@ import mappingData_functions as mpF
 from fastapi import APIRouter
 import requests
 import io
-import await
+#import await
 import generateReport as genRep
 import cx_Oracle
 import math
+import platform
 
 map = mpF.Mapping()
 gener = genProf.BaseProfileGenerator()
 dread = dRead.BaseSeriesReader()
 prelegs = preLegs.preProcessLegs(knotsFlag = False)
-
-
 router = APIRouter()
+
 class neuralDT:
 
     def __init__(self, vessel):
 
-        self.imo = self.extractIMO(vessel,  server = '10.2.5.80',
+        '''self.imo = self.extractIMO(vessel,  server = '10.2.5.80',
                                         sid = 'OR12',
                                         password = 'shipping',
-                                        usr = 'shipping')
+                                        usr = 'shipping')'''
+
+        self.imo = 0
+
         self.prelegs = preLegs.preProcessLegs(knotsFlag=False)
         self.dm = dModel.BasePartitionModeler()
         #self.currModeler = keras.models.load_model('./DeployedModels/estimator_HYUNDAI SMART 10_09_2021_17:25 2.1_5.0.h5')
@@ -48,11 +51,15 @@ class neuralDT:
         #self.currModeler = keras.models.load_model('./DeployedModels/estimator_GENOA 09_09_2021_21:49 1.51_3.0.h5')
         #self.currModeler = keras.models.load_model('./DeployedModels/estimator_GENOA 10_09_2021_12:00 1.58_2.0.h5')
         #self.currModeler = keras.models.load_model('./DeployedModels/estimator_GENOA 12_09_2021_15:11 1.64_3.0.h5')
+        for infile in sorted(glob.glob('./DeployedModels/*.h5')):
+           if infile.__contains__(vessel): self.currModeler = self.getCurrentModelForVessel(vessel); break;
 
-        model = keras.models.load_model('./DeployedModels/estimator_MELISANDE 04_10_2021_11:55 2.0_3.0.h5')
-        #model = self.getCurrentModelForVessel(vessel)
+        #model = keras.models.load_model('./DeployedModels/estimator_MELISANDE 04_10_2021_11:55 2.0_3.0.h5')
+
+    def initModel(self, vessel):
+
+        model = self.getCurrentModelForVessel(vessel)
         self.currModeler = model
-
 
     def extractIMO(self, vessel, server, sid, password, usr):
 
@@ -100,27 +107,27 @@ class neuralDT:
 
     def getCurrentModelForVessel(self, vessel):
 
+        os = platform.system()
         path = './DeployedModels/'
         dts = []
         dateNow = datetime.now()
         ind = 2 if str(vessel).__contains__(" ") else 1
+
         for infile in sorted(glob.glob(path + 'estimator_'+vessel+'*.h5')):
 
             dateTime = infile.split(" ")[ind]
-            dt = datetime.strptime(dateTime,"%d_%m_%Y_%H:%M")
+            dt = datetime.strptime(dateTime,"%d_%m_%Y_%H:%M") if os != "Windows" else datetime.strptime(dateTime,"%d_%m_%Y_%H_%M")
             dts.append(dt)
 
         closestDate = min(dts, key=lambda d: abs(d - dateNow))
 
-        formatClosestDate = closestDate.strftime("%d_%m_%Y_%H:%M")
+        formatClosestDate = closestDate.strftime("%d_%m_%Y_%H:%M") if os != "Windows" else  closestDate.strftime("%d_%m_%Y_%H_%M")
         file = path + 'estimator_'+vessel+' '+formatClosestDate+'*.h5'
         fileNew = glob.glob(file)[0]
         print("Model = "+fileNew)
         model = keras.models.load_model(fileNew)
 
         return model
-
-
 
     def evaluateNeuralOnPavlosJson(self, n_steps):
 
@@ -500,7 +507,7 @@ class neuralDT:
     def callNeuralDTOnRoutes(self, vessel, dataRoute, pathEval=None):
 
         pathToWebAPIForPavlosInterpolation = \
-            '/home/dimitris/Desktop/gitlabDanaos/danaos-deep-learning/ConsModelComparison/ConsModelComparison_webapi/bin/Debug/net5.0'
+            './danaos-deep-learning/ConsModelComparison/ConsModelComparison_webapi/bin/Debug/net5.0'
 
         #dataRoute = pd.read_csv(file).values
 
@@ -614,6 +621,12 @@ class neuralDT:
 
         rows = np.arange(0,len(data))
         dfNN = pd.DataFrame({'FOC_pred': focPreds, 'FOC_act': [0]* len(data), 'stw': data[:,3], 'draft': data[:, 0] }, index=rows)
+
+        if os.path.isdir('./APIresp/') == False:
+            os.mkdir('./APIresp/')
+        if os.path.isdir('./APIresp/' + vessel) == False:
+            os.mkdir('./APIresp/' + vessel)
+
         dfNN.to_csv('./APIresp/' + vessel + '/compareSpeeddetailed_interp_'+ str(reta)+'_'+ leg)
 
     def calcSTWFromCurrents(self, relCurDir, currentSpeed):
@@ -622,15 +635,27 @@ class neuralDT:
 
     def evaluateNeuralDTOnFiltered(self, vessel, n_steps, expansion, dataType, modelType, minSpeed ,pathEval=None, ):
 
+        #self.initModel(vessel)
         dataSet = []
         #minSpeed = 10
-        wsInd = 10
+        print("For modeltype {modelType} for ws {dataType}".format(modelType=modelType, dataType = dataType))
+        wsInd = 10 if dataType == 'ws' else 3
+        pathToFile = './sensAnalysis/' + vessel + '/' if dataType == 'raw' else './sensAnalysisWS/' + vessel + '/'
+        if dataType == 'raw':
+            if os.path.isdir(pathToFile) == False:
+                os.mkdir(pathToFile)
+        else:
+            if os.path.isdir(pathToFile) == False:
+                os.mkdir(pathToFile)
+
         pathToWebAPIForPavlosInterpolation = \
-            '/home/dimitris/Desktop/gitlabDanaos/danaos-deep-learning/ConsModelComparison/ConsModelComparison_webapi/bin/Debug/net5.0'
+            './danaos-deep-learning/ConsModelComparison/ConsModelComparison_webapi/bin/Debug/net5.0'
         path = './correctedLegsForTR/' + vessel + '/' if pathEval == None else pathEval
         #path = './legs/'+vessel+'/ANTWERP_LE HAVRE'
         if modelType =='nn':
-            with open('./sensAnalysisWS/' + vessel + '/errorStatistics.txt', 'w') as f:
+
+
+            with open(pathToFile+ '/errorStatistics.txt', 'w') as f:
 
                 for infile in sorted(glob.glob(path + '*.csv')):
 
@@ -638,20 +663,23 @@ class neuralDT:
                     lErrors = []
                     percErrors = []
                     focPreds = []
+                    infile = str(infile).replace("\\", '/')
                     leg = infile.split('/')[3]
                     #if leg != 'SUEZ_SINGAPORE_leg.csv': continue
                     #######################
                     #if os.path.isfile('./sensAnalysis/' + vessel + '/preds_' + vessel + '_' + leg): continue
                     #if leg != 'VUNG TAU_HONG KONG_leg.csv' and leg != 'NEW ORLEANS_TAMPA_leg.csv' and leg != 'TAMPA_MIAMI_leg.csv':
-                    if leg != 'SHEKOU_NINGBO_leg.csv':
-                        continue
+                    #if leg != 'SHEKOU_NINGBO_leg.csv':
+                        #continue
                     data = pd.read_csv(infile, sep=',', decimal='.', skiprows=0, ).values
                     #if data.shape[1] !=8: continue
                     print(str(infile)+ ' '+ str(len(data)))
 
                     data = data[data[:, 0] >= minSpeed]
+
+                    if len(data) <= 1000: continue
                     #data = data[data[:, 4].astype(float) > 0]
-                    if dataType == 'raw':
+                    if dataType == 'raw' or dataType=='ws':
                         for i in range(0, len(data[:, 4])):
                             if float(data[i, 4]) < 0:
                                 data[i, 4] += 360
@@ -676,7 +704,7 @@ class neuralDT:
 
 
                     stwCurr = np.array(stwCurr).astype(float)
-                    draft = data[:,1].astype(float).reshape(-1, 1)
+                    draft = data[:, 1].astype(float).reshape(-1, 1)
                     relWd = np.round(data[:, 4].astype(float), 2)
                     wsBft = data[:, wsInd].astype(int)
                     stw = data[:, 0].astype(float)
@@ -685,8 +713,13 @@ class neuralDT:
                     foc = data[:, 2].astype(float)
                     #dt = data[:, 6]
 
-                    rollWindowData = np.array(
-                        np.append(draft, np.asmatrix([relWd, wsBft, stwCurr, swh, foc]).T, axis=1)).astype(float)
+                    if dataType == 'ws':
+                        rollWindowData = np.array(
+                            np.append(draft, np.asmatrix([relWd, wsBft, stwCurr, swh, foc]).T, axis=1)).astype(float)
+                    else:
+                        rollWindowData = np.array(
+                            np.append(draft, np.asmatrix([relWd, wsBft, stw, swh, foc]).T, axis=1)).astype(float)
+
 
                     #rollWindowData = np.array(np.append(data[:, :6], np.asmatrix(data[:, 9]).T, axis=1))
 
@@ -712,7 +745,7 @@ class neuralDT:
                             draft = rollWindowData[i,0]
                             focActual = rollWindowData[i,5]#.astype(int)
                             ws = rollWindowData[i,2]
-                            wd = rollWindowData[i, 3]
+                            wd = rollWindowData[i, 1]
                             swh = rollWindowData[i, 4]
                             #vslHead = data[i,9]
 
@@ -785,7 +818,7 @@ class neuralDT:
                                     np.shape(data)) + " observations of route "  + str(infile)+'\n')
 
 
-                        with open('./sensAnalysisWS/'+vessel+'/preds_' +vessel +'_'+leg, mode='w') as wdata:
+                        with open(pathToFile+'/preds_' +vessel +'_'+leg, mode='w') as wdata:
                             data_writer = csv.writer(wdata, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
                             data_writer.writerow(
                                 [ 'stw','draft','ws','wd','swh','FOC_act','FOC_pred','dt'])
@@ -802,6 +835,8 @@ class neuralDT:
                             pass
 
         else:
+            if os.path.isdir('./sensAnalysisNeuralDT/' + vessel ) == False:
+                os.mkdir('./sensAnalysisNeuralDT/' + vessel )
 
             with open('./sensAnalysisNeuralDT/' + vessel + '/errorStatistics.txt', 'w') as f:
 
@@ -818,7 +853,7 @@ class neuralDT:
                     print(str(infile) + ' ' + str(len(data)))
 
                     data = data[data[:, 0] >= minSpeed]
-                    #if len(data) <= 4320: continue
+                    if len(data) <= 1000: continue
                     # data = data[data[:, 4].astype(float) > 0]
                     if dataType == 'raw':
                         for i in range(0, len(data[:, 4])):
@@ -893,7 +928,7 @@ class neuralDT:
     @router.get("/")
     def get_ModelComparison(self, interpolation, vessel):
             response = requests.get(
-                "https://localhost:5001/CompareConsumptionModels/?interpolation=" + interpolation +"&vessel=" + vessel,
+                "https://localhost:5002/CompareConsumptionModels/?interpolation=" + interpolation +"&vessel=" + vessel,
                 verify=False)
             return response.text
 
@@ -1013,7 +1048,7 @@ def load_data():
 def main():
 
 
-    vessels = ['MELISANDE']
+    vessels = ['NERVAL']
 
     for vessel in vessels:
 
@@ -1026,10 +1061,10 @@ def main():
         #ndt.evaluateNeuralDT('EXPRESS ATHENS', 1)
 
         #ndt.evaluateNeuralDTOnFiltered('HYUNDAI SMART', 15, False)
-        trData = prelegs.concatLegs(vessel, './correctedLegsForTR/' + vessel + '/', False)
+        #trData = prelegs.concatLegs(vessel, './correctedLegsForTR/' + vessel + '/', False)
         dataType = 'raw'
-        #trData = pd.read_csv('./consProfileJSON_Neural/cleaned_' + dataType + '_' + vessel + '.csv', delimiter=',').values
-        #ndt.fillDecisionTree(ndt.imo, vessel, trData, 15, 'exp', 12)
+        trData = pd.read_csv('./consProfileJSON_Neural/cleaned_' + dataType + '_' + vessel + '.csv', delimiter=',').values
+        #ndt.fillDecisionTree(ndt.imo, vessel, trData, 15, 'db', 12)
         ndt.evaluateNeuralDTOnFiltered(vessel, 15, False, 'raw', 'nn', 10)
         #ndt.evaluateNeuralDTOnFiltered(vessel, 15, False, 'raw', 'dt', 12)
     #return

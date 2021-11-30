@@ -196,6 +196,7 @@ class preProcessLegs:
 
 
         if dataType == 'raw':
+            #dataset = pd.read_csv('./consProfileJSON_Neural/cleaned_New_' + vessel + '.csv').values
             dataset = pd.read_csv('./consProfileJSON_Neural/cleaned_'+dataType+'_'+vessel+'.csv').values
         else:
             dataset = pd.read_csv('./consProfileJSON_Neural/cleaned_New_' + vessel + '.csv').values
@@ -205,7 +206,8 @@ class preProcessLegs:
         datasetLegs = []
         for infile in sorted(glob.glob(path + '*.csv')):
             print(str(infile))
-            leg = infile.split('/')[3]
+            infile = str(infile).replace("\\", '/')
+            leg = infile.split(r'/')[3]
             dataLegs = pd.read_csv(infile, sep=',', decimal='.', skiprows=0, ).values
             arrDate = dataLegs[len(dataLegs)-1,8]
             depDate = dataLegs[0,8]
@@ -213,7 +215,7 @@ class preProcessLegs:
             rawLeg = np.array([k for k in dataset if k[dtInd] >= depDate and k[dtInd] <= arrDate])
 
             if len(rawLeg)==0:
-                print("Not found instances for leg: " +leg + "Deleting from ./legs folder . . .")
+                print("Not found instances for leg: " +leg + " Deleting from ./legs folder . . .")
                 #os.remove(infile)
                 continue
             if dataType == 'raw':
@@ -229,7 +231,8 @@ class preProcessLegs:
                      'ws': rawLeg[:, wsIndSensor],
                      'wd': rawLeg[:, wdInd], 'swh': rawLeg[:, swhInd],})
 
-
+            if os.path.isdir('./correctedLegsForTR/' + vessel ) == False:
+                os.mkdir('./correctedLegsForTR/' + vessel )
             dfNew.to_csv('./correctedLegsForTR/' + vessel + '/' + leg, index=False)
     
     def correctData(self, vessel):
@@ -350,7 +353,7 @@ class preProcessLegs:
         print("Cleaned trData length: " + str(len(trDataCleaned)))
         return trDataCleaned
 
-    def returnCleanedDatasetForTR(self,vessel, path, dataType, minSpeed):
+    def returnCleanedDatasetForTR(self,vessel, path, dataType, minSpeed, fromFile, processedData = None):
 
         wsIndSensor = 11 if dataType == 'raw' else 3
         wsIndWS = 28 if dataType == 'raw' else 10
@@ -363,7 +366,7 @@ class preProcessLegs:
         dtInd = 0 if dataType == 'raw' else 8
         bearInd = 1 if dataType == 'raw' else 9
 
-        dataset = pd.read_csv(path).values
+        dataset = pd.read_csv(path).values if fromFile == True else processedData
         dataset = dataset[dataset[:, stwInd].astype(float) >= minSpeed]
         #dataset = dataset[dataset[:, stwInd].astype(float) <= 23]
 
@@ -464,12 +467,12 @@ class preProcessLegs:
                                 'stw': trData[:, 3], 'swh': trData[:, 4],
                                 'foc': trData[:, 5]})
 
-        sns.displot(dfTrSet, x='draft')
+        '''sns.displot(dfTrSet, x='draft')
         sns.displot(dfTrSet, x='wd')
         sns.displot(dfTrSet, x='ws')
         sns.displot(dfTrSet, x='stw')
         sns.displot(dfTrSet, x='swh')
-        sns.displot(dfTrSet, x='foc')
+        sns.displot(dfTrSet, x='foc')'''
 
         #plt.show()
 
@@ -893,7 +896,7 @@ class preProcessLegs:
         data, ind = self.replaceOutliers(data, data, 'ws', 'raw', True, False)
 
         print("Initial trData length: " +str(len(data)))
-        data = self.initialCleaning(data, 'raw', 1, minSpeed)
+        data = self.initialCleaning(data, 'raw', 2, minSpeed)
         #pd.DataFrame(data).to_csv('./data/DANAOS/' + vessel + '/mappedDataNew.csv', header=False,
                                   #index=False)
         #return
@@ -1057,6 +1060,7 @@ class preProcessLegs:
         #path = './correctedLegsForTR/' + vessel + '/'
         dataset = []
         for infile in sorted(glob.glob(path + '*.csv')):
+            infile = str(infile).replace("\\", '/')
             print(str(infile))
             leg = infile.split('/')[3]
             data = pd.read_csv(infile, sep=',', decimal='.', skiprows=0, ).values
@@ -1134,10 +1138,10 @@ class preProcessLegs:
 
         if type == 'foc':
             minStwTresh = 12
-            minFocTreshHold = np.round(np.mean(np.array([k for k in dataRaw if
+            '''minFocTreshHold = np.round(np.mean(np.array([k for k in dataRaw if
                                                          k[stwInd] >= minStwTresh - 0.25 and k[
                                                              stwInd] <= minStwTresh + 0.25 and
-                                                         k[wsIndSensor] >= 0 and k[wsIndSensor] <= 5.5])[:, focInd]))
+                                                         k[wsIndSensor] >= 0 and k[wsIndSensor] <= 5.5])[:, focInd]))'''
 
         if dataType == 'legs':
 
@@ -1274,6 +1278,7 @@ class preProcessLegs:
         dataset = []
         for infile in sorted(glob.glob(path + '*.csv')):
             print(str(infile))
+            infile = str(infile).replace("\\", '/')
             leg = infile.split('/')[3]
             data = pd.read_csv(infile, sep=',', decimal='.', skiprows=0, ).values
 
@@ -1302,9 +1307,10 @@ class preProcessLegs:
                 {'stw': data[:, 0], 'draft': data[:, 1], 'foc': data[:, 2],
                  'ws': data[:, 3],
                  'wd': data[:, 4], 'swh': data[:, 5], 'lat': data[:, 6], 'lon': data[:, 7], 'dt': data[:, 8],
-                 'vslHeading': data[:, 6], 'wsWS': data[:,7]})
+                 'vslHeading': data[:, 9], 'wsWS':data[:,10], 'sOvg': data[:,11], 'currSp': data[:,12], 'currDir': data[:,13]})
 
-
+            if os.path.isdir('./correctedLegsForTR/' + vessel ) == False:
+                os.mkdir('./correctedLegsForTR/' + vessel )
             dfNew.to_csv('./correctedLegsForTR/' + vessel + '/' + leg, index=False)
 
             '''dfNew = pd.DataFrame({'stw': np.round(data[:, 0],2), 'draft': np.round(data[:, 1],2), 'foc': np.round(data[:, 2],2), 'ws': np.round(data[:, 3],2),
@@ -1394,7 +1400,7 @@ class preProcessLegs:
 
 def main():
 
-  vessel = 'MELISANDE'
+  vessel = 'NERVAL'
   #vessel = 'EXPRESS ATHENS'
 
   preLegs = preProcessLegs(knotsFlag=False)
@@ -1406,11 +1412,11 @@ def main():
   #preLegs.correctData(vessel)
   #return
   #preLegs.extractLegsToJsonWithRollWindow(vessel, 9229312)
-  minSpeed = 2 ## speed to cut off and below
+  minSpeed = 12 ## speed to cut off and below
 
   dataRaw = pd.read_csv('./data/DANAOS/'+vessel+'/mappedData.csv', delimiter=',').values
   #dataRaw = dataRaw[np.isnan(dataRaw[:,8].astype(float))]
-  #preLegs.correctData(vessel)
+  preLegs.correctData(vessel)
   preLegs.buildTableWithMeanValues(dataRaw, vessel, minSpeed)
   #return
 
@@ -1420,7 +1426,7 @@ def main():
   #dataRaw = pd.read_csv('./consProfileJSON_Neural/cleaned_' + dataType + '_' + vessel + '.csv', delimiter=',').values
   #preLegs.cleanDataset(dataRaw, "raw", vessel, minSpeed)
 
-  trData = preLegs.returnCleanedDatasetForTR(vessel, './consProfileJSON_Neural/cleaned_raw_' + vessel + '.csv', 'raw', minSpeed)
+  trData = preLegs.returnCleanedDatasetForTR(vessel, './consProfileJSON_Neural/cleaned_raw_' + vessel + '.csv', 'raw', minSpeed, True, None)
 
   preLegs.trainBaseLines(trData)
 

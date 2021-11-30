@@ -1,13 +1,13 @@
 ,0
-ScoreA without memory,28.597275560776644
-ScoreB without memory,0.4509286771009046
-R2A without memory:,-33.25847905767709
-R2B without memory:,0.2106279872257415
-ScoreA with selective memory,1.1451339488126793
-ScoreB with selective memory,0.7399213946595484
-R2A with selective memory:,-2.038149365875698
-R2B with selective memory:,-0.3470473512129508
-ScoreA with full memory,1.3559321627530876
-ScoreB with full memory,0.7738108046458689
-R2A with full memory:,0.779028707831083
-R2B with full memory:,-1.2739173573705487
+ScoreA without memory,27.900143440567998
+ScoreB without memory,1.5473368416121676
+R2A without memory:,-37.553336891263754
+R2B without memory:,0.8422791816094104
+ScoreA with selective memory,1.1569598334176199
+ScoreB with selective memory,1.8020205595055405
+R2A with selective memory:,0.5045989330962798
+R2B with selective memory:,0.8012387518193604
+ScoreA with full memory,1.7767129052260062
+ScoreB with full memory,1.762983039167293
+R2A with full memory:,0.7557946234641119
+R2B with full memory:,0.8020398376730782

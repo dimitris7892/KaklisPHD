@@ -1,11 +1,11 @@
 from datetime import datetime
-import holoviews as hv
+#import holoviews as hv
 import pandas as pd
 import numpy as np
 import dataReading as dRead
 import csv
 import json
-hv.extension('bokeh', 'matplotlib')
+#hv.extension('bokeh', 'matplotlib')
 dr = dRead.BaseSeriesReader()
 import geopy.distance
 import pyproj
@@ -13,7 +13,7 @@ from pyproj import Proj, transform
 import cx_Oracle
 import os
 import glob
-from global_land_mask import globe
+#from global_land_mask import globe
 geodesic = pyproj.Geod(ellps='WGS84')
 
 class vesselDetails:
@@ -178,14 +178,15 @@ class extractLegs:
         trData = np.array(np.append(data[:,8].reshape(-1,1),np.asmatrix([data[:,10],data[:,11],data[:,12],data[:,22],(data[:,15]),
 
                                                                          data[:,26],data[:,27],data[:,0], data[:,1], data[:,28],
-                                                                         ]).T,axis=1))#.astype(float)#data[:,26],data[:,27]
+                                                                        data[:,31], data[:,29], data[:,30] ]).T,axis=1))#.astype(float)#data[:,26],data[:,27]
 
         trData = np.array([k for k in trData if  str(k[0])!='nan' and float(k[2])>=0 and float(k[4])>=0 and float(k[3])>=0 and float(k[5])>0  ])
 
         trData[:,8] = list(map(lambda s: s[:-3], trData[:,8]))
         d = {'draft': trData[:,0], 'wd': trData[:,1],'ws':trData[:,2],'stw':trData[:,3],'swh':trData[:,4],
 
-             'foc':(trData[:,5]),'lat':trData[:,6],'lon':trData[:,7],'timestamp':trData[:,8], 'vslHeading': trData[:,9], 'wsWS':trData[:,10],  }
+             'foc':(trData[:,5]),'lat':trData[:,6],'lon':trData[:,7],'timestamp':trData[:,8], 'vslHeading': trData[:,9], 'wsWS':trData[:,10],
+             'sOvg':trData[:,11], 'currSp':trData[:,12], 'currDir':trData[:,13]}
 
         df  = pd.DataFrame(d)
         print(trData.shape)
@@ -281,7 +282,7 @@ class extractLegs:
         with open('./legs/'+vessel+'/'+portDeparure+'_'+portArrival+'_leg.csv', mode='w') as dataw:
             data_writer = csv.writer(dataw, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
 
-            data_writer.writerow(['stw', 'draft', 'foc', 'ws', 'wd', 'swh', 'lat', 'lon', 'dt', 'vslHeading', 'wsWS', ])
+            data_writer.writerow(['stw', 'draft', 'foc', 'ws', 'wd', 'swh', 'lat', 'lon', 'dt', 'vslHeading', 'wsWS', 'sOvg', 'currSp', 'currDir'])
 
             for i in range(0, len(rawDataLeg)):
                 dt = str(rawDataLeg[i][8])
@@ -296,15 +297,19 @@ class extractLegs:
                 lon = rawDataLeg[i][7]
                 vslDir = rawDataLeg[i][9]
                 wsWS = rawDataLeg[i][10]
+                sOvg = rawDataLeg[i][11]
+                currSp = rawDataLeg[i][12]
+                currDir = rawDataLeg[i][13]
 
                 #inclX =rawDataLeg[i][11]
 
 
-                data_writer.writerow([stw, draft, foc, ws, wd, swh, lat, lon, dt, vslDir, wsWS])
+                data_writer.writerow([stw, draft, foc, ws, wd, swh, lat, lon, dt, vslDir, wsWS, sOvg, currSp, currDir])
 
                 item = {'datetime': dt, 'ws': ws, 'swh'
 
-                : swh, 'wd': wd, 'stw': stw, 'foc': foc, 'lat': lat, 'lon': lon, 'draft': draft, 'vslHeading':vslDir, 'wsWS': wsWS, }
+                : swh, 'wd': wd, 'stw': stw, 'foc': foc, 'lat': lat, 'lon': lon, 'draft': draft, 'vslHeading':vslDir, 'wsWS': wsWS,
+                        'sOvg': sOvg, 'currSp': currSp, 'currDir': currDir }
 
                 leg['data'].append(item)
         return leg
@@ -508,7 +513,8 @@ class extractLegs:
                     'legs': legsExtracted
                     }
         # pd.json_normalize(jsonFile['data']).head()
-
+        if os.path.isdir('./legs/' + vessel ) == False:
+            os.mkdir('./legs/' + vessel )
         with open('./legs/' + vessel + '/legs_' + vessel + '.json', 'w') as outfile:
             json.dump(jsonFile, outfile)
 

@@ -1,21 +1,20 @@
-
 from sklearn.model_selection import  train_test_split
 import dataReading
 import dataReading as dRead
 import dataPartitioning as dPart
 import dataModeling as dModel
-import Danaos_ML_Project.evaluation as eval
+import evaluation as eval
 from math import sqrt
 import pandas as pd
 from pylab import *
-import Danaos_ML_Project.generateProfile as genProf
+#import Danaos_ML_Project.generateProfile as genProf
 import mappingData_functions as mpf
 import preProcessLegs as preLegs
 import pickle
 
 
 prelegs = preLegs.preProcessLegs(False)
-gener = genProf.BaseProfileGenerator()
+#gener = genProf.BaseProfileGenerator()
 mapping = mpf.Mapping()
 dread = dataReading.BaseSeriesReader()
 
@@ -135,16 +134,11 @@ def preProcessData(data, datatype):
     return trData
 
 
-def main(vessel):
+def main(vessel, algs, cls, fromFile, processedData):
 
-
-
-    #data = pd.read_csv('./data/MODERNA/SPETSES SPIRIT/mappedData.csv').values
-    #mapping.extractJSON_TestData_MODERNA(9543886,'SPETSES SPIRIT',data)
-    #return
-    end, endU, history, future,sFile, start, startU , algs , cls = initParameters()
+    end, endU, history, future, sFile, start, startU , algs , cls = initParameters(algs, cls)
     # Load data
-    if len(sys.argv) >1:
+    if len(sys.argv) >3:
         algs = algs.split(',')
         cls=cls.split(',')
         print(sFile , algs , cls)
@@ -155,22 +149,7 @@ def main(vessel):
         start = int(start)
         startU = int(startU)
 
-    trSetlen=[500,1000,2000,3000,5000,10000,20000,30000,40000]
-    errors=[]
-    trErrors=[]
-    var=[]
-    clusters=[]
-    cutoff=np.linspace(0.1,1,111)
-    subsetsX=[]
-    subsetsY = []
-    subsetsB=[]
 
-
-
-    #plRes = pltRes.ErrorGraphs()
-
-    # Sample size - in this case ~10%
-    size = 5000
     modelers=[]
     for al in algs:
         if al=='SR' : modelers.append(dModel.SplineRegressionModeler())
@@ -200,9 +179,7 @@ def main(vessel):
     print(modelers)
     ###########################################################################
 
-    #plRes.PlotTrueVsPredLine()
 
-    #plRes.PLotTrajectory(df,'Express Athens')
     # 2nd place BALLAST FLAG
     # 8th place DRAFT
     # 10th place rel WD
@@ -276,24 +253,19 @@ def main(vessel):
     #trData = prelegs.extractDataFromLegs(data, "EXPRESS ATHENS")
     #return
     #trData = prelegs.concatLegs_PrepareForTR( vessel, './correctedLegsForTR/'+vessel+'/')
-    with open('./attentionWeights.pkl', 'rb') as f:
-        attWeights = pickle.load(f)
+    #with open('./attentionWeights.pkl', 'rb') as f:
+        #attWeights = pickle.load(f)
+    attWeights = None
 
     print(vessel)
 
     prelegs.extractLegsFromRawCleanedData(vessel, 'raw')
-    return
-    trData = prelegs.returnCleanedDatasetForTR(vessel, './consProfileJSON_Neural/cleaned_raw_'+vessel+'.csv', 'raw')
 
-    lenTestData = int(len(trData) * 0.1)
-
-    lenTrainData = len(trData) - lenTestData
-
-    #trData = trData[:100]
+    trData = prelegs.returnCleanedDatasetForTR(vessel, './consProfileJSON_Neural/cleaned_raw_'+vessel+'.csv', 'raw', 11, fromFile, processedData)
 
     expansion = False
 
-    #X_train, X_test, y_train, y_test = train_test_split(trData[:, 0:5], trData[:, 5], test_size=0.1, random_state=42)
+    X_train, X_test, y_train, y_test = train_test_split(trData[:, 0:5], trData[:, 5], test_size=0.1, random_state=42)
 
 
     #mapping.writeTrainTestData('DANAOS','HYUNDAI SMART',X_test,y_test,X_train,y_train)
@@ -301,14 +273,9 @@ def main(vessel):
 
     #mapping.extractJSON_TestData(9484948,'EXPRESS ATHENS',X_test, y_test,)
     #return
+    subsetsX = []
+    subsetsY = []
 
-
-    X_train = trData[:, 0:5]
-    y_train = trData[:, 5]
-
-    X_test = trData[:5000, 0:5]
-
-    y_test = trData[:5000, 5]
 
     subsetsX.append(X_train.astype(float))
     subsetsY.append(y_train.astype(float))
@@ -324,23 +291,24 @@ def main(vessel):
 
     print("Number of Statistically ind. subsets for training: " + str(len(subsetsX)))
 
-    #K=[10]
-    #rangeSubs = k
     stdInU = []
     varTr = []
     models = []
     K = range(1,25)
     part = []
     subsetInd = 0
+    errors = []
+    trErrors = []
+    var = []
+    clusters = []
+    cutoff = np.linspace(0.1, 1, 111)
+
 
     for subsetX, subsetY in zip(subsetsX, subsetsY):
-
       for modeler in modelers:
         for partitioner in partitioners:
            if partitioner.__class__.__name__=='DelaunayTriPartitioner':
-                 partK=np.linspace(0.7,1,4)#[0.5]
-                 #np.linspace(0.2,1,11)
-                     #[0.6]
+                 partK=np.linspace(0.7,1,4)
            if partitioner.__class__.__name__=='KMeansPartitioner' or partitioner.__class__.__name__=='KMeansPartitionerWS_WA'\
                     or partitioner.__class__.__name__=='KMeansPartitionerWH_WD':
                if modeler.__class__.__name__ == 'PavlosInterpolation':
@@ -352,57 +320,31 @@ def main(vessel):
            else:
                partK=[1]
            error = {"errors": []}
-           #random.seed(1)
 
-           flagEvalTri = False
            for k in partK:
                 if modeler.__class__.__name__ == 'TensorFlowW' and K==1: continue
 
-                #if  modeler.__class__.__name__ == 'TensorFlow' and k>1: continue
+
                 print(modeler.__class__.__name__)
                 print("Reading data...")
                 reader = dRead.BaseSeriesReader()
-                trSize=80000
 
                 ####################################LAROS DATA STATISTICAL TESTS
-                if modeler.__class__.__name__ == 'TensorFlowWD':
-                    #reader.insertDataAtDb()
-                    #reader.readNewDataset()
-                    reader.readExtractNewDataset('MILLENIA')
-                    #data = pd.read_csv('./MT_DELTA_MARIA_data_1.csv')
-                    #reader.readLarosDataFromCsvNewExtractExcels(data)
-                    seriesX, targetY,unseenFeaturesX, unseenFeaturesY  , drftB6 , drftS6 , drftTargetB6 , drftTargetS6, partitionsX, partitionsY,partitionLabels = reader.readLarosDataFromCsvNew(data)
-                #################
-
-                #seriesX, targetY ,targetW= reader.readStatDifferentSubsets(data,subsetsX,subsetsY,2880)
-                if modeler.__class__.__name__ != 'TensorFlowWD':
-                    seriesX, targetY, = subsetX,subsetY
-                    '''dataset = np.array(np.append(seriesX, np.asmatrix([targetY]).T, axis=1))
-
-                    for i in range(0, len(dataset)):
-                        dataset[i] = np.mean(dataset[i:i + 10], axis=0)
-
-                    seriesX = dataset[:, 0:7]
-                    targetY = dataset[:, 7]'''
-                counter=+1
 
                 print("Reading data... Done.")
 
                 # Extract features
 
-                if modeler.__class__.__name__ == 'PavlosInterpolation':
-                        k=1
-                #partitionsX, partitionsY , partitionLabels=X,Y,W
-                #if modeler.__class__.__name__!='TensorFlow':
-                # Partition data
+
                 print("Partitioning training set...")
-                partitionsX, partitionsY = seriesX , targetY
+
+                seriesX = subsetX
+                targetY = subsetY
+
                 NUM_OF_CLUSTERS =k# TODO: Read from command line
-                NUM_OF_FOLDS=6
-                #if modeler!='TRI':
 
                 if modeler.__class__.__name__ != 'TensorFlowWD':
-                        partitionsX, partitionsY, partitionLabels, partitionRepresentatives, partitioningModel  , centroids  = partitioner.clustering(seriesX, targetY, None ,NUM_OF_CLUSTERS, True,k)
+                        partitionsX, partitionsY, partitionLabels, partitionRepresentatives, partitioningModel  , centroids  = partitioner.clustering(seriesX, targetY, None, NUM_OF_CLUSTERS, True, k)
                 else:
                        #partitionLabels=23
 
@@ -410,52 +352,21 @@ def main(vessel):
 
                             seriesX, targetY, None, NUM_OF_CLUSTERS, True, k)
 
-                        #partitionsXDB6, partitionsYDB6, partitionLabels, partitionRepresentatives, partitioningModel, tri = partitioner.clustering(
-                            #drftB6, targetY, None, 25, True, k)
-
-                        #partitionsXDBS6, partitionsYDS6, partitionLabels, partitionRepresentatives, partitioningModel, tri = partitioner.clustering(
-                            #drftS6, targetY, None, 25, True, k)
 
                 print("Partitioning training set... Done.")
                 # For each partition create model
-                ''''for i in range(0,len(partitionsX)):
-                    with open('./DeployedModels/cluster_' + str(i) + '_.csv', mode='w') as data:
-                        data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-                        for k in range(0,len(partitionsX[i])):
 
-
-                                data_writer.writerow(
-                                    [partitionsX[i][k][0], partitionsX[i][0][1],partitionsX[i][k][2],partitionsX[i][k][3],partitionsX[i][k][4],partitionsX[i][k][5],partitionsX[i][k][6]])
-
-                    with open('./DeployedModels/cluster_foc' + str(i) + '_.csv', mode='w') as data:
-                        data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-                        for z in range(0, len(partitionsY[i])):
-
-                            data_writer.writerow(
-                                [partitionsY[i][z]])'''
 
 
                 print("Creating models per partition...")
 
 
-                #if modeler.__class__.__name__ == 'TensorFlowWD':
-                    #X = np.array(np.concatenate(partitionsX))
-                    #Y = np.array(np.concatenate(partitionsY))
-                #skip_idx1 = random.sample(range(num_linesx, num_lines), (num_lines-num_linesx) - 1000)
-
-                #modeler.plotRegressionLine(partitionsX, partitionsY, partitionLabels,genericModel,modelMap)
-                # ...and keep them in a dict, connecting label to model
-                #modelMap, xs, output, genericModel =None,None,None,None
-
                 if modeler.__class__.__name__!= 'TriInterpolantModeler' and modeler.__class__.__name__!= 'PavlosInterpolation' :
-                            #and modeler.__class__.__name__ != 'TensorFlow':
+
                     modelMap, history, scores, output, genericModel = modeler.createModelsFor(partitionsX, partitionsY, partitionLabels
 
                                                                                             ,None, seriesX, targetY, expansion, vessel, attWeights)
 
-                            #, genericModel , partitionsXDC
-                    #if modeler.__class__.__name__ != 'TensorFlow':
-                        #modelMap = dict(zip(partitionLabels, modelMap))
                     print("Creating models per partition... Done")
 
                     # Get unseen data
@@ -528,8 +439,7 @@ def main(vessel):
                 else:
                     models.append('Analytical method')
                 part.append(partitioner.__class__.__name__)
-                #meanVTr.append(np.mean(s ubsetX))
-                #meanBTr.append(np.mean(X[:,2]))
+
                 errors.append(meanError)
                 trErrors.append(meanError)
 
@@ -548,10 +458,10 @@ def main(vessel):
 
     eval.MeanAbsoluteErrorEvaluation.ANOVAtest(eval.MeanAbsoluteErrorEvaluation(), clusters, varTr, trErrors,errors,models,part)
 
-def initParameters():
+def initParameters(algs, cls):
 
 
-    sFile = './data/DANAOS/EXPRESS ATHENS/mappedDataNew.csv'
+    sFile = './data/DANAOS/MELISANDE/mappedData.csv'
     #sFile = './consProfileJSON_Neural/cleaned_EXPRESS ATHENS.csv'
     #sFile = './consProfileJSON_Neural/cleaned_legs_EXPRESS ATHENS.csv'
 
@@ -564,12 +474,12 @@ def initParameters():
     end = 17000
     startU = 30000
     endU = 31000
-    algs=['NNW1']
+    algs=algs
 
-    cls=['KM']
+    cls=cls
 
 
-    if len(sys.argv) > 1:
+    if len(sys.argv) > 3:
         sFile = sys.argv[1]
         history = sys.argv[2]
         start = sys.argv[3]

@@ -9,28 +9,18 @@ import glob
 import pandas as pd
 import geopy.distance
 import shutil
-import geopandas as gpd
 import seaborn as sns
 import cx_Oracle
 from sklearn.cluster import KMeans
 from matplotlib import pyplot
 import locale
-import osmnx as ox
-import networkx as nx
-import PIL.Image
-import io
 import plotly.graph_objects as go
 from geographiclib.geodesic import Geodesic
 from fastapi import APIRouter
 import requests
-from ipywidgets.embed import embed_minimal_html
 from datetime import date, datetime, timedelta
 import json
-import leafmap
 import csv
-from global_land_mask import globe
-from ipywebrtc import WidgetStream, ImageRecorder
-from IPython.display import display
 import pyproj
 import dataReading as dRead
 import neuralDT as NDT
@@ -43,7 +33,6 @@ plotly.io.orca.config.mapbox_access_token = "pk.eyJ1IjoiZGltaXRyaXNrYWsiLCJhIjoi
 preLegs = prePro.preProcessLegs(knotsFlag=False)
 dread = dRead.BaseSeriesReader()
 geodesic = pyproj.Geod(ellps='WGS84')
-geoviz = leafmap.Map()
 locale.setlocale(locale.LC_ALL, '')
 router = APIRouter()
 config = configparser.ConfigParser()
@@ -72,15 +61,15 @@ class GenerateReport:
     def __init__(self, company, vessel, server, sid, password, usr):
 
 
-        self.config = config.read('configRepGen.ini')['DEFAULT']
+        #self.config = config.read('configRepGen.ini')['DEFAULT']
 
         self.ndt = NDT.neuralDT(vessel)
 
         self.pathToWebAPIForPavlosInterpolation = \
-            '/home/dimitris/Desktop/gitlabDanaos/danaos-deep-learning/ConsModelComparison/ConsModelComparison_webapi/bin/Debug/net5.0'
+            './danaos-deep-learning/ConsModelComparison/ConsModelComparison_webapi/bin/Debug/net5.0'
 
         self.pathToWebAPIForPavlosBreakRoute = \
-            '/home/dimitris/Desktop/gitlabDanaos/danaos-deep-learning/ConsModelComparison/RouteBreakGen_webapi/bin/Debug/net5.0'
+            './danaos-deep-learning/ConsModelComparison/RouteBreakGen_webapi/bin/Debug/net5.0'
 
         self.requestJSON = {
             "client_request_id": 0,
@@ -269,6 +258,16 @@ class GenerateReport:
         self.usr = usr
         self.vessel = vessel
         self.company = company
+
+        if self.vessel.__contains__(" "):
+
+            self.vslFig = self.vessel.split(" ")[0] + "_" + self.vessel.split(" ")[1]
+
+        else:
+            self.vslFig = self.vessel
+
+        if os.path.isdir('./Figures/' + self.company + '/' + self.vslFig) == False:
+            os.mkdir('./Figures/' + self.company + '/' + self.vslFig)
 
         self.weatherCompTemplate = r'''
                         \section{Weather Comparison - Sensor / Weather Service (NOA) - Total }
@@ -603,10 +602,10 @@ class GenerateReport:
             \usepackage{subfigure}
             \usepackage[subfigure]{tocloft}
             \usepackage{hyperref}
-            \usepackage{pdfcomment}
-            \usepackage{todonotes}
-            \usepackage{mdwlist} 
-            \usepackage{svg}
+            
+            \usepackage{mdwlist}
+            \usepackage{todonotes} 
+            
 
             \usepackage[normalem]{ulem}
             \usepackage[autostyle=true,english=american]{csquotes} 
@@ -638,7 +637,7 @@ class GenerateReport:
 
             %% Grafiken
             \usepackage{graphicx} %% Grafiken einfügen
-            \usepackage{svg} %% .svg's einbinden
+        
             \usepackage{float} %% Package zur Festlegung der Position von Tabellen/Abbildungen
             \usepackage[clockwise]{rotating} %% Drehung von Bildern & Tabellen
 
@@ -657,7 +656,7 @@ class GenerateReport:
             %% Bild- & Tabellenunterschriften & -quellen
             \usepackage{caption}
             \captionsetup{format=plain,justification=RaggedRight,singlelinecheck=false}
-            \usepackage{capt-of}
+            
             \usepackage[labelfont=bf]{caption}			
             \captionsetup[table]{justification=centerlast}
 
@@ -822,12 +821,7 @@ class GenerateReport:
             %%========== Dokumentende ==========
                     '''
 
-        if self.vessel.__contains__(" "):
 
-            self.vslFig = self.vessel.split(" ")[0] + "_" + self.vessel.split(" ")[1]
-
-        else:
-            self.vslFig = self.vessel
 
     def valCheck(self):
 
@@ -886,7 +880,10 @@ class GenerateReport:
         legsCorr = []
         sortedCorrLegs = self.sortLegsInFiles(path)
         for infile in sortedCorrLegs:
+            print(infile)
             dataLegs = pd.read_csv(infile, sep=',', decimal='.', skiprows=0, ).values
+            #print(len(dataLegs))
+            #if len(dataLegs)>1000:
             legsCorr.append(dataLegs)
 
         path = './legs/' + vessel + '/'
@@ -897,6 +894,7 @@ class GenerateReport:
                 os.remove('./legs/' + vessel + '/' + infile.split("/")[3])
                 continue
             dataLegs = pd.read_csv(infile, sep=',', decimal='.', skiprows=0, ).values
+            #if len(dataLegs) < 1000: continue
             legs.append(dataLegs)
 
         return legsCorr, legs
@@ -907,8 +905,11 @@ class GenerateReport:
 
         files = []
         for infile in sorted(glob.glob(path + '*.csv')):
-            print("Sorting . . . " + infile)
-            dataLeg = pd.read_csv(infile, sep=',', decimal='.')  # .values
+            #print("Sorting . . . " + infile)
+            dataLeg = pd.read_csv(infile, sep=',', decimal='.')
+            #if len(dataLeg.values)<1000:
+                #continue
+            #print(dataLeg['dt'])# .values
             files.append(infile + '_DT' + dataLeg['dt'][0])
 
         sorted_files = sorted(files, key=lambda x: x.split('_DT')[1])
@@ -922,13 +923,18 @@ class GenerateReport:
 
         dataListLegsCorr, dataListLegs = self.getListOfDataLegs(self.vessel)
 
+        print(len(dataListLegs))
+        print("LEN CORR :   "+str(len(dataListLegsCorr)))
 
         predDfs, accs, legs, sumActs, sumPreds, percDiffs, stws, drfts, latlonDep, latlonArr, sovgs = self.extractStatisticsForLegs(
             "", 'stats')
 
+
+
         predDfsDT, accsDT, legs, sumActsDT, sumPredsDT, percDiffsDT, stwsDT, drftsDT, latlonDep, latlonArr, sovgs = self.extractStatisticsForLegs(
             "NeuralDT", 'stats', )
         # self.extractStatisticsForLegs("NeuralDT")
+        print("LEN legs :   " + str(len(legs)))
 
         ##########################  ======>
         totalSailingTimeHours, distTravelled, \
@@ -941,7 +947,7 @@ class GenerateReport:
         # predDfsDTPL, accsDTPL, legsPL, sumActsDTPL, sumPredsDTPL, percDiffsDTPL, stwsDTPL, drftsDTPL, latlonDepPL, latlonArrPL = self.extractStatisticsForLegs(
         # "NeuralDT", 'plots')
 
-        #self.extractPlotsForLegs(predDfs, predDfsDT, legs, accs, accsDT)
+        self.extractPlotsForLegs(predDfs, predDfsDT, legs, accs, accsDT)
         #################
 
 
@@ -950,11 +956,12 @@ class GenerateReport:
         predDfsOvDT, accsOVDT, legsOVDT, predDfsOvGWDT =  self.extractOverallAccData("NeuralDT", 'stats')
 
         ###Plots
-        #predDfsOvPL, accsOVPL, legsOVPL, predDfsOvGWPL = self.extractOverallAccData("", 'plots')
+        predDfsOvPL, accsOVPL, legsOVPL, predDfsOvGWPL = self.extractOverallAccData("", 'plots')
 
-        #predDfsOvDTPL, accsOVDTPL, legsOVDTPL, predDfsOvGWDTPL = self.extractOverallAccData("NeuralDT", 'plots')
+        #predDfsOvDTPL, accsOVDTPL, legsOVDTPL, predDfsOvGWDTPL = None, None, None, None
+        # self.extractOverallAccData("NeuralDT", 'plots')
 
-        #self.plotOverallAcc(predDfsOv, accsOV, predDfsOvDT, accsOVDT, legsOV, legsOVDT, predDfsOvGW)
+        self.plotOverallAcc(predDfsOv, accsOV, predDfsOvDT, accsOVDT, legsOV, legsOVDT, predDfsOvGW)
         ####END OF PLOTS
 
         predDfsWS, accsWS, legsWS, sumActsWS, sumPredsWS, percDiffsWS, stwsWS, drftsWS, latlonDepWS, latlonArrWS, sovgsWS = self.extractStatisticsForLegs(
@@ -963,9 +970,12 @@ class GenerateReport:
         templateRowTable = ''
         templateRowTableNDT = ''
         templateLegInfo = ''
+        print(legs)
 
         ###### TABLES & LEGS INFO
         for i in range(0, len(legs)):
+
+
             ######################################################### NN TABLE INFO
             templateRowTableArgs = {'leg': legs[i], 'totalActFoc': "{:,.2f}".format(sumActs[i]),
                                     'totalPredFoc': "{:,.2f}".format(sumPreds[i]),
@@ -992,9 +1002,9 @@ class GenerateReport:
             ####check if voyage is >= 3 days
             elapsedTime = (datetime.strptime(arrDate, "%Y-%m-%d %H:%M") - datetime.strptime(depDate, "%Y-%m-%d %H:%M"))
             totalSailingHoursRO = np.round(divmod(elapsedTime.total_seconds(), 60)[0] / 60, 2)
-            if totalSailingHoursRO <= 65 : #legs[i] != 'SINGAPORE - VUNG TAU'
+            #if totalSailingHoursRO <= 65 : #legs[i] != 'SINGAPORE - VUNG TAU'
             #if  legs[i] != 'SHEKOU - NINGBO':  # legs[i] != 'SINGAPORE - VUNG TAU'
-                continue
+                #continue
 
             ####check if voyage is >= 3 days
 
@@ -1031,7 +1041,7 @@ class GenerateReport:
                     ##change evalRoute and FromAPI boolean value to swithc between models
                 else:
                     # retCode = -1
-                    #retCode = self.getOptimizedRouteFromNavigatorForLeg(leg, reta)
+                    retCode = self.getOptimizedRouteFromNavigatorForLeg(leg, reta)
                     fromAPI = True
                 # if os.path.isfile('./routingResponses/'+self.vessel+'/mappedResponse_'+self.vessel+'_'+leg) else -1
                 # self.getOptimizedRouteFromNavigatorForLeg(leg)
@@ -1081,6 +1091,7 @@ class GenerateReport:
                 leg2 = legWOExt.split(" ")[1]
             legF = leg1 + "_" + leg2 if str(leg).__contains__(" ") else legWOExt
 
+            print("Map LEG: " +legF)
             '''if leg == 'SUEZ_SINGAPORE_leg.csv':
                 totalFocOptTrue = 909.37
 
@@ -1571,16 +1582,24 @@ class GenerateReport:
         # sorted(glob.glob(path + '*.csv'))
         for infile in sorted_legs:
 
-            leg = infile.split('/')[3]
-            leg = leg.split("_")[2] + " - " + leg.split("_")[3]
-            legs.append(leg)
+            legInit = infile.split('/')[3]
+            legInitWithoutVN = legInit.split(self.vessel+"_")[1]
+            leg = legInit.split("_")[2] + " - " + legInit.split("_")[3]
+
+
 
             testPred = pd.read_csv(infile, sep=',', decimal='.')
             if type == 'plots':
                 testPred = testPred[testPred['stw'] >= 12]
                 testPred = testPred.reset_index(drop=True)
-            # if len(testPred) < 100: continue
-            print(leg)
+            '''if len(testPred) < 1000:
+                os.remove(path+'/'+legInit);
+                if os.path.isdir('./legs/' + legInitWithoutVN): os.remove('./legs/'+legInitWithoutVN);
+                if os.path.isdir('./correctedLegsForTR/'+legInitWithoutVN): os.remove('./correctedLegsForTR/'+legInitWithoutVN);
+                continue'''
+            #if len(testPred) < 1000: continue
+            legs.append(leg)
+            #print(leg)
             ##lat lon dep arr
             legFile = infile.split(self.vessel + "_")[1]
             legDat = pd.read_csv('./legs/' + self.vessel + '/' + legFile).values
@@ -1695,10 +1714,10 @@ class GenerateReport:
             meanAcc = ((np.abs(testPred['FOC_pred'] - testPred['FOC_act'])) / testPred['FOC_act']) * 100
 
             meanAcc = str(np.round(100 - np.mean(meanAcc), 2)) + '%'
-            print("MP Accuracy " + str(meanAcc))
+            #print("MP Accuracy " + str(meanAcc))
 
             mae = np.abs(testPred['FOC_act'] - testPred['FOC_pred'])
-            print("MAE " + str(np.round(np.mean(mae))))
+            #print("MAE " + str(np.round(np.mean(mae))))
 
             data = testPred.values
 
@@ -1709,8 +1728,8 @@ class GenerateReport:
                 raw = np.array(np.append(data[:, 3].reshape(-1, 1),
                                          np.asmatrix([data[:, 4], data[:, 2].astype(float), data[:, 1]]).T, axis=1))
             # print(raw)
-            minSpeed = np.min(raw[:, 0])
-            # minSpeed = 12
+            #minSpeed = np.min(raw[:, 0])
+            minSpeed = 12
             i = minSpeed
             maxSpeed = np.max(raw[:, 0])
             sizesSpeed = []
@@ -1910,6 +1929,11 @@ class GenerateReport:
             responseWeatherRouting['path'] = oo
 
             ####  write updated route locally
+            if os.path.isdir('./routingResponses/') == False:
+                os.mkdir('./routingResponses/')
+            if os.path.isdir('./routingResponses/' + self.vessel ) == False:
+                os.mkdir('./routingResponses/' + self.vessel )
+
             with open('./routingResponses/' + self.vessel + '/response_' + self.vessel + '_' + str(
                     reta) + '_' + legWOExt + '.json', 'w') as json_file:
                 json.dump(responseWeatherRouting, json_file)
@@ -1922,7 +1946,7 @@ class GenerateReport:
 
             print("Drawing routes . . . ")
             self.saveResponseRouteCoords(leg, reta)
-            # self.drawRoutesOnMap(leg)
+            #self.drawRoutesOnMap(leg)
             return 1
 
     def evalRoutes(self, leg, type, reta):
@@ -1933,9 +1957,9 @@ class GenerateReport:
             dataLeg = pd.read_csv('./routingResponses/' + self.vessel + '/mappedResponse_' + self.vessel + "_" + str(
                 reta) + '_' + legWOExt + '.csv').values
 
-            #dfResponseAPI = self.ndt.callNeuralDTOnRoutes(self.vessel, dataLeg, )
+            dfResponseAPI = self.ndt.callNeuralDTOnRoutes(self.vessel, dataLeg, )
 
-            dfNN = self.ndt.evaluateNeuralOnFile(dataLeg, self.vessel, 15, False, reta, leg)
+            #dfNN = self.ndt.evaluateNeuralOnFile(dataLeg, self.vessel, 15, False, reta, leg)
 
     def mapResponseRoute(self, leg, type, reta):
 
@@ -1964,7 +1988,7 @@ class GenerateReport:
             depDate = request['optimization_model']['voyage']['departDT']
             initBearing = None
             draft = request['optimization_model']['vessel']['draft']
-            depDateFormated = datetime.strptime(depDate, '%Y-%m-%d %H:%M:%S')
+            depDateFormated = datetime.strptime(depDate, '%Y-%m-%d %H:%M')
             currDt = None
             bearings = []
             swhs = []
@@ -2029,9 +2053,10 @@ class GenerateReport:
             sovg = np.array([k['speed'] for k in route])
             stwFromCurrents = self.calculateSTWFromCurrents(bearings, relCurrentDirs, currentSpeeds, sovg)
 
-            '''shutil.copy('/home/dimitris/Desktop/opt4_data.csv',
-                        './routingResponses/' + self.vessel + '/mappedResponse_' + self.vessel + '_' + str(
-                            reta) + '_' + legWOExt + '.csv')'''
+
+            if os.path.isdir('./routingResponses/') == False:
+                os.mkdir('./routingResponses/')
+                os.mkdir('./routingResponses/' + self.vessel)
 
             with open('./routingResponses/'+self.vessel+'/mappedResponse_' + self.vessel + '_' +str(reta)+'_'+ legWOExt +'.csv', mode='w') as data:
                 data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
@@ -2095,7 +2120,7 @@ class GenerateReport:
     def get_ReproducedRoutePerH(self, leg):
         vslLeg = self.vessel + "_" + leg
         response = requests.get(
-            "https://localhost:5002/BreakRoute/?vsLeg=" + vslLeg,
+            "https://localhost:5004/BreakRoute/?vsLeg=" + vslLeg,
             verify=False)
         return response.text
 
@@ -2305,6 +2330,9 @@ class GenerateReport:
             lats.append(path['lat'][i])
             lons.append(path['lon'][i])
 
+        if os.path.isdir('./coords/' + self.company + '/' + self.vessel ) == False:
+            os.mkdir('./coords/' + self.company + '/' + self.vessel )
+
         with open('./coords/' + self.company + '/' + self.vessel + '/' + str(
                 reta) + '_' + legWOExt + '_coords_response.csv', mode='w') as data:
             data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
@@ -2363,10 +2391,10 @@ class GenerateReport:
 
     def buildJsonForRoutingRequest(self, leg, reta):
 
-        latInd = 8
-        lonInd = 9
-        bearInd = 6
-        dtInd = 7
+        latInd = 6
+        lonInd = 7
+        bearInd = 9
+        dtInd = 8
 
         legWOExt = leg.split(".")[0]
 
@@ -2475,8 +2503,8 @@ class GenerateReport:
 
             stwPrevKMperMin = (stwPrev) / 32.39741
 
-            dt = datetime.strptime(dataLeg[i][dtInd], "%Y-%m-%d %H:%M:%S")
-            dtPrev = datetime.strptime(dataLeg[i - 1][dtInd], "%Y-%m-%d %H:%M:%S")
+            dt = datetime.strptime(dataLeg[i][dtInd], "%Y-%m-%d %H:%M")
+            dtPrev = datetime.strptime(dataLeg[i - 1][dtInd], "%Y-%m-%d %H:%M")
             elapsedTimeFromPrev = (dt - dtPrev)
             minsFromPrev = np.round(divmod(elapsedTimeFromPrev.total_seconds(), 60)[0], 2)
 
@@ -2535,6 +2563,14 @@ class GenerateReport:
         # lons.append(dataLeg[len(dataLeg)-1][7])
         print(len(listIs))
         # data = np.delete(data, indicesToBeDeleted, axis=0)
+        if os.path.isdir('./coords/')==False:
+            os.mkdir('./coords/')
+
+        if os.path.isdir('./coords/' + self.company ) == False:
+            os.mkdir('./coords/' + self.company )
+
+        if os.path.isdir('./coords/' + self.company + '/' + self.vessel   ) == False:
+            os.mkdir('./coords/' + self.company + '/' + self.vessel )
 
         with open('./coords/' + self.company + '/' + self.vessel + '/' + str(reta) + '_' + legWOExt + '_coords_.csv',
                   mode='w') as data:
@@ -2547,6 +2583,11 @@ class GenerateReport:
         # self.drawCoordsOnMap("")
 
         # return
+        if os.path.isdir('./routingRequestsBody/' ) == False:
+            os.mkdir('./routingRequestsBody/')
+        if os.path.isdir('./routingRequestsBody/' + self.vessel ) == False:
+            os.mkdir('./routingRequestsBody/' + self.vessel )
+
         with open('./routingRequestsBody/' + self.vessel + '/request_' + self.vessel + '_' + str(
                 reta) + '_' + legWOExt + '.json', 'w') as json_file:
             json.dump(tempRequestJson, json_file)
@@ -2711,7 +2752,7 @@ def main():
     password = 'shipping'
     usr = 'shipping'
     company = 'DANAOS'
-    vessel = r'''MELISANDE'''
+    vessel = r'''NERVAL'''
     genRep = GenerateReport(company, vessel, server, sid, password, usr)
 
     # plotOptimizationVSInitialWeather("MIAMI_SUEZ_leg.csv", 1)

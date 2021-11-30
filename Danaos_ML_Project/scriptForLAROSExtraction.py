@@ -1,15 +1,4 @@
-import pandas as pd
-from datetime import datetime, date
-import numpy as np
 import csv
-from global_land_mask import globe
-import Danaos_ML_Project.dataReading as dRead
-from mpl_toolkits.basemap import Basemap
-import matplotlib.pyplot as plt
-from shapely.geometry import Point
-import geopandas as gpd
-from geopandas import GeoDataFrame
-import seaborn as sns
 import cx_Oracle
 
 
@@ -25,9 +14,11 @@ class scriptForLAROSExtraction:
         self.vessel = vessel
         self.company = company
         self.siteid = siteid
+        self.timeout = 10000000
 
 
-    def extractDataForSiteID(self, vessel, siteId):
+    def extractDataForSiteID(self, vessel, siteId, periodFrom, periodTo):
+
 
 
         dsn = cx_Oracle.makedsn(
@@ -41,16 +32,17 @@ class scriptForLAROSExtraction:
             dsn=dsn
         )
 
-
+        connection.callTimeout = self.timeout
         cursor_myserver = connection.cursor()
+
         cursor_myserver.execute(
-            'select * from TBL_STATUS_PARAMETER_VAL where SITE_ID = '"'" + siteId + "'"' '
-                'and DATETIME >  TO_DATE( '"'2020-01-01 12:00'"', '"'YYYY-MM-DD HH:MI'"') and '
-                'DATETIME < TO_DATE('"'2020-01-01 13:00'"', '"'YYYY-MM-DD HH:MI'"') order by DATETIME')
+            'select * from TBL_STATUS_PARAMETER_VAL where SITE_ID = '"'" + str(siteId) + "'"' '
+                'and DATETIME >  TO_DATE( '"' "+periodFrom+" '"', '"'YYYY-MM-DD HH:MI'"') and '
+                'DATETIME < TO_DATE('"' "+periodTo+" '"', '"'YYYY-MM-DD HH:MI'"') order by DATETIME')
         # if cursor_myserver.fetchall().__len__() > 0:
 
         rows = cursor_myserver.fetchall()
-        fp = open('./'+vessel+'_'+self.sid+'_'+str(date.today())+'_.csv', 'w')
+        fp = open('./pipeLineData/'+vessel+'_'+str(self.siteid)+'_.csv', 'w')
         myFile = csv.writer(fp)
         myFile.writerows(rows)
         fp.close()

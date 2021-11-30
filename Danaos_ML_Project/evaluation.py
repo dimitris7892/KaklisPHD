@@ -12,6 +12,7 @@ from itertools import combinations
 from statsmodels.stats.multitest import multipletests
 import warnings
 import math
+import os
 from scipy import spatial
 import pyearth as sp
 from scipy.spatial import Delaunay, ConvexHull
@@ -399,6 +400,8 @@ class MeanAbsoluteErrorEvaluation (Evaluation):
 
         plt.legend()
         plt.grid()
+        if os.path.isdir(r'./Figures/' + company + r'/' + vessel ) == False:
+            os.mkdir(r'./Figures/' + company + '/' + vessel )
         plt.savefig('./Figures/' + company + '/' + vessel + '/evalPerf '+vessel+'.eps', format='eps')
 
 

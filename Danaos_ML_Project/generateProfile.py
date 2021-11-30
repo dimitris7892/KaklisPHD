@@ -35,7 +35,7 @@ from sympy import cos, sin , tan , exp , sqrt , E
 from openpyxl import load_workbook
 import glob, os
 from pathlib import Path
-from openpyxl.styles.colors import YELLOW
+#from openpyxl.styles.colors import YELLOW
 from openpyxl.styles import Font
 from openpyxl.styles.borders import Border, Side
 import shutil
@@ -47,11 +47,11 @@ from openpyxl.drawing.image import Image
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.linear_model import LinearRegression
 from tensorflow import keras
-from global_land_mask import globe
-import Danaos_ML_Project.dataModeling as dModel
+#from global_land_mask import globe
+import dataModeling as dModel
 
 dm = dModel.BasePartitionModeler()
-currModeler = keras.models.load_model('./DeployedModels/estimatorCl_Gen.h5')
+
 
 class BaseProfileGenerator:
 

@@ -1,16 +1,5 @@
 import numpy as np
 import pandas as pd
-from scipy.stats import ks_2samp,chisquare,chi2_contingency
-import math
-#from pyproj import Proj, transform
-import pyearth as sp
-import matplotlib
-from sklearn.cluster import KMeans
-from matplotlib.lines import Line2D
-from decimal import Decimal
-import random
-from numpy import inf
-#from coordinates.converter import CoordinateConverter, WGS84, L_Est97
 import pyodbc
 import csv
 import pytz
@@ -19,37 +8,18 @@ import time
 #locale.setlocale(locale.LC_NUMERIC, "en_DK.UTF-8")
 import datetime
 import cx_Oracle
-from dateutil.rrule import rrule, DAILY, MINUTELY
-from sympy.solvers import solve
-from sympy import Symbol
-from pathlib import Path
-import itertools
-from sympy import cos, sin , tan , exp , sqrt , E
-from openpyxl import load_workbook
-import glob, os
-from pathlib import Path
-#from openpyxl.styles.colors import YELLOW
-from openpyxl.styles import Font
-from openpyxl.styles.borders import Border, Side
-import shutil
-from openpyxl.styles import PatternFill
-from openpyxl.styles import Alignment
-#import matplotlib.pyplot as plt
-#import seaborn as sns
-from openpyxl.drawing.image import Image
-from scipy.stats import ttest_ind_from_stats
-#pytz.timezone("Eastern European Time")
-import geopy
-from geopy import  geocoders
 from tzwhere import tzwhere
 import json
 
 class DBconnections:
 
-    def __init__(self):
+    def __init__(self, usr, password, sid):
         self.connection = None
         self.cursor = None
         self.table = None
+        self.usr = usr
+        self.password = password
+        self.sid = sid
 
     class DBcredentials:
 
@@ -60,12 +30,29 @@ class DBconnections:
             self.server = server
             self.db = db
 
-    def connectToDB(self, creds):
+    def connectToOracelDB(self):
+
+        dsn = cx_Oracle.makedsn(
+            '10.2.5.80',
+            '1521',
+            service_name= self.sid
+        )
+        connection = cx_Oracle.connect(
+            user= self.usr,
+            password=self.password,
+            dsn=dsn
+        )
+        cursor_myserver = connection.cursor()
+
+        return cursor_myserver
+
+    def  connectToDB(self, creds):
 
         user = creds.user
         pwd = creds.pwd
         server = creds.server
         db = creds.db
+        #ODBC Driver 17 for SQL Server
         connINSTALLATIONS = pyodbc.connect('DRIVER={ODBC Driver 17 for SQL Server};SERVER='+server+';'
                                             'DATABASE='+db+';'
                                             'UID='+user+';'
@@ -215,6 +202,31 @@ class DBconnections:
 
                 self.connection.commit()
                 print("TABLE " + vessel +'_PROCESSED' " ON DATABASE " + str.upper(company) + " CREATED! ")
+        elif type == "installations":
+
+            if cursor_myserver.tables(table='INSTALLATIONS', tableType='TABLE').fetchone():
+                print("TABLE INSTALLATIONS  ON DATABASE " + str.upper(company) + " EXISTS! ")
+            else:
+                cursor_myserver.execute(
+                   'CREATE TABLE [dbo].[INSTALLATIONS]('
+                    +'[vesselId] [int] NOT NULL, '
+                    +'[vesselName] [nchar](10) NOT NULL, '
+                    +'[dateCreated] [datetime] NULL, '
+                    +'[lastUpdated] [datetime] NULL, '
+                    +'[modelType] [nchar](10) NULL, '
+                    +'[profileCreated] [int] NOT NULL, '
+                    +'CONSTRAINT [PK_INSTALLATIONS] PRIMARY KEY CLUSTERED '
+                    +'( '
+                        +'[vesselId] ASC '
+                    +')'
+                    +')'
+                )
+
+                # + ') WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]'
+                # + ' ) ON [PRIMARY]')
+
+                self.connection.commit()
+                print("TABLE INSTALLATIONS  ON DATABASE " + str.upper(company) + " CREATED! ")
 
     def findLATLONFromRaw(self, company, table, datetime):
 
@@ -236,7 +248,7 @@ class DBconnections:
             #'SELECT id FROM [dbo].['+table+'_TLG] WHERE  FORMAT (vdate, '"'yyyy-MM-dd'"') =  '"'" + dateRaw + "'"'   ')
         self.cursor.execute('SELECT TOP 1 id '
                             'FROM [dbo].['+table+']'
-                            'WHERE [dbo].['+table+'].vdate <  '"'" + dateTimeRaw + "'"
+                            'WHERE [dbo].['+table+'].vdate <=  '"'" + dateTimeRaw + "'"
                             'ORDER BY [dbo].['+table+'].vdate DESC')
         rows = self.cursor.fetchall()
         for row in rows:
@@ -244,21 +256,52 @@ class DBconnections:
 
         return tlg_id
 
-    def insertInToTable(self,table,values):
+    def findVesselCode(self, vessel):
+
+        oracleCursor = self.connectToOracelDB()
+
+        oracleCursor.execute(
+            'SELECT count(*) FROM VESSEL_DATA WHERE VESSEL_NAME =  '"'" + vessel + "'"' OR VESSEL_SHORT_NAME = '"'" + vessel + "'"' OR VESSEL_NAME '
+                                                                                                                               'LIKE '"'%" + vessel + "%'"'   ')
+        if len(oracleCursor.fetchall()) > 1:
+
+            oracleCursor.execute(
+                'SELECT VESSEL_CODE, ROWNUM FROM VESSEL_DATA WHERE VESSEL_NAME =  '"'" + vessel + "'"' OR VESSEL_SHORT_NAME = '"'" + vessel + "'"'   ')
+        else:
+
+            oracleCursor.execute(
+                'SELECT VESSEL_CODE FROM VESSEL_DATA WHERE VESSEL_NAME =  '"'" + vessel + "'"' OR VESSEL_SHORT_NAME = '"'" + vessel + "'"' OR VESSEL_NAME '
+                                                                                                                                      'LIKE '"'%" + vessel + "%'"' ')
+
+        # if cursor_myserver.fetchall().__len__() > 0:
+        for row in oracleCursor.fetchall():
+            vessel_code = row[0]
+
+        return vessel_code
+
+    def insertIntoInstallations(self,vesselName):
+
+        vesselId = self.findVesselCode(vesselName)
 
         try:
             self.cursor.execute(
-                "insert into [dbo].["+table+"]"
-                "(companyName, dateCreated, lastUpdated )"
+                "insert into [dbo].[INSTALLATIONS]"
+                "(vesselId, vesselName, dateCreated, lastUpdated, modelType, profileCreated )"
                 + "values ("
-                + "'" + str(values.compName) + "', "
-                + "'"+ str(values.dateCreated) + "', "
-                + "'"+ str(datetime.datetime.now().strftime("%Y%m%d %H:%M:%S")) + "' )")
+                + "'" + str(vesselId) + "', "
+                + "'" + str(vesselName) + "', "
+                + "'"+ str(datetime.datetime.now().strftime("%Y%m%d %H:%M:%S")) + "', "
+                + "'"+ str(datetime.datetime.now().strftime("%Y%m%d %H:%M:%S")) + "',"
+                + "'"+ str(0) + "', "
+                + "'"+ str(0) + "' "                                
+                                ") ")
 
             self.connection.commit()
 
         except Exception as e:
             print(str(e))
+
+        return vesselId
 
     def insertInToTableVessel(self, table,compName, values):
 
@@ -275,10 +318,10 @@ class DBconnections:
                 "insert into [dbo].["+table+"]"
                 "( companyId, imo, vesselName, vesselType, dateCreated, dataTypes )"
                 + "values ("
-                + "'" + str(companyId) + "', "
-                + "'" + values.imo + "', "
-                + "'"+ values.vslName + "', "
-                + "'" + values.vslType + "', "
+                + "'"+ str(companyId) + "', "
+                + "'"+ values.imo + "', "
+                + "'"+  values.vslName + "', "
+                + "'"+ values.vslType + "', "
                 + "'"+ str(datetime.datetime.now().strftime("%Y%m%d %H:%M:%S")) +"', "
                 + str(values.dataTypes) +
                 " )")
@@ -329,9 +372,9 @@ class DBconnections:
         self.connection.commit()
         print("FINISHED  UPDATE ON TABLE " + vessel +'_TLG'  "FOR FILED "+field+" ON DATABASE " + str.upper(company) + "!")
 
-    def insertIntoDataTableforVessel(self, company, vessel ,connInst, type, insertType ,values = None, valuesBulk = None, csv_file_nm = None):
+    def insertIntoDataTableforVessel(self, company, vessel , table, connInst, type, insertType ,values = None, valuesBulk = None, csv_file_nm = None):
 
-        print("INSERTING INTO " +vessel+ " IN DB "+ company+" . . .")
+        print("INSERTING INTO " +table+ " IN DB "+ company+" . . .")
         connInst.cursor.execute(
             'SELECT vesselId FROM INSTALLATIONS WHERE vesselName =  '"'" + vessel + "'"'   ')
         # if cursor_myserver.fetchall().__len__() > 0:
@@ -342,7 +385,7 @@ class DBconnections:
         start_time = time.time()
         if type=='raw' and insertType=='bulk':
             self.cursor.fast_executemany = True
-            sql = "insert into [dbo].["+vessel+"] " \
+            sql = "insert into [dbo].["+table+"] " \
                 +"(installationsId, lat, lon, t_stamp , course , stw , s_ovg , me_foc , rpm , power , draft , trim , at_port ,daysFromLastPropClean, "\
                 +"daysFromLastDryDock , sensor_wind_speed , sensor_wind_dir , wind_speed ,wind_dir ,curr_speed ,curr_dir ,comb_waves_height ," \
                 +"comb_waves_dir , swell_height ,swell_dir, wind_waves_height   , wind_waves_dir, tlg_id ) " \
@@ -352,7 +395,7 @@ class DBconnections:
             self.cursor.executemany(sql, valuesBulk)
 
             self.connection.commit()
-            print("FINISHED BULK INSERT OR UPDATE ON TABLE " + vessel + " ON DATABASE " + str.upper(company) + "!")
+            print("FINISHED BULK INSERT OR UPDATE ON TABLE " + table + " ON DATABASE " + str.upper(company) + "!")
 
         if type == 'raw' and insertType!='bulk':
             for i in range(0,len(values)):
@@ -360,7 +403,7 @@ class DBconnections:
 
                 tlg_id = self.mapWithTLG(company, vessel, str(values[i].dt))
                 self.cursor.execute(
-                    'SELECT * FROM [dbo].['+vessel+'] WHERE LAT =  '"'" + str(values[i].OrigLAT) + "'"' AND '
+                    'SELECT * FROM [dbo].['+table+'] WHERE LAT =  '"'" + str(values[i].OrigLAT) + "'"' AND '
                                                             'LON = '"'" + str(values[i].OrigLON) + "'"' AND '
                                                              't_stamp= '"'" + str(values[i].dt) + "'"'')
                 if len(self.cursor.fetchall()) == 0:
@@ -438,14 +481,14 @@ class DBconnections:
                         't_stamp = '"'" + str(values[i].dt) + "'"'')
 
             self.connection.commit()
-            print("FINISHED INSERT OR UPDATE ON TABLE " + vessel + " ON DATABASE " + str.upper(company) + "!")
+            print("FINISHED INSERT OR UPDATE ON TABLE " + table + " ON DATABASE " + str.upper(company) + "!")
 
 
         elif type=='tlg':
             try:
                 for i in range(0, len(values)):
                     self.cursor.execute(
-                            "insert into [dbo].[" + vessel + '_TLG' + "](installationsId, vdate, time_utc , type ,actl_spd  , avg_spd , slip , act_rpm , sail_time , weather_force , weather_wind_tv , sea_condition , swell_dir,"
+                            "insert into [dbo].[" + table + "](installationsId, vdate, time_utc , type ,actl_spd  , avg_spd , slip , act_rpm , sail_time , weather_force , weather_wind_tv , sea_condition , swell_dir,"
                             + "swell_lvl   , current_dir , current_speed , lat, lon, draft  ) "
                             + "values ("
                             + str(installationsId) + ", "
@@ -473,9 +516,10 @@ class DBconnections:
                 return
 
             self.connection.commit()
-            print("FINISHED INSERT OR UPDATE ON TABLE " + vessel +'_TLG' " ON DATABASE " + str.upper(company) + "!")
+            print("FINISHED INSERT OR UPDATE ON TABLE " + table +'_TLG' " ON DATABASE " + str.upper(company) + "!")
 
         print("--- %s seconds ---" % (time.time() - start_time))
+
 class Values:
 
     def __init__(self):
@@ -556,6 +600,7 @@ def fillDataTlgVesselClass(company, vessel):
 
     tlgs = pd.read_csv('./data/' + company + '/' + vessel + '/TELEGRAMS/'+vessel+'.csv', sep=';').values
     tlgDataVesselClassList = []
+    print("Filling Tlg vessel class List with: " + str(len(tlgs))+" records . . .")
 
     for i in range(0, len(tlgs)):
 
@@ -575,8 +620,8 @@ def fillDataTlgVesselClass(company, vessel):
         values.swell_lvl = tlgs[i][20]
         values.lat = tlgs[i][5] + tlgs[i][4] / 60
         values.lon = tlgs[i][3] + tlgs[i][6] / 60
-        #values.current_dir = None
-        #values.current_speed = None
+        values.current_dir = tlgs[i][23]
+        values.current_speed = tlgs[i][23]
         values.port_name = tlgs[i][22]
         values.bl_flag = tlgs[i][2]
         values.tlg_type = tlgs[i][1]
@@ -585,7 +630,7 @@ def fillDataTlgVesselClass(company, vessel):
         #lat, lon = connData.findLATLON(company, vessel.split(" ")[0]+'_'+vessel.split(" ")[1], values.vdate)
         lat, lon = values.lat, values.lon
 
-        try:
+        '''try:
             if lat != -1:
                 tz = tzwhere.tzwhere(forceTZ=True)
                 gmtTimezone = tz.tzNameAt(lat, lon, forceTZ=True)
@@ -601,9 +646,9 @@ def fillDataTlgVesselClass(company, vessel):
             else:
                 utc_dt = values.vdate
         except:
-            utc_dt = values.vdate
+            utc_dt = values.vdate'''
 
-        values.time_utc = utc_dt
+        values.time_utc = values.vdate
         #values.time_utc = None
 
         #print(i)
@@ -620,10 +665,10 @@ def fillDataTlgVesselClass(company, vessel):
 
     return tlgDataVesselClassList
 
-def fillDataVesselClass(company, vessel, connInst, connData, dataCleaned = None):
+def fillDataVesselClass(company, vessel, connInst, dataCleaned = None):
 
-    tableNameVslRaw =  vessel.split(" ")[0]+"_"+vessel.split(" ")[1]
-    tableNameVsl_TLG = vessel.split(" ")[0]+"_"+vessel.split(" ")[1]+"_TLG"
+    tableNameVslRaw =  vessel.split(" ")[0]+"_"+vessel.split(" ")[1] if str(vessel).__contains__(" ") else vessel
+    tableNameVsl_TLG = vessel.split(" ")[0]+"_"+vessel.split(" ")[1]+"_TLG" if str(vessel).__contains__(" ") else vessel+"_TLG"
     tableNameVsl = tableNameVslRaw +"_PROCESSED" if len(dataCleaned) > 0 else tableNameVslRaw
     ##find InstallaitonId
     connInst.cursor.execute(
@@ -633,10 +678,13 @@ def fillDataVesselClass(company, vessel, connInst, connData, dataCleaned = None)
         installationsId = row[0]
     #########################################################
 
-    data = pd.read_csv('./data/'+company+'/'+vessel+'/mappedDataNew.csv').values if len(dataCleaned) == 0 else dataCleaned
+    data = pd.read_csv('./data/'+company+'/'+vessel+'/mappedData.csv').values if len(dataCleaned) == 0 else dataCleaned
     tlgs = pd.read_csv('./data/' + company + '/' + vessel + '/TELEGRAMS/'+vessel+'.csv', sep=';').values
     dataVesselClassList = []
     dataVesselClassListBulk = []
+    print("Filling Raw vessel class List with: " + str(len(data)) + " records . . .") if len(dataCleaned) == 0 else \
+        print("Filling Processed vessel class List with: " + str(len(data)) + " records . . .")
+
     for i in range(0, len(data)):
 
         values = Values()
@@ -674,10 +722,13 @@ def fillDataVesselClass(company, vessel, connInst, connData, dataCleaned = None)
         values.OrigLON = data[i][27]
         values.windSpeed = data[i][28]
         values.relWindDir = data[i][27]
-        #values.currentsSpeed = data[i][29]
-        #values.relCurrentsDir = data[i][30]
-        #values.Sovg = data[i][31]
-        tlg_id = connData.mapWithTLG(company, tableNameVsl_TLG, str(values.dt))
+        values.currentsSpeed = data[i][29]
+        values.relCurrentsDir = data[i][30]
+        values.Sovg = data[i][31]
+        values.rpm = data[i][32]
+        values.power = data[i][33]
+
+        tlg_id = connInst.mapWithTLG(company, tableNameVsl_TLG, str(values.dt))
 
         dataVesselClassListBulk.append((
             installationsId,
@@ -719,12 +770,13 @@ def fillDataVesselClass(company, vessel, connInst, connData, dataCleaned = None)
 def main():
 
     connInst = DBconnections()
-    instanceInfoInstallationsDB = connInst.DBcredentials("sa", "Man1f0ld", 'localhost, 1433', 'Installations')
-    connInst.connectToDB(instanceInfoInstallationsDB)
+    #instanceInfoInstallationsDB = connInst.DBcredentials("DMCDOMAIN\dkaklis", "", 'KAKLIS\SQLEXPRESS', 'Installations')
+    #connInst.connectToDB(instanceInfoInstallationsDB)
 
     connData = DBconnections()
-    instanceDataDB = connData.DBcredentials("sa", "Man1f0ld", 'localhost, 1433', 'DANAOS')
+    instanceDataDB = connData.DBcredentials("sa", "sa1!", '10.2.4.54', 'DANAOS')
     cnxn = connData.connectToDB(instanceDataDB)
+
 
     connData.createTables("DANAOS", "EXPRESS_ATHENS", 'tlg')
     connData.createTables("DANAOS","EXPRESS_ATHENS",'raw')

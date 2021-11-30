@@ -121,9 +121,9 @@ tasksB=[]
 tasksAMem=[]
 tasksBMem=[]
 lenS = 1000
-startA = 13000
-startB = 50000
-for i in range(0,1):
+startA = 22000
+startB = 45000
+for i in range(0, 1):
 
     seqLSTMA = seqLSTM[startA:lenS+startA]
     seqLSTMAmem = split_sequence(seqLSTMA, n_steps)
@@ -142,12 +142,12 @@ for i in range(0,1):
     startA += lenS
     startB += lenS
 
-seqLSTMA = seqLSTM[21000:22000]
+seqLSTMA = seqLSTM[startA:startA+lenS]
 
 seqLSTMAmem = split_sequence(seqLSTMA,n_steps)
 seqLSTMA = seqLSTMAmem.reshape(-1,n_steps,7)
 
-seqLSTMB = seqLSTM[60000:61000]
+seqLSTMB = seqLSTM[startB:startB+lenS]
 
 seqLSTMBmem = split_sequence(seqLSTMB,n_steps)
 seqLSTMB = seqLSTMBmem.reshape(-1,n_steps,7)
@@ -174,6 +174,8 @@ X_train_normB = np.array(seqBScaled)
 #print(str(apEn))
 
 tasks = [X_train_normA.reshape(len(seqLSTMA),n_steps,7), X_train_normB.reshape(len(seqLSTMB),n_steps,7)]
+
+
 def pointInRect(point,rect):
     x1, y1 = rect.xy
     w, h = rect.get_bbox().width , rect.get_bbox().height
@@ -689,25 +691,12 @@ def VAE_getMemoryWindowBetweenTaskA_TaskB():
 
     return selectiveMemory_ExtractedOfTaskA
 
-def getMemoryWindowBetweenTaskA_TaskB(lenSeq,seqLSTMA, seqLSTMB):
+def getMemoryWindowBetweenTaskA_TaskB(lenSeq, seqLSTMA, seqLSTMB):
 
-    '''seqLSTMAB = np.append(seqLSTMA,seqLSTMB, axis=0)
-
-    seqLSTMABtr = seqLSTMAB.transpose()#.reshape(7,n_steps,2000)
-    min_max_scalerAB =  MinMaxScaler()
-
-    seqLSTMBtr = seqLSTMB.transpose()#.reshape(n_steps,9,1000)
-    seqLSTMAtr = seqLSTMA.transpose()#.reshape(n_steps,9,1000)
-
-
-    min_max_scalerB = MinMaxScaler()
-    min_max_scalerA  = MinMaxScaler()
-    X_train_normB = min_max_scalerB.fit_transform(seqLSTMBtr)
-    X_train_normA = min_max_scalerA.fit_transform(seqLSTMAtr)
-
-    seqA = X_train_normA.reshape( n_steps,7 , lenSeq)
-    seqB = X_train_normB.reshape( n_steps,7 , lenSeq)'''
-
+    '''scale seqlLSTMA given the task of incremental training
+    of a base learner from taskA=>taskB in a way that the accuracy
+    of BL evaluated on both tasks when incorporating the scaled info
+    is better when evaluated wihout it'''
 
     ######################################################################
     min_max_scalerA = MinMaxScaler()
@@ -719,8 +708,7 @@ def getMemoryWindowBetweenTaskA_TaskB(lenSeq,seqLSTMA, seqLSTMB):
         seqAScaled.append(seqScaled)
 
     X_train_normA = np.array(seqAScaled)
-    # X_train_normA = min_max_scaler.fit_transform(seqLSTMA)
-    # X_train_normB = min_max_scaler.fit_transform(seqLSTMB)
+
     min_max_scalerB = MinMaxScaler()
     seqBScaled = []
     for i in range(0, len(seqLSTMB)):
@@ -730,105 +718,39 @@ def getMemoryWindowBetweenTaskA_TaskB(lenSeq,seqLSTMA, seqLSTMB):
         seqBScaled.append(seqScaled)
 
     X_train_normB = np.array(seqBScaled)
-    #seqA, seqB =  X_train_normA.reshape( n_steps,7 , lenSeq-n_steps), X_train_normB.reshape( n_steps,7 , lenSeq-n_steps)
+
     seqA, seqB = X_train_normA, X_train_normB
-    #seqAE , enc = lstmAUTO()
-    #seqAE.compile(optimizer=keras.optimizers.Adam(),loss='mse')
-    #seqAE.fit(seqA,seqB)
 
     encoderA , decoderA  = windwowIdentificationModel()
+    #print(encoderA.summary())
+    #print(decoderA.summary())
+
     windAEa = LSTM_AE_IW(encoderA, decoderA)
     windAEa.compile(optimizer=keras.optimizers.Adam())
 
-    es = keras.callbacks.EarlyStopping(monitor='loss',restore_best_weights=True, mode='min')
+    es = keras.callbacks.EarlyStopping(monitor='loss', restore_best_weights=True, mode='min')
 
-    windAEa.fit(seqA, seqB , epochs=30,)#batch_size=20
-
-    '''encoderB, decoderB = windwowIdentificationModel()
-    windAEb = LSTM_AE_IW(encoderB, decoderB)
-    windAEb.compile(optimizer=keras.optimizers.Adam())
-
-    windAEb.fit(seqB, seqA, epochs=30, )'''
-
-    '''encoderB, decoderB = windwowIdentificationModel()
-    windAEb = LSTM_AE_IW(encoderB, decoderB)
-    windAEb.compile(optimizer=keras.optimizers.Adam())
-
-    windAEb.fit(seqB, seqA, epochs=50, )'''
-    ##########################################
-
-    '''encoderB , decoderB  = windwowIdentificationModel()
-    #encoderA.compile(optimizer=keras.optimizers.Adam(),loss='mse')
-    #encoderA.fit(seqA, seqA,epochs=30)
-    windAEb = LSTM_AE_IW(encoderB, decoderB)
-    windAEb.compile(optimizer=keras.optimizers.Adam())
-
-    es = keras.callbacks.EarlyStopping(monitor='loss',restore_best_weights=True, mode='min')
-    windAEb.fit(seqB,seqA,epochs=30, )'''
-
-    encodedTimeSeriesA = np.round(windAEa.encoder.predict(seqA),2)
-
-    #encodedTimeSeriesB = np.round(windAEb.encoder.predict(seqB), 2)
+    windAEa.fit(seqA, seqB, epochs=30, )#batch_size=20
 
 
+    encodedTimeSeriesA = np.round(windAEa.encoder.predict(seqA), 2)
 
-    arr = encodedTimeSeriesA[0] > 0
-    #indicesOfA = [k for k in range(0, lenSeq) if arr[:, k].all() == True]
 
-    #selectiveMemory_ExtractedOfTaskA =  seqLSTMA[indicesOfA]
     batches = []
     for i in range(0,len(encodedTimeSeriesA)):
         #batch = min_max_scalerA.inverse_transform((seqA[i] + (seqA[i] * encodedTimeSeriesA[i])).transpose())
         #batches.append(batch)
-
-        seq_a = min_max_scalerA.inverse_transform(seqA[i].transpose())
-        batch = (seq_a + (seq_a * encodedTimeSeriesA[i].transpose()))
+        seq_a = seqA[i].transpose()
+        #seq_a = min_max_scalerA.inverse_transform(seqA[i].transpose())
+        weight = encodedTimeSeriesA[i].transpose()
+        batch = (seq_a + (  weight))
         batches.append(batch)
 
     selectiveMemory_ExtractedOfTaskA = np.array(batches)
 
-    '''batches = []
-    for i in range(0, len(encodedTimeSeriesB)):
 
-        seq_b = min_max_scalerB.inverse_transform(seqB[i].transpose())
-        batch = (seq_b + (seq_b * encodedTimeSeriesB[i].transpose()))
-        batches.append(batch)'''
-
-    selectiveMemory_ExtractedOfTaskB = np.array(batches)
-
-    #scaledArr_A = seqLSTMA.transpose() + (seqLSTMA.transpose() * encodedTimeSeriesA[0])
-
-
-    #plt.plot(np.linspace(0, 5000, 5000), seqLSTMA[:, 3], color='red')
-    #plt.plot(decodedA[:,3])
-    #plt.plot(np.linspace(5000, 10000, 5000), seqLSTMB[:, 3], color='blue')
-    #plt.plot(indicesOfA, selectiveMemory_ExtractedOfTaskA[:,3], color='green')
-    #plt.show()
-
-    '''with open('./AE_files/selectiveMemory_ExtractedOfTaskA.csv', mode='w') as data:
-        data_writer = csv.writer(data, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-        for i in range(0, len(selectiveMemory_ExtractedOfTaskA)):
-            data_writer.writerow(
-                [selectiveMemory_ExtractedOfTaskA[i][0], selectiveMemory_ExtractedOfTaskA[i][1],
-                 selectiveMemory_ExtractedOfTaskA[i][2],selectiveMemory_ExtractedOfTaskA[i][3],
-                 selectiveMemory_ExtractedOfTaskA[i][4],
-                 selectiveMemory_ExtractedOfTaskA[i][5],
-                 selectiveMemory_ExtractedOfTaskA[i][6],
-                 ])'''
-    #scaledArr_A = seqLSTMA.transpose() + (seqLSTMA.transpose() * encodedTimeSeriesA[0])
-    #scaledArr_A = np.array(scaledArr_A).transpose()
-
-    #scaledArr_B = seqLSTMB.transpose() + (seqLSTMB.transpose() * encodedTimeSeriesB[0])
-    rndIndices = []
-    rndLen = random.randint(300,900)
-    for k in range(0,rndLen):
-        rndIndices.append(random.randint(0, lenSeq-1))
-    #selectiveMemory_ExtractedOfTaskA = seqLSTMA[rndIndices]
-    #scaledArr_B = np.array(scaledArr_B).transpose()
     return selectiveMemory_ExtractedOfTaskA, None
-        #np.append(scaledArr_A,scaledArr_B, axis=0)
-    #np.append(scaledArr_A,scaledArr_B, axis=0)
-        #np.append(selectiveMemory_ExtractedOfTaskA,selectiveMemory_ExtractedOfTaskB,axis=0)
+
 
 def trainAE():
     encoder, decoder = baselineModel()
@@ -1159,8 +1081,7 @@ def baselineLearner():
 
 
 def trainingBaselinesForFOCestimation(seqLSTMA, seqLSTMB, memoryA, memoryB, alg ):
-    #X_train, X_test, y_train, y_test = train_test_split(seqLSTMB[:, :8], seqLSTMB[:, 8], test_size=0.2, random_state=42)
-    #SplineRegression = sp.Earth()
+
     lrA = LinearRegression()
 
     xa = seqLSTMA[:, :6]
@@ -1176,7 +1097,7 @@ def trainingBaselinesForFOCestimation(seqLSTMA, seqLSTMB, memoryA, memoryB, alg 
     lrBase.fit(xa, ya)
 
 
-    xb = seqLSTMB[:,:6]
+    xb = seqLSTMB[:, :6]
     yb = seqLSTMB[:, 6]
 
     lrBase.fit(xb, yb)
@@ -1206,13 +1127,15 @@ def trainingBaselinesForFOCestimation(seqLSTMA, seqLSTMB, memoryA, memoryB, alg 
     print("R2 Score for A without memory:" + str(scoreAWM))
     print("R2 Score for B without memory:" + str(scoreBWM) + "\n")
 
+
+    ####TRAIN LSTM BASELINE ########
     lrAB = baselineLearner()
     batchesX = []
     batchesY = []
-    for i in range(0,len(memoryA)):
+    for i in range(0, len(memoryA)):
 
-        batchesX.append(memoryA[i][:,:6])
-        batchesY.append(memoryA[i][n_steps-1,6])
+        batchesX.append(memoryA[i][:, :6])
+        batchesY.append(memoryA[i][n_steps-1, 6])
 
     batchesX = np.array(batchesX)
     batchesY = np.array(batchesY)
@@ -1243,11 +1166,10 @@ def trainingBaselinesForFOCestimation(seqLSTMA, seqLSTMB, memoryA, memoryB, alg 
     #lrAB.layers[0].set_weights([weights, np.array([0] * (genModelKnots - 1))])
     recosntructA = []
     for i in range(0,len(memoryA)):
-
-         if i ==0:
+         if i==0:
             recon = memoryA[i][0]
          else:
-             recon = memoryA[i][0]
+            recon = memoryA[i][0]
          recosntructA.append(recon)
     #seqAscaled = np.append(np.array(recosntructA[0]).reshape(n_steps, 7), np.array(recosntructA[1:]).reshape(-1, 7), axis=0)
     seqAscaled = np.array(recosntructA)
@@ -1271,8 +1193,6 @@ def trainingBaselinesForFOCestimation(seqLSTMA, seqLSTMB, memoryA, memoryB, alg 
     #seqAwithMem = np.append(seqBscaled, seqLSTMA.reshape(-1,7),axis=0)
 
     seqABwithMem = np.append(seqAscaled, seqLSTMB.reshape(-1, 7), axis=0)
-
-
 
     xab_mem = seqABwithMem[:, :6]
     yab_mem = seqABwithMem[:, 6]
@@ -1376,6 +1296,8 @@ def trainingBaselinesForFOCestimation(seqLSTMA, seqLSTMB, memoryA, memoryB, alg 
                        },orient='index')
     #df.to_csv('./AE_files/'+alg+'.csv')
     return df
+
+
 #######################################################
 def runAlgorithmsforEvaluation( alg, seqLen):
     memories = None
