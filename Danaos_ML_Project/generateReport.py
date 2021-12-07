@@ -2,7 +2,7 @@ import argparse
 import os
 from typing import Optional, List, Any, AnyStr
 import subprocess
-import global_land_mask
+#import global_land_mask
 import numpy as np
 import matplotlib.pyplot as plt
 import glob
@@ -23,13 +23,11 @@ import plotly.graph_objects as go
 from geographiclib.geodesic import Geodesic
 from fastapi import APIRouter
 import requests
-from ipywidgets.embed import embed_minimal_html
+#from ipywidgets.embed import embed_minimal_html
 from datetime import  date, datetime, timedelta
 import json
 import leafmap
 import csv
-from global_land_mask import globe
-from ipywebrtc import WidgetStream, ImageRecorder
 from IPython.display import display
 import pyproj
 import dataReading as dRead

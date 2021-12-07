@@ -17,22 +17,24 @@ import numpy as np
 import pandas as pd
 import generateReportCMA as genRep
 import configparser
+
 import requests
 from fastapi import APIRouter
 
-config = configparser.ConfigParser()
+#config = configparser.ConfigParser()
 #config.read('configPipeLine.ini')['DEFAULT']
+
 config = {}
 config["DEFAULT"] = {
 
 "larosext" : False,
-"parselaros": True,
-"mappwithws" : True,
-"extlegs" : False,
+"parselaros": False,
+"mappwithws" : False,
+"extlegs" : True,
 "cleandata" : True,
-"insertatdb" : True,
+"insertatdb" : False,
 "trainmodel" : True,
-"evalneuralonlegs" : False,
+"evalneuralonlegs" : True,
 "filldt" : True,
 'updateProfileInDB': False,
 "generaterep" : True}
@@ -187,7 +189,7 @@ def main():
 
     ####EXTRACT LEGS
     if configProp['extlegs'] == True:
-        #extLegs.runExtractionProcess()
+        extLegs.runExtractionProcess()
         dataRaw = preLegs.concatLegs(vessel, './legs/' + vessel + '/', False)
         preLegs.extractDataFromLegs(dataRaw, './legs/' + vessel + '/', vessel, 'legs')
     ####EXTRACT LEGS
@@ -301,49 +303,58 @@ def main():
     ##MODEL EVAL ON LEGS
 
     if configProp['filldt'] == True:
-        tableNameVslProcessed = vessel + "_PROCESSED"
-        installationId = vesselId
 
-        data = pd.read_sql_query(
-            'SELECT  t_stamp,'
-            + 'course,'
-            + 'trim,'
-            + 'trim,'
-            + 'at_port,'
-            + 'daysFromLastPropClean,'
-            + 'daysFromLastDryDock,'
-            + 'curr_speed,'
-            + 'draft,'
-            + 'curr_dir,'
-            + 'sensor_wind_dir,'
-            + 'sensor_wind_speed,'
-            + 'stw,'
-            + 'comb_waves_height,'
-            + 'comb_waves_dir, '
-            + 'me_foc, '
-            + 'tlg_id, '
-            + 'trim, '
-            + 'tlg_id, '
-            + 'tlg_id, '
-            + 'swell_height, '
-            + 'swell_dir, '
-            + 'comb_waves_height,'
-            + 'comb_waves_dir, '
-            + 'wind_waves_height,'
-            + 'wind_waves_dir, '
-            + 'lat,'
-            + 'lon, '
-            + 'wind_speed,'
-            + 'wind_dir, '
-            + 'curr_speed, '
-            + 'curr_dir, '
-            + 'rpm,'
-            + 'power '
+        fromFileDT = True
 
-            + 'FROM  ' + tableNameVslProcessed + '    WHERE installationsId =  '"'" + str(installationId) + "'"'   ',
-            connInst.connection)
+        if fromFileDT == False:
+            tableNameVslProcessed = vessel + "_PROCESSED"
+            installationId = vesselId
 
-        processedData = data.values
+            data = pd.read_sql_query(
+                'SELECT  t_stamp,'
+                + 'course,'
+                + 'trim,'
+                + 'trim,'
+                + 'at_port,'
+                + 'daysFromLastPropClean,'
+                + 'daysFromLastDryDock,'
+                + 'curr_speed,'
+                + 'draft,'
+                + 'curr_dir,'
+                + 'sensor_wind_dir,'
+                + 'sensor_wind_speed,'
+                + 'stw,'
+                + 'comb_waves_height,'
+                + 'comb_waves_dir, '
+                + 'me_foc, '
+                + 'tlg_id, '
+                + 'trim, '
+                + 'tlg_id, '
+                + 'tlg_id, '
+                + 'swell_height, '
+                + 'swell_dir, '
+                + 'comb_waves_height,'
+                + 'comb_waves_dir, '
+                + 'wind_waves_height,'
+                + 'wind_waves_dir, '
+                + 'lat,'
+                + 'lon, '
+                + 'wind_speed,'
+                + 'wind_dir, '
+                + 'curr_speed, '
+                + 'curr_dir, '
+                + 'rpm,'
+                + 'power '
+
+                + 'FROM  ' + tableNameVslProcessed + '    WHERE installationsId =  '"'" + str(installationId) + "'"'   ',
+                connInst.connection)
+
+            processedData = data.values
+
+
+        else:
+            processedData = pd.read_csv('./consProfileJSON_Neural/cleaned_raw_' + vessel + '.csv', delimiter=',').values
+
         print("Filling Neural DT . . .\n")
         nDT.fillDecisionTree(nDT.imo, vessel, processedData, 15, 'db', 11)
 

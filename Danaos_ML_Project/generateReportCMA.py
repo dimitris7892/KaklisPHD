@@ -60,7 +60,6 @@ class GenerateReport:
 
     def __init__(self, company, vessel, server, sid, password, usr):
 
-
         #self.config = config.read('configRepGen.ini')['DEFAULT']
 
         self.ndt = NDT.neuralDT(vessel)
@@ -821,8 +820,6 @@ class GenerateReport:
             %%========== Dokumentende ==========
                     '''
 
-
-
     def valCheck(self):
 
         path1 = './legs/' + self.vessel + '/'
@@ -950,7 +947,6 @@ class GenerateReport:
         self.extractPlotsForLegs(predDfs, predDfsDT, legs, accs, accsDT)
         #################
 
-
         predDfsOv, accsOV, legsOV, predDfsOvGW = self.extractOverallAccData("", 'stats',)
 
         predDfsOvDT, accsOVDT, legsOVDT, predDfsOvGWDT =  self.extractOverallAccData("NeuralDT", 'stats')
@@ -964,8 +960,8 @@ class GenerateReport:
         self.plotOverallAcc(predDfsOv, accsOV, predDfsOvDT, accsOVDT, legsOV, legsOVDT, predDfsOvGW)
         ####END OF PLOTS
 
-        predDfsWS, accsWS, legsWS, sumActsWS, sumPredsWS, percDiffsWS, stwsWS, drftsWS, latlonDepWS, latlonArrWS, sovgsWS = self.extractStatisticsForLegs(
-            "", 'stats', True)
+        predDfsWS, accsWS, legsWS, sumActsWS, sumPredsWS, percDiffsWS, stwsWS, drftsWS, latlonDepWS, latlonArrWS, sovgsWS = \
+            self.extractStatisticsForLegs("NeuralDT", 'stats', True)
 
         templateRowTable = ''
         templateRowTableNDT = ''
@@ -1988,7 +1984,7 @@ class GenerateReport:
             depDate = request['optimization_model']['voyage']['departDT']
             initBearing = None
             draft = request['optimization_model']['vessel']['draft']
-            depDateFormated = datetime.strptime(depDate, '%Y-%m-%d %H:%M')
+            depDateFormated = datetime.strptime(depDate, '%Y-%m-%d %H:%M:%S')
             currDt = None
             bearings = []
             swhs = []
@@ -2049,9 +2045,15 @@ class GenerateReport:
                 currentSpeeds.append(currentSpeed)
                 relCurrentDirs.append(relCurrentDir)
 
-            ##calculate stw from sovg response form pavlos and currents from weather service
+            ##calculate stw from sovg response from pavlos and currents from weather service
             sovg = np.array([k['speed'] for k in route])
-            stwFromCurrents = self.calculateSTWFromCurrents(bearings, relCurrentDirs, currentSpeeds, sovg)
+
+            stwFromCurrents = []
+            for i in range(0,len(sovg)):
+                currSpeedEffect = self.ndt.calcSTWFromCurrents(relCurrentDirs[i], currentSpeeds[i])
+                stwFromCurrents.append(sovg[i] - currSpeedEffect)
+
+            #stwFromCurrents = self.calculateSTWFromCurrents(bearings, relCurrentDirs, currentSpeeds, sovg)
 
 
             if os.path.isdir('./routingResponses/') == False:
@@ -2391,10 +2393,10 @@ class GenerateReport:
 
     def buildJsonForRoutingRequest(self, leg, reta):
 
-        latInd = 6
-        lonInd = 7
-        bearInd = 9
-        dtInd = 8
+        latInd = 8
+        lonInd = 9
+        bearInd = 6
+        dtInd = 7
 
         legWOExt = leg.split(".")[0]
 
@@ -2503,8 +2505,8 @@ class GenerateReport:
 
             stwPrevKMperMin = (stwPrev) / 32.39741
 
-            dt = datetime.strptime(dataLeg[i][dtInd], "%Y-%m-%d %H:%M")
-            dtPrev = datetime.strptime(dataLeg[i - 1][dtInd], "%Y-%m-%d %H:%M")
+            dt = datetime.strptime(dataLeg[i][dtInd], "%Y-%m-%d %H:%M:%S")
+            dtPrev = datetime.strptime(dataLeg[i - 1][dtInd], "%Y-%m-%d %H:%M:%S")
             elapsedTimeFromPrev = (dt - dtPrev)
             minsFromPrev = np.round(divmod(elapsedTimeFromPrev.total_seconds(), 60)[0], 2)
 
@@ -2516,7 +2518,7 @@ class GenerateReport:
                                                                                      bearingPrev)
             latCorr, lonCorr = destination.latitude, destination.longitude
 
-            if distFromPrevRaw > 1:
+            if distFromPrevRaw > distanceKM:
                 # or distFromTwoPrevRaw > 5 or distFromThreePrevRaw > 5 or (lat < latDep or lat > latArr) or (lon < lonDep or lon > lonArr)
                 # delIndices.append(i)
                 listIs.append(i)
@@ -2645,7 +2647,7 @@ class GenerateReport:
         if len(longInit) < 1000:
             zoomMap = 6
 
-        long, longInit = self.processLATLONToDraw(lat, long, latInit, longInit)
+        #long, longInit = self.processLATLONToDraw(lat, long, latInit, longInit)
 
         legWOExt = leg.split(".")[0]
         """
@@ -2739,7 +2741,8 @@ class GenerateReport:
 
         try:
             fig.write_image('./Figures/' + self.company + '/' + self.vslFig + '/map_' + legF + '.pdf')
-        except:
+        except Exception as e:
+            print(e)
             print("Error writing map " + self.vslFig + '/map_' + legF + '.pdf')
 
             shutil.copy('./Figures/NA.pdf', './Figures/' + self.company + '/' + self.vslFig + '/map_' + legF + '.pdf')

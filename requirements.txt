@@ -21,7 +21,6 @@ chardet
 coordinates-converter
 cx-Oracle
 cx-oracle-on-ctypes
-cxOracle
 cycler
 et-xmlfile
 ez-setup

@@ -19,121 +19,6 @@ mapping = mpf.Mapping()
 dread = dataReading.BaseSeriesReader()
 
 
-
-def preProcessData(data, datatype):
-
-
-    stwInd = 12 if datatype == ' raw' else 0
-    draftInd = 8 if datatype == ' raw' else 1
-    wsInd = 11 if datatype == ' raw' else 3
-    focInd = 15 if datatype == ' raw' else 2
-    swhInd = 22 if datatype == ' raw' else 5
-    wdInd =  10 if datatype == ' raw' else 4
-    vslHeadInd = 1 if datatype == ' raw' else 9
-    # data =np.array([k for k in data if k[2]=='B' or k[2]=='L'])
-
-    '''wfS = data[:, 11].astype(float) / (1.944)
-    wsSen = []
-    for i in range(0, len(wfS)):
-        wsSen.append(gener.ConvertMSToBeaufort(float(float(wfS[i]))))
-    data[:, 11] = wsSen
-
-    # data[:, 11] = wfS
-
-    data[:, 15] = ((data[:, 15]) / 1000) * 1440'''
-
-    for i in range(0, len(data[:, wdInd])):
-        if float(data[i, wdInd]) < 0:
-            data[i, wdInd] += 360
-        data[i, wdInd] = dread.getRelativeDirectionWeatherVessel(float(data[i, vslHeadInd]), float(data[i, wdInd]))
-
-    for i in range(0, len(data[:wdInd])):
-        if float(data[i, wdInd]) > 180:
-            data[i, wdInd] = float(data[i, wdInd]) - 180  # and  float(k[8])<20
-
-    '''for i in range(0,len(data[:,10])):
-        if float(data[i,10]) >=0 and float(data[i,10]) <22.5:
-            data[i,10] = 1
-        elif float(data[i,10]) >= 22.5 and float(data[i,10]) < 67.5:
-            data[i, 10] = 2
-        elif float(data[i,10]) >= 67.5 and float(data[i,10]) < 112.5:
-            data[i, 10] = 3
-        elif float(data[i, 10]) >= 112.5 and float(data[i,10]) < 157.5:
-            data[i, 10] = 4
-        elif float(data[i,10]) >= 157.5 and float(data[i,10]) < 180.5:
-            data[i, 10] = 5'''
-    '''for i in range(0, len(data[:,1])):
-        if float(data[i,1]) > 180:
-            data[i,1] = float(data[i,1]) - 180'''
-
-    '''for i in range(0, len(vslHeadingTD)):
-        if float(vslHeadingTD[i]) > 180:
-            vslHeadingTD[i] = float(vslHeadingTD[i]) - 180'''
-
-    '''for i in range(0, len(currentDirTD)):
-        if float(currentDirTD[i]) > 180:
-            currentDirTD[i] = float(currentDirTD[i]) - 180'''
-
-    '''for i in range(0, len(data[:,30])):
-        if float(data[i,30]) > 180:
-            data[i,30] = float(data[i,30]) - 180'''
-    ##################################################
-    trData = np.array(
-        np.append(data[:, draftInd].reshape(-1, 1), np.asmatrix([data[:, wdInd], data[:, wsInd], data[:, stwInd], data[:, swhInd],
-                                                           data[:, focInd]]).T, axis=1)).astype(float)  # data[:,26],data[:,27]
-    # trData = np.nan_to_num(trData)
-    # trData = np.array(np.append(data[:, 0].reshape(-1, 1),
-
-    # np.asmatrix([data[:, 1], data[:, 3], data[:, 4], data[:, 5]]).T,
-    # axis=1)).astype(float)
-    # np.array(np.append(data[:,0].reshape(-1,1),np.asmatrix([data[:,1],data[:,2],data[:,3],data[:,4],data[:,7],data[:,8],data[:,9]]).T,axis=1)).astype(float)
-    # np.array(np.append(data[:,8].reshape(-1,1),np.asmatrix([data[:,10],data[:,11],data[:,12],data[:,20],data[:,21],data[:,15]]).T,axis=1)).astype(float)
-
-    '''meanFoc = np.mean(trData[:,5 ], axis=0)
-    stdFoc = np.std(trData[:, 5], axis=0)
-    trData = np.array(
-        [k for k in trData if (k[5] >= (meanFoc - (3 * stdFoc))) and (k[5] <= (meanFoc + (3 * stdFoc)))])
-
-    trData = np.array([k for k in trData if  str(k[0])!='nan' and  float(k[2])>=0 and float(k[4])>=0 and (float(k[3])>=9 ) and float(k[5])>0  ]).astype(float)'''
-    #trData = np.array([k for k in trData if (float(k[3]) >= 9) ]).astype(float)
-    # trData = np.nan_to_num(trData)
-
-    '''genprf = generateProfile.BaseProfileGenerator()
-    trDataPorts, trDataNoInPorts = genprf.findCloseToLandDataPoints(trData)
-    trData = trDataNoInPorts
-
-    trData = np.array(np.append(trData[:, 0:5], np.asmatrix(trData[:, 7]).T, axis=1))'''
-    #######################################################################################
-    # np.concatenate([trDataNoInPorts,trDataPorts])
-    # plRes.PLotDists(trData)
-    e = 0
-    # X_train, X_test, y_train, y_test = train_test_split(trData[:, 0:5], trData[:, 5:], test_size=0.26, random_state=42)
-    # trData1 =  trData[27000:86000, :]
-    # trData2 =  trData[86000:145115,:] #HAMBURG - MUMBAI - #HAMBURG
-
-    # for i in range(0, len(trData)):
-    # trData[i] = np.mean(trData[i:i + 15], axis=0)
-
-    '''wd = np.array([k for k in trData])[:, 1]
-    for i in range(0, len(wd)):
-        if float(wd[i]) > 180:
-            wd[i] = float(wd[i]) - 180  # and  float(k[8])<20
-
-    trData[:, 1] = wd'''
-
-    '''wf = np.array([k for k in trData])[:, 2]
-    for i in range(0, len(wf)):
-        wf[i] = gener.ConvertMSToBeaufort(float(float(wf[i])))
-    trData[:, 2] = wf'''
-
-    # trData = trData[:40000]
-
-    for i in range(0, len(trData)):
-        trData[i] = np.mean(trData[i:i + 15], axis=0)
-
-    return trData
-
-
 def main(vessel, algs, cls, fromFile, processedData):
 
     end, endU, history, future, sFile, start, startU , algs , cls = initParameters(algs, cls)
@@ -259,13 +144,15 @@ def main(vessel, algs, cls, fromFile, processedData):
 
     print(vessel)
 
-    prelegs.extractLegsFromRawCleanedData(vessel, 'raw')
+    #prelegs.extractLegsFromRawCleanedData(vessel, 'raw')
 
-    trData = prelegs.returnCleanedDatasetForTR(vessel, './consProfileJSON_Neural/cleaned_raw_'+vessel+'.csv', 'raw', 11, fromFile, processedData)
+    trData = prelegs.returnCleanedDatasetForTR(vessel, './consProfileJSON_Neural/cleaned_raw_'+vessel+'.csv', 'raw', 12, fromFile, processedData)
 
     expansion = False
 
-    X_train, X_test, y_train, y_test = train_test_split(trData[:, 0:5], trData[:, 5], test_size=0.1, random_state=42)
+    X_train, X_test, y_train, y_test = trData[:, 0:5], trData[:5000, 0:5], trData[:, 5], trData[:5000, 5]
+
+        #train_test_split(trData[:, 0:5], trData[:, 5], test_size=0.1, random_state=42)
 
 
     #mapping.writeTrainTestData('DANAOS','HYUNDAI SMART',X_test,y_test,X_train,y_train)

@@ -12,6 +12,8 @@ import generateProfile as genProf
 import json
 import csv
 import seaborn as sns
+matplotlib.use('TkAgg')
+
 
 gener = genProf.BaseProfileGenerator()
 dread = dataReading.BaseSeriesReader()
@@ -233,7 +235,9 @@ class preProcessLegs:
 
             if os.path.isdir('./correctedLegsForTR/' + vessel ) == False:
                 os.mkdir('./correctedLegsForTR/' + vessel )
-            dfNew.to_csv('./correctedLegsForTR/' + vessel + '/' + leg, index=False)
+
+            if len(dfNew.values) >=1000:
+                dfNew.to_csv('./correctedLegsForTR/' + vessel + '/' + leg, index=False)
     
     def correctData(self, vessel):
 
@@ -896,7 +900,7 @@ class preProcessLegs:
         data, ind = self.replaceOutliers(data, data, 'ws', 'raw', True, False)
 
         print("Initial trData length: " +str(len(data)))
-        data = self.initialCleaning(data, 'raw', 2, minSpeed)
+        data = self.initialCleaning(data, 'raw', 1, minSpeed)
         #pd.DataFrame(data).to_csv('./data/DANAOS/' + vessel + '/mappedDataNew.csv', header=False,
                                   #index=False)
         #return
@@ -1424,11 +1428,11 @@ def main():
   #dataRaw = pd.read_csv('./data/DANAOS/' + vessel + '/mappedData.csv', delimiter=',').values
   dataType = 'raw'
   #dataRaw = pd.read_csv('./consProfileJSON_Neural/cleaned_' + dataType + '_' + vessel + '.csv', delimiter=',').values
-  #preLegs.cleanDataset(dataRaw, "raw", vessel, minSpeed)
+  preLegs.cleanDataset(dataRaw, "raw", vessel, minSpeed)
 
-  trData = preLegs.returnCleanedDatasetForTR(vessel, './consProfileJSON_Neural/cleaned_raw_' + vessel + '.csv', 'raw', minSpeed, True, None)
+  #trData = preLegs.returnCleanedDatasetForTR(vessel, './consProfileJSON_Neural/cleaned_raw_' + vessel + '.csv', 'raw', minSpeed, True, None)
 
-  preLegs.trainBaseLines(trData)
+  #preLegs.trainBaseLines(trData)
 
 
   #return

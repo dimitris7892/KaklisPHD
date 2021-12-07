@@ -4,23 +4,11 @@ import numpy as np
 from math import sqrt
 import pandas as pd
 import bokeh
-import dask.dataframe as dd, geoviews as gv, cartopy.crs as crs
-from colorcet import fire
-import holoviews as hv
-from datashader.utils import lnglat_to_meters
-from holoviews.operation.datashader import datashade
-from geoviews.tile_sources import EsriImagery
-import holoviews.plotting.bokeh
+import dask.dataframe as dd
 import seaborn as sns
-from bokeh.plotting import show
-from beaufort_scale import beaufort_scale_kmh
-from mpl_toolkits.basemap import Basemap
-
 import matplotlib
 #matplotlib.use('TkAgg')
-import param, panel as pn
-from colorcet import palette
-hv.extension('bokeh', 'matplotlib')
+
 class ErrorGraphs:
 
     def ErrorGraphswithKandTrlen(self,errors,K,trSize,show,modeler):

@@ -1281,7 +1281,7 @@ class BaseSeriesReader:
                             'CURRENT_SPEED, '
                             'CURRENT_DIRECTION '
                             ''
-                            'FROM TELEGRAMS where vessel_code = '"'" + vessel_code + "'" )
+                            'FROM TELEGRAMS where vessel_code = '"'" + vessel_code + "'"  'ORDER BY TELEGRAM_DATE')
 
 
                     else:
@@ -1312,7 +1312,8 @@ class BaseSeriesReader:
                             'CURRENT_SPEED, '
                             'CURRENT_DIRECTION '
                             
-                            'FROM TELEGRAMS where vessel_code = '"'" + vessel_code + "'" 'AND (telegram_type='"'N'"' or telegram_type='"'A'"' or  telegram_type='"'D'"' )'
+                            'FROM TELEGRAMS where vessel_code = '"'" + vessel_code + "'" 'AND (telegram_type  like '"'%N%'"' or telegram_type like '"'%A%'"' '
+                                                                                     'or  telegram_type like '"'%D%'"' )'
                                                                                      'ORDER BY TELEGRAM_DATE')
                         #and    telegram_date < TO_DATE('"'04/10/2019'"', '"'DD/MM/YY'"') AND telegram_date >= TO_DATE('"'04/06/2019'"', '"'DD/MM/YY'"') ')
 

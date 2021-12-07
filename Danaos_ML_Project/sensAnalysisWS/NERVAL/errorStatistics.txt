@@ -1,0 +1,21 @@
+Mean ABS Error: 5.67+/-0.08 on test set of (2692, 14) observations of route ./correctedLegsForTR/NERVAL/ALIAGA_MARSAXLOKK_leg.csv
+Mean Accuracy: 87.36% on test set of (2692, 14) observations of route ./correctedLegsForTR/NERVAL/ALIAGA_MARSAXLOKK_leg.csv
+
+Mean ABS Error: 5.99+/-0.07 on test set of (7944, 14) observations of route ./correctedLegsForTR/NERVAL/ANTWERP_MARSAXLOKK_leg.csv
+Mean Accuracy: 84.73% on test set of (7944, 14) observations of route ./correctedLegsForTR/NERVAL/ANTWERP_MARSAXLOKK_leg.csv
+
+Mean ABS Error: 4.28+/-0.08 on test set of (1751, 14) observations of route ./correctedLegsForTR/NERVAL/MARSAXLOKK_PIRAEUS_leg.csv
+Mean Accuracy: 93.78% on test set of (1751, 14) observations of route ./correctedLegsForTR/NERVAL/MARSAXLOKK_PIRAEUS_leg.csv
+
+Mean ABS Error: 5.18+/-0.05 on test set of (2163, 14) observations of route ./correctedLegsForTR/NERVAL/MARSAXLOKK_VALENCIA_leg.csv
+Mean Accuracy: 94.62% on test set of (2163, 14) observations of route ./correctedLegsForTR/NERVAL/MARSAXLOKK_VALENCIA_leg.csv
+
+Mean ABS Error: 3.55+/-0.07 on test set of (1228, 14) observations of route ./correctedLegsForTR/NERVAL/PIRAEUS_GEBZE_leg.csv
+Mean Accuracy: 94.01% on test set of (1228, 14) observations of route ./correctedLegsForTR/NERVAL/PIRAEUS_GEBZE_leg.csv
+
+Mean ABS Error: 7.86+/-0.08 on test set of (4592, 14) observations of route ./correctedLegsForTR/NERVAL/TANGER MED_FELIXSTOWE_leg.csv
+Mean Accuracy: 85.81% on test set of (4592, 14) observations of route ./correctedLegsForTR/NERVAL/TANGER MED_FELIXSTOWE_leg.csv
+
+Mean ABS Error: 4.25+/-0.11 on test set of (1618, 14) observations of route ./correctedLegsForTR/NERVAL/VALENCIA_TANGER MED_leg.csv
+Mean Accuracy: 89.03% on test set of (1618, 14) observations of route ./correctedLegsForTR/NERVAL/VALENCIA_TANGER MED_leg.csv
+

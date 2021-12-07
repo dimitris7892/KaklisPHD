@@ -191,7 +191,6 @@ class neuralDT:
             with open(infile, "w") as jsonFile:
                 json.dump(data, jsonFile)
 
-
     def fillDecisionTree(self, imo, vessel, dtNew, n_steps, dataType, minSpeed):
 
 
@@ -513,9 +512,9 @@ class neuralDT:
 
         X_test = dataRoute[:, :5]
         ##convert ms to Bft
-        #for i in range(0,len(X_test)):
+        '''for i in range(0,len(X_test)):
 
-            #X_test[i][2] = dread.ConvertMSToBeaufort(X_test[i][2])
+            X_test[i][2] = dread.ConvertMSToBeaufort(X_test[i][2])'''
 
         X_test = X_test.astype(float)
         y_test = [0] * len(X_test)
@@ -919,7 +918,8 @@ class neuralDT:
 
                     #print(file)
                     df = pd.read_csv(file)
-                    df['dt'] = dt
+                    #df['dt'] = dt
+                    df.insert(4, 'dt', dt)
                     print("Detailed response form WebAPI: " + str(len(df))+'\n')
                     mae = np.mean(abs(df['FOC_act'] - df['FOC_pred']))
                     print("MAE: " +str( np.round(mae,2)))
@@ -1065,8 +1065,8 @@ def main():
         dataType = 'raw'
         trData = pd.read_csv('./consProfileJSON_Neural/cleaned_' + dataType + '_' + vessel + '.csv', delimiter=',').values
         #ndt.fillDecisionTree(ndt.imo, vessel, trData, 15, 'db', 12)
-        ndt.evaluateNeuralDTOnFiltered(vessel, 15, False, 'raw', 'nn', 10)
-        #ndt.evaluateNeuralDTOnFiltered(vessel, 15, False, 'raw', 'dt', 12)
+        #ndt.evaluateNeuralDTOnFiltered(vessel, 15, False, 'raw', 'nn', 10)
+        ndt.evaluateNeuralDTOnFiltered(vessel, 15, False, 'raw', 'dt', 12)
     #return
 
     #trData = pd.read_csv('./tmpData/trData.csv',delimiter=',').values

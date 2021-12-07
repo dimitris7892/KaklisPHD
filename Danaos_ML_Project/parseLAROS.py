@@ -2,12 +2,12 @@ import pandas as pd
 from datetime import datetime
 import numpy as np
 import csv
-from global_land_mask import globe
+#from global_land_mask import globe
 import re
 import os
 import seaborn as sns
 
-is_in_ocean = globe.is_ocean(23,54)
+#is_in_ocean = globe.is_ocean(23,54)
 
 vessel = 'SAMSON'
 def main():
