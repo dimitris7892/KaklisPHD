@@ -2127,7 +2127,6 @@ class GenerateReport:
         return response.text
 
     ############################################################## ===> API CALLS
-
     def plotOptimizationVSInitialWeather(self, leg, legNum, reta, notAvailable=None):
 
         plt.clf()
@@ -2139,7 +2138,7 @@ class GenerateReport:
             windSpeedResp = routingResp[:, 2]
 
             dtResp = list(
-                map(lambda x: str(datetime.strptime(x, '%Y-%m-%d %H:%M:%S.%f').replace(second=0, microsecond=0)) if str(
+                map(lambda x: datetime.strptime(x, '%Y-%m-%d %H:%M:%S.%f').replace(second=0, microsecond=0) if str(
                     x).__contains__('.') else
                 datetime.strptime(x, '%Y-%m-%d %H:%M:%S').replace(second=0, microsecond=0), routingResp[:, 5]))
 
@@ -2150,29 +2149,13 @@ class GenerateReport:
             initialRoute[:, 8] = initialRoute[:, 8] + ":00"
             # windSpeedInit = np.array([k for k in initialRoute if k[8] in dtResp])
             windSpeedInit = np.array(
-                [k for k in initialRoute if datetime.strptime(k[8], '%Y-%m-%d %H:%M:%S') in dtResp])
+                [min(initialRoute, key=lambda x: abs(datetime.strptime(x[8], '%Y-%m-%d %H:%M:%S') - k)) for k in dtResp ])
 
-            dataWS = []
-            for i in range(0, len(windSpeedInit)):
 
-                if i == 0:
-                    dataWS.append(windSpeedInit[i, 3])
-                if i > 0:
-                    if windSpeedInit[i - 1, 8] != windSpeedInit[i, 8]:
-                        dataWS.append(windSpeedInit[i, 3])
+            dataWS = windSpeedInit[:,10]
 
-            # perH = list(map(lambda x:  x % 60 ==0 , np.arange(0, len(windSpeedInit)) ))
 
-            # windSpeedInit = windSpeedInit[perH]
-            if len(dtResp) <= len(dataWS):
-                dataWS = dataWS[: len(dtResp)]
-
-            else:
-
-                for i in range(len(dataWS), len(dtResp), ):
-                    dataWS.append((dataWS[len(dataWS) - i] + windSpeedResp[i]) / 2)
-
-            plt.plot(dataWS, label='Wind Speed Iniital route Per Hour')
+            plt.plot(dataWS, label='Wind Speed Initial route Per Hour')
             plt.plot(windSpeedResp, label='Wind Speed Optimized route Per Hour', color='red')
             # plt.title("Leg: " +leg)
             plt.grid()

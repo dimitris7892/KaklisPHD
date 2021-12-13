@@ -17,58 +17,42 @@ import numpy as np
 import pandas as pd
 import generateReportCMA as genRep
 import configparser
-
 import requests
 from fastapi import APIRouter
 
+router = APIRouter()
+
 #config = configparser.ConfigParser()
 #config.read('configPipeLine.ini')['DEFAULT']
-
 config = {}
+
 config["DEFAULT"] = {
 
 "larosext" : False,
 "parselaros": False,
 "mappwithws" : False,
-"extlegs" : True,
-"cleandata" : True,
+"extlegs" : False,
+"cleandata" : False,
 "insertatdb" : False,
-"trainmodel" : True,
-"evalneuralonlegs" : True,
-"filldt" : True,
-'updateProfileInDB': False,
-"generaterep" : True}
+"trainmodel" : False,
+"evalneuralonlegs" : False,
+"filldt" : False,
+'updateProfileInDB': True,
+"generaterep" : False }
 
 configProp = config['DEFAULT']
 
-
-'''company = sys.argv[0]
-vessel = sys.argv[1]
-hostname = sys.argv[2]
-sid = sys.argv[3]
-usr = sys.argv[4]
-pwd = sys.argv[5]
-siteID = sys.argv[6]'''
-
-
-'''company = input("Company:")
-vessel = input("Vessel:")
-hostname = input("host:")
-sid = input("sid:")
-usr = input("usr:")
-pwd = input("pwd:")
-siteID = input("siteID:")'''
 
 sidShipping = 'OR12'
 pwdShipping = 'shipping'
 usrShipping = 'shipping'
 company = "DANAOS"
-vessel = sys.argv[1]
+vessel = 'NERVAL'
 hostname = "10.2.5.80"
 sid = "or19"
 usr = "laros"
 pwd = "laros"
-siteID = sys.argv[2]
+siteID = 3
 
 
 
@@ -100,55 +84,8 @@ NUM_CLASSES = 10
 EPOCHS = 100
 
 
-'''args = {
-    'owner': 'airflow',
-    'start_date': airflow.utils.dates.days_ago(1),       # this in combination with catchup=False ensures the DAG being triggered from the current date onwards along the set interval
-    'provide_context': True,                            # this is set to True as we want to pass variables on from one task to another
-}
-
-dag = DAG(
-    dag_id='pipeLineServer',
-    default_args=args,
-	schedule_interval='@daily',        # set interval
-	catchup=False,                    # indicate whether or not Airflow should do any runs for intervals between the start_date and the current date that haven't been run thus far
-)
-
-
-task1 = PythonOperator(
-    task_id='get_data_from_db',
-    python_callable = dretrieve.extractDataForSiteID(vessel, siteID),            # function called to get data from the Kafka topic and store it
-    op_kwargs={'vessel': vessel,
-               'siteId': siteID,
-               },
-    dag=dag,
-)
-
-
-
-task1 = PythonOperator(
-    task_id= 'extractRAWLarosData',
-    python_callable= extractRAWLarosData,                      # function called to load data for further processing
-    op_kwargs={'siteId': siteID,
-               'fileName': './'+vessel+'_'+str(siteID)+'_.csv',
-               'destinationFile': vessel+'_data.csv' },
-    dag=dag,
-)
-
-task2 = PythonOperator(
-    task_id='extractFeaturesFromLarosData',
-    python_callable = extractFeaturesFromLarosData,            # function called to get data from the Kafka topic and store it
-    op_kwargs={'fileName': './'+vessel+'_data.csv',
-               'vessel': siteID,
-               },
-    dag=dag,
-)
-
-
-task1 >> task2'''
-
 
 def main():
-
 
     ##init connections
     connInst = inDB.DBconnections(usr='shipping', password='shipping', sid='or12')
@@ -361,7 +298,11 @@ def main():
 
     if configProp['updateProfileInDB'] == True:
 
-        nDT.updateVesselProfile()
+        updateServer = "WeatherServer"
+        response = requests.get(
+                "https://localhost:5005/UpdateVesselProfile/updateServer="+updateServer,
+                verify=False)
+
 
     ### Report Generation (CMA)
     if configProp['generaterep'] == True:
